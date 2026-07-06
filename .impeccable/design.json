@@ -1,0 +1,120 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-07-06T00:00:00Z",
+  "title": "Design System: Bloomy",
+  "extensions": {
+    "colorMeta": {
+      "lilac": { "role": "primary", "displayName": "Lilás", "canonical": "#A78BD0", "tonalRamp": ["#2E2344", "#453566", "#5C4788", "#745AA9", "#8768BC", "#A78BD0", "#C9B4E3", "#EDE7F8"] },
+      "pink": { "role": "secondary", "displayName": "Rosa", "canonical": "#F3B6D0", "tonalRamp": ["#46212F", "#6E3149", "#964263", "#C76E9E", "#E08AB0", "#F3B6D0", "#F9D3E2", "#FBEAF2"] },
+      "green": { "role": "secondary", "displayName": "Verdinho", "canonical": "#A8D5BA", "tonalRamp": ["#16301F", "#26543A", "#397655", "#4E9C74", "#7FC4A0", "#A8D5BA", "#CBE7D6", "#E6F4EC"] },
+      "coral": { "role": "tertiary", "displayName": "Coral-remédio", "canonical": "#C77E93", "tonalRamp": ["#3A1F27", "#5C3140", "#86485C", "#A66177", "#C77E93", "#DBA2B2", "#EDCBD5", "#FBECEF"] },
+      "ink": { "role": "neutral", "displayName": "Tinta", "canonical": "#3B3552", "tonalRamp": ["#201C2E", "#3B3552", "#554D75", "#6F6787", "#8A82A0", "#A79FB8", "#C7C0D6", "#E9E2F3"] },
+      "bg": { "role": "neutral", "displayName": "Fundo", "canonical": "#FBFAFE", "tonalRamp": ["#8A82A0", "#A79FB8", "#C7C0D6", "#DDD1EF", "#E9E2F3", "#F1EBF8", "#F8F5FC", "#FBFAFE"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Saudação e título de tela (Quicksand 700, 23-24px)." },
+      "title": { "displayName": "Title", "purpose": "Título de card e rótulo de seção (Quicksand 700, 15px)." },
+      "number": { "displayName": "Number", "purpose": "Números de stepper e timer (Quicksand 700, 30-44px)." },
+      "body": { "displayName": "Body", "purpose": "Corpo e metadados (Nunito 600, 12-14px)." },
+      "label": { "displayName": "Label", "purpose": "Labels da tab bar (Nunito 700-800, 10px)." }
+    },
+    "shadows": [
+      { "name": "card", "value": "0 6px 18px rgba(120,86,164,.06)", "purpose": "Cards brancos em repouso." },
+      { "name": "card-sm", "value": "0 5px 16px rgba(120,86,164,.05)", "purpose": "Cards e linhas menores." },
+      { "name": "button-primary", "value": "0 8px 20px rgba(167,139,208,.35)", "purpose": "Botão lilás cheio e tile de humor selecionado." },
+      { "name": "sheet", "value": "0 -12px 40px rgba(59,53,82,.25)", "purpose": "Bottom sheets ancorados embaixo." },
+      { "name": "device", "value": "0 22px 50px rgba(120,86,164,.16)", "purpose": "Coluna do app sobre o board no desktop." }
+    ],
+    "motion": [
+      { "name": "ease-out", "value": "cubic-bezier(0.25, 1, 0.5, 1)", "purpose": "Easing padrão (ease-out-quart) para estados e sheets." },
+      { "name": "duration-state", "value": "150ms", "purpose": "Hover, seleção, toggles." },
+      { "name": "duration-sheet", "value": "250ms", "purpose": "Entrada/saída de bottom sheet e overlay." }
+    ],
+    "breakpoints": [
+      { "name": "app-column", "value": "420px", "purpose": "Largura máxima da coluna do app; acima disso ela centra sobre o board lilás." }
+    ]
+  },
+  "components": [
+    {
+      "name": "Botão primário",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Ação principal em lilás; cada modal troca para a cor do seu domínio.",
+      "html": "<button class=\"ds-btn-primary\">Adicionar copo</button>",
+      "css": ".ds-btn-primary { background: #A78BD0; color: #fff; font-family: Quicksand, system-ui, sans-serif; font-weight: 700; font-size: 15px; border: none; border-radius: 999px; padding: 14px 22px; box-shadow: 0 8px 20px rgba(167,139,208,.35); cursor: pointer; transition: background 150ms cubic-bezier(0.25,1,0.5,1), transform 150ms cubic-bezier(0.25,1,0.5,1); } .ds-btn-primary:hover { background: #8768BC; } .ds-btn-primary:active { transform: scale(0.98); } .ds-btn-primary:focus-visible { outline: 2px solid #A78BD0; outline-offset: 2px; }"
+    },
+    {
+      "name": "Botão tint",
+      "kind": "button",
+      "refersTo": "button-tint",
+      "description": "Ação secundária: fundo tint com texto na variante profunda do mesmo matiz.",
+      "html": "<button class=\"ds-btn-tint\">+ Adicionar</button>",
+      "css": ".ds-btn-tint { background: #EDE7F8; color: #8768BC; font-family: Quicksand, system-ui, sans-serif; font-weight: 700; font-size: 15px; border: none; border-radius: 999px; padding: 14px 22px; cursor: pointer; transition: background 150ms cubic-bezier(0.25,1,0.5,1); } .ds-btn-tint:hover { background: #E2D8F0; } .ds-btn-tint:focus-visible { outline: 2px solid #A78BD0; outline-offset: 2px; }"
+    },
+    {
+      "name": "Card de ritual",
+      "kind": "card",
+      "refersTo": "card-ritual",
+      "description": "Célula do grid 2×2 da tela Hoje: tint do domínio, chip de ícone branco, título Quicksand e barra de progresso.",
+      "html": "<div class=\"ds-card-ritual\"><div class=\"ds-card-ritual-chip\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"#8768BC\"><path d=\"M12 2C12 2 5 10.2 5 15a7 7 0 0 0 14 0C19 10.2 12 2 12 2Z\"/></svg></div><div class=\"ds-card-ritual-title\">Hidratação</div><div class=\"ds-card-ritual-sub\">5 de 8 copos</div><div class=\"ds-card-ritual-bar\"><span style=\"width:62%\"></span></div></div>",
+      "css": ".ds-card-ritual { background: #EDE7F8; border-radius: 26px; padding: 16px; width: 150px; font-family: Nunito, system-ui, sans-serif; } .ds-card-ritual-chip { width: 42px; height: 42px; border-radius: 14px; background: #fff; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; } .ds-card-ritual-title { font-family: Quicksand, system-ui, sans-serif; font-weight: 700; font-size: 15px; color: #3B3552; } .ds-card-ritual-sub { font-size: 12px; font-weight: 600; color: #6F6787; margin: 2px 0 10px; } .ds-card-ritual-bar { height: 6px; border-radius: 999px; background: #fff; overflow: hidden; } .ds-card-ritual-bar span { display: block; height: 100%; border-radius: 999px; background: #A78BD0; }"
+    },
+    {
+      "name": "Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Campo de texto dos sheets: branco, hairline, foco lilás.",
+      "html": "<input class=\"ds-input\" type=\"text\" placeholder=\"O que você comeu?\" />",
+      "css": ".ds-input { background: #fff; border: 1px solid #EAE2F4; border-radius: 16px; padding: 13px 16px; font-family: Nunito, system-ui, sans-serif; font-size: 14px; font-weight: 600; color: #3B3552; width: 240px; transition: border-color 150ms cubic-bezier(0.25,1,0.5,1), box-shadow 150ms cubic-bezier(0.25,1,0.5,1); } .ds-input::placeholder { color: #A79FB8; } .ds-input:focus { outline: none; border-color: #A78BD0; box-shadow: 0 0 0 3px #EDE7F8; }"
+    },
+    {
+      "name": "Toggle",
+      "kind": "custom",
+      "description": "Interruptor dos lembretes: 46×27, knob 21px, ON lilás / OFF lilás apagado.",
+      "html": "<label class=\"ds-toggle\"><input type=\"checkbox\" checked /><span class=\"ds-toggle-track\"><span class=\"ds-toggle-knob\"></span></span></label>",
+      "css": ".ds-toggle { display: inline-block; cursor: pointer; } .ds-toggle input { position: absolute; opacity: 0; } .ds-toggle-track { display: inline-flex; align-items: center; width: 46px; height: 27px; border-radius: 999px; background: #E2D8F0; padding: 3px; box-sizing: border-box; transition: background 150ms cubic-bezier(0.25,1,0.5,1); } .ds-toggle-knob { width: 21px; height: 21px; border-radius: 50%; background: #fff; box-shadow: 0 2px 6px rgba(59,53,82,.2); transition: transform 150ms cubic-bezier(0.25,1,0.5,1); } .ds-toggle input:checked + .ds-toggle-track { background: #A78BD0; } .ds-toggle input:checked + .ds-toggle-track .ds-toggle-knob { transform: translateX(19px); } .ds-toggle input:focus-visible + .ds-toggle-track { outline: 2px solid #A78BD0; outline-offset: 2px; }"
+    },
+    {
+      "name": "Mood tiles",
+      "kind": "chip",
+      "description": "Fileira de 5 tiles de humor 52×52; o selecionado fica lilás cheio com sombra de botão.",
+      "html": "<div class=\"ds-moods\"><button class=\"ds-mood\" aria-label=\"triste\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"currentColor\"><circle cx=\"12\" cy=\"12\" r=\"10\" opacity=\".25\"/><circle cx=\"9\" cy=\"10\" r=\"1.4\"/><circle cx=\"15\" cy=\"10\" r=\"1.4\"/><path d=\"M8.5 16.5c1-1.2 2.2-1.8 3.5-1.8s2.5.6 3.5 1.8\" stroke=\"currentColor\" stroke-width=\"1.6\" fill=\"none\" stroke-linecap=\"round\"/></svg></button><button class=\"ds-mood is-selected\" aria-label=\"bem\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"currentColor\"><circle cx=\"12\" cy=\"12\" r=\"10\" opacity=\".25\"/><circle cx=\"9\" cy=\"10\" r=\"1.4\"/><circle cx=\"15\" cy=\"10\" r=\"1.4\"/><path d=\"M8.5 14.5c1 1.2 2.2 1.8 3.5 1.8s2.5-.6 3.5-1.8\" stroke=\"currentColor\" stroke-width=\"1.6\" fill=\"none\" stroke-linecap=\"round\"/></svg></button></div>",
+      "css": ".ds-moods { display: flex; gap: 10px; } .ds-mood { width: 52px; height: 52px; border-radius: 16px; border: none; background: #F4EFFA; color: #C7BEDA; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 150ms cubic-bezier(0.25,1,0.5,1), color 150ms cubic-bezier(0.25,1,0.5,1); } .ds-mood:hover { background: #EDE7F8; } .ds-mood.is-selected { background: #A78BD0; color: #fff; box-shadow: 0 8px 20px rgba(167,139,208,.35); } .ds-mood:focus-visible { outline: 2px solid #A78BD0; outline-offset: 2px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Jardim de bolso",
+    "overview": "Bloomy é um jardim que cabe no bolso: cuidar de si tem o gesto de regar uma plantinha — pequeno, diário, recompensador. A superfície é clara e macia, tudo é arredondado, as sombras são tingidas de lilás em vez de cinza, e cada domínio do dia tem sua própria cor de canteiro: lilás para o geral e a água, verde para a alimentação, rosa para o treino, coral para os remédios. A densidade é baixa e o toque é grande — o app é feito para visitas de dez segundos com o polegar. O sistema rejeita o prontuário clínico, o dashboard fitness, a gamificação que envergonha e o cinza SaaS genérico. A emoção-alvo é alívio e carinho, não urgência.",
+    "keyCharacteristics": [
+      "Tudo arredondado: nada de canto vivo; do chip (999px) ao bottom sheet (28px).",
+      "Sombras lilás, nunca pretas: profundidade com a cor da marca.",
+      "Tint + profundo: todo fundo tint carrega texto/ícone na variante profunda do mesmo matiz.",
+      "Uma cor por domínio, em todas as telas, sem exceção.",
+      "Pendência neutra: o que falta é tracejado e gentil, nunca vermelho."
+    ],
+    "rules": [
+      { "name": "A Regra do Sem-Vermelho", "body": "Vermelho de alerta é proibido na experiência diária. Pendência é neutra (tracejado + tinta suave); erro real de formulário usa o coral profundo, nunca um vermelho de sistema.", "section": "colors" },
+      { "name": "A Regra do Tint + Profundo", "body": "Sobre qualquer fundo tint, texto e ícone usam a variante profunda do mesmo matiz — nunca cinza, nunca a variante cheia.", "section": "colors" },
+      { "name": "A Regra da Cor por Domínio", "body": "Lilás = geral/água, verde = alimentação, rosa = treino/mente, coral = remédios. Sem trocas.", "section": "colors" },
+      { "name": "A Regra do Quicksand-para-destaque", "body": "Quicksand aparece só em título, número e label de destaque; todo texto corrido é Nunito.", "section": "typography" },
+      { "name": "A Regra da Sombra Lilás", "body": "Toda sombra carrega o matiz da marca. Se aparecer rgba(0,0,0,…) numa sombra, está errado.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do usar Phosphor Icons — Fill para estados ativos e destaque, Regular para nav inativa. Nunca outro icon set.",
+      "Do manter toda ação diária a ≤2 toques da tela Hoje, com tap target ≥44px.",
+      "Do escurecer o texto secundário para ~#6F6787 quando for corpo de leitura ≤14px; manter #8A82A0 apenas em metadados grandes/bold ou não-essenciais.",
+      "Do mostrar progresso pelo que foi feito e tratar pendência com card tracejado neutro.",
+      "Do fornecer alternativa prefers-reduced-motion (crossfade ou corte seco) para toda transição.",
+      "Do centrar o app numa coluna ~420px sobre o board lilás no desktop — sem layout desktop alternativo."
+    ],
+    "donts": [
+      "Don't parecer app clínico/hospitalar: sem vermelho de alerta, sem jargão médico, sem densidade de prontuário.",
+      "Don't parecer fitness agressivo (Strong/Hevy): sem dashboard de PRs nem gráficos intimidadores — treino é ritual.",
+      "Don't usar gamificação punitiva (Duolingo): o streak celebra, nunca ameaça; sem notificação chantagista.",
+      "Don't regredir ao SaaS genérico: nada dos tokens cinza shadcn default, tabelas densas ou tom B2B.",
+      "Don't usar sombra preta, canto vivo, border-left colorido como acento, gradient text ou glassmorphism.",
+      "Don't usar modal centrado onde o padrão é bottom sheet, nem inventar affordances fora do vocabulário.",
+      "Don't usar cinza sobre fundo tint — a Regra do Tint + Profundo manda usar a variante profunda do matiz."
+    ]
+  }
+}
