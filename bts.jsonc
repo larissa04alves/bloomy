@@ -1,0 +1,31 @@
+// Better-T-Stack
+//
+// Website: https://www.better-t-stack.dev/
+// Stack Builder: https://www.better-t-stack.dev/new
+// Analytics: https://www.better-t-stack.dev/analytics
+// Showcase: https://www.better-t-stack.dev/showcase
+// Sponsor: https://github.com/sponsors/AmanVarshney01
+//
+// Add new addons with: bun create better-t-stack add
+// This file is safe to delete
+
+{
+  "$schema": "https://r2.better-t-stack.dev/schema.json",
+  "version": "3.36.2",
+  "createdAt": "2026-07-06T16:38:49.339Z",
+  "reproducibleCommand": "bun create better-t-stack@latest bloomy --frontend next --backend self --runtime none --database sqlite --orm drizzle --api none --auth better-auth --payments none --addons mcp pwa skills turborepo --examples none --db-setup turso --web-deploy vercel --server-deploy none --git --package-manager bun --install",
+  "database": "sqlite",
+  "orm": "drizzle",
+  "backend": "self",
+  "runtime": "none",
+  "frontend": ["next"],
+  "addons": ["mcp", "pwa", "skills", "turborepo"],
+  "examples": [],
+  "auth": "better-auth",
+  "payments": "none",
+  "packageManager": "bun",
+  "dbSetup": "turso",
+  "api": "none",
+  "webDeploy": "vercel",
+  "serverDeploy": "none",
+}

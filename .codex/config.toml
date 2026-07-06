@@ -1,0 +1,15 @@
+[mcp_servers.better-t-stack]
+command = "bunx"
+args = ["create-better-t-stack@latest", "mcp"]
+
+[mcp_servers.shadcn]
+command = "npx"
+args = ["-y", "shadcn@latest", "mcp"]
+
+[mcp_servers.next-devtools]
+command = "npx"
+args = ["-y", "next-devtools-mcp@latest"]
+
+[mcp_servers.better-auth]
+type = "http"
+url = "https://mcp.inkeep.com/better-auth/mcp"
