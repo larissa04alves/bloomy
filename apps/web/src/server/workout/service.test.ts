@@ -67,4 +67,19 @@ describe("startSession / completeSession (db em arquivo)", () => {
     expect(await startSession(db, userId, w.id)).toBe("already_active");
     expect(await getActiveSession(db, userId)).not.toBeNull();
   });
+
+  test("completeSession duas vezes: a segunda retorna null (idempotente)", async () => {
+    const db = await createTestDb();
+    const userId = await createTestUser(db);
+    const w = await createWorkout(db, userId, {
+      name: "Costas",
+      focus: "back",
+      exercises: [{ name: "Remada", targetSets: 1, position: 0 }],
+    });
+    const s = await startSession(db, userId, w.id);
+    if (s === "already_active" || s === "not_found") throw new Error("unreachable");
+
+    expect(await completeSession(db, userId, s.session.id)).not.toBeNull();
+    expect(await completeSession(db, userId, s.session.id)).toBeNull();
+  });
 });

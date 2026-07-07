@@ -7,7 +7,7 @@ import {
   type Appointment,
   type Exam,
 } from "@bloomy/db/schema/health";
-import { and, asc, eq, gte, isNotNull, lte, or } from "drizzle-orm";
+import { and, asc, eq, gte, isNotNull, lte, ne, or } from "drizzle-orm";
 
 const NEXT_WINDOW_DAYS = 30;
 
@@ -144,7 +144,14 @@ export async function completeAppointment(
     const [completed] = await tx
       .update(appointment)
       .set({ status: "completed", completedAt: now, updatedAt: now })
-      .where(and(eq(appointment.id, id), eq(appointment.userId, userId)))
+      // guarda de idempotência: retry/double-tap num item já concluído não recria o retorno
+      .where(
+        and(
+          eq(appointment.id, id),
+          eq(appointment.userId, userId),
+          ne(appointment.status, "completed"),
+        ),
+      )
       .returning();
     if (!completed) return null;
 
@@ -245,7 +252,10 @@ export async function completeExam(
     const [completed] = await tx
       .update(exam)
       .set({ status: "completed", completedAt: now, updatedAt: now })
-      .where(and(eq(exam.id, id), eq(exam.userId, userId)))
+      // guarda de idempotência: retry/double-tap num item já concluído não recria o retorno
+      .where(
+        and(eq(exam.id, id), eq(exam.userId, userId), ne(exam.status, "completed")),
+      )
       .returning();
     if (!completed) return null;
 

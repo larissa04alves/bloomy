@@ -4,6 +4,7 @@ import { createTestDb, createTestUser } from "@/server/shared/test-db";
 import {
   completeAppointment,
   createAppointment,
+  listAppointments,
   nextAppointment,
 } from "./service";
 
@@ -42,6 +43,26 @@ describe("completeAppointment (ciclo de retorno)", () => {
 
     const result = await completeAppointment(db, userId, appt.id, { needsReturn: false });
     expect(result!.followUp).toBeNull();
+  });
+
+  test("double-tap não recria retorno (idempotente)", async () => {
+    const db = await createTestDb();
+    const userId = await createTestUser(db);
+    const appt = await createAppointment(db, userId, {
+      professional: "Dra. Marina",
+      scheduledAt: new Date("2026-07-01T14:00:00Z"),
+    });
+
+    const first = await completeAppointment(db, userId, appt.id, { needsReturn: true });
+    expect(first!.followUp).not.toBeNull();
+
+    const second = await completeAppointment(db, userId, appt.id, { needsReturn: true });
+    expect(second).toBeNull();
+
+    const followUps = (await listAppointments(db, userId)).filter(
+      (a) => a.status === "to_schedule",
+    );
+    expect(followUps).toHaveLength(1);
   });
 });
 

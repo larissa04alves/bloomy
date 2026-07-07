@@ -178,10 +178,13 @@ export async function lastPerformance(
   return row ?? null;
 }
 
+type PerfCache = Map<string, { reps: number | null; load: number | null } | null>;
+
 async function buildSessionDetail(
   db: Db,
   session: WorkoutSession,
   userId: string,
+  perfByName?: PerfCache,
 ): Promise<SessionDetail> {
   const exercises = await db
     .select()
@@ -195,17 +198,19 @@ async function buildSessionDetail(
     .where(eq(setLog.sessionId, session.id))
     .orderBy(asc(setLog.setIndex));
 
-  const detail: SessionExercise[] = [];
-  for (const ex of exercises) {
-    detail.push({
+  // reusa o cache pré-computado (startSession) ou busca em paralelo (evita N+1 sequencial)
+  const detail = await Promise.all(
+    exercises.map(async (ex) => ({
       exerciseId: ex.id,
       name: ex.name,
       targetSets: ex.targetSets,
       position: ex.position,
       sets: sets.filter((s) => s.exerciseId === ex.id),
-      lastPerformance: await lastPerformance(db, userId, ex.name),
-    });
-  }
+      lastPerformance: perfByName?.has(ex.name)
+        ? (perfByName.get(ex.name) ?? null)
+        : await lastPerformance(db, userId, ex.name),
+    })),
+  );
   return { session, exercises: detail };
 }
 
@@ -236,7 +241,7 @@ export async function startSession(
     .orderBy(asc(exercise.position));
 
   // pré-computa o último treino de cada exercício antes da transação (evita atrito tx/db)
-  const perfByName = new Map<string, { reps: number | null; load: number | null } | null>();
+  const perfByName: PerfCache = new Map();
   for (const ex of exercises) {
     if (!perfByName.has(ex.name)) {
       perfByName.set(ex.name, await lastPerformance(db, userId, ex.name));
@@ -266,7 +271,7 @@ export async function startSession(
     return s;
   });
 
-  return buildSessionDetail(db, session, userId);
+  return buildSessionDetail(db, session, userId, perfByName);
 }
 
 export async function getActiveSession(
@@ -314,17 +319,20 @@ export async function completeSession(
   userId: string,
   sessionId: string,
 ): Promise<{ completedAt: Date; durationSec: number; exerciseCount: number } | null> {
-  const [session] = await db
-    .select()
-    .from(workoutSession)
-    .where(and(eq(workoutSession.id, sessionId), eq(workoutSession.userId, userId)));
-  if (!session || session.completedAt) return null;
-
   const completedAt = new Date();
-  await db
+  // update atômico: só conclui se ainda estava em andamento — double-tap perde a corrida e recebe null
+  const [session] = await db
     .update(workoutSession)
     .set({ completedAt })
-    .where(eq(workoutSession.id, sessionId));
+    .where(
+      and(
+        eq(workoutSession.id, sessionId),
+        eq(workoutSession.userId, userId),
+        isNull(workoutSession.completedAt),
+      ),
+    )
+    .returning();
+  if (!session) return null;
 
   const exercises = await db
     .select({ id: exercise.id })

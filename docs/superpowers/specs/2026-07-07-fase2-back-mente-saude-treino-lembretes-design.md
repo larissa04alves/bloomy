@@ -71,7 +71,7 @@ alteramos a tabela `user`; criamos `profile` à parte).
 
 **Serviço (`server/profile/service.ts`):**
 - `ensureProfile(db, userId): Promise<Profile>` — cria on-demand (onConflictDoNothing) e retorna.
-- `updateProfile(db, userId, input: { restSeconds?; autoRest?; markOnboardingComplete?: boolean }): Promise<Profile>`.
+- `updateProfile(db, userId, input: { restSeconds?; autoRest?; completeOnboarding?: boolean }): Promise<Profile>`.
 
 **Rotas:**
 - `GET /api/profile` → `{ profile }` (cria na 1ª chamada).
@@ -222,7 +222,7 @@ log de séries com reps/carga; "último treino" derivado; streak semanal.
 - `createWorkout(db, userId, input: { name; focus; exercises: {name; targetSets; position}[] }): Promise<WorkoutWithExercises>`.
 - `updateWorkout(db, userId, id, input): Promise<...>` — edita template; exercícios via replace-all (add/remove/reorder).
 - `deactivateWorkout(db, userId, id): Promise<boolean>` — soft delete (`active=false`).
-- `lastPerformance(db, userId, exerciseId): Promise<{ reps: number | null; load: number | null } | null>` — (pura de query) melhor/primeira série da última sessão concluída.
+- `lastPerformance(db, userId, exerciseName): Promise<{ reps: number | null; load: number | null } | null>` — última sessão concluída com esse nome de exercício (por `exerciseName`, para o histórico sobreviver a edições de template).
 - `startSession(db, userId, workoutId): Promise<SessionDetail | "already_active" | "not_found">` — cria sessão + `set_log` pré-preenchidos.
 - `getActiveSession(db, userId): Promise<SessionDetail | null>`.
 - `updateSet(db, userId, sessionId, setId, input: { reps?; load?; done? }): Promise<SetLog | null>` — marca Feito / edita.
