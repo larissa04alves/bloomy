@@ -1,10 +1,9 @@
 import { db } from "@bloomy/db";
 import { z } from "zod";
 
-import { badRequest, requireUserId, unauthorized } from "@/server/shared/api";
+import { invalidBody, parseJson, requireUserId, unauthorized } from "@/server/shared/api";
+import { TIME_SCHEMA } from "@/server/shared/time";
 import { createMedication, listMedications } from "@/server/medications/service";
-
-const TIME_SCHEMA = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, "expected HH:MM");
 
 const BODY_SCHEMA = z.object({
   name: z.string().min(1).max(120),
@@ -24,8 +23,8 @@ export async function POST(request: Request) {
   const userId = await requireUserId(request);
   if (!userId) return unauthorized();
 
-  const parsed = BODY_SCHEMA.safeParse(await request.json());
-  if (!parsed.success) return badRequest(parsed.error.message);
+  const parsed = BODY_SCHEMA.safeParse(await parseJson(request));
+  if (!parsed.success) return invalidBody(parsed.error);
 
   const created = await createMedication(db, userId, parsed.data);
   return Response.json({ medication: created }, { status: 201 });

@@ -29,8 +29,13 @@ export async function removeLastWater(
 
   if (!last) return null;
 
-  await db.delete(waterLog).where(eq(waterLog.id, last.id));
-  return last;
+  const deleted = await db
+    .delete(waterLog)
+    .where(eq(waterLog.id, last.id))
+    .returning();
+
+  // double-tap concorrente: se outra request já apagou esta linha, não minta sucesso
+  return deleted.length > 0 ? last : null;
 }
 
 export async function getWaterDay(

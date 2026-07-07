@@ -15,6 +15,41 @@
       "when": 1783423591049,
       "tag": "0001_stale_hellion",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1783432460869,
+      "tag": "0002_good_bushwacker",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1783432667735,
+      "tag": "0003_perpetual_vapor",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1783433010868,
+      "tag": "0004_clear_wiccan",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1783433746271,
+      "tag": "0005_colossal_firebrand",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1783433982483,
+      "tag": "0006_pink_turbo",
+      "breakpoints": true
     }
   ]
 }
