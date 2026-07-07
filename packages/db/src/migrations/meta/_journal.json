@@ -43,6 +43,13 @@
       "when": 1783433746271,
       "tag": "0005_colossal_firebrand",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1783433982483,
+      "tag": "0006_pink_turbo",
+      "breakpoints": true
     }
   ]
 }
