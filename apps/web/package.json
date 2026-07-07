@@ -30,6 +30,7 @@
     "react-dom": "catalog:",
     "server-only": "^0.0.1",
     "sonner": "catalog:",
+    "vaul": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {

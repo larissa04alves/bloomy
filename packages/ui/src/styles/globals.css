@@ -4,117 +4,103 @@
 @source "../../../apps/**/*.{ts,tsx}";
 @source "../**/*.{ts,tsx}";
 
-@custom-variant dark (&:is(.dark *));
-
+/* ---- Tokens semânticos shadcn (light-only, mapeados p/ Bloomy) ---- */
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.58 0.22 27);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.809 0.105 251.813);
-  --chart-2: oklch(0.623 0.214 259.815);
-  --chart-3: oklch(0.546 0.245 262.881);
-  --chart-4: oklch(0.488 0.243 264.376);
-  --chart-5: oklch(0.424 0.199 265.638);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --background: #fbfafe; /* bg */
+  --foreground: #3b3552; /* ink */
+  --card: #ffffff;
+  --card-foreground: #3b3552;
+  --popover: #ffffff;
+  --popover-foreground: #3b3552;
+  --primary: #a78bd0; /* lilac */
+  --primary-foreground: #ffffff;
+  --secondary: #ede7f8; /* lilac-tint */
+  --secondary-foreground: #8768bc; /* lilac-deep */
+  --muted: #f4effa; /* lilac-tint-soft */
+  --muted-foreground: #8a82a0; /* ink-soft */
+  --accent: #ede7f8;
+  --accent-foreground: #8768bc;
+  --destructive: #c76e93; /* coral profundo — erro de form, nunca vermelho */
+  --border: #eae2f4; /* hairline */
+  --input: #eae2f4;
+  --ring: #a78bd0; /* lilac */
+  --radius: 1rem; /* 16px = control */
 }
 
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.87 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.371 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.809 0.105 251.813);
-  --chart-2: oklch(0.623 0.214 259.815);
-  --chart-3: oklch(0.546 0.245 262.881);
-  --chart-4: oklch(0.488 0.243 264.376);
-  --chart-5: oklch(0.424 0.199 265.638);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+/* ---- Tokens Bloomy (utilitários bg-/text-/border-<nome>) ---- */
+@theme {
+  --color-lilac: #a78bd0;
+  --color-lilac-deep: #8768bc;
+  --color-lilac-tint: #ede7f8;
+  --color-lilac-tint-soft: #f4effa;
+
+  --color-pink: #f3b6d0;
+  --color-pink-deep: #c76e9e;
+  --color-pink-bright: #e08ab0;
+  --color-pink-tint: #fbeaf2;
+
+  --color-green: #a8d5ba;
+  --color-green-deep: #4e9c74;
+  --color-green-mid: #7fc4a0;
+  --color-green-tint: #e6f4ec;
+  --color-green-tint-soft: #eaf5ef;
+
+  --color-coral: #c77e93;
+  --color-coral-tint: #fbecef;
+
+  --color-bg: #fbfafe;
+  --color-board: #e9e2f3;
+
+  --color-ink: #3b3552;
+  --color-ink-soft: #8a82a0;
+  --color-ink-faint: #a79fb8;
+  --color-ink-read: #6f6787; /* corpo pequeno AA sobre bg */
+
+  --color-nav-inactive: #b3abc4;
+  --color-control-off: #e2d8f0;
+  --color-ring-track: #ddd1ef;
+  --color-hairline: #eae2f4;
+  --color-hairline-soft: #f1ebf8;
+
+  --radius-control: 16px;
+  --radius-card: 20px;
+  --radius-card-lg: 26px;
+  --radius-sheet: 28px;
+
+  --shadow-card: 0 6px 18px rgba(120, 86, 164, 0.06);
+  --shadow-card-sm: 0 5px 16px rgba(120, 86, 164, 0.05);
+  --shadow-btn: 0 8px 20px rgba(167, 139, 208, 0.35);
+  --shadow-sheet: 0 -12px 40px rgba(59, 53, 82, 0.25);
+  --shadow-device: 0 22px 50px rgba(120, 86, 164, 0.16);
+
+  --font-display: var(--font-quicksand);
+  --font-sans: var(--font-nunito);
 }
 
+/* ---- Mapa dos tokens semânticos p/ os componentes shadcn ---- */
 @theme inline {
-  --font-sans: "Inter Variable", sans-serif;
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
-  --color-ring: var(--ring);
-  --color-input: var(--input);
-  --color-border: var(--border);
-  --color-destructive: var(--destructive);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-accent: var(--accent);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-muted: var(--muted);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-secondary: var(--secondary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-primary: var(--primary);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-popover: var(--popover);
-  --color-card-foreground: var(--card-foreground);
-  --color-card: var(--card);
-  --color-foreground: var(--foreground);
   --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
-  --radius-2xl: calc(var(--radius) + 8px);
-  --radius-3xl: calc(var(--radius) + 12px);
-  --radius-4xl: calc(var(--radius) + 16px);
 }
 
 @layer base {
@@ -122,9 +108,7 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply font-sans bg-background text-foreground;
-  }
-  html {
-    @apply font-sans;
+    @apply bg-background text-foreground;
+    font-family: var(--font-nunito), system-ui, sans-serif;
   }
 }

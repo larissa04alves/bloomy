@@ -8,6 +8,11 @@ Glossário canônico em `CONTEXT.md` (nesta pasta). Decisões em `/docs/adr/`.
   Toda lógica/consts/handlers em `src/app/<tela>/hooks/use<Tela>.ts`
   (ex.: `app/hoje/page.tsx` + `app/hoje/hooks/useHoje.ts`). Fetch inicial
   e mutações acontecem no hook, via API REST (telas nascem com skeleton).
+- **Componentes** (EN): globais (usados em >2 telas) em `src/components/`, mesmo
+  quando envolvem um shadcn; específicos de uma tela na `components/` dentro da
+  pasta da tela. `packages/ui/src/components/` é SÓ dos arquivos gerados pelo
+  shadcn — nada autoral lá. Tokens Bloomy vêm de `@bloomy/ui` (`globals.css`);
+  `cn` de `@bloomy/ui/lib/utils`.
 - **Serviços** (EN): `src/server/<domínio>/service.ts` — donos das regras.
   Recebem `db: Db` por parâmetro (testabilidade). Nunca importam de `app/`.
   Marcados com `import "server-only"` (build-time: nunca vão pro client).
