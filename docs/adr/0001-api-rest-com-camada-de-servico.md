@@ -1,6 +1,6 @@
 # API REST como porta única, com camada de serviço
 
-Num app Next.js solo o caminho óbvio seriam Server Actions, mas decidimos expor o back-end como rotas REST por domínio (`/api/<domínio>/…`): o contrato HTTP fica pronto para um futuro cliente nativo, e as telas web — client components com toda a lógica em hooks (`app/<tela>/hooks/use<Tela>.ts`, o `.tsx` só renderiza) — consomem essa mesma API via fetch, tanto leituras quanto mutações. As regras não vivem nos handlers: ficam em funções de serviço (`apps/web/src/features/<domínio>/`), e os route handlers são wrappers finos (zod + sessão better-auth + serviço).
+Num app Next.js solo o caminho óbvio seriam Server Actions, mas decidimos expor o back-end como rotas REST por domínio (`/api/<domínio>/…`): o contrato HTTP fica pronto para um futuro cliente nativo, e as telas web — client components com toda a lógica em hooks (`app/<tela>/hooks/use<Tela>.ts`, o `.tsx` só renderiza) — consomem essa mesma API via fetch, tanto leituras quanto mutações. As regras não vivem nos handlers: ficam em funções de serviço (`apps/web/src/server/<domínio>/`), marcadas com `import "server-only"` para nunca vazarem pro bundle client, e os route handlers são wrappers finos (zod + sessão better-auth + serviço).
 
 ## Considered Options
 

@@ -1,0 +1,1 @@
+ALTER TABLE `medication_intake` ADD `stock_decremented` integer DEFAULT false NOT NULL;

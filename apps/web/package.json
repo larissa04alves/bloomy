@@ -5,10 +5,13 @@
   "scripts": {
     "dev": "next dev --port 3001",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "check-types": "tsc --noEmit",
+    "test": "bun test --conditions react-server src"
   },
   "dependencies": {
     "@bloomy/auth": "workspace:*",
+    "@bloomy/db": "workspace:*",
     "@bloomy/env": "workspace:*",
     "@bloomy/ui": "workspace:*",
     "@libsql/client": "catalog:",
@@ -17,18 +20,21 @@
     "babel-plugin-react-compiler": "^1.0.0",
     "better-auth": "catalog:",
     "dotenv": "catalog:",
+    "drizzle-orm": "^0.45.2",
     "libsql": "catalog:",
     "lucide-react": "catalog:",
     "next": "^16.2.0",
     "next-themes": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
+    "server-only": "^0.0.1",
     "sonner": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {
     "@bloomy/config": "workspace:*",
     "@tailwindcss/postcss": "catalog:",
+    "@types/bun": "^1.2.23",
     "@types/node": "^20",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",

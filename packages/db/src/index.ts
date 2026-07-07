@@ -1,16 +1,10 @@
 import { env } from "@bloomy/env/server";
-import { createClient } from "@libsql/client";
-import { drizzle } from "drizzle-orm/libsql";
 
-import * as schema from "./schema";
+import { createDb } from "./client";
 
-export function createDb() {
-  const client = createClient({
-    url: env.DATABASE_URL,
-    authToken: env.DATABASE_AUTH_TOKEN,
-  });
+export { createDb, type Db } from "./client";
 
-  return drizzle({ client, schema });
-}
-
-export const db = createDb();
+export const db = createDb({
+  url: env.DATABASE_URL,
+  authToken: env.DATABASE_AUTH_TOKEN,
+});

@@ -19,6 +19,8 @@
         "name": "next"
       }
     ],
+    // "types" restringe a auto-inclusão de @types/* — adicione aqui qualquer pacote futuro de globals ambientes
+    "types": ["bun", "node"],
     "paths": {
       "@/*": ["./src/*"],
       "@bloomy/ui/*": ["../../packages/ui/src/*"]
