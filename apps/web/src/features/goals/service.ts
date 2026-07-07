@@ -17,7 +17,11 @@ export async function ensureGoals(db: Db, userId: string): Promise<Goal[]> {
   );
 
   if (missing.length > 0) {
-    await db.insert(goal).values(missing.map((d) => ({ ...d, userId })));
+    // onConflictDoNothing: dois GETs concorrentes no 1º acesso não podem estourar o UNIQUE(user_id, domain)
+    await db
+      .insert(goal)
+      .values(missing.map((d) => ({ ...d, userId })))
+      .onConflictDoNothing();
     return db.select().from(goal).where(eq(goal.userId, userId));
   }
 
