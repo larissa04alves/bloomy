@@ -1,10 +1,12 @@
-import { describe, expect, test } from "bun:test";
+import { afterAll, describe, expect, test } from "bun:test";
 import { eq } from "drizzle-orm";
 
 import { medication } from "@bloomy/db/schema/body";
 
-import { createTestDb, createTestUser } from "@/features/shared/test-db";
+import { cleanupTestDbs, createTestDb, createTestUser } from "@/features/shared/test-db";
 import { createMedication, deriveIntakes, getIntakesDay, markIntake, unmarkIntake } from "./service";
+
+afterAll(cleanupTestDbs);
 
 describe("deriveIntakes (pura)", () => {
   const meds = [
@@ -74,5 +76,14 @@ describe("markIntake / unmarkIntake (db em memória)", () => {
     expect(await unmarkIntake(db, userId, { medicationId: med.id, time: "09:00", day: "2026-07-06" })).toBe(true);
     [row] = await db.select().from(medication).where(eq(medication.id, med.id));
     expect(row.stock).toBe(0);
+  });
+
+  test("remédio inexistente: mark retorna not_found e unmark false", async () => {
+    const db = await createTestDb();
+    const userId = await createTestUser(db);
+    const input = { medicationId: "nao-existe", time: "09:00", day: "2026-07-06" };
+
+    expect(await markIntake(db, userId, input)).toBe("not_found");
+    expect(await unmarkIntake(db, userId, input)).toBe(false);
   });
 });
