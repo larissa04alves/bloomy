@@ -15,6 +15,7 @@
     "@bloomy/env": "workspace:*",
     "@bloomy/ui": "workspace:*",
     "@libsql/client": "catalog:",
+    "@phosphor-icons/react": "catalog:",
     "@swc/helpers": "^0.5.23",
     "@tanstack/react-form": "^1.33.0",
     "babel-plugin-react-compiler": "^1.0.0",
