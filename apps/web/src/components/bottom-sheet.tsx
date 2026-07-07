@@ -25,7 +25,7 @@ export function BottomSheet({
   children: ReactNode;
 }) {
   return (
-    <Drawer.Root open={open} onOpenChange={onOpenChange}>
+    <Drawer.Root open={open} onOpenChange={onOpenChange} repositionInputs={false}>
       <Drawer.Portal>
         <Drawer.Overlay className="fixed inset-0 z-40 bg-[#2b2640]/42" />
         <Drawer.Content

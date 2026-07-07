@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Nunito, Quicksand } from "next/font/google";
 
+import { Toaster } from "@bloomy/ui/components/sonner";
+
 import "../index.css";
 
 const quicksand = Quicksand({
@@ -33,6 +35,7 @@ export default function RootLayout({
         <div className="mx-auto flex min-h-dvh w-full max-w-105 flex-col bg-bg sm:shadow-device">
           {children}
         </div>
+        <Toaster position="top-center" richColors={false} />
       </body>
     </html>
   );
