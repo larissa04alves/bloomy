@@ -1,8 +1,14 @@
 import { db } from "@bloomy/db";
 import { z } from "zod";
 
-import { badRequest, requireUserId, unauthorized } from "@/server/shared/api";
-import { DAY_SCHEMA, dayFor } from "@/server/shared/day";
+import {
+  badRequest,
+  invalidBody,
+  parseJson,
+  requireUserId,
+  unauthorized,
+} from "@/server/shared/api";
+import { resolveDay } from "@/server/shared/day";
 import { addMeal, getMealsDay } from "@/server/meals/service";
 
 const BODY_SCHEMA = z.object({
@@ -14,19 +20,18 @@ export async function GET(request: Request) {
   const userId = await requireUserId(request);
   if (!userId) return unauthorized();
 
-  const raw = new URL(request.url).searchParams.get("day");
-  const day = raw ? DAY_SCHEMA.safeParse(raw) : { success: true as const, data: dayFor() };
-  if (!day.success) return badRequest("invalid day");
+  const day = resolveDay(request);
+  if (!day.ok) return badRequest("invalid day");
 
-  return Response.json(await getMealsDay(db, userId, day.data));
+  return Response.json(await getMealsDay(db, userId, day.day));
 }
 
 export async function POST(request: Request) {
   const userId = await requireUserId(request);
   if (!userId) return unauthorized();
 
-  const parsed = BODY_SCHEMA.safeParse(await request.json());
-  if (!parsed.success) return badRequest(parsed.error.message);
+  const parsed = BODY_SCHEMA.safeParse(await parseJson(request));
+  if (!parsed.success) return invalidBody(parsed.error);
 
   const created = await addMeal(db, userId, parsed.data);
   return Response.json({ meal: created }, { status: 201 });

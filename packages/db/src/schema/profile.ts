@@ -1,12 +1,7 @@
-import { sql } from "drizzle-orm";
 import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 import { user } from "./auth";
-
-const timestampMs = (name: string) =>
-  integer(name, { mode: "timestamp_ms" })
-    .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
-    .notNull();
+import { timestampMs } from "./_columns";
 
 export const profile = sqliteTable("profile", {
   userId: text("user_id")

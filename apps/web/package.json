@@ -20,7 +20,7 @@
     "babel-plugin-react-compiler": "^1.0.0",
     "better-auth": "catalog:",
     "dotenv": "catalog:",
-    "drizzle-orm": "^0.45.2",
+    "drizzle-orm": "catalog:",
     "libsql": "catalog:",
     "lucide-react": "catalog:",
     "next": "^16.2.0",

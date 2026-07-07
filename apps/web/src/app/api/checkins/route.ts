@@ -1,8 +1,14 @@
 import { db } from "@bloomy/db";
 import { z } from "zod";
 
-import { badRequest, requireUserId, unauthorized } from "@/server/shared/api";
-import { DAY_SCHEMA, dayFor } from "@/server/shared/day";
+import {
+  badRequest,
+  invalidBody,
+  parseJson,
+  requireUserId,
+  unauthorized,
+} from "@/server/shared/api";
+import { resolveDay } from "@/server/shared/day";
 import { getCheckin, upsertCheckin } from "@/server/mind/service";
 
 const PUT_SCHEMA = z
@@ -20,11 +26,10 @@ export async function GET(request: Request) {
   const userId = await requireUserId(request);
   if (!userId) return unauthorized();
 
-  const raw = new URL(request.url).searchParams.get("day");
-  const day = raw ? DAY_SCHEMA.safeParse(raw) : { success: true as const, data: dayFor() };
-  if (!day.success) return badRequest("invalid day");
+  const day = resolveDay(request);
+  if (!day.ok) return badRequest("invalid day");
 
-  const checkin = await getCheckin(db, userId, day.data);
+  const checkin = await getCheckin(db, userId, day.day);
   return Response.json({ checkin });
 }
 
@@ -32,8 +37,8 @@ export async function PUT(request: Request) {
   const userId = await requireUserId(request);
   if (!userId) return unauthorized();
 
-  const parsed = PUT_SCHEMA.safeParse(await request.json());
-  if (!parsed.success) return badRequest(parsed.error.message);
+  const parsed = PUT_SCHEMA.safeParse(await parseJson(request));
+  if (!parsed.success) return invalidBody(parsed.error);
 
   const checkin = await upsertCheckin(db, userId, parsed.data);
   return Response.json({ checkin });

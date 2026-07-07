@@ -1,7 +1,7 @@
-import { sql } from "drizzle-orm";
 import { integer, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
 
 import { user } from "./auth";
+import { timestampMs } from "./_columns";
 
 export const goal = sqliteTable(
   "goal",
@@ -17,12 +17,8 @@ export const goal = sqliteTable(
     unit: text("unit").$type<"ml" | "count" | "days">().notNull(),
     period: text("period").$type<"day" | "week">().notNull(),
     active: integer("active", { mode: "boolean" }).default(true).notNull(),
-    createdAt: integer("created_at", { mode: "timestamp_ms" })
-      .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
-      .notNull(),
-    updatedAt: integer("updated_at", { mode: "timestamp_ms" })
-      .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
-      .notNull(),
+    createdAt: timestampMs("created_at"),
+    updatedAt: timestampMs("updated_at"),
   },
   (table) => [uniqueIndex("goal_user_domain_idx").on(table.userId, table.domain)],
 );

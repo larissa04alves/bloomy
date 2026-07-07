@@ -21,7 +21,7 @@
     "@bloomy/env": "workspace:*",
     "@libsql/client": "catalog:",
     "dotenv": "catalog:",
-    "drizzle-orm": "^0.45.2",
+    "drizzle-orm": "catalog:",
     "libsql": "catalog:",
     "zod": "catalog:"
   },

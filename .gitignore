@@ -35,6 +35,8 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 .pnpm-debug.log*
+bun.lock
+bun.lockb
 
 # Turbo
 .turbo

@@ -1,4 +1,3 @@
-import { sql } from "drizzle-orm";
 import {
   type AnySQLiteColumn,
   index,
@@ -8,11 +7,7 @@ import {
 } from "drizzle-orm/sqlite-core";
 
 import { user } from "./auth";
-
-const timestampMs = (name: string) =>
-  integer(name, { mode: "timestamp_ms" })
-    .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
-    .notNull();
+import { timestampMs } from "./_columns";
 
 export const appointment = sqliteTable(
   "appointment",

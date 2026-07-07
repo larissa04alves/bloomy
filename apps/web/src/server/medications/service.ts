@@ -51,7 +51,7 @@ export async function createMedication(
       name: input.name,
       dose: input.dose ?? null,
       stock: input.stock ?? null,
-      times: [...input.times].sort(),
+      times: [...new Set(input.times)].sort(),
     })
     .returning();
 
@@ -70,7 +70,7 @@ export async function updateMedication(
       ...(input.name !== undefined && { name: input.name }),
       ...(input.dose !== undefined && { dose: input.dose }),
       ...(input.stock !== undefined && { stock: input.stock }),
-      ...(input.times !== undefined && { times: [...input.times].sort() }),
+      ...(input.times !== undefined && { times: [...new Set(input.times)].sort() }),
       updatedAt: new Date(),
     })
     .where(and(eq(medication.id, medicationId), eq(medication.userId, userId)))

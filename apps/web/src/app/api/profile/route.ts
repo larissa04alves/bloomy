@@ -1,7 +1,7 @@
 import { db } from "@bloomy/db";
 import { z } from "zod";
 
-import { badRequest, requireUserId, unauthorized } from "@/server/shared/api";
+import { invalidBody, parseJson, requireUserId, unauthorized } from "@/server/shared/api";
 import { ensureProfile, updateProfile } from "@/server/profile/service";
 
 const PATCH_SCHEMA = z.object({
@@ -22,8 +22,8 @@ export async function PATCH(request: Request) {
   const userId = await requireUserId(request);
   if (!userId) return unauthorized();
 
-  const parsed = PATCH_SCHEMA.safeParse(await request.json());
-  if (!parsed.success) return badRequest(parsed.error.message);
+  const parsed = PATCH_SCHEMA.safeParse(await parseJson(request));
+  if (!parsed.success) return invalidBody(parsed.error);
 
   const profile = await updateProfile(db, userId, parsed.data);
   return Response.json({ profile });
