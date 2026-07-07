@@ -29,6 +29,7 @@
     "dev": "turbo run dev",
     "build": "turbo run build",
     "check-types": "turbo run check-types",
+    "test": "turbo run test",
     "dev:web": "turbo run dev -F web",
     "db:push": "turbo run db:push -F @bloomy/db",
     "db:studio": "turbo run db:studio -F @bloomy/db",

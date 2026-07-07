@@ -19,6 +19,7 @@
         "name": "next"
       }
     ],
+    "types": ["bun", "node"],
     "paths": {
       "@/*": ["./src/*"],
       "@bloomy/ui/*": ["../../packages/ui/src/*"]
