@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@bloomy/auth": "workspace:*",
+    "@bloomy/db": "workspace:*",
     "@bloomy/env": "workspace:*",
     "@bloomy/ui": "workspace:*",
     "@libsql/client": "catalog:",
