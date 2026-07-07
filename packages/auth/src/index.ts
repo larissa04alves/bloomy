@@ -6,7 +6,10 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
 
 export function createAuth() {
-  const db = createDb();
+  const db = createDb({
+    url: env.DATABASE_URL,
+    authToken: env.DATABASE_AUTH_TOKEN,
+  });
 
   return betterAuth({
     database: drizzleAdapter(db, {

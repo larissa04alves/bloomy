@@ -11,3 +11,4 @@
   `apps/web/.env`.
 - Serviços recebem `Db` (`import type { Db } from "@bloomy/db"`); o singleton
   `db` só é importado por rotas/entrypoints.
+- `src/client.ts` cria conexões sem tocar no env (`createDb({ url, authToken })`) — é o que os testes usam; `src/index.ts` valida env e expõe o singleton `db` do runtime.
