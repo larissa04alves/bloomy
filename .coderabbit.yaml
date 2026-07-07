@@ -1,0 +1,30 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+language: "pt-BR"
+reviews:
+  profile: assertive
+  request_changes_workflow: true   # segura o PR até os comentários serem resolvidos
+  high_level_summary: true         # resumo do que foi feito no topo do PR
+  review_status: true
+  poem: false
+  auto_review:
+    enabled: true
+    auto_incremental_review: true  # re-revisa a cada novo push
+    drafts: false                  # não revisa PR em draft
+    base_branches:
+      - "master"
+    ignore_usernames:
+      - "dependabot[bot]"
+      - "renovate[bot]"
+  path_filters:
+    - "!**/bun.lock"
+    - "!**/bun.lockb"
+    - "!**/*.snap"
+    - "!**/*.svg"
+    - "!**/*.png"
+  path_instructions:
+    - path: "**/*.sql"
+      instructions: "Flag any statements that drop or truncate tables. Migrations must be additive/reversible."
+    - path: "packages/db/**/migrations/**"
+      instructions: "Generated Drizzle migrations — flag manual edits; schema changes should come from db:generate."
+    - path: "apps/web/src/app/**/*.tsx"
+      instructions: "Screens must be PT (UI copy) with logic extracted to hooks; code identifiers in EN. Flag business logic inline in .tsx."
