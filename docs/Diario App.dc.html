@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: 'Nunito', sans-serif; background: #E9E2F3; -webkit-font-smoothing: antialiased; }
+  a { color: #8768BC; text-decoration: none; }
+  a:hover { color: #6E509F; }
+  .pscroll::-webkit-scrollbar { width: 5px; }
+  .pscroll::-webkit-scrollbar-thumb { background: rgba(150,120,190,.22); border-radius: 3px; }
+  .pscroll::-webkit-scrollbar-track { background: transparent; }
+</style>
+</helmet>
+
+<template id="__bundler_thumbnail"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" rx="22" fill="#A78BD0"/><path d="M50 72c-1-.8-16-11.4-21-19.6C25.6 46.9 27 40 33 38.4c4.2-1.1 8 .9 10 4.2 2-3.3 5.8-5.3 10-4.2 6 1.6 7.4 8.5 4 14C66 60.6 51 71.2 50 72Z" fill="#fff"/></svg></template>
+<div style="min-height:100vh;background:#E9E2F3;padding:56px 64px 96px;">
+
+  <div style="max-width:1500px;margin:0 auto 44px;">
+    <div style="display:inline-flex;align-items:center;gap:10px;background:#fff;padding:7px 16px 7px 10px;border-radius:999px;box-shadow:0 6px 18px rgba(120,86,164,.08);margin-bottom:18px;">
+      <span style="width:30px;height:30px;border-radius:10px;background:#A78BD0;display:flex;align-items:center;justify-content:center;"><i class="ph-fill ph-heart" style="color:#fff;font-size:17px;"></i></span>
+      <span style="font:700 14px 'Quicksand';color:#3B3552;">Diário</span>
+    </div>
+    <h1 style="font:700 30px 'Quicksand';color:#3B3552;margin:0 0 6px;">App de acompanhamento diário</h1>
+    <p style="margin:0;color:#7A7290;font-size:15px;">Estética Dailoz · lilás, rosa e verdinho · design mobile</p>
+    <div style="display:flex;gap:18px;margin-top:20px;flex-wrap:wrap;">
+      <div style="display:flex;align-items:center;gap:8px;"><span style="width:18px;height:18px;border-radius:6px;background:#A78BD0;"></span><span style="font:600 13px 'Nunito';color:#6B6386;">Lilás — principal</span></div>
+      <div style="display:flex;align-items:center;gap:8px;"><span style="width:18px;height:18px;border-radius:6px;background:#F3B6D0;"></span><span style="font:600 13px 'Nunito';color:#6B6386;">Rosa</span></div>
+      <div style="display:flex;align-items:center;gap:8px;"><span style="width:18px;height:18px;border-radius:6px;background:#A8D5BA;"></span><span style="font:600 13px 'Nunito';color:#6B6386;">Verdinho</span></div>
+    </div>
+  </div>
+
+  <!-- ============ TURN 1: HOJE VARIATIONS ============ -->
+  <section style="max-width:1500px;margin:0 auto 60px;">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:22px;">
+      <span style="width:6px;height:22px;border-radius:3px;background:#A78BD0;"></span>
+      <h2 style="font:700 16px 'Quicksand';color:#4A4360;margin:0;letter-spacing:.04em;text-transform:uppercase;">Tela Hoje</h2>
+    </div>
+    <div style="display:flex;gap:44px;flex-wrap:wrap;">
+
+      <!-- ===== 1a: Hoje grid ===== -->
+      <div id="1a" style="display:flex;flex-direction:column;gap:14px;width:342px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="background:#A78BD0;color:#fff;font:700 12px 'Nunito';padding:4px 12px;border-radius:999px;">1a</span>
+          <span style="font:700 14px 'Quicksand';color:#4A4360;">Grid de rituais</span>
+        </div>
+        <div data-screen-label="Hoje 1a" style="width:342px;height:748px;background:#FBFAFE;border-radius:38px;box-shadow:0 22px 50px rgba(120,86,164,.16);border:1px solid #EAE2F4;overflow:hidden;display:flex;flex-direction:column;">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 24px 2px;font:700 13px 'Nunito';color:#4A4360;"><span>9:41</span><span style="display:flex;gap:7px;font-size:14px;"><i class="ph-fill ph-cell-signal-full"></i><i class="ph-fill ph-wifi-high"></i><i class="ph-fill ph-battery-full"></i></span></div>
+          <div class="pscroll" style="flex:1;overflow-y:auto;padding:12px 22px 18px;">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:22px;">
+              <div>
+                <div style="font:700 23px 'Quicksand';color:#3B3552;">Boa noite, {{ userName }}</div>
+                <div style="font:600 13px 'Nunito';color:#8A82A0;margin-top:2px;">Segunda, 6 de julho</div>
+              </div>
+              <div style="width:46px;height:46px;border-radius:50%;background:#A78BD0;color:#fff;display:flex;align-items:center;justify-content:center;font:700 18px 'Quicksand';">A</div>
+            </div>
+
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+              <span style="font:700 14px 'Quicksand';color:#3B3552;">Como você está?</span>
+              <span style="font:700 11px 'Nunito';color:#8768BC;">registrado ✓</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:26px;">
+              <div style="width:52px;height:52px;border-radius:16px;background:#F4EFFA;display:flex;align-items:center;justify-content:center;"><i class="ph-fill ph-smiley-sad" style="font-size:26px;color:#C7BEDA;"></i></div>
+              <div style="width:52px;height:52px;border-radius:16px;background:#F4EFFA;display:flex;align-items:center;justify-content:center;"><i class="ph-fill ph-smiley-meh" style="font-size:26px;color:#C7BEDA;"></i></div>
+              <div style="width:52px;height:52px;border-radius:16px;background:#A78BD0;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 14px rgba(167,139,208,.4);"><i class="ph-fill ph-smiley" style="font-size:28px;color:#fff;"></i></div>
+              <div style="width:52px;height:52px;border-radius:16px;background:#F4EFFA;display:flex;align-items:center;justify-content:center;"><i class="ph-fill ph-smiley-wink" style="font-size:26px;color:#C7BEDA;"></i></div>
+              <div style="width:52px;height:52px;border-radius:16px;background:#F4EFFA;display:flex;align-items:center;justify-content:center;"><i class="ph-fill ph-heart" style="font-size:24px;color:#C7BEDA;"></i></div>
+            </div>
+
+            <div style="font:700 15px 'Quicksand';color:#3B3552;margin-bottom:14px;">Seus rituais de hoje</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+              <div style="background:#EDE7F8;border-radius:22px;padding:15px;">
+                <div style="width:42px;height:42px;border-radius:14px;background:#fff;display:flex;align-items:center;justify-content:center;margin-bottom:12px;"><i class="ph-fill ph-drop" style="font-size:22px;color:#8768BC;"></i></div>
+                <div style="font:700 15px 'Quicksand';color:#3B3552;">Hidratação</div>
+                <div style="font:600 12px 'Nunito';color:#8A82A0;margin-top:2px;">5 de 8 copos</div>
+                <div style="height:7px;border-radius:4px;background:#fff;margin-top:11px;overflow:hidden;"><div style="width:62%;height:100%;background:#A78BD0;border-radius:4px;"></div></div>
+              </div>
+              <div style="background:#E6F4EC;border-radius:22px;padding:15px;">
+                <div style="width:42px;height:42px;border-radius:14px;background:#fff;display:flex;align-items:center;justify-content:center;margin-bottom:12px;"><i class="ph-fill ph-fork-knife" style="font-size:22px;color:#4E9C74;"></i></div>
+                <div style="font:700 15px 'Quicksand';color:#3B3552;">Alimentação</div>
+                <div style="font:600 12px 'Nunito';color:#8A82A0;margin-top:2px;">2 refeições · faltou o jantar</div>
+                <div style="margin-top:11px;font:700 12px 'Nunito';color:#4E9C74;display:inline-flex;align-items:center;gap:4px;"><i class="ph-fill ph-plus-circle"></i>Adicionar</div>
+              </div>
+              <div style="background:#FBEAF2;border-radius:22px;padding:15px;">
+                <div style="width:42px;height:42px;border-radius:14px;background:#fff;display:flex;align-items:center;justify-content:center;margin-bottom:12px;"><i class="ph-fill ph-barbell" style="font-size:22px;color:#C76E9E;"></i></div>
+                <div style="font:700 15px 'Quicksand';color:#3B3552;">Treino</div>
+                <div style="font:600 12px 'Nunito';color:#8A82A0;margin-top:2px;">Peito e tríceps</div>
+                <div style="margin-top:11px;font:700 12px 'Nunito';color:#C76E9E;display:inline-flex;align-items:center;gap:4px;"><i class="ph-fill ph-play-circle"></i>Iniciar</div>
+              </div>
+              <div style="background:#FBECEF;border-radius:22px;padding:15px;">
+                <div style="width:42px;height:42px;border-radius:14px;background:#fff;display:flex;align-items:center;justify-content:center;margin-bottom:12px;"><i class="ph-fill ph-pill" style="font-size:22px;color:#C77E93;"></i></div>
+                <div style="font:700 15px 'Quicksand';color:#3B3552;">Remédios</div>
+                <div style="font:600 12px 'Nunito';color:#8A82A0;margin-top:2px;">1 de 3 tomados</div>
+                <div style="margin-top:11px;font:700 12px 'Nunito';color:#C77E93;display:inline-flex;align-items:center;gap:4px;"><i class="ph-fill ph-check-circle"></i>Marcar</div>
+              </div>
+            </div>
+
+            <div style="background:#fff;border-radius:22px;padding:15px;display:flex;align-items:center;gap:13px;box-shadow:0 6px 18px rgba(120,86,164,.06);">
+              <div style="width:44px;height:44px;border-radius:14px;background:#EDE7F8;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="ph-fill ph-calendar-heart" style="font-size:22px;color:#8768BC;"></i></div>
+              <div style="flex:1;">
+                <div style="font:600 11px 'Nunito';color:#A79FB8;text-transform:uppercase;letter-spacing:.04em;">Próxima consulta</div>
+                <div style="font:700 14px 'Quicksand';color:#3B3552;margin-top:1px;">Dra. Marina · Nutricionista</div>
+              </div>
+              <div style="text-align:right;">
+                <div style="font:700 13px 'Quicksand';color:#8768BC;">qui, 9</div>
+                <div style="font:600 12px 'Nunito';color:#8A82A0;">14h</div>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:space-around;align-items:center;padding:11px 6px 18px;background:#fff;border-top:1px solid #F1EBF8;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#8768BC;font:800 10px 'Nunito';"><i class="ph-fill ph-house" style="font-size:23px;"></i><span>Hoje</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#B3ABC4;font:600 10px 'Nunito';"><i class="ph ph-heartbeat" style="font-size:23px;"></i><span>Corpo</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#B3ABC4;font:600 10px 'Nunito';"><i class="ph ph-barbell" style="font-size:23px;"></i><span>Treino</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#B3ABC4;font:600 10px 'Nunito';"><i class="ph ph-smiley" style="font-size:23px;"></i><span>Mente</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#B3ABC4;font:600 10px 'Nunito';"><i class="ph ph-first-aid-kit" style="font-size:23px;"></i><span>Saúde</span></div>
+          </div>
+        </div>
+        <div style="font-size:13px;color:#8A82A0;text-align:center;line-height:1.4;">Baseada no seu design favorito,<br>recolorida na paleta aesthetic.</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ FLUXO COMPLETO ============ -->
+  <section style="max-width:1500px;margin:0 auto;">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:22px;">
+      <span style="width:6px;height:22px;border-radius:3px;background:#A8D5BA;"></span>
+      <h2 style="font:700 16px 'Quicksand';color:#4A4360;margin:0;letter-spacing:.04em;text-transform:uppercase;">Fluxo completo — Corpo · Treino · Mente · Saúde</h2>
+    </div>
+    <div style="display:flex;gap:44px;flex-wrap:wrap;">
+
+      <!-- ===== CORPO ===== -->
+      <div style="display:flex;flex-direction:column;gap:14px;width:342px;">
+        <span style="align-self:flex-start;background:#fff;color:#6B6386;font:700 12px 'Nunito';padding:4px 12px;border-radius:999px;box-shadow:0 4px 12px rgba(120,86,164,.07);">Corpo</span>
+        <div data-screen-label="Corpo" style="width:342px;height:748px;background:#FBFAFE;border-radius:38px;box-shadow:0 22px 50px rgba(120,86,164,.16);border:1px solid #EAE2F4;overflow:hidden;display:flex;flex-direction:column;">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 24px 2px;font:700 13px 'Nunito';color:#4A4360;"><span>9:41</span><span style="display:flex;gap:7px;font-size:14px;"><i class="ph-fill ph-cell-signal-full"></i><i class="ph-fill ph-wifi-high"></i><i class="ph-fill ph-battery-full"></i></span></div>
+          <div class="pscroll" style="flex:1;overflow-y:auto;padding:12px 22px 18px;">
+            <div style="font:700 24px 'Quicksand';color:#3B3552;margin-bottom:4px;">Corpo</div>
+            <div style="font:600 13px 'Nunito';color:#8A82A0;margin-bottom:18px;">O básico do seu dia a dia físico</div>
+
+            <div style="background:#EDE7F8;border-radius:24px;padding:16px 8px;display:flex;margin-bottom:24px;">
+              <div style="flex:1;text-align:center;"><div style="font:700 20px 'Quicksand';color:#8768BC;">5<span style="font-size:13px;color:#A79FB8;">/8</span></div><div style="font:700 11px 'Nunito';color:#8A82A0;margin-top:2px;">copos</div></div>
+              <div style="width:1px;background:#DBD0EC;"></div>
+              <div style="flex:1;text-align:center;"><div style="font:700 20px 'Quicksand';color:#4E9C74;">2<span style="font-size:13px;color:#A79FB8;">/3</span></div><div style="font:700 11px 'Nunito';color:#8A82A0;margin-top:2px;">refeições</div></div>
+              <div style="width:1px;background:#DBD0EC;"></div>
+              <div style="flex:1;text-align:center;"><div style="font:700 20px 'Quicksand';color:#C77E93;">1<span style="font-size:13px;color:#A79FB8;">/3</span></div><div style="font:700 11px 'Nunito';color:#8A82A0;margin-top:2px;">remédios</div></div>
+            </div>
+
+            <div style="font:700 15px 'Quicksand';color:#3B3552;margin-bottom:12px;">Hidratação</div>
+            <div style="background:#fff;border-radius:22px;padding:16px;box-shadow:0 6px 18px rgba(120,86,164,.06);margin-bottom:24px;">
+              <div style="display:flex;justify-content:space-between;font-size:22px;margin-bottom:14px;">
+                <i class="ph-fill ph-drop" style="color:#A78BD0;"></i><i class="ph-fill ph-drop" style="color:#A78BD0;"></i><i class="ph-fill ph-drop" style="color:#A78BD0;"></i><i class="ph-fill ph-drop" style="color:#A78BD0;"></i><i class="ph-fill ph-drop" style="color:#A78BD0;"></i><i class="ph ph-drop" style="color:#D3C9E6;"></i><i class="ph ph-drop" style="color:#D3C9E6;"></i><i class="ph ph-drop" style="color:#D3C9E6;"></i>
+              </div>
+              <div style="background:#A78BD0;color:#fff;border-radius:14px;padding:11px;text-align:center;font:700 14px 'Quicksand';display:flex;align-items:center;justify-content:center;gap:6px;"><i class="ph-fill ph-plus"></i>Adicionar copo</div>
+            </div>
+
+            <div style="font:700 15px 'Quicksand';color:#3B3552;margin-bottom:12px;">Alimentação</div>
+            <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px;">
+              <div style="background:#fff;border-radius:18px;padding:12px 14px;display:flex;align-items:center;gap:12px;box-shadow:0 5px 14px rgba(120,86,164,.05);"><div style="width:38px;height:38px;border-radius:12px;background:#E6F4EC;display:flex;align-items:center;justify-content:center;"><i class="ph-fill ph-coffee" style="font-size:19px;color:#4E9C74;"></i></div><div style="flex:1;"><div style="font:700 14px 'Quicksand';color:#3B3552;">Café da manhã</div><div style="font:600 12px 'Nunito';color:#8A82A0;">08:20</div></div><i class="ph-fill ph-check-circle" style="font-size:22px;color:#7FC4A0;"></i></div>
+              <div style="background:#fff;border-radius:18px;padding:12px 14px;display:flex;align-items:center;gap:12px;box-shadow:0 5px 14px rgba(120,86,164,.05);"><div style="width:38px;height:38px;border-radius:12px;background:#E6F4EC;display:flex;align-items:center;justify-content:center;"><i class="ph-fill ph-bowl-food" style="font-size:19px;color:#4E9C74;"></i></div><div style="flex:1;"><div style="font:700 14px 'Quicksand';color:#3B3552;">Almoço</div><div style="font:600 12px 'Nunito';color:#8A82A0;">13:00</div></div><i class="ph-fill ph-check-circle" style="font-size:22px;color:#7FC4A0;"></i></div>
+              <div style="background:#fff;border-radius:18px;padding:12px 14px;display:flex;align-items:center;gap:12px;box-shadow:0 5px 14px rgba(120,86,164,.05);border:1.5px dashed #E2D8F0;"><div style="width:38px;height:38px;border-radius:12px;background:#F4EFFA;display:flex;align-items:center;justify-content:center;"><i class="ph-fill ph-moon-stars" style="font-size:19px;color:#A78BD0;"></i></div><div style="flex:1;"><div style="font:700 14px 'Quicksand';color:#3B3552;">Jantar</div><div style="font:600 12px 'Nunito';color:#8A82A0;">pendente</div></div><span style="font:700 12px 'Nunito';color:#8768BC;">Registrar</span></div>
+            </div>
+
+            <div style="font:700 15px 'Quicksand';color:#3B3552;margin-bottom:12px;">Remédios de hoje</div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <div style="background:#fff;border-radius:18px;padding:12px 14px;display:flex;align-items:center;gap:12px;box-shadow:0 5px 14px rgba(120,86,164,.05);"><div style="width:38px;height:38px;border-radius:12px;background:#FBECEF;display:flex;align-items:center;justify-content:center;"><i class="ph-fill ph-pill" style="font-size:19px;color:#C77E93;"></i></div><div style="flex:1;"><div style="font:700 14px 'Quicksand';color:#3B3552;">Vitamina D</div><div style="font:600 12px 'Nunito';color:#8A82A0;">09:00</div></div><i class="ph-fill ph-check-circle" style="font-size:22px;color:#7FC4A0;"></i></div>
+              <div style="background:#fff;border-radius:18px;padding:12px 14px;display:flex;align-items:center;gap:12px;box-shadow:0 5px 14px rgba(120,86,164,.05);"><div style="width:38px;height:38px;border-radius:12px;background:#FBECEF;display:flex;align-items:center;justify-content:center;"><i class="ph-fill ph-pill" style="font-size:19px;color:#C77E93;"></i></div><div style="flex:1;"><div style="font:700 14px 'Quicksand';color:#3B3552;">Ômega 3</div><div style="font:600 12px 'Nunito';color:#8A82A0;">13:00</div></div><span style="width:24px;height:24px;border-radius:50%;border:2px solid #E2D8F0;"></span></div>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:space-around;align-items:center;padding:11px 6px 18px;background:#fff;border-top:1px solid #F1EBF8;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#B3ABC4;font:600 10px 'Nunito';"><i class="ph ph-house" style="font-size:23px;"></i><span>Hoje</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#8768BC;font:800 10px 'Nunito';"><i class="ph-fill ph-heartbeat" style="font-size:23px;"></i><span>Corpo</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#B3ABC4;font:600 10px 'Nunito';"><i class="ph ph-barbell" style="font-size:23px;"></i><span>Treino</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#B3ABC4;font:600 10px 'Nunito';"><i class="ph ph-smiley" style="font-size:23px;"></i><span>Mente</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#B3ABC4;font:600 10px 'Nunito';"><i class="ph ph-first-aid-kit" style="font-size:23px;"></i><span>Saúde</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== TREINO LISTA ===== -->
+      <div style="display:flex;flex-direction:column;gap:14px;width:342px;">
+        <span style="align-self:flex-start;background:#fff;color:#6B6386;font:700 12px 'Nunito';padding:4px 12px;border-radius:999px;box-shadow:0 4px 12px rgba(120,86,164,.07);">Treino · lista</span>
+        <div data-screen-label="Treino lista" style="width:342px;height:748px;background:#FBFAFE;border-radius:38px;box-shadow:0 22px 50px rgba(120,86,164,.16);border:1px solid #EAE2F4;overflow:hidden;display:flex;flex-direction:column;">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 24px 2px;font:700 13px 'Nunito';color:#4A4360;"><span>9:41</span><span style="display:flex;gap:7px;font-size:14px;"><i class="ph-fill ph-cell-signal-full"></i><i class="ph-fill ph-wifi-high"></i><i class="ph-fill ph-battery-full"></i></span></div>
+          <div class="pscroll" style="flex:1;overflow-y:auto;padding:12px 22px 18px;">
+            <div style="font:700 24px 'Quicksand';color:#3B3552;margin-bottom:4px;">Treino</div>
+            <div style="font:600 13px 'Nunito';color:#8A82A0;margin-bottom:18px;">Escolha o treino de hoje</div>
+
+            <div style="background:#FBEAF2;border-radius:24px;padding:16px;margin-bottom:24px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                <div><div style="font:700 20px 'Quicksand';color:#C76E9E;">3 treinos</div><div style="font:600 12px 'Nunito';color:#9A8290;">essa semana</div></div>
+                <div style="display:flex;align-items:center;gap:5px;background:#fff;padding:6px 12px;border-radius:999px;"><i class="ph-fill ph-fire" style="color:#E08AB0;font-size:16px;"></i><span style="font:700 13px 'Quicksand';color:#C76E9E;">5 dias</span></div>
+              </div>
+              <div style="display:flex;justify-content:space-between;">
+                <div style="display:flex;flex-direction:column;align-items:center;gap:5px;"><span style="width:26px;height:26px;border-radius:50%;background:#E08AB0;color:#fff;display:flex;align-items:center;justify-content:center;font:700 11px 'Nunito';">S</span></div>
+                <div style="display:flex;flex-direction:column;align-items:center;gap:5px;"><span style="width:26px;height:26px;border-radius:50%;background:#E08AB0;color:#fff;display:flex;align-items:center;justify-content:center;font:700 11px 'Nunito';">T</span></div>
+                <div style="display:flex;flex-direction:column;align-items:center;gap:5px;"><span style="width:26px;height:26px;border-radius:50%;background:#fff;color:#C9A8B8;display:flex;align-items:center;justify-content:center;font:700 11px 'Nunito';">Q</span></div>
+                <div style="display:flex;flex-direction:column;align-items:center;gap:5px;"><span style="width:26px;height:26px;border-radius:50%;background:#E08AB0;color:#fff;display:flex;align-items:center;justify-content:center;font:700 11px 'Nunito';">Q</span></div>
+                <div style="display:flex;flex-direction:column;align-items:center;gap:5px;"><span style="width:26px;height:26px;border-radius:50%;background:#fff;color:#C9A8B8;display:flex;align-items:center;justify-content:center;font:700 11px 'Nunito';border:2px solid #E08AB0;">S</span></div>
+                <div style="display:flex;flex-direction:column;align-items:center;gap:5px;"><span style="width:26px;height:26px;border-radius:50%;background:#fff;color:#C9A8B8;display:flex;align-items:center;justify-content:center;font:700 11px 'Nunito';">S</span></div>
+                <div style="display:flex;flex-direction:column;align-items:center;gap:5px;"><span style="width:26px;height:26px;border-radius:50%;background:#fff;color:#C9A8B8;display:flex;align-items:center;justify-content:center;font:700 11px 'Nunito';">D</span></div>
+              </div>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:12px;">
+              <div style="background:#fff;border-radius:22px;padding:15px;display:flex;align-items:center;gap:13px;box-shadow:0 6px 18px rgba(120,86,164,.06);">
+                <div style="width:46px;height:46px;border-radius:15px;background:#EDE7F8;display:flex;align-items:center;justify-content:center;"><i class="ph-fill ph-barbell" style="font-size:23px;color:#8768BC;"></i></div>
+                <div style="flex:1;"><div style="font:700 15px 'Quicksand';color:#3B3552;">Peito e tríceps</div><div style="font:600 12px 'Nunito';color:#8A82A0;">5 exercícios · 45 min</div></div>
+                <div style="width:34px;height:34px;border-radius:50%;background:#A78BD0;display:flex;align-items:center;justify-content:center;"><i class="ph-fill ph-play" style="font-size:15px;color:#fff;"></i></div>
+              </div>
+              <div style="background:#fff;border-radius:22px;padding:15px;display:flex;align-items:center;gap:13px;box-shadow:0 6px 18px rgba(120,86,164,.06);">
+                <div style="width:46px;height:46px;border-radius:15px;background:#E6F4EC;display:flex;align-items:center;justify-content:center;"><i class="ph-fill ph-person-simple-tai-chi" style="font-size:23px;color:#4E9C74;"></i></div>
+                <div style="flex:1;"><div style="font:700 15px 'Quicksand';color:#3B3552;">Costas e bíceps</div><div style="font:600 12px 'Nunito';color:#8A82A0;">6 exercícios · 50 min</div></div>
+                <div style="width:34px;height:34px;border-radius:50%;background:#F4EFFA;display:flex;align-items:center;justify-content:center;"><i class="ph-fill ph-play" style="font-size:15px;color:#A78BD0;"></i></div>
+              </div>
+              <div style="background:#fff;border-radius:22px;padding:15px;display:flex;align-items:center;gap:13px;box-shadow:0 6px 18px rgba(120,86,164,.06);">
+                <div style="width:46px;height:46px;border-radius:15px;background:#FBEAF2;display:flex;align-items:center;justify-content:center;"><i class="ph-fill ph-person-simple-walk" style="font-size:23px;color:#C76E9E;"></i></div>
+                <div style="flex:1;"><div style="font:700 15px 'Quicksand';color:#3B3552;">Pernas</div><div style="font:600 12px 'Nunito';color:#8A82A0;">5 exercícios · 55 min</div></div>
+                <div style="width:34px;height:34px;border-radius:50%;background:#F4EFFA;display:flex;align-items:center;justify-content:center;"><i class="ph-fill ph-play" style="font-size:15px;color:#A78BD0;"></i></div>
+              </div>
+              <div style="background:#fff;border-radius:22px;padding:15px;display:flex;align-items:center;gap:13px;box-shadow:0 6px 18px rgba(120,86,164,.06);">
+                <div style="width:46px;height:46px;border-radius:15px;background:#EDE7F8;display:flex;align-items:center;justify-content:center;"><i class="ph-fill ph-heartbeat" style="font-size:23px;color:#8768BC;"></i></div>
+                <div style="flex:1;"><div style="font:700 15px 'Quicksand';color:#3B3552;">Cardio leve</div><div style="font:600 12px 'Nunito';color:#8A82A0;">30 min</div></div>
+                <div style="width:34px;height:34px;border-radius:50%;background:#F4EFFA;display:flex;align-items:center;justify-content:center;"><i class="ph-fill ph-play" style="font-size:15px;color:#A78BD0;"></i></div>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:space-around;align-items:center;padding:11px 6px 18px;background:#fff;border-top:1px solid #F1EBF8;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#B3ABC4;font:600 10px 'Nunito';"><i class="ph ph-house" style="font-size:23px;"></i><span>Hoje</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#B3ABC4;font:600 10px 'Nunito';"><i class="ph ph-heartbeat" style="font-size:23px;"></i><span>Corpo</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#8768BC;font:800 10px 'Nunito';"><i class="ph-fill ph-barbell" style="font-size:23px;"></i><span>Treino</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#B3ABC4;font:600 10px 'Nunito';"><i class="ph ph-smiley" style="font-size:23px;"></i><span>Mente</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#B3ABC4;font:600 10px 'Nunito';"><i class="ph ph-first-aid-kit" style="font-size:23px;"></i><span>Saúde</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== TREINO EM ANDAMENTO ===== -->
+      <div style="display:flex;flex-direction:column;gap:14px;width:342px;">
+        <span style="align-self:flex-start;background:#fff;color:#6B6386;font:700 12px 'Nunito';padding:4px 12px;border-radius:999px;box-shadow:0 4px 12px rgba(120,86,164,.07);">Treino · em andamento</span>
+        <div data-screen-label="Treino em andamento" style="width:342px;height:748px;background:#FBFAFE;border-radius:38px;box-shadow:0 22px 50px rgba(120,86,164,.16);border:1px solid #EAE2F4;overflow:hidden;display:flex;flex-direction:column;position:relative;">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 24px 2px;font:700 13px 'Nunito';color:#4A4360;"><span>9:41</span><span style="display:flex;gap:7px;font-size:14px;"><i class="ph-fill ph-cell-signal-full"></i><i class="ph-fill ph-wifi-high"></i><i class="ph-fill ph-battery-full"></i></span></div>
+          <div class="pscroll" style="flex:1;overflow-y:auto;padding:12px 22px 18px;">
+            <!-- LISTA DE EXERCÍCIOS -->
+            <sc-if value="{{ isLista }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+                <div style="width:38px;height:38px;border-radius:12px;background:#F4EFFA;display:flex;align-items:center;justify-content:center;"><i class="ph-fill ph-arrow-left" style="font-size:18px;color:#8768BC;"></i></div>
+                <div style="text-align:center;"><div style="font:700 16px 'Quicksand';color:#3B3552;">Peito e tríceps</div><div style="font:600 12px 'Nunito';color:#8A82A0;">{{ progressoLabel }}</div></div>
+                <div style="display:flex;align-items:center;gap:5px;background:#FBEAF2;padding:7px 11px;border-radius:999px;"><i class="ph-fill ph-timer" style="font-size:15px;color:#C76E9E;"></i><span style="font:700 13px 'Quicksand';color:#C76E9E;">24:12</span></div>
+              </div>
+              <div style="font:600 12px 'Nunito';color:#A79FB8;margin-bottom:13px;">Toque num exercício para registrar as séries</div>
+              <div style="display:flex;flex-direction:column;gap:11px;margin-bottom:18px;">
+                <sc-for list="{{ exList }}" as="item" hint-placeholder-count="5">
+                  <div onClick="{{ item.onOpen }}" style="background:#fff;border-radius:20px;padding:14px 15px;display:flex;align-items:center;gap:13px;box-shadow:0 5px 16px rgba(120,86,164,.05);cursor:pointer;">
+                    <div style="width:42px;height:42px;border-radius:13px;background:#EDE7F8;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="ph-fill ph-barbell" style="font-size:21px;color:#8768BC;"></i></div>
+                    <div style="flex:1;"><div style="font:700 15px 'Quicksand';color:#3B3552;">{{ item.nome }}</div><div style="font:600 12px 'Nunito';color:#8A82A0;">{{ item.sub }}</div></div>
+                    <sc-if value="{{ item.isDone }}" hint-placeholder-val="{{ false }}"><i class="ph-fill ph-check-circle" style="font-size:24px;color:#7FC4A0;"></i></sc-if>
+                    <sc-if value="{{ item.notDone }}" hint-placeholder-val="{{ true }}"><i class="ph-fill ph-caret-right" style="font-size:18px;color:#C9BFDE;"></i></sc-if>
+                  </div>
+                </sc-for>
+              </div>
+              <div onClick="{{ concluir }}" style="background:#A78BD0;color:#fff;border-radius:18px;padding:15px;text-align:center;font:700 15px 'Quicksand';box-shadow:0 8px 20px rgba(167,139,208,.35);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;"><i class="ph-fill ph-flag-checkered"></i>Concluir treino</div>
+            </sc-if>
+
+            <!-- EXERCÍCIO / SÉRIES -->
+            <sc-if value="{{ isEx }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;">
+                <div onClick="{{ backToLista }}" style="width:38px;height:38px;border-radius:12px;background:#F4EFFA;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;"><i class="ph-fill ph-arrow-left" style="font-size:18px;color:#8768BC;"></i></div>
+                <div><div style="font:700 17px 'Quicksand';color:#3B3552;">{{ exNome }}</div><div style="font:600 12px 'Nunito';color:#8A82A0;">{{ exSub }}</div></div>
+              </div>
+              <div style="background:#EDE7F8;border-radius:15px;padding:11px 14px;display:flex;align-items:center;gap:9px;margin-bottom:16px;"><i class="ph-fill ph-clock-counter-clockwise" style="color:#8768BC;font-size:18px;"></i><span style="font:600 12px 'Nunito';color:#6B6386;">Último treino: {{ ultimoLabel }}</span></div>
+              <div style="display:flex;flex-direction:column;gap:10px;">
+                <sc-for list="{{ seriesRows }}" as="s" hint-placeholder-count="4">
+                  <div style="display:flex;align-items:center;gap:9px;background:{{ s.bg }};border-radius:14px;padding:9px 10px;">
+                    <span style="font:700 13px 'Quicksand';color:#5B5470;width:46px;">Série {{ s.n }}</span>
+                    <span style="flex:1;background:#fff;border-radius:11px;padding:9px;text-align:center;font:700 13px 'Nunito';color:#5B5470;">{{ s.reps }}</span>
+                    <span style="flex:1;background:#fff;border-radius:11px;padding:9px;text-align:center;font:700 13px 'Nunito';color:#5B5470;">{{ s.kg }}</span>
+                    <sc-if value="{{ s.isDone }}" hint-placeholder-val="{{ false }}"><span style="width:66px;text-align:center;"><i class="ph-fill ph-check-circle" style="font-size:24px;color:#7FC4A0;"></i></span></sc-if>
+                    <sc-if value="{{ s.notDone }}" hint-placeholder-val="{{ true }}"><span onClick="{{ fazerSerie }}" style="width:66px;background:#A78BD0;color:#fff;border-radius:11px;padding:9px 0;text-align:center;font:700 12px 'Nunito';cursor:pointer;">Feito</span></sc-if>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+
+            <!-- TREINO CONCLUÍDO -->
+            <sc-if value="{{ isFim }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;flex-direction:column;align-items:center;text-align:center;padding-top:56px;">
+                <div style="width:88px;height:88px;border-radius:50%;background:#E6F4EC;display:flex;align-items:center;justify-content:center;margin-bottom:20px;"><i class="ph-fill ph-check-fat" style="font-size:42px;color:#7FC4A0;"></i></div>
+                <div style="font:700 22px 'Quicksand';color:#3B3552;margin-bottom:6px;">Treino concluído!</div>
+                <div style="font:600 13px 'Nunito';color:#8A82A0;max-width:230px;line-height:1.5;margin-bottom:24px;">Mandou bem, {{ userName }}. Peito e tríceps registrado no seu histórico.</div>
+                <div style="display:flex;gap:12px;margin-bottom:28px;">
+                  <div style="background:#EDE7F8;border-radius:18px;padding:14px 22px;text-align:center;"><div style="font:700 20px 'Quicksand';color:#8768BC;">{{ doneCount }}<span style="font-size:13px;color:#A79FB8;">/5</span></div><div style="font:700 11px 'Nunito';color:#8A82A0;">exercícios</div></div>
+                  <div style="background:#FBEAF2;border-radius:18px;padding:14px 22px;text-align:center;"><div style="font:700 20px 'Quicksand';color:#C76E9E;">24<span style="font-size:13px;color:#A79FB8;">min</span></div><div style="font:700 11px 'Nunito';color:#8A82A0;">duração</div></div>
+                </div>
+                <div onClick="{{ reiniciar }}" style="background:#A78BD0;color:#fff;border-radius:16px;padding:13px 28px;font:700 14px 'Quicksand';cursor:pointer;">Voltar ao início</div>
+              </div>
+            </sc-if>
+          </div>
+          <!-- TIMER DE DESCANSO -->
+          <sc-if value="{{ resting }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;left:16px;right:16px;bottom:88px;background:#3B3552;border-radius:22px;padding:15px 18px;display:flex;align-items:center;gap:14px;box-shadow:0 16px 36px rgba(59,53,82,.4);">
+              <div style="width:48px;height:48px;border-radius:50%;border:3px solid rgba(255,255,255,.22);border-top-color:#F3B6D0;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="ph-fill ph-timer" style="color:#F3B6D0;font-size:22px;"></i></div>
+              <div style="flex:1;"><div style="font:600 11px 'Nunito';color:#C9BFDE;text-transform:uppercase;letter-spacing:.05em;">Descanso</div><div style="font:700 25px 'Quicksand';color:#fff;line-height:1.1;">{{ restTime }}</div></div>
+              <span onClick="{{ skipRest }}" style="background:rgba(255,255,255,.14);color:#fff;border-radius:12px;padding:10px 16px;font:700 13px 'Nunito';cursor:pointer;">Pular</span>
+            </div>
+          </sc-if>
+          <div style="display:flex;justify-content:space-around;align-items:center;padding:11px 6px 18px;background:#fff;border-top:1px solid #F1EBF8;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#B3ABC4;font:600 10px 'Nunito';"><i class="ph ph-house" style="font-size:23px;"></i><span>Hoje</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#B3ABC4;font:600 10px 'Nunito';"><i class="ph ph-heartbeat" style="font-size:23px;"></i><span>Corpo</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#8768BC;font:800 10px 'Nunito';"><i class="ph-fill ph-barbell" style="font-size:23px;"></i><span>Treino</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#B3ABC4;font:600 10px 'Nunito';"><i class="ph ph-smiley" style="font-size:23px;"></i><span>Mente</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#B3ABC4;font:600 10px 'Nunito';"><i class="ph ph-first-aid-kit" style="font-size:23px;"></i><span>Saúde</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== MENTE ===== -->
+      <div style="display:flex;flex-direction:column;gap:14px;width:342px;">
+        <span style="align-self:flex-start;background:#fff;color:#6B6386;font:700 12px 'Nunito';padding:4px 12px;border-radius:999px;box-shadow:0 4px 12px rgba(120,86,164,.07);">Mente</span>
+        <div data-screen-label="Mente" style="width:342px;height:748px;background:#FBFAFE;border-radius:38px;box-shadow:0 22px 50px rgba(120,86,164,.16);border:1px solid #EAE2F4;overflow:hidden;display:flex;flex-direction:column;">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 24px 2px;font:700 13px 'Nunito';color:#4A4360;"><span>9:41</span><span style="display:flex;gap:7px;font-size:14px;"><i class="ph-fill ph-cell-signal-full"></i><i class="ph-fill ph-wifi-high"></i><i class="ph-fill ph-battery-full"></i></span></div>
+          <div class="pscroll" style="flex:1;overflow-y:auto;padding:12px 22px 18px;">
+            <div style="font:700 24px 'Quicksand';color:#3B3552;margin-bottom:4px;">Seu espaço</div>
+            <div style="font:600 13px 'Nunito';color:#8A82A0;margin-bottom:22px;line-height:1.5;">Sem pressa e sem cobrança. Só um lugar pra registrar como você está.</div>
+
+            <div style="background:#EDE7F8;border-radius:24px;padding:18px;margin-bottom:22px;">
+              <div style="font:700 15px 'Quicksand';color:#3B3552;margin-bottom:14px;">Como você está se sentindo agora?</div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+                <div style="width:50px;height:50px;border-radius:16px;background:#fff;display:flex;align-items:center;justify-content:center;"><i class="ph-fill ph-cloud-rain" style="font-size:24px;color:#C7BEDA;"></i></div>
+                <div style="width:50px;height:50px;border-radius:16px;background:#fff;display:flex;align-items:center;justify-content:center;"><i class="ph-fill ph-smiley-sad" style="font-size:24px;color:#C7BEDA;"></i></div>
+                <div style="width:50px;height:50px;border-radius:16px;background:#A78BD0;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 14px rgba(167,139,208,.4);"><i class="ph-fill ph-smiley-meh" style="font-size:26px;color:#fff;"></i></div>
+                <div style="width:50px;height:50px;border-radius:16px;background:#fff;display:flex;align-items:center;justify-content:center;"><i class="ph-fill ph-smiley" style="font-size:24px;color:#C7BEDA;"></i></div>
+                <div style="width:50px;height:50px;border-radius:16px;background:#fff;display:flex;align-items:center;justify-content:center;"><i class="ph-fill ph-sun" style="font-size:24px;color:#C7BEDA;"></i></div>
+              </div>
+            </div>
+
+            <div style="background:#fff;border-radius:22px;padding:18px;box-shadow:0 6px 18px rgba(120,86,164,.06);margin-bottom:22px;">
+              <div style="font:700 15px 'Quicksand';color:#3B3552;margin-bottom:14px;">E a ansiedade hoje?</div>
+              <div style="height:8px;border-radius:5px;background:linear-gradient(90deg,#A8D5BA,#F3B6D0);position:relative;margin:6px 6px 10px;">
+                <div style="position:absolute;left:35%;top:50%;transform:translate(-50%,-50%);width:22px;height:22px;border-radius:50%;background:#fff;border:3px solid #A78BD0;box-shadow:0 3px 8px rgba(120,86,164,.25);"></div>
+              </div>
+              <div style="display:flex;justify-content:space-between;font:600 12px 'Nunito';color:#8A82A0;"><span>Tranquilo</span><span>Agitado</span></div>
+            </div>
+
+            <div style="font:700 15px 'Quicksand';color:#3B3552;margin-bottom:12px;">Mini-diário</div>
+            <div style="background:#FBEAF2;border-radius:22px;padding:16px;margin-bottom:22px;">
+              <div style="font:600 13px 'Nunito';color:#9A8290;margin-bottom:12px;line-height:1.5;">Quer escrever o que passou pela sua cabeça? Fica só entre vocês dois.</div>
+              <div style="background:#fff;border-radius:14px;padding:12px 14px;font:400 13px 'Nunito';color:#C6B6C0;min-height:52px;">Escreva o que vier...</div>
+              <div style="background:#E08AB0;color:#fff;border-radius:13px;padding:11px;text-align:center;font:700 14px 'Quicksand';margin-top:12px;">Salvar registro</div>
+            </div>
+
+            <div style="font:700 15px 'Quicksand';color:#3B3552;margin-bottom:12px;">Seus registros</div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <div style="background:#fff;border-radius:18px;padding:14px;box-shadow:0 5px 14px rgba(120,86,164,.05);">
+                <div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span style="font:700 13px 'Quicksand';color:#8768BC;">Ontem</span><i class="ph-fill ph-smiley" style="color:#7FC4A0;font-size:18px;"></i></div>
+                <div style="font:400 13px 'Nunito';color:#6B6386;line-height:1.5;">Consegui terminar o projeto e ainda deu tempo de caminhar. Dia leve.</div>
+              </div>
+              <div style="background:#fff;border-radius:18px;padding:14px;box-shadow:0 5px 14px rgba(120,86,164,.05);">
+                <div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span style="font:700 13px 'Quicksand';color:#8768BC;">Sábado</span><i class="ph-fill ph-smiley-meh" style="color:#D6A96B;font-size:18px;"></i></div>
+                <div style="font:400 13px 'Nunito';color:#6B6386;line-height:1.5;">Meio cansado, mas tudo bem descansar quando precisa.</div>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:space-around;align-items:center;padding:11px 6px 18px;background:#fff;border-top:1px solid #F1EBF8;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#B3ABC4;font:600 10px 'Nunito';"><i class="ph ph-house" style="font-size:23px;"></i><span>Hoje</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#B3ABC4;font:600 10px 'Nunito';"><i class="ph ph-heartbeat" style="font-size:23px;"></i><span>Corpo</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#B3ABC4;font:600 10px 'Nunito';"><i class="ph ph-barbell" style="font-size:23px;"></i><span>Treino</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#8768BC;font:800 10px 'Nunito';"><i class="ph-fill ph-smiley" style="font-size:23px;"></i><span>Mente</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#B3ABC4;font:600 10px 'Nunito';"><i class="ph ph-first-aid-kit" style="font-size:23px;"></i><span>Saúde</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== SAÚDE ===== -->
+      <div style="display:flex;flex-direction:column;gap:14px;width:342px;">
+        <span style="align-self:flex-start;background:#fff;color:#6B6386;font:700 12px 'Nunito';padding:4px 12px;border-radius:999px;box-shadow:0 4px 12px rgba(120,86,164,.07);">Saúde</span>
+        <div data-screen-label="Saúde" style="width:342px;height:748px;background:#FBFAFE;border-radius:38px;box-shadow:0 22px 50px rgba(120,86,164,.16);border:1px solid #EAE2F4;overflow:hidden;display:flex;flex-direction:column;">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 24px 2px;font:700 13px 'Nunito';color:#4A4360;"><span>9:41</span><span style="display:flex;gap:7px;font-size:14px;"><i class="ph-fill ph-cell-signal-full"></i><i class="ph-fill ph-wifi-high"></i><i class="ph-fill ph-battery-full"></i></span></div>
+          <div class="pscroll" style="flex:1;overflow-y:auto;padding:12px 22px 18px;">
+            <div style="font:700 24px 'Quicksand';color:#3B3552;margin-bottom:4px;">Saúde</div>
+            <div style="font:600 13px 'Nunito';color:#8A82A0;margin-bottom:18px;">Consultas, exames e agenda de remédios</div>
+
+            <div style="background:#EDE7F8;border-radius:24px;padding:16px;display:flex;align-items:center;gap:13px;margin-bottom:24px;">
+              <div style="width:46px;height:46px;border-radius:15px;background:#fff;display:flex;align-items:center;justify-content:center;"><i class="ph-fill ph-calendar-heart" style="font-size:23px;color:#8768BC;"></i></div>
+              <div><div style="font:700 16px 'Quicksand';color:#3B3552;">Próxima consulta em 3 dias</div><div style="font:600 12px 'Nunito';color:#8A82A0;">Dra. Marina · qui, 9 às 14h</div></div>
+            </div>
+
+            <div style="font:700 15px 'Quicksand';color:#3B3552;margin-bottom:12px;">Consultas</div>
+            <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px;">
+              <div style="background:#fff;border-radius:18px;padding:13px 14px;display:flex;align-items:center;gap:12px;box-shadow:0 5px 14px rgba(120,86,164,.05);"><div style="width:40px;height:40px;border-radius:13px;background:#E6F4EC;display:flex;align-items:center;justify-content:center;"><i class="ph-fill ph-carrot" style="font-size:20px;color:#4E9C74;"></i></div><div style="flex:1;"><div style="font:700 14px 'Quicksand';color:#3B3552;">Dra. Marina</div><div style="font:600 12px 'Nunito';color:#8A82A0;">Nutricionista</div></div><div style="text-align:right;"><div style="font:700 13px 'Quicksand';color:#8768BC;">qui, 9</div><div style="font:600 11px 'Nunito';color:#8A82A0;">14h</div></div></div>
+              <div style="background:#fff;border-radius:18px;padding:13px 14px;display:flex;align-items:center;gap:12px;box-shadow:0 5px 14px rgba(120,86,164,.05);"><div style="width:40px;height:40px;border-radius:13px;background:#EDE7F8;display:flex;align-items:center;justify-content:center;"><i class="ph-fill ph-stethoscope" style="font-size:20px;color:#8768BC;"></i></div><div style="flex:1;"><div style="font:700 14px 'Quicksand';color:#3B3552;">Dr. Paulo</div><div style="font:600 12px 'Nunito';color:#8A82A0;">Clínico geral</div></div><div style="text-align:right;"><div style="font:700 13px 'Quicksand';color:#8768BC;">22 jul</div><div style="font:600 11px 'Nunito';color:#8A82A0;">10h</div></div></div>
+            </div>
+
+            <div style="font:700 15px 'Quicksand';color:#3B3552;margin-bottom:12px;">Exames</div>
+            <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px;">
+              <div style="background:#fff;border-radius:18px;padding:13px 14px;display:flex;align-items:center;gap:12px;box-shadow:0 5px 14px rgba(120,86,164,.05);"><div style="width:40px;height:40px;border-radius:13px;background:#E6F4EC;display:flex;align-items:center;justify-content:center;"><i class="ph-fill ph-test-tube" style="font-size:20px;color:#4E9C74;"></i></div><div style="flex:1;"><div style="font:700 14px 'Quicksand';color:#3B3552;">Hemograma</div><div style="font:600 12px 'Nunito';color:#7FC4A0;">resultado disponível</div></div><i class="ph-fill ph-caret-right" style="color:#C9BFDE;font-size:18px;"></i></div>
+              <div style="background:#fff;border-radius:18px;padding:13px 14px;display:flex;align-items:center;gap:12px;box-shadow:0 5px 14px rgba(120,86,164,.05);"><div style="width:40px;height:40px;border-radius:13px;background:#FBEAF2;display:flex;align-items:center;justify-content:center;"><i class="ph-fill ph-drop-half" style="font-size:20px;color:#C76E9E;"></i></div><div style="flex:1;"><div style="font:700 14px 'Quicksand';color:#3B3552;">Vitamina D</div><div style="font:600 12px 'Nunito';color:#C76E9E;">a agendar</div></div><i class="ph-fill ph-caret-right" style="color:#C9BFDE;font-size:18px;"></i></div>
+            </div>
+
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+              <span style="font:700 15px 'Quicksand';color:#3B3552;">Agenda de remédios</span>
+              <span style="font:700 12px 'Nunito';color:#8768BC;display:inline-flex;align-items:center;gap:3px;"><i class="ph-fill ph-plus-circle"></i>Cadastrar</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <div style="background:#fff;border-radius:18px;padding:13px 14px;display:flex;align-items:center;gap:12px;box-shadow:0 5px 14px rgba(120,86,164,.05);"><div style="width:40px;height:40px;border-radius:13px;background:#FBECEF;display:flex;align-items:center;justify-content:center;"><i class="ph-fill ph-pill" style="font-size:20px;color:#C77E93;"></i></div><div style="flex:1;"><div style="font:700 14px 'Quicksand';color:#3B3552;">Vitamina D</div><div style="font:600 12px 'Nunito';color:#8A82A0;">1x ao dia · 09h</div></div></div>
+              <div style="background:#fff;border-radius:18px;padding:13px 14px;display:flex;align-items:center;gap:12px;box-shadow:0 5px 14px rgba(120,86,164,.05);"><div style="width:40px;height:40px;border-radius:13px;background:#FBECEF;display:flex;align-items:center;justify-content:center;"><i class="ph-fill ph-pill" style="font-size:20px;color:#C77E93;"></i></div><div style="flex:1;"><div style="font:700 14px 'Quicksand';color:#3B3552;">Magnésio</div><div style="font:600 12px 'Nunito';color:#8A82A0;">1x ao dia · noite</div></div></div>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:space-around;align-items:center;padding:11px 6px 18px;background:#fff;border-top:1px solid #F1EBF8;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#B3ABC4;font:600 10px 'Nunito';"><i class="ph ph-house" style="font-size:23px;"></i><span>Hoje</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#B3ABC4;font:600 10px 'Nunito';"><i class="ph ph-heartbeat" style="font-size:23px;"></i><span>Corpo</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#B3ABC4;font:600 10px 'Nunito';"><i class="ph ph-barbell" style="font-size:23px;"></i><span>Treino</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#B3ABC4;font:600 10px 'Nunito';"><i class="ph ph-smiley" style="font-size:23px;"></i><span>Mente</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#8768BC;font:800 10px 'Nunito';"><i class="ph-fill ph-first-aid-kit" style="font-size:23px;"></i><span>Saúde</span></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ LEMBRETES E NOTIFICAÇÕES ============ -->
+  <section style="max-width:1500px;margin:60px auto 0;">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:22px;">
+      <span style="width:6px;height:22px;border-radius:3px;background:#F3B6D0;"></span>
+      <h2 style="font:700 16px 'Quicksand';color:#4A4360;margin:0;letter-spacing:.04em;text-transform:uppercase;">Lembretes e notificações</h2>
+    </div>
+    <div style="display:flex;gap:44px;flex-wrap:wrap;">
+
+      <!-- ===== NOTIFICAÇÕES (LOCK SCREEN) ===== -->
+      <div style="display:flex;flex-direction:column;gap:14px;width:342px;">
+        <span style="align-self:flex-start;background:#fff;color:#6B6386;font:700 12px 'Nunito';padding:4px 12px;border-radius:999px;box-shadow:0 4px 12px rgba(120,86,164,.07);">Notificações</span>
+        <div data-screen-label="Notificações" style="width:342px;height:748px;background:linear-gradient(160deg,#C9B6E6,#E9DDF3 52%,#F3D9E6);border-radius:38px;box-shadow:0 22px 50px rgba(120,86,164,.16);border:1px solid #EAE2F4;overflow:hidden;display:flex;flex-direction:column;">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 24px 2px;font:700 13px 'Nunito';color:#4A4360;"><span>9:41</span><span style="display:flex;gap:7px;font-size:14px;"><i class="ph-fill ph-cell-signal-full"></i><i class="ph-fill ph-wifi-high"></i><i class="ph-fill ph-battery-full"></i></span></div>
+          <div style="flex:1;padding:20px;display:flex;flex-direction:column;">
+            <div style="text-align:center;margin:14px 0 26px;">
+              <i class="ph-fill ph-lock-simple" style="font-size:19px;color:#6B5A8A;"></i>
+              <div style="font:700 62px 'Quicksand';color:#43395E;line-height:1;margin-top:8px;">9:41</div>
+              <div style="font:600 14px 'Nunito';color:#6B5A8A;margin-top:2px;">Segunda, 6 de julho</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:11px;">
+              <div style="background:rgba(255,255,255,.9);border-radius:20px;padding:12px 13px;display:flex;align-items:center;gap:12px;box-shadow:0 8px 20px rgba(90,60,130,.12);">
+                <div style="width:40px;height:40px;border-radius:12px;background:#EDE7F8;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="ph-fill ph-drop" style="font-size:20px;color:#8768BC;"></i></div>
+                <div style="flex:1;min-width:0;"><div style="display:flex;justify-content:space-between;"><span style="font:800 11px 'Nunito';color:#8768BC;letter-spacing:.03em;">DIÁRIO</span><span style="font:600 11px 'Nunito';color:#A79FB8;">agora</span></div><div style="font:700 14px 'Quicksand';color:#3B3552;margin-top:1px;">Hora de se hidratar</div><div style="font:600 12px 'Nunito';color:#7A7290;margin-top:1px;">Faltam 3 copos pra sua meta de hoje 💧</div></div>
+              </div>
+              <div style="background:rgba(255,255,255,.9);border-radius:20px;padding:12px 13px;display:flex;align-items:center;gap:12px;box-shadow:0 8px 20px rgba(90,60,130,.12);">
+                <div style="width:40px;height:40px;border-radius:12px;background:#FBECEF;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="ph-fill ph-pill" style="font-size:20px;color:#C77E93;"></i></div>
+                <div style="flex:1;min-width:0;"><div style="display:flex;justify-content:space-between;"><span style="font:800 11px 'Nunito';color:#8768BC;letter-spacing:.03em;">DIÁRIO</span><span style="font:600 11px 'Nunito';color:#A79FB8;">há 5 min</span></div><div style="font:700 14px 'Quicksand';color:#3B3552;margin-top:1px;">Vitamina D</div><div style="font:600 12px 'Nunito';color:#7A7290;margin-top:1px;">Não esqueça do seu remédio das 21h.</div></div>
+              </div>
+              <div style="background:rgba(255,255,255,.9);border-radius:20px;padding:12px 13px;display:flex;align-items:center;gap:12px;box-shadow:0 8px 20px rgba(90,60,130,.12);">
+                <div style="width:40px;height:40px;border-radius:12px;background:#FBEAF2;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="ph-fill ph-barbell" style="font-size:20px;color:#C76E9E;"></i></div>
+                <div style="flex:1;min-width:0;"><div style="display:flex;justify-content:space-between;"><span style="font:800 11px 'Nunito';color:#8768BC;letter-spacing:.03em;">DIÁRIO</span><span style="font:600 11px 'Nunito';color:#A79FB8;">18:00</span></div><div style="font:700 14px 'Quicksand';color:#3B3552;margin-top:1px;">Bora treinar?</div><div style="font:600 12px 'Nunito';color:#7A7290;margin-top:1px;">Peito e tríceps te espera — 45 min.</div></div>
+              </div>
+              <div style="background:rgba(255,255,255,.9);border-radius:20px;padding:12px 13px;display:flex;align-items:center;gap:12px;box-shadow:0 8px 20px rgba(90,60,130,.12);">
+                <div style="width:40px;height:40px;border-radius:12px;background:#E6F4EC;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="ph-fill ph-moon-stars" style="font-size:20px;color:#4E9C74;"></i></div>
+                <div style="flex:1;min-width:0;"><div style="display:flex;justify-content:space-between;"><span style="font:800 11px 'Nunito';color:#8768BC;letter-spacing:.03em;">DIÁRIO</span><span style="font:600 11px 'Nunito';color:#A79FB8;">21:00</span></div><div style="font:700 14px 'Quicksand';color:#3B3552;margin-top:1px;">Como foi seu dia?</div><div style="font:600 12px 'Nunito';color:#7A7290;margin-top:1px;">Um check-in rápido antes de dormir 🌙</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="font-size:13px;color:#8A82A0;text-align:center;line-height:1.4;">Lembretes gentis de água, remédio,<br>treino e check-in da mente.</div>
+      </div>
+
+      <!-- ===== LEMBRETES (CONFIGURAÇÃO) ===== -->
+      <div style="display:flex;flex-direction:column;gap:14px;width:342px;">
+        <span style="align-self:flex-start;background:#fff;color:#6B6386;font:700 12px 'Nunito';padding:4px 12px;border-radius:999px;box-shadow:0 4px 12px rgba(120,86,164,.07);">Lembretes · ajustes</span>
+        <div data-screen-label="Lembretes" style="width:342px;height:748px;background:#FBFAFE;border-radius:38px;box-shadow:0 22px 50px rgba(120,86,164,.16);border:1px solid #EAE2F4;overflow:hidden;display:flex;flex-direction:column;">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 24px 2px;font:700 13px 'Nunito';color:#4A4360;"><span>9:41</span><span style="display:flex;gap:7px;font-size:14px;"><i class="ph-fill ph-cell-signal-full"></i><i class="ph-fill ph-wifi-high"></i><i class="ph-fill ph-battery-full"></i></span></div>
+          <div class="pscroll" style="flex:1;overflow-y:auto;padding:12px 22px 18px;">
+            <div style="font:700 24px 'Quicksand';color:#3B3552;margin-bottom:4px;">Lembretes</div>
+            <div style="font:600 13px 'Nunito';color:#8A82A0;margin-bottom:20px;">Escolha o que o app te lembra, e quando</div>
+            <div style="display:flex;flex-direction:column;gap:11px;">
+              <div style="background:#fff;border-radius:20px;padding:14px 15px;display:flex;align-items:center;gap:13px;box-shadow:0 5px 16px rgba(120,86,164,.05);">
+                <div style="width:42px;height:42px;border-radius:13px;background:#EDE7F8;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="ph-fill ph-drop" style="font-size:21px;color:#8768BC;"></i></div>
+                <div style="flex:1;"><div style="font:700 15px 'Quicksand';color:#3B3552;">Beber água</div><div style="font:600 12px 'Nunito';color:#8A82A0;">A cada 2 horas</div></div>
+                <div style="width:46px;height:27px;border-radius:999px;background:#A78BD0;display:flex;align-items:center;justify-content:flex-end;padding:3px;"><div style="width:21px;height:21px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.15);"></div></div>
+              </div>
+              <div style="background:#fff;border-radius:20px;padding:14px 15px;display:flex;align-items:center;gap:13px;box-shadow:0 5px 16px rgba(120,86,164,.05);">
+                <div style="width:42px;height:42px;border-radius:13px;background:#FBECEF;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="ph-fill ph-pill" style="font-size:21px;color:#C77E93;"></i></div>
+                <div style="flex:1;"><div style="font:700 15px 'Quicksand';color:#3B3552;">Remédios</div><div style="font:600 12px 'Nunito';color:#8A82A0;">Nos horários de cada remédio</div></div>
+                <div style="width:46px;height:27px;border-radius:999px;background:#A78BD0;display:flex;align-items:center;justify-content:flex-end;padding:3px;"><div style="width:21px;height:21px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.15);"></div></div>
+              </div>
+              <div style="background:#fff;border-radius:20px;padding:14px 15px;display:flex;align-items:center;gap:13px;box-shadow:0 5px 16px rgba(120,86,164,.05);">
+                <div style="width:42px;height:42px;border-radius:13px;background:#FBEAF2;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="ph-fill ph-barbell" style="font-size:21px;color:#C76E9E;"></i></div>
+                <div style="flex:1;"><div style="font:700 15px 'Quicksand';color:#3B3552;">Treino do dia</div><div style="font:600 12px 'Nunito';color:#8A82A0;">Todo dia às 18h</div></div>
+                <div style="width:46px;height:27px;border-radius:999px;background:#A78BD0;display:flex;align-items:center;justify-content:flex-end;padding:3px;"><div style="width:21px;height:21px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.15);"></div></div>
+              </div>
+              <div style="background:#fff;border-radius:20px;padding:14px 15px;display:flex;align-items:center;gap:13px;box-shadow:0 5px 16px rgba(120,86,164,.05);">
+                <div style="width:42px;height:42px;border-radius:13px;background:#E6F4EC;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="ph-fill ph-smiley" style="font-size:21px;color:#4E9C74;"></i></div>
+                <div style="flex:1;"><div style="font:700 15px 'Quicksand';color:#3B3552;">Check-in da mente</div><div style="font:600 12px 'Nunito';color:#8A82A0;">Às 21h, sem cobrança</div></div>
+                <div style="width:46px;height:27px;border-radius:999px;background:#A78BD0;display:flex;align-items:center;justify-content:flex-end;padding:3px;"><div style="width:21px;height:21px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.15);"></div></div>
+              </div>
+              <div style="background:#fff;border-radius:20px;padding:14px 15px;display:flex;align-items:center;gap:13px;box-shadow:0 5px 16px rgba(120,86,164,.05);">
+                <div style="width:42px;height:42px;border-radius:13px;background:#EDE7F8;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="ph-fill ph-calendar-heart" style="font-size:21px;color:#8768BC;"></i></div>
+                <div style="flex:1;"><div style="font:700 15px 'Quicksand';color:#3B3552;">Consultas</div><div style="font:600 12px 'Nunito';color:#8A82A0;">1 dia antes</div></div>
+                <div style="width:46px;height:27px;border-radius:999px;background:#E2D8F0;display:flex;align-items:center;justify-content:flex-start;padding:3px;"><div style="width:21px;height:21px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.15);"></div></div>
+              </div>
+            </div>
+            <div style="background:#F4EFFA;border-radius:16px;padding:13px 15px;display:flex;align-items:center;gap:10px;margin-top:16px;"><i class="ph-fill ph-bell-ringing" style="color:#8768BC;font-size:19px;"></i><span style="font:600 12px 'Nunito';color:#6B6386;line-height:1.4;">Lembretes chegam como notificação, mesmo com o app fechado.</span></div>
+          </div>
+          <div style="display:flex;justify-content:space-around;align-items:center;padding:11px 6px 18px;background:#fff;border-top:1px solid #F1EBF8;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#B3ABC4;font:600 10px 'Nunito';"><i class="ph ph-house" style="font-size:23px;"></i><span>Hoje</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#B3ABC4;font:600 10px 'Nunito';"><i class="ph ph-heartbeat" style="font-size:23px;"></i><span>Corpo</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#B3ABC4;font:600 10px 'Nunito';"><i class="ph ph-barbell" style="font-size:23px;"></i><span>Treino</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#B3ABC4;font:600 10px 'Nunito';"><i class="ph ph-smiley" style="font-size:23px;"></i><span>Mente</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#8768BC;font:800 10px 'Nunito';"><i class="ph-fill ph-first-aid-kit" style="font-size:23px;"></i><span>Saúde</span></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ ENTRADA E CONFIGURAÇÃO ============ -->
+  <section style="max-width:1500px;margin:60px auto 0;">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:22px;">
+      <span style="width:6px;height:22px;border-radius:3px;background:#A78BD0;"></span>
+      <h2 style="font:700 16px 'Quicksand';color:#4A4360;margin:0;letter-spacing:.04em;text-transform:uppercase;">Entrada e configuração</h2>
+    </div>
+    <div style="display:flex;gap:44px;flex-wrap:wrap;">
+
+      <!-- ===== LOGIN ===== -->
+      <div style="display:flex;flex-direction:column;gap:14px;width:342px;">
+        <span style="align-self:flex-start;background:#fff;color:#6B6386;font:700 12px 'Nunito';padding:4px 12px;border-radius:999px;box-shadow:0 4px 12px rgba(120,86,164,.07);">Login / cadastro</span>
+        <div data-screen-label="Login" style="width:342px;height:748px;background:radial-gradient(120% 55% at 50% 0%,#EFE6FA,#FBFAFE 62%);border-radius:38px;box-shadow:0 22px 50px rgba(120,86,164,.16);border:1px solid #EAE2F4;overflow:hidden;display:flex;flex-direction:column;">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 24px 2px;font:700 13px 'Nunito';color:#4A4360;"><span>9:41</span><span style="display:flex;gap:7px;font-size:14px;"><i class="ph-fill ph-cell-signal-full"></i><i class="ph-fill ph-wifi-high"></i><i class="ph-fill ph-battery-full"></i></span></div>
+          <div style="flex:1;display:flex;flex-direction:column;padding:0 30px;">
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;">
+              <div style="width:78px;height:78px;border-radius:24px;background:#A78BD0;display:flex;align-items:center;justify-content:center;box-shadow:0 12px 28px rgba(167,139,208,.4);margin-bottom:20px;"><i class="ph-fill ph-heart" style="font-size:40px;color:#fff;"></i></div>
+              <div style="font:700 32px 'Quicksand';color:#3B3552;">Diário</div>
+              <div style="font:600 15px 'Nunito';color:#8A82A0;margin-top:6px;max-width:220px;line-height:1.5;">Seu dia a dia, com carinho. Corpo, treino e mente num só lugar.</div>
+              <div style="display:flex;gap:8px;margin-top:22px;"><span style="width:9px;height:9px;border-radius:50%;background:#A78BD0;"></span><span style="width:9px;height:9px;border-radius:50%;background:#F3B6D0;"></span><span style="width:9px;height:9px;border-radius:50%;background:#A8D5BA;"></span></div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;padding-bottom:34px;">
+              <div style="background:#fff;border:1.5px solid #E6DEF2;border-radius:16px;padding:15px;display:flex;align-items:center;justify-content:center;gap:11px;box-shadow:0 5px 16px rgba(120,86,164,.07);"><i class="ph-fill ph-google-logo" style="font-size:21px;color:#8768BC;"></i><span style="font:700 15px 'Quicksand';color:#3B3552;">Continuar com Google</span></div>
+              <div style="background:#F4EFFA;border-radius:16px;padding:15px;display:flex;align-items:center;justify-content:center;gap:11px;"><i class="ph-fill ph-envelope-simple" style="font-size:20px;color:#8768BC;"></i><span style="font:700 15px 'Quicksand';color:#6B6386;">Entrar com e-mail</span></div>
+              <div style="font:600 11px 'Nunito';color:#A79FB8;text-align:center;line-height:1.5;margin-top:6px;">Ao continuar, você aceita os Termos de Uso<br>e a Política de Privacidade.</div>
+            </div>
+          </div>
+        </div>
+        <div style="font-size:13px;color:#8A82A0;text-align:center;line-height:1.4;">Login rápido com Google;<br>e-mail como alternativa.</div>
+      </div>
+
+      <!-- ===== ONBOARDING · ÁGUA ===== -->
+      <div style="display:flex;flex-direction:column;gap:14px;width:342px;">
+        <span style="align-self:flex-start;background:#fff;color:#6B6386;font:700 12px 'Nunito';padding:4px 12px;border-radius:999px;box-shadow:0 4px 12px rgba(120,86,164,.07);">Onboarding · 1 água</span>
+        <div data-screen-label="Onboarding água" style="width:342px;height:748px;background:#FBFAFE;border-radius:38px;box-shadow:0 22px 50px rgba(120,86,164,.16);border:1px solid #EAE2F4;overflow:hidden;display:flex;flex-direction:column;">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 24px 2px;font:700 13px 'Nunito';color:#4A4360;"><span>9:41</span><span style="display:flex;gap:7px;font-size:14px;"><i class="ph-fill ph-cell-signal-full"></i><i class="ph-fill ph-wifi-high"></i><i class="ph-fill ph-battery-full"></i></span></div>
+          <div style="flex:1;display:flex;flex-direction:column;padding:16px 28px 30px;">
+            <div style="display:flex;gap:6px;margin-bottom:9px;"><span style="flex:1;height:5px;border-radius:3px;background:#A78BD0;"></span><span style="flex:1;height:5px;border-radius:3px;background:#E2D8F0;"></span><span style="flex:1;height:5px;border-radius:3px;background:#E2D8F0;"></span></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;"><span style="font:700 11px 'Nunito';color:#A79FB8;">Passo 1 de 3</span><span style="font:700 12px 'Nunito';color:#8768BC;">Pular</span></div>
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;">
+              <div style="width:112px;height:112px;border-radius:50%;background:#EDE7F8;display:flex;align-items:center;justify-content:center;margin-bottom:22px;"><i class="ph-fill ph-drop" style="font-size:52px;color:#8768BC;"></i></div>
+              <div style="font:700 24px 'Quicksand';color:#3B3552;max-width:250px;line-height:1.25;">Quanto de água por dia?</div>
+              <div style="font:600 14px 'Nunito';color:#8A82A0;max-width:250px;line-height:1.5;margin:8px 0 28px;">A gente te lembra de beber ao longo do dia.</div>
+              <div style="display:flex;align-items:center;justify-content:center;gap:26px;margin-bottom:20px;">
+                <div style="width:52px;height:52px;border-radius:50%;background:#EDE7F8;display:flex;align-items:center;justify-content:center;"><i class="ph-fill ph-minus" style="font-size:20px;color:#8768BC;"></i></div>
+                <div style="text-align:center;min-width:96px;"><div style="font:700 44px 'Quicksand';color:#3B3552;line-height:1;">8</div><div style="font:600 13px 'Nunito';color:#8A82A0;margin-top:4px;">copos · ≈ 2 litros</div></div>
+                <div style="width:52px;height:52px;border-radius:50%;background:#A78BD0;display:flex;align-items:center;justify-content:center;"><i class="ph-fill ph-plus" style="font-size:20px;color:#fff;"></i></div>
+              </div>
+              <div style="display:flex;gap:6px;"><i class="ph-fill ph-drop" style="font-size:20px;color:#A78BD0;"></i><i class="ph-fill ph-drop" style="font-size:20px;color:#A78BD0;"></i><i class="ph-fill ph-drop" style="font-size:20px;color:#A78BD0;"></i><i class="ph-fill ph-drop" style="font-size:20px;color:#A78BD0;"></i><i class="ph-fill ph-drop" style="font-size:20px;color:#A78BD0;"></i><i class="ph-fill ph-drop" style="font-size:20px;color:#A78BD0;"></i><i class="ph-fill ph-drop" style="font-size:20px;color:#A78BD0;"></i><i class="ph-fill ph-drop" style="font-size:20px;color:#A78BD0;"></i></div>
+            </div>
+            <div style="background:#A78BD0;color:#fff;border-radius:16px;padding:15px;text-align:center;font:700 15px 'Quicksand';box-shadow:0 8px 20px rgba(167,139,208,.35);">Continuar</div>
+          </div>
+        </div>
+        <div style="font-size:13px;color:#8A82A0;text-align:center;line-height:1.4;">Passo 1 — meta de água.</div>
+      </div>
+
+      <!-- ===== ONBOARDING · REFEIÇÕES ===== -->
+      <div style="display:flex;flex-direction:column;gap:14px;width:342px;">
+        <span style="align-self:flex-start;background:#fff;color:#6B6386;font:700 12px 'Nunito';padding:4px 12px;border-radius:999px;box-shadow:0 4px 12px rgba(120,86,164,.07);">Onboarding · 2 refeições</span>
+        <div data-screen-label="Onboarding refeições" style="width:342px;height:748px;background:#FBFAFE;border-radius:38px;box-shadow:0 22px 50px rgba(120,86,164,.16);border:1px solid #EAE2F4;overflow:hidden;display:flex;flex-direction:column;">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 24px 2px;font:700 13px 'Nunito';color:#4A4360;"><span>9:41</span><span style="display:flex;gap:7px;font-size:14px;"><i class="ph-fill ph-cell-signal-full"></i><i class="ph-fill ph-wifi-high"></i><i class="ph-fill ph-battery-full"></i></span></div>
+          <div style="flex:1;display:flex;flex-direction:column;padding:16px 28px 30px;">
+            <div style="display:flex;gap:6px;margin-bottom:9px;"><span style="flex:1;height:5px;border-radius:3px;background:#A78BD0;"></span><span style="flex:1;height:5px;border-radius:3px;background:#A78BD0;"></span><span style="flex:1;height:5px;border-radius:3px;background:#E2D8F0;"></span></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;"><span style="font:700 11px 'Nunito';color:#A79FB8;">Passo 2 de 3</span><span style="font:700 12px 'Nunito';color:#8768BC;">Pular</span></div>
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;">
+              <div style="width:112px;height:112px;border-radius:50%;background:#E6F4EC;display:flex;align-items:center;justify-content:center;margin-bottom:22px;"><i class="ph-fill ph-fork-knife" style="font-size:50px;color:#4E9C74;"></i></div>
+              <div style="font:700 24px 'Quicksand';color:#3B3552;max-width:250px;line-height:1.25;">Quantas refeições por dia?</div>
+              <div style="font:600 14px 'Nunito';color:#8A82A0;max-width:250px;line-height:1.5;margin:8px 0 28px;">Sem contar calorias — só pra você não esquecer.</div>
+              <div style="display:flex;align-items:center;justify-content:center;gap:26px;margin-bottom:22px;">
+                <div style="width:52px;height:52px;border-radius:50%;background:#E6F4EC;display:flex;align-items:center;justify-content:center;"><i class="ph-fill ph-minus" style="font-size:20px;color:#4E9C74;"></i></div>
+                <div style="text-align:center;min-width:96px;"><div style="font:700 44px 'Quicksand';color:#3B3552;line-height:1;">3</div><div style="font:600 13px 'Nunito';color:#8A82A0;margin-top:4px;">refeições</div></div>
+                <div style="width:52px;height:52px;border-radius:50%;background:#7FC4A0;display:flex;align-items:center;justify-content:center;"><i class="ph-fill ph-plus" style="font-size:20px;color:#fff;"></i></div>
+              </div>
+              <div style="display:flex;gap:8px;"><span style="padding:8px 14px;border-radius:999px;background:#E6F4EC;color:#4E9C74;font:700 12px 'Nunito';">Café</span><span style="padding:8px 14px;border-radius:999px;background:#E6F4EC;color:#4E9C74;font:700 12px 'Nunito';">Almoço</span><span style="padding:8px 14px;border-radius:999px;background:#E6F4EC;color:#4E9C74;font:700 12px 'Nunito';">Jantar</span></div>
+            </div>
+            <div style="background:#A78BD0;color:#fff;border-radius:16px;padding:15px;text-align:center;font:700 15px 'Quicksand';box-shadow:0 8px 20px rgba(167,139,208,.35);">Continuar</div>
+            <div style="text-align:center;font:700 14px 'Nunito';color:#8A82A0;padding:12px 0 0;">Voltar</div>
+          </div>
+        </div>
+        <div style="font-size:13px;color:#8A82A0;text-align:center;line-height:1.4;">Passo 2 — refeições por dia.</div>
+      </div>
+
+      <!-- ===== ONBOARDING · DIAS DE TREINO ===== -->
+      <div style="display:flex;flex-direction:column;gap:14px;width:342px;">
+        <span style="align-self:flex-start;background:#fff;color:#6B6386;font:700 12px 'Nunito';padding:4px 12px;border-radius:999px;box-shadow:0 4px 12px rgba(120,86,164,.07);">Onboarding · 3 treino</span>
+        <div data-screen-label="Onboarding treino" style="width:342px;height:748px;background:#FBFAFE;border-radius:38px;box-shadow:0 22px 50px rgba(120,86,164,.16);border:1px solid #EAE2F4;overflow:hidden;display:flex;flex-direction:column;">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 24px 2px;font:700 13px 'Nunito';color:#4A4360;"><span>9:41</span><span style="display:flex;gap:7px;font-size:14px;"><i class="ph-fill ph-cell-signal-full"></i><i class="ph-fill ph-wifi-high"></i><i class="ph-fill ph-battery-full"></i></span></div>
+          <div style="flex:1;display:flex;flex-direction:column;padding:16px 28px 30px;">
+            <div style="display:flex;gap:6px;margin-bottom:9px;"><span style="flex:1;height:5px;border-radius:3px;background:#A78BD0;"></span><span style="flex:1;height:5px;border-radius:3px;background:#A78BD0;"></span><span style="flex:1;height:5px;border-radius:3px;background:#A78BD0;"></span></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;"><span style="font:700 11px 'Nunito';color:#A79FB8;">Passo 3 de 3</span><span style="font:700 12px 'Nunito';color:#8768BC;">Pular</span></div>
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;">
+              <div style="width:112px;height:112px;border-radius:50%;background:#FBEAF2;display:flex;align-items:center;justify-content:center;margin-bottom:22px;"><i class="ph-fill ph-barbell" style="font-size:50px;color:#C76E9E;"></i></div>
+              <div style="font:700 24px 'Quicksand';color:#3B3552;max-width:250px;line-height:1.25;">Quantos dias de treino?</div>
+              <div style="font:600 14px 'Nunito';color:#8A82A0;max-width:250px;line-height:1.5;margin:8px 0 28px;">Escolha os dias que você costuma treinar.</div>
+              <div style="display:flex;gap:9px;margin-bottom:18px;">
+                <span style="width:36px;height:36px;border-radius:50%;background:#E08AB0;color:#fff;display:flex;align-items:center;justify-content:center;font:700 13px 'Nunito';">S</span>
+                <span style="width:36px;height:36px;border-radius:50%;background:#E08AB0;color:#fff;display:flex;align-items:center;justify-content:center;font:700 13px 'Nunito';">T</span>
+                <span style="width:36px;height:36px;border-radius:50%;background:#FBEAF2;color:#C9A8B8;display:flex;align-items:center;justify-content:center;font:700 13px 'Nunito';">Q</span>
+                <span style="width:36px;height:36px;border-radius:50%;background:#E08AB0;color:#fff;display:flex;align-items:center;justify-content:center;font:700 13px 'Nunito';">Q</span>
+                <span style="width:36px;height:36px;border-radius:50%;background:#E08AB0;color:#fff;display:flex;align-items:center;justify-content:center;font:700 13px 'Nunito';">S</span>
+                <span style="width:36px;height:36px;border-radius:50%;background:#FBEAF2;color:#C9A8B8;display:flex;align-items:center;justify-content:center;font:700 13px 'Nunito';">S</span>
+                <span style="width:36px;height:36px;border-radius:50%;background:#FBEAF2;color:#C9A8B8;display:flex;align-items:center;justify-content:center;font:700 13px 'Nunito';">D</span>
+              </div>
+              <div style="font:700 14px 'Quicksand';color:#C76E9E;">4 dias por semana</div>
+            </div>
+            <div style="background:#A78BD0;color:#fff;border-radius:16px;padding:15px;text-align:center;font:700 15px 'Quicksand';box-shadow:0 8px 20px rgba(167,139,208,.35);">Começar a usar</div>
+            <div style="text-align:center;font:700 14px 'Nunito';color:#8A82A0;padding:12px 0 0;">Voltar</div>
+          </div>
+        </div>
+        <div style="font-size:13px;color:#8A82A0;text-align:center;line-height:1.4;">Passo 3 — dias de treino.</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ MODAIS — ADICIONAR ============ -->
+  <section style="max-width:1500px;margin:60px auto 0;">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:22px;">
+      <span style="width:6px;height:22px;border-radius:3px;background:#A8D5BA;"></span>
+      <h2 style="font:700 16px 'Quicksand';color:#4A4360;margin:0;letter-spacing:.04em;text-transform:uppercase;">Modais — adicionar</h2>
+    </div>
+    <div style="display:flex;gap:44px;flex-wrap:wrap;">
+
+      <!-- ===== MODAL ÁGUA ===== -->
+      <div style="display:flex;flex-direction:column;gap:14px;width:342px;">
+        <span style="align-self:flex-start;background:#fff;color:#6B6386;font:700 12px 'Nunito';padding:4px 12px;border-radius:999px;box-shadow:0 4px 12px rgba(120,86,164,.07);">Adicionar água</span>
+        <div data-screen-label="Modal água" style="width:342px;height:748px;background:#FBFAFE;border-radius:38px;box-shadow:0 22px 50px rgba(120,86,164,.16);border:1px solid #EAE2F4;overflow:hidden;display:flex;flex-direction:column;">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 24px 2px;font:700 13px 'Nunito';color:#4A4360;"><span>9:41</span><span style="display:flex;gap:7px;font-size:14px;"><i class="ph-fill ph-cell-signal-full"></i><i class="ph-fill ph-wifi-high"></i><i class="ph-fill ph-battery-full"></i></span></div>
+          <div style="flex:1;position:relative;background:#EDE7F5;overflow:hidden;">
+            <div style="position:absolute;inset:0;background:rgba(43,38,64,.42);"></div>
+            <div style="position:absolute;left:0;right:0;bottom:0;background:#FBFAFE;border-radius:28px 28px 0 0;padding:8px 24px 26px;box-shadow:0 -12px 40px rgba(59,53,82,.25);">
+              <div style="width:40px;height:5px;border-radius:3px;background:#E2D8F0;margin:6px auto 18px;"></div>
+              <div style="display:flex;align-items:center;gap:11px;margin-bottom:22px;"><div style="width:44px;height:44px;border-radius:14px;background:#EDE7F8;display:flex;align-items:center;justify-content:center;"><i class="ph-fill ph-drop" style="font-size:22px;color:#8768BC;"></i></div><div><div style="font:700 18px 'Quicksand';color:#3B3552;">Adicionar água</div><div style="font:600 12px 'Nunito';color:#8A82A0;">Registre o quanto você bebeu</div></div></div>
+              <div style="display:flex;align-items:center;justify-content:center;gap:26px;margin-bottom:22px;">
+                <div style="width:46px;height:46px;border-radius:50%;background:#EDE7F8;display:flex;align-items:center;justify-content:center;"><i class="ph-fill ph-minus" style="font-size:19px;color:#8768BC;"></i></div>
+                <div style="text-align:center;min-width:96px;"><div style="font:700 40px 'Quicksand';color:#3B3552;line-height:1;">250</div><div style="font:600 13px 'Nunito';color:#8A82A0;margin-top:3px;">ml</div></div>
+                <div style="width:46px;height:46px;border-radius:50%;background:#A78BD0;display:flex;align-items:center;justify-content:center;"><i class="ph-fill ph-plus" style="font-size:19px;color:#fff;"></i></div>
+              </div>
+              <div style="font:700 12px 'Nunito';color:#8A82A0;margin-bottom:9px;">Atalhos</div>
+              <div style="display:flex;gap:8px;margin-bottom:22px;">
+                <span style="flex:1;text-align:center;padding:11px 0;border-radius:13px;background:#F4EFFA;color:#6B6386;font:700 13px 'Nunito';">200 ml</span>
+                <span style="flex:1;text-align:center;padding:11px 0;border-radius:13px;background:#A78BD0;color:#fff;font:700 13px 'Nunito';">250 ml</span>
+                <span style="flex:1;text-align:center;padding:11px 0;border-radius:13px;background:#F4EFFA;color:#6B6386;font:700 13px 'Nunito';">500 ml</span>
+                <span style="flex:1;text-align:center;padding:11px 0;border-radius:13px;background:#F4EFFA;color:#6B6386;font:700 13px 'Nunito';">Garrafa</span>
+              </div>
+              <div style="background:#A78BD0;color:#fff;border-radius:16px;padding:15px;text-align:center;font:700 15px 'Quicksand';box-shadow:0 8px 20px rgba(167,139,208,.35);">Adicionar água</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== MODAL REFEIÇÃO ===== -->
+      <div style="display:flex;flex-direction:column;gap:14px;width:342px;">
+        <span style="align-self:flex-start;background:#fff;color:#6B6386;font:700 12px 'Nunito';padding:4px 12px;border-radius:999px;box-shadow:0 4px 12px rgba(120,86,164,.07);">Adicionar refeição</span>
+        <div data-screen-label="Modal refeição" style="width:342px;height:748px;background:#FBFAFE;border-radius:38px;box-shadow:0 22px 50px rgba(120,86,164,.16);border:1px solid #EAE2F4;overflow:hidden;display:flex;flex-direction:column;">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 24px 2px;font:700 13px 'Nunito';color:#4A4360;"><span>9:41</span><span style="display:flex;gap:7px;font-size:14px;"><i class="ph-fill ph-cell-signal-full"></i><i class="ph-fill ph-wifi-high"></i><i class="ph-fill ph-battery-full"></i></span></div>
+          <div style="flex:1;position:relative;background:#EDE7F5;overflow:hidden;">
+            <div style="position:absolute;inset:0;background:rgba(43,38,64,.42);"></div>
+            <div style="position:absolute;left:0;right:0;bottom:0;background:#FBFAFE;border-radius:28px 28px 0 0;padding:8px 24px 26px;box-shadow:0 -12px 40px rgba(59,53,82,.25);">
+              <div style="width:40px;height:5px;border-radius:3px;background:#E2D8F0;margin:6px auto 18px;"></div>
+              <div style="display:flex;align-items:center;gap:11px;margin-bottom:20px;"><div style="width:44px;height:44px;border-radius:14px;background:#E6F4EC;display:flex;align-items:center;justify-content:center;"><i class="ph-fill ph-fork-knife" style="font-size:22px;color:#4E9C74;"></i></div><div style="font:700 18px 'Quicksand';color:#3B3552;">Registrar refeição</div></div>
+              <div style="font:700 12px 'Nunito';color:#8A82A0;margin-bottom:8px;">Qual refeição?</div>
+              <div style="display:flex;gap:7px;margin-bottom:18px;">
+                <span style="flex:1;text-align:center;padding:10px 0;border-radius:12px;background:#F4EFFA;color:#6B6386;font:700 12px 'Nunito';">Café</span>
+                <span style="flex:1;text-align:center;padding:10px 0;border-radius:12px;background:#7FC4A0;color:#fff;font:700 12px 'Nunito';">Almoço</span>
+                <span style="flex:1;text-align:center;padding:10px 0;border-radius:12px;background:#F4EFFA;color:#6B6386;font:700 12px 'Nunito';">Jantar</span>
+                <span style="flex:1;text-align:center;padding:10px 0;border-radius:12px;background:#F4EFFA;color:#6B6386;font:700 12px 'Nunito';">Lanche</span>
+              </div>
+              <div style="font:700 12px 'Nunito';color:#8A82A0;margin-bottom:8px;">O que você comeu?</div>
+              <div style="background:#F4EFFA;border-radius:13px;padding:13px 14px;font:600 13px 'Nunito';color:#A79FB8;margin-bottom:18px;">Ex: Arroz, frango grelhado e salada</div>
+              <div style="display:flex;gap:12px;margin-bottom:22px;">
+                <div style="flex:1;"><div style="font:700 12px 'Nunito';color:#8A82A0;margin-bottom:8px;">Horário</div><div style="background:#F4EFFA;border-radius:13px;padding:13px 14px;font:700 13px 'Nunito';color:#3B3552;display:flex;align-items:center;gap:7px;"><i class="ph-fill ph-clock" style="color:#8768BC;"></i>13:00</div></div>
+                <div style="flex:1;"><div style="font:700 12px 'Nunito';color:#8A82A0;margin-bottom:8px;">Foto (opcional)</div><div style="background:#F4EFFA;border-radius:13px;padding:13px 14px;font:700 13px 'Nunito';color:#8768BC;display:flex;align-items:center;gap:7px;"><i class="ph-fill ph-camera"></i>Adicionar</div></div>
+              </div>
+              <div style="background:#7FC4A0;color:#fff;border-radius:16px;padding:15px;text-align:center;font:700 15px 'Quicksand';box-shadow:0 8px 20px rgba(127,196,160,.35);">Salvar refeição</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== MODAL REMÉDIO ===== -->
+      <div style="display:flex;flex-direction:column;gap:14px;width:342px;">
+        <span style="align-self:flex-start;background:#fff;color:#6B6386;font:700 12px 'Nunito';padding:4px 12px;border-radius:999px;box-shadow:0 4px 12px rgba(120,86,164,.07);">Adicionar remédio</span>
+        <div data-screen-label="Modal remédio" style="width:342px;height:748px;background:#FBFAFE;border-radius:38px;box-shadow:0 22px 50px rgba(120,86,164,.16);border:1px solid #EAE2F4;overflow:hidden;display:flex;flex-direction:column;">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 24px 2px;font:700 13px 'Nunito';color:#4A4360;"><span>9:41</span><span style="display:flex;gap:7px;font-size:14px;"><i class="ph-fill ph-cell-signal-full"></i><i class="ph-fill ph-wifi-high"></i><i class="ph-fill ph-battery-full"></i></span></div>
+          <div style="flex:1;position:relative;background:#EDE7F5;overflow:hidden;">
+            <div style="position:absolute;inset:0;background:rgba(43,38,64,.42);"></div>
+            <div style="position:absolute;left:0;right:0;bottom:0;background:#FBFAFE;border-radius:28px 28px 0 0;padding:8px 24px 26px;box-shadow:0 -12px 40px rgba(59,53,82,.25);">
+              <div style="width:40px;height:5px;border-radius:3px;background:#E2D8F0;margin:6px auto 18px;"></div>
+              <div style="display:flex;align-items:center;gap:11px;margin-bottom:20px;"><div style="width:44px;height:44px;border-radius:14px;background:#FBECEF;display:flex;align-items:center;justify-content:center;"><i class="ph-fill ph-pill" style="font-size:22px;color:#C77E93;"></i></div><div style="font:700 18px 'Quicksand';color:#3B3552;">Novo remédio</div></div>
+              <div style="font:700 12px 'Nunito';color:#8A82A0;margin-bottom:8px;">Nome</div>
+              <div style="background:#F4EFFA;border-radius:13px;padding:13px 14px;font:600 13px 'Nunito';color:#A79FB8;margin-bottom:16px;">Ex: Vitamina D</div>
+              <div style="display:flex;gap:12px;margin-bottom:16px;">
+                <div style="flex:1;"><div style="font:700 12px 'Nunito';color:#8A82A0;margin-bottom:8px;">Dose</div><div style="background:#F4EFFA;border-radius:13px;padding:13px 14px;font:600 13px 'Nunito';color:#A79FB8;">1000 UI</div></div>
+                <div style="flex:1;"><div style="font:700 12px 'Nunito';color:#8A82A0;margin-bottom:8px;">Estoque</div><div style="background:#F4EFFA;border-radius:13px;padding:13px 14px;font:600 13px 'Nunito';color:#A79FB8;">30 un.</div></div>
+              </div>
+              <div style="font:700 12px 'Nunito';color:#8A82A0;margin-bottom:8px;">Frequência</div>
+              <div style="display:flex;gap:7px;margin-bottom:16px;">
+                <span style="flex:1;text-align:center;padding:10px 0;border-radius:12px;background:#C77E93;color:#fff;font:700 12px 'Nunito';">1x ao dia</span>
+                <span style="flex:1;text-align:center;padding:10px 0;border-radius:12px;background:#F4EFFA;color:#6B6386;font:700 12px 'Nunito';">2x ao dia</span>
+                <span style="flex:1;text-align:center;padding:10px 0;border-radius:12px;background:#F4EFFA;color:#6B6386;font:700 12px 'Nunito';">3x ao dia</span>
+              </div>
+              <div style="font:700 12px 'Nunito';color:#8A82A0;margin-bottom:8px;">Horários</div>
+              <div style="display:flex;gap:8px;margin-bottom:22px;">
+                <span style="padding:9px 15px;border-radius:12px;background:#EDE7F8;color:#8768BC;font:700 13px 'Nunito';display:inline-flex;align-items:center;gap:6px;"><i class="ph-fill ph-clock"></i>09:00</span>
+                <span style="padding:9px 15px;border-radius:12px;background:#F4EFFA;color:#8768BC;font:700 13px 'Nunito';display:inline-flex;align-items:center;gap:6px;border:1.5px dashed #D8CCEC;"><i class="ph-fill ph-plus"></i>Horário</span>
+              </div>
+              <div style="background:#C77E93;color:#fff;border-radius:16px;padding:15px;text-align:center;font:700 15px 'Quicksand';box-shadow:0 8px 20px rgba(199,126,147,.35);">Cadastrar remédio</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== MODAL CONSULTA ===== -->
+      <div style="display:flex;flex-direction:column;gap:14px;width:342px;">
+        <span style="align-self:flex-start;background:#fff;color:#6B6386;font:700 12px 'Nunito';padding:4px 12px;border-radius:999px;box-shadow:0 4px 12px rgba(120,86,164,.07);">Adicionar consulta</span>
+        <div data-screen-label="Modal consulta" style="width:342px;height:748px;background:#FBFAFE;border-radius:38px;box-shadow:0 22px 50px rgba(120,86,164,.16);border:1px solid #EAE2F4;overflow:hidden;display:flex;flex-direction:column;">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 24px 2px;font:700 13px 'Nunito';color:#4A4360;"><span>9:41</span><span style="display:flex;gap:7px;font-size:14px;"><i class="ph-fill ph-cell-signal-full"></i><i class="ph-fill ph-wifi-high"></i><i class="ph-fill ph-battery-full"></i></span></div>
+          <div style="flex:1;position:relative;background:#EDE7F5;overflow:hidden;">
+            <div style="position:absolute;inset:0;background:rgba(43,38,64,.42);"></div>
+            <div style="position:absolute;left:0;right:0;bottom:0;background:#FBFAFE;border-radius:28px 28px 0 0;padding:8px 24px 26px;box-shadow:0 -12px 40px rgba(59,53,82,.25);">
+              <div style="width:40px;height:5px;border-radius:3px;background:#E2D8F0;margin:6px auto 18px;"></div>
+              <div style="display:flex;align-items:center;gap:11px;margin-bottom:20px;"><div style="width:44px;height:44px;border-radius:14px;background:#EDE7F8;display:flex;align-items:center;justify-content:center;"><i class="ph-fill ph-calendar-heart" style="font-size:22px;color:#8768BC;"></i></div><div style="font:700 18px 'Quicksand';color:#3B3552;">Nova consulta</div></div>
+              <div style="font:700 12px 'Nunito';color:#8A82A0;margin-bottom:8px;">Profissional / especialidade</div>
+              <div style="background:#F4EFFA;border-radius:13px;padding:13px 14px;font:600 13px 'Nunito';color:#A79FB8;margin-bottom:16px;">Ex: Dra. Marina · Nutricionista</div>
+              <div style="display:flex;gap:12px;margin-bottom:16px;">
+                <div style="flex:1;"><div style="font:700 12px 'Nunito';color:#8A82A0;margin-bottom:8px;">Data</div><div style="background:#F4EFFA;border-radius:13px;padding:13px 14px;font:700 13px 'Nunito';color:#3B3552;display:flex;align-items:center;gap:7px;"><i class="ph-fill ph-calendar-blank" style="color:#8768BC;"></i>09/07</div></div>
+                <div style="flex:1;"><div style="font:700 12px 'Nunito';color:#8A82A0;margin-bottom:8px;">Hora</div><div style="background:#F4EFFA;border-radius:13px;padding:13px 14px;font:700 13px 'Nunito';color:#3B3552;display:flex;align-items:center;gap:7px;"><i class="ph-fill ph-clock" style="color:#8768BC;"></i>14:00</div></div>
+              </div>
+              <div style="font:700 12px 'Nunito';color:#8A82A0;margin-bottom:8px;">Local ou link</div>
+              <div style="background:#F4EFFA;border-radius:13px;padding:13px 14px;font:600 13px 'Nunito';color:#A79FB8;margin-bottom:18px;">Ex: Clínica Vida · sala 3</div>
+              <div style="display:flex;align-items:center;gap:11px;background:#F4EFFA;border-radius:14px;padding:13px 14px;margin-bottom:22px;"><i class="ph-fill ph-bell-ringing" style="color:#8768BC;font-size:19px;"></i><span style="flex:1;font:700 13px 'Quicksand';color:#3B3552;">Lembrar 1 dia antes</span><div style="width:46px;height:27px;border-radius:999px;background:#A78BD0;display:flex;align-items:center;justify-content:flex-end;padding:3px;"><div style="width:21px;height:21px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.15);"></div></div></div>
+              <div style="background:#A78BD0;color:#fff;border-radius:16px;padding:15px;text-align:center;font:700 15px 'Quicksand';box-shadow:0 8px 20px rgba(167,139,208,.35);">Agendar consulta</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== MODAL TREINO ===== -->
+      <div style="display:flex;flex-direction:column;gap:14px;width:342px;">
+        <span style="align-self:flex-start;background:#fff;color:#6B6386;font:700 12px 'Nunito';padding:4px 12px;border-radius:999px;box-shadow:0 4px 12px rgba(120,86,164,.07);">Criar treino</span>
+        <div data-screen-label="Modal treino" style="width:342px;height:748px;background:#FBFAFE;border-radius:38px;box-shadow:0 22px 50px rgba(120,86,164,.16);border:1px solid #EAE2F4;overflow:hidden;display:flex;flex-direction:column;">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 24px 2px;font:700 13px 'Nunito';color:#4A4360;"><span>9:41</span><span style="display:flex;gap:7px;font-size:14px;"><i class="ph-fill ph-cell-signal-full"></i><i class="ph-fill ph-wifi-high"></i><i class="ph-fill ph-battery-full"></i></span></div>
+          <div style="flex:1;position:relative;background:#EDE7F5;overflow:hidden;">
+            <div style="position:absolute;inset:0;background:rgba(43,38,64,.42);"></div>
+            <div style="position:absolute;left:0;right:0;bottom:0;background:#FBFAFE;border-radius:28px 28px 0 0;padding:8px 24px 26px;box-shadow:0 -12px 40px rgba(59,53,82,.25);">
+              <div style="width:40px;height:5px;border-radius:3px;background:#E2D8F0;margin:6px auto 18px;"></div>
+              <div style="display:flex;align-items:center;gap:11px;margin-bottom:20px;"><div style="width:44px;height:44px;border-radius:14px;background:#EDE7F8;display:flex;align-items:center;justify-content:center;"><i class="ph-fill ph-barbell" style="font-size:22px;color:#8768BC;"></i></div><div style="font:700 18px 'Quicksand';color:#3B3552;">Criar treino</div></div>
+              <div style="font:700 12px 'Nunito';color:#8A82A0;margin-bottom:8px;">Nome do treino</div>
+              <div style="background:#F4EFFA;border-radius:13px;padding:13px 14px;font:600 13px 'Nunito';color:#A79FB8;margin-bottom:16px;">Ex: Peito e tríceps</div>
+              <div style="font:700 12px 'Nunito';color:#8A82A0;margin-bottom:8px;">Foco</div>
+              <div style="display:flex;gap:7px;margin-bottom:18px;">
+                <span style="flex:1;text-align:center;padding:10px 0;border-radius:12px;background:#A78BD0;color:#fff;font:700 12px 'Nunito';">Peito</span>
+                <span style="flex:1;text-align:center;padding:10px 0;border-radius:12px;background:#F4EFFA;color:#6B6386;font:700 12px 'Nunito';">Costas</span>
+                <span style="flex:1;text-align:center;padding:10px 0;border-radius:12px;background:#F4EFFA;color:#6B6386;font:700 12px 'Nunito';">Pernas</span>
+                <span style="flex:1;text-align:center;padding:10px 0;border-radius:12px;background:#F4EFFA;color:#6B6386;font:700 12px 'Nunito';">Cardio</span>
+              </div>
+              <div style="font:700 12px 'Nunito';color:#8A82A0;margin-bottom:8px;">Exercícios</div>
+              <div style="display:flex;flex-direction:column;gap:9px;margin-bottom:12px;">
+                <div style="background:#F4EFFA;border-radius:13px;padding:11px 13px;display:flex;align-items:center;gap:10px;"><i class="ph-fill ph-barbell" style="color:#8768BC;font-size:18px;"></i><span style="flex:1;font:700 13px 'Quicksand';color:#3B3552;">Supino reto</span><span style="font:600 12px 'Nunito';color:#8A82A0;">4 séries</span></div>
+                <div style="background:#F4EFFA;border-radius:13px;padding:11px 13px;display:flex;align-items:center;gap:10px;"><i class="ph-fill ph-barbell" style="color:#8768BC;font-size:18px;"></i><span style="flex:1;font:700 13px 'Quicksand';color:#3B3552;">Crucifixo com halteres</span><span style="font:600 12px 'Nunito';color:#8A82A0;">3 séries</span></div>
+              </div>
+              <div style="border:1.5px dashed #D8CCEC;border-radius:13px;padding:11px;text-align:center;font:700 13px 'Nunito';color:#8768BC;display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:20px;"><i class="ph-fill ph-plus-circle"></i>Adicionar exercício</div>
+              <div style="background:#A78BD0;color:#fff;border-radius:16px;padding:15px;text-align:center;font:700 15px 'Quicksand';box-shadow:0 8px 20px rgba(167,139,208,.35);">Criar treino</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ METAS E PROGRESSO ============ -->
+  <section style="max-width:1500px;margin:60px auto 0;">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:22px;">
+      <span style="width:6px;height:22px;border-radius:3px;background:#A78BD0;"></span>
+      <h2 style="font:700 16px 'Quicksand';color:#4A4360;margin:0;letter-spacing:.04em;text-transform:uppercase;">Metas e progresso</h2>
+    </div>
+    <div style="display:flex;gap:44px;flex-wrap:wrap;">
+
+      <!-- ===== MINHAS METAS ===== -->
+      <div style="display:flex;flex-direction:column;gap:14px;width:342px;">
+        <span style="align-self:flex-start;background:#fff;color:#6B6386;font:700 12px 'Nunito';padding:4px 12px;border-radius:999px;box-shadow:0 4px 12px rgba(120,86,164,.07);">Minhas metas</span>
+        <div data-screen-label="Metas" style="width:342px;height:748px;background:#FBFAFE;border-radius:38px;box-shadow:0 22px 50px rgba(120,86,164,.16);border:1px solid #EAE2F4;overflow:hidden;display:flex;flex-direction:column;">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 24px 2px;font:700 13px 'Nunito';color:#4A4360;"><span>9:41</span><span style="display:flex;gap:7px;font-size:14px;"><i class="ph-fill ph-cell-signal-full"></i><i class="ph-fill ph-wifi-high"></i><i class="ph-fill ph-battery-full"></i></span></div>
+          <div class="pscroll" style="flex:1;overflow-y:auto;padding:12px 22px 18px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+              <div style="width:38px;height:38px;border-radius:12px;background:#F4EFFA;display:flex;align-items:center;justify-content:center;"><i class="ph-fill ph-arrow-left" style="font-size:18px;color:#8768BC;"></i></div>
+              <div style="font:700 17px 'Quicksand';color:#3B3552;">Minhas metas</div>
+              <div style="width:38px;height:38px;"></div>
+            </div>
+
+            <div style="background:#EDE7F8;border-radius:24px;padding:18px;display:flex;align-items:center;gap:16px;margin-bottom:22px;">
+              <div style="width:76px;height:76px;border-radius:50%;background:conic-gradient(#8768BC 0% 82%, #DDD1EF 82% 100%);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <div style="width:56px;height:56px;border-radius:50%;background:#EDE7F8;display:flex;flex-direction:column;align-items:center;justify-content:center;"><span style="font:700 19px 'Quicksand';color:#8768BC;line-height:1;">82%</span><span style="font:700 9px 'Nunito';color:#A79FB8;">semana</span></div>
+              </div>
+              <div style="flex:1;">
+                <div style="font:700 16px 'Quicksand';color:#3B3552;line-height:1.3;">Você está no ritmo</div>
+                <div style="font:600 12px 'Nunito';color:#8A82A0;margin-top:4px;">5 de 6 metas em dia hoje. Continua assim!</div>
+              </div>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:12px;">
+
+              <div style="background:#fff;border-radius:22px;padding:15px;box-shadow:0 6px 18px rgba(120,86,164,.06);">
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+                  <div style="width:42px;height:42px;border-radius:13px;background:#EDE7F8;display:flex;align-items:center;justify-content:center;"><i class="ph-fill ph-drop" style="font-size:21px;color:#8768BC;"></i></div>
+                  <div style="flex:1;"><div style="font:700 15px 'Quicksand';color:#3B3552;">Hidratação</div><div style="font:600 12px 'Nunito';color:#8A82A0;">Meta: 8 copos por dia</div></div>
+                  <div style="display:flex;align-items:center;gap:6px;background:#F4EFFA;border-radius:11px;padding:8px 11px;font:700 13px 'Nunito';color:#8768BC;">8<i class="ph-fill ph-pencil-simple" style="font-size:13px;"></i></div>
+                </div>
+                <div style="display:flex;align-items:center;gap:9px;"><div style="flex:1;height:7px;border-radius:4px;background:#F1ECF8;overflow:hidden;"><div style="width:62%;height:100%;background:#A78BD0;border-radius:4px;"></div></div><span style="font:700 11px 'Nunito';color:#8A82A0;">hoje 5/8</span></div>
+              </div>
+
+              <div style="background:#fff;border-radius:22px;padding:15px;box-shadow:0 6px 18px rgba(120,86,164,.06);">
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+                  <div style="width:42px;height:42px;border-radius:13px;background:#E6F4EC;display:flex;align-items:center;justify-content:center;"><i class="ph-fill ph-fork-knife" style="font-size:21px;color:#4E9C74;"></i></div>
+                  <div style="flex:1;"><div style="font:700 15px 'Quicksand';color:#3B3552;">Alimentação</div><div style="font:600 12px 'Nunito';color:#8A82A0;">Meta: 3 refeições por dia</div></div>
+                  <div style="display:flex;align-items:center;gap:6px;background:#EAF5EF;border-radius:11px;padding:8px 11px;font:700 13px 'Nunito';color:#4E9C74;">3<i class="ph-fill ph-pencil-simple" style="font-size:13px;"></i></div>
+                </div>
+                <div style="display:flex;align-items:center;gap:9px;"><div style="flex:1;height:7px;border-radius:4px;background:#EAF5EF;overflow:hidden;"><div style="width:66%;height:100%;background:#7FC4A0;border-radius:4px;"></div></div><span style="font:700 11px 'Nunito';color:#8A82A0;">hoje 2/3</span></div>
+              </div>
+
+              <div style="background:#fff;border-radius:22px;padding:15px;box-shadow:0 6px 18px rgba(120,86,164,.06);">
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:13px;">
+                  <div style="width:42px;height:42px;border-radius:13px;background:#FBEAF2;display:flex;align-items:center;justify-content:center;"><i class="ph-fill ph-barbell" style="font-size:21px;color:#C76E9E;"></i></div>
+                  <div style="flex:1;"><div style="font:700 15px 'Quicksand';color:#3B3552;">Treino</div><div style="font:600 12px 'Nunito';color:#8A82A0;">Meta: 4 dias por semana</div></div>
+                  <div style="display:flex;align-items:center;gap:6px;background:#FBEAF2;border-radius:11px;padding:8px 11px;font:700 13px 'Nunito';color:#C76E9E;">4<i class="ph-fill ph-pencil-simple" style="font-size:13px;"></i></div>
+                </div>
+                <div style="display:flex;justify-content:space-between;">
+                  <span style="width:28px;height:28px;border-radius:50%;background:#E08AB0;color:#fff;display:flex;align-items:center;justify-content:center;font:700 11px 'Nunito';">S</span>
+                  <span style="width:28px;height:28px;border-radius:50%;background:#E08AB0;color:#fff;display:flex;align-items:center;justify-content:center;font:700 11px 'Nunito';">T</span>
+                  <span style="width:28px;height:28px;border-radius:50%;background:#FBEAF2;color:#C9A8B8;display:flex;align-items:center;justify-content:center;font:700 11px 'Nunito';">Q</span>
+                  <span style="width:28px;height:28px;border-radius:50%;background:#E08AB0;color:#fff;display:flex;align-items:center;justify-content:center;font:700 11px 'Nunito';">Q</span>
+                  <span style="width:28px;height:28px;border-radius:50%;background:#fff;color:#C9A8B8;display:flex;align-items:center;justify-content:center;font:700 11px 'Nunito';border:2px solid #E08AB0;">S</span>
+                  <span style="width:28px;height:28px;border-radius:50%;background:#FBEAF2;color:#C9A8B8;display:flex;align-items:center;justify-content:center;font:700 11px 'Nunito';">S</span>
+                  <span style="width:28px;height:28px;border-radius:50%;background:#FBEAF2;color:#C9A8B8;display:flex;align-items:center;justify-content:center;font:700 11px 'Nunito';">D</span>
+                </div>
+              </div>
+
+              <div style="background:#fff;border-radius:22px;padding:15px;box-shadow:0 6px 18px rgba(120,86,164,.06);">
+                <div style="display:flex;align-items:center;gap:12px;">
+                  <div style="width:42px;height:42px;border-radius:13px;background:#E6F4EC;display:flex;align-items:center;justify-content:center;"><i class="ph-fill ph-smiley" style="font-size:21px;color:#4E9C74;"></i></div>
+                  <div style="flex:1;"><div style="font:700 15px 'Quicksand';color:#3B3552;">Check-in da mente</div><div style="font:600 12px 'Nunito';color:#8A82A0;">Meta: todo dia</div></div>
+                  <div style="display:flex;align-items:center;gap:5px;background:#FBEAF2;border-radius:999px;padding:7px 11px;"><i class="ph-fill ph-fire" style="color:#E08AB0;font-size:15px;"></i><span style="font:700 12px 'Quicksand';color:#C76E9E;">6 dias</span></div>
+                </div>
+              </div>
+
+              <div style="background:#fff;border-radius:22px;padding:15px;box-shadow:0 6px 18px rgba(120,86,164,.06);">
+                <div style="display:flex;align-items:center;gap:12px;">
+                  <div style="width:42px;height:42px;border-radius:13px;background:#FBECEF;display:flex;align-items:center;justify-content:center;"><i class="ph-fill ph-pill" style="font-size:21px;color:#C77E93;"></i></div>
+                  <div style="flex:1;"><div style="font:700 15px 'Quicksand';color:#3B3552;">Remédios</div><div style="font:600 12px 'Nunito';color:#8A82A0;">Meta: tomar no horário</div></div>
+                  <span style="font:700 12px 'Nunito';color:#7FC4A0;display:inline-flex;align-items:center;gap:4px;"><i class="ph-fill ph-check-circle" style="font-size:16px;"></i>em dia</span>
+                </div>
+              </div>
+
+              <div style="border:1.5px dashed #D8CCEC;border-radius:18px;padding:14px;text-align:center;font:700 14px 'Nunito';color:#8768BC;display:flex;align-items:center;justify-content:center;gap:7px;"><i class="ph-fill ph-plus-circle"></i>Nova meta</div>
+
+            </div>
+          </div>
+          <div style="display:flex;justify-content:space-around;align-items:center;padding:11px 6px 18px;background:#fff;border-top:1px solid #F1EBF8;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#B3ABC4;font:600 10px 'Nunito';"><i class="ph ph-house" style="font-size:23px;"></i><span>Hoje</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#B3ABC4;font:600 10px 'Nunito';"><i class="ph ph-heartbeat" style="font-size:23px;"></i><span>Corpo</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#B3ABC4;font:600 10px 'Nunito';"><i class="ph ph-barbell" style="font-size:23px;"></i><span>Treino</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#B3ABC4;font:600 10px 'Nunito';"><i class="ph ph-smiley" style="font-size:23px;"></i><span>Mente</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#8768BC;font:800 10px 'Nunito';"><i class="ph-fill ph-first-aid-kit" style="font-size:23px;"></i><span>Saúde</span></div>
+          </div>
+        </div>
+        <div style="font-size:13px;color:#8A82A0;text-align:center;line-height:1.4;">Painel de metas: alvo + progresso<br>de hoje e da semana, com ajuste rápido.</div>
+      </div>
+
+    </div>
+  </section>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{
+  &quot;userName&quot;: {&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Alex&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Conteúdo&quot;},
+  &quot;restSeconds&quot;: {&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:45,&quot;min&quot;:15,&quot;max&quot;:120,&quot;step&quot;:5,&quot;unit&quot;:&quot;s&quot;,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Treino&quot;},
+  &quot;autoRest&quot;: {&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Treino&quot;}
+}">
+class Component extends DCLogic {
+  state = { view: 'lista', activeEx: 0, done: {}, resting: false, restLeft: 45 };
+
+  exercicios = [
+    { nome: 'Supino reto', series: 4, kg: '40 kg', reps: '10 reps' },
+    { nome: 'Supino inclinado', series: 4, kg: '30 kg', reps: '12 reps' },
+    { nome: 'Crucifixo com halteres', series: 3, kg: '14 kg', reps: '12 reps' },
+    { nome: 'Tríceps na corda', series: 4, kg: '25 kg', reps: '15 reps' },
+    { nome: 'Tríceps francês', series: 3, kg: '12 kg', reps: '12 reps' },
+  ];
+
+  componentWillUnmount() { clearInterval(this._t); }
+
+  openEx(i) { this.setState({ view: 'ex', activeEx: i }); }
+  backToLista() { this.setState({ view: 'lista' }); }
+  concluir() { clearInterval(this._t); this.setState({ view: 'fim', resting: false }); }
+  reiniciar() { clearInterval(this._t); this.setState({ view: 'lista', activeEx: 0, done: {}, resting: false }); }
+
+  fazerSerie() {
+    const i = this.state.activeEx;
+    const done = { ...this.state.done };
+    const max = this.exercicios[i].series;
+    const cur = done[i] || 0;
+    if (cur < max) done[i] = cur + 1;
+    this.setState({ done });
+    if (this.props.autoRest ?? true) this.startRest();
+  }
+
+  startRest() {
+    clearInterval(this._t);
+    this.setState({ resting: true, restLeft: (this.props.restSeconds ?? 45) });
+    this._t = setInterval(() => {
+      this.setState(s => {
+        if (s.restLeft <= 1) { clearInterval(this._t); return { resting: false, restLeft: 0 }; }
+        return { restLeft: s.restLeft - 1 };
+      });
+    }, 1000);
+  }
+
+  skipRest() { clearInterval(this._t); this.setState({ resting: false }); }
+
+  renderVals() {
+    const { view, activeEx, done, resting, restLeft } = this.state;
+    const ex = this.exercicios[activeEx];
+    const doneOf = (i) => done[i] || 0;
+    const exDone = (i) => doneOf(i) >= this.exercicios[i].series;
+    const doneCount = this.exercicios.filter((e, i) => exDone(i)).length;
+
+    const exList = this.exercicios.map((e, i) => ({
+      nome: e.nome,
+      sub: e.series + ' séries · ' + e.kg,
+      isDone: exDone(i),
+      notDone: !exDone(i),
+      onOpen: () => this.openEx(i),
+    }));
+
+    const curDone = doneOf(activeEx);
+    const seriesRows = Array.from({ length: ex.series }, (_, i) => {
+      const isDone = curDone > i;
+      const isCurrent = curDone === i;
+      return {
+        n: i + 1,
+        kg: ex.kg,
+        reps: ex.reps,
+        isDone,
+        notDone: !isDone,
+        bg: isDone ? '#EFF6F1' : (isCurrent ? '#EDE7F8' : '#F7F4FB'),
+      };
+    });
+
+    const exSub = curDone >= ex.series ? 'Concluído' : ('Série ' + (curDone + 1) + ' de ' + ex.series);
+    const mm = String(Math.floor(restLeft / 60)).padStart(2, '0');
+    const ss = String(restLeft % 60).padStart(2, '0');
+
+    return {
+      isLista: view === 'lista',
+      isEx: view === 'ex',
+      isFim: view === 'fim',
+      exNome: ex.nome,
+      exSub,
+      ultimoLabel: ex.kg + ' · ' + ex.reps,
+      seriesRows,
+      exList,
+      resting,
+      userName: this.props.userName ?? 'Alex',
+      restTime: mm + ':' + ss,
+      progressoLabel: doneCount + ' de ' + this.exercicios.length + ' exercícios',
+      doneCount,
+      backToLista: () => this.backToLista(),
+      fazerSerie: () => this.fazerSerie(),
+      skipRest: () => this.skipRest(),
+      concluir: () => this.concluir(),
+      reiniciar: () => this.reiniciar(),
+    };
+  }
+}
+</script>
+</body>
+</html>
