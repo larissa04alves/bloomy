@@ -15,6 +15,13 @@
       "when": 1783423591049,
       "tag": "0001_stale_hellion",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1783432460869,
+      "tag": "0002_good_bushwacker",
+      "breakpoints": true
     }
   ]
 }
