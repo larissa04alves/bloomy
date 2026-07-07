@@ -154,28 +154,39 @@ git commit -m "docs: convenções de código por pacote"
 
 - [ ] **Step 1: Alterar `packages/db/src/index.ts`**
 
+Criar `packages/db/src/client.ts` (conexão sem env — o que os testes usam):
+
 ```ts
-import { env } from "@bloomy/env/server";
 import { createClient } from "@libsql/client";
 import { drizzle } from "drizzle-orm/libsql";
 
 import * as schema from "./schema";
 
-export function createDb(config?: { url: string; authToken?: string }) {
-  const client = createClient(
-    config ?? {
-      url: env.DATABASE_URL,
-      authToken: env.DATABASE_AUTH_TOKEN,
-    },
-  );
+export function createDb(config: { url: string; authToken?: string }) {
+  const client = createClient(config);
 
   return drizzle({ client, schema });
 }
 
 export type Db = ReturnType<typeof createDb>;
-
-export const db = createDb();
 ```
+
+E `packages/db/src/index.ts` (singleton do runtime — único lugar que valida env):
+
+```ts
+import { env } from "@bloomy/env/server";
+
+import { createDb } from "./client";
+
+export { createDb, type Db } from "./client";
+
+export const db = createDb({
+  url: env.DATABASE_URL,
+  authToken: env.DATABASE_AUTH_TOKEN,
+});
+```
+
+Em `packages/auth/src/index.ts`, `createDb()` passa a receber `{ url: env.DATABASE_URL, authToken: env.DATABASE_AUTH_TOKEN }` (o env já é importado lá).
 
 - [ ] **Step 2: Criar `packages/db/src/schema/body.ts`**
 
@@ -257,6 +268,7 @@ export const medicationIntake = sqliteTable(
       .references(() => medication.id, { onDelete: "cascade" }),
     day: text("day").notNull(),
     time: text("time").notNull(),
+    stockDecremented: integer("stock_decremented", { mode: "boolean" }).default(false).notNull(),
     createdAt: timestampMs("created_at"),
   },
   (table) => [
@@ -451,7 +463,11 @@ export async function ensureGoals(db: Db, userId: string): Promise<Goal[]> {
   );
 
   if (missing.length > 0) {
-    await db.insert(goal).values(missing.map((d) => ({ ...d, userId })));
+    // onConflictDoNothing: dois GETs concorrentes no 1º acesso não podem estourar o UNIQUE(user_id, domain)
+    await db
+      .insert(goal)
+      .values(missing.map((d) => ({ ...d, userId })))
+      .onConflictDoNothing();
     return db.select().from(goal).where(eq(goal.userId, userId));
   }
 
@@ -826,7 +842,7 @@ git commit -m "feat: refeições com pendência por tipo"
 ```ts
 import type { Db } from "@bloomy/db";
 import { medication, medicationIntake, type Medication } from "@bloomy/db/schema/body";
-import { and, asc, eq, sql } from "drizzle-orm";
+import { and, asc, eq, gt, sql } from "drizzle-orm";
 
 export type IntakeSlot = {
   medicationId: string;
@@ -952,26 +968,29 @@ export async function markIntake(
 
     if (!med || !med.active) return "not_found";
 
-    const existing = await tx
-      .select({ id: medicationIntake.id })
-      .from(medicationIntake)
-      .where(
-        and(
-          eq(medicationIntake.medicationId, input.medicationId),
-          eq(medicationIntake.day, input.day),
-          eq(medicationIntake.time, input.time),
-        ),
-      );
+    // Insert atômico: o UNIQUE(medication_id, day, time) decide a duplicata — sem select prévio (TOCTOU)
+    const inserted = await tx
+      .insert(medicationIntake)
+      .values({ userId, ...input })
+      .onConflictDoNothing()
+      .returning({ id: medicationIntake.id });
 
-    if (existing.length > 0) return "duplicate";
-
-    await tx.insert(medicationIntake).values({ userId, ...input });
+    if (inserted.length === 0) return "duplicate";
 
     if (med.stock !== null) {
-      await tx
+      // Decrementa só se havia estoque; registra na toma se descontou, p/ o unmark devolver com precisão
+      const decremented = await tx
         .update(medication)
-        .set({ stock: sql`max(${medication.stock} - 1, 0)` })
-        .where(eq(medication.id, med.id));
+        .set({ stock: sql`${medication.stock} - 1` })
+        .where(and(eq(medication.id, med.id), gt(medication.stock, 0)))
+        .returning({ stock: medication.stock });
+
+      if (decremented.length > 0) {
+        await tx
+          .update(medicationIntake)
+          .set({ stockDecremented: true })
+          .where(eq(medicationIntake.id, inserted[0].id));
+      }
     }
 
     return "ok";
@@ -998,15 +1017,18 @@ export async function unmarkIntake(
 
     if (deleted.length === 0) return false;
 
-    await tx
-      .update(medication)
-      .set({ stock: sql`${medication.stock} + 1` })
-      .where(
-        and(
-          eq(medication.id, input.medicationId),
-          sql`${medication.stock} is not null`,
-        ),
-      );
+    // Devolve estoque só se esta toma realmente descontou (evita unidade fantasma no clamp de 0)
+    if (deleted[0].stockDecremented) {
+      await tx
+        .update(medication)
+        .set({ stock: sql`${medication.stock} + 1` })
+        .where(
+          and(
+            eq(medication.id, input.medicationId),
+            sql`${medication.stock} is not null`,
+          ),
+        );
+    }
 
     return true;
   });
@@ -1196,7 +1218,8 @@ git commit -m "feat: remédios com tomas derivadas e estoque"
 - Create: `apps/web/src/features/shared/day.test.ts`
 - Create: `apps/web/src/features/meals/service.test.ts`
 - Create: `apps/web/src/features/medications/service.test.ts`
-- Modify: `apps/web/package.json` (script `test`)
+- Modify: `apps/web/package.json` (script `test` + devDependency `@types/bun`)
+- Modify: `apps/web/tsconfig.json` (`"types": ["bun", "node"]` — linker isolated do Bun não expõe @types/bun à auto-discovery do tsc)
 - Modify: `turbo.json` (task `test`)
 - Modify: `package.json` raiz (script `test`)
 
@@ -1207,14 +1230,21 @@ git commit -m "feat: remédios com tomas derivadas e estoque"
 - [ ] **Step 1: Criar `apps/web/src/features/shared/test-db.ts`**
 
 ```ts
+import { randomUUID } from "node:crypto";
+import { tmpdir } from "node:os";
 import path from "node:path";
 
-import { createDb, type Db } from "@bloomy/db";
+import { createDb, type Db } from "@bloomy/db/client";
 import { user } from "@bloomy/db/schema/auth";
 import { migrate } from "drizzle-orm/libsql/migrator";
 
 export async function createTestDb(): Promise<Db> {
-  const db = createDb({ url: ":memory:" });
+  // Arquivo temp único por chamada: ":memory:" do @libsql/client abre uma conexão
+  // física separada dentro de db.transaction(), fazendo queries pós-transação não
+  // enxergarem as tabelas (bug do driver). Arquivo real evita isso e mantém isolamento
+  // entre testes.
+  const file = path.join(tmpdir(), `bloomy-test-${randomUUID()}.db`);
+  const db = createDb({ url: `file:${file}` });
   await migrate(db, {
     migrationsFolder: path.resolve(process.cwd(), "../../packages/db/src/migrations"),
   });
@@ -1366,7 +1396,12 @@ describe("markIntake / unmarkIntake (db em memória)", () => {
     });
 
     expect(await markIntake(db, userId, { medicationId: med.id, time: "09:00", day: "2026-07-06" })).toBe("ok");
-    const [row] = await db.select().from(medication).where(eq(medication.id, med.id));
+    let [row] = await db.select().from(medication).where(eq(medication.id, med.id));
+    expect(row.stock).toBe(0);
+
+    // desmarcar uma toma que não descontou não pode criar unidade fantasma
+    expect(await unmarkIntake(db, userId, { medicationId: med.id, time: "09:00", day: "2026-07-06" })).toBe(true);
+    [row] = await db.select().from(medication).where(eq(medication.id, med.id));
     expect(row.stock).toBe(0);
   });
 });
@@ -1397,7 +1432,7 @@ No `package.json` da raiz, em `scripts`:
 - [ ] **Step 7: Rodar toda a suíte**
 
 Run: `bun test` (na raiz, via turbo — ou `cd apps/web && bun test src`)
-Expected: todos os testes pass (10 testes: 4 day + 4 meals + 2 blocos de medications).
+Expected: todos os testes pass (12 testes: 4 day + 4 meals + 4 medications).
 
 - [ ] **Step 8: Typecheck e commit**
 

@@ -53,3 +53,4 @@ coverage
 .cache
 tmp
 temp
+.superpowers/
