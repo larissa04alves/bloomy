@@ -1,3 +1,5 @@
+import "server-only";
+
 import type { Db } from "@bloomy/db";
 import { medication, medicationIntake, type Medication } from "@bloomy/db/schema/body";
 import { and, asc, eq, gt, sql } from "drizzle-orm";

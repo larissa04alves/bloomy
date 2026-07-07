@@ -1,8 +1,8 @@
 import { db } from "@bloomy/db";
 import { z } from "zod";
 
-import { badRequest, notFound, requireUserId, unauthorized } from "@/features/shared/api";
-import { deactivateMedication, updateMedication } from "@/features/medications/service";
+import { badRequest, notFound, requireUserId, unauthorized } from "@/server/shared/api";
+import { deactivateMedication, updateMedication } from "@/server/medications/service";
 
 const TIME_SCHEMA = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, "expected HH:MM");
 

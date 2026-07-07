@@ -7,9 +7,9 @@ import {
   notFound,
   requireUserId,
   unauthorized,
-} from "@/features/shared/api";
-import { DAY_SCHEMA, dayFor } from "@/features/shared/day";
-import { getIntakesDay, markIntake, unmarkIntake } from "@/features/medications/service";
+} from "@/server/shared/api";
+import { DAY_SCHEMA, dayFor } from "@/server/shared/day";
+import { getIntakesDay, markIntake, unmarkIntake } from "@/server/medications/service";
 
 const TIME_SCHEMA = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, "expected HH:MM");
 

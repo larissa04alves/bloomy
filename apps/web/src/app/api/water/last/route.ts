@@ -1,8 +1,8 @@
 import { db } from "@bloomy/db";
 
-import { badRequest, requireUserId, unauthorized } from "@/features/shared/api";
-import { DAY_SCHEMA, dayFor } from "@/features/shared/day";
-import { removeLastWater } from "@/features/water/service";
+import { badRequest, requireUserId, unauthorized } from "@/server/shared/api";
+import { DAY_SCHEMA, dayFor } from "@/server/shared/day";
+import { removeLastWater } from "@/server/water/service";
 
 export async function DELETE(request: Request) {
   const userId = await requireUserId(request);

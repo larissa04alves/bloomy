@@ -1,3 +1,5 @@
+import "server-only";
+
 import type { Db } from "@bloomy/db";
 import { goal, type Goal } from "@bloomy/db/schema/goals";
 import { and, eq } from "drizzle-orm";

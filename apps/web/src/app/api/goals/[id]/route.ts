@@ -1,8 +1,8 @@
 import { db } from "@bloomy/db";
 import { z } from "zod";
 
-import { badRequest, notFound, requireUserId, unauthorized } from "@/features/shared/api";
-import { updateGoal } from "@/features/goals/service";
+import { badRequest, notFound, requireUserId, unauthorized } from "@/server/shared/api";
+import { updateGoal } from "@/server/goals/service";
 
 const BODY_SCHEMA = z.object({ target: z.number().int().positive() });
 

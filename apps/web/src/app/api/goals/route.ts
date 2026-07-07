@@ -1,7 +1,7 @@
 import { db } from "@bloomy/db";
 
-import { requireUserId, unauthorized } from "@/features/shared/api";
-import { ensureGoals } from "@/features/goals/service";
+import { requireUserId, unauthorized } from "@/server/shared/api";
+import { ensureGoals } from "@/server/goals/service";
 
 export async function GET(request: Request) {
   const userId = await requireUserId(request);

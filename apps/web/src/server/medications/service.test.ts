@@ -3,7 +3,7 @@ import { eq } from "drizzle-orm";
 
 import { medication } from "@bloomy/db/schema/body";
 
-import { cleanupTestDbs, createTestDb, createTestUser } from "@/features/shared/test-db";
+import { cleanupTestDbs, createTestDb, createTestUser } from "@/server/shared/test-db";
 import { createMedication, deriveIntakes, getIntakesDay, markIntake, unmarkIntake } from "./service";
 
 afterAll(cleanupTestDbs);

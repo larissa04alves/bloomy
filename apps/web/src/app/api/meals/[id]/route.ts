@@ -1,7 +1,7 @@
 import { db } from "@bloomy/db";
 
-import { notFound, requireUserId, unauthorized } from "@/features/shared/api";
-import { deleteMeal } from "@/features/meals/service";
+import { notFound, requireUserId, unauthorized } from "@/server/shared/api";
+import { deleteMeal } from "@/server/meals/service";
 
 export async function DELETE(
   request: Request,

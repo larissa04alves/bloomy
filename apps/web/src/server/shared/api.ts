@@ -1,3 +1,5 @@
+import "server-only";
+
 import { auth } from "@bloomy/auth";
 
 export async function requireUserId(request: Request): Promise<string | null> {

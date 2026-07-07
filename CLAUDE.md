@@ -29,7 +29,7 @@ Dependências de catálogo ficam em `package.json` raiz (`workspaces.catalog`) �
 
 Glossário: `apps/web/CONTEXT.md` · ADRs: `docs/adr/` · Convenções por pacote:
 `apps/web/CLAUDE.md`, `packages/db/CLAUDE.md`, `packages/ui/CLAUDE.md`.
-Resumo: REST fino + serviços em `features/` (ADR-0001); coluna `day` fuso BR
+Resumo: REST fino + serviços em `server/` (ADR-0001); coluna `day` fuso BR
 (ADR-0002); telas PT sem lógica no `.tsx` (hooks); código EN; migrations sempre.
 
 ## Agent skills

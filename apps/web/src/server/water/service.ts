@@ -1,8 +1,10 @@
+import "server-only";
+
 import type { Db } from "@bloomy/db";
 import { waterLog, type WaterLog } from "@bloomy/db/schema/body";
 import { and, desc, eq } from "drizzle-orm";
 
-import { dayFor } from "@/features/shared/day";
+import { dayFor } from "@/server/shared/day";
 
 export async function addWater(db: Db, userId: string, ml: number): Promise<WaterLog> {
   const [log] = await db

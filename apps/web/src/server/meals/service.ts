@@ -1,8 +1,10 @@
+import "server-only";
+
 import type { Db } from "@bloomy/db";
 import { meal, type Meal } from "@bloomy/db/schema/body";
 import { and, asc, eq } from "drizzle-orm";
 
-import { dayFor } from "@/features/shared/day";
+import { dayFor } from "@/server/shared/day";
 
 export type MealType = Meal["type"];
 
