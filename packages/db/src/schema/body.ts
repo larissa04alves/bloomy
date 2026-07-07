@@ -75,6 +75,7 @@ export const medicationIntake = sqliteTable(
       .references(() => medication.id, { onDelete: "cascade" }),
     day: text("day").notNull(),
     time: text("time").notNull(),
+    stockDecremented: integer("stock_decremented", { mode: "boolean" }).default(false).notNull(),
     createdAt: timestampMs("created_at"),
   },
   (table) => [

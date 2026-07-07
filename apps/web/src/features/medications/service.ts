@@ -1,6 +1,6 @@
 import type { Db } from "@bloomy/db";
 import { medication, medicationIntake, type Medication } from "@bloomy/db/schema/body";
-import { and, asc, eq, sql } from "drizzle-orm";
+import { and, asc, eq, gt, sql } from "drizzle-orm";
 
 export type IntakeSlot = {
   medicationId: string;
@@ -126,26 +126,29 @@ export async function markIntake(
 
     if (!med || !med.active) return "not_found";
 
-    const existing = await tx
-      .select({ id: medicationIntake.id })
-      .from(medicationIntake)
-      .where(
-        and(
-          eq(medicationIntake.medicationId, input.medicationId),
-          eq(medicationIntake.day, input.day),
-          eq(medicationIntake.time, input.time),
-        ),
-      );
+    // Insert atômico: o UNIQUE(medication_id, day, time) decide a duplicata — sem select prévio (TOCTOU)
+    const inserted = await tx
+      .insert(medicationIntake)
+      .values({ userId, ...input })
+      .onConflictDoNothing()
+      .returning({ id: medicationIntake.id });
 
-    if (existing.length > 0) return "duplicate";
-
-    await tx.insert(medicationIntake).values({ userId, ...input });
+    if (inserted.length === 0) return "duplicate";
 
     if (med.stock !== null) {
-      await tx
+      // Decrementa só se havia estoque; registra na toma se descontou, p/ o unmark devolver com precisão
+      const decremented = await tx
         .update(medication)
-        .set({ stock: sql`max(${medication.stock} - 1, 0)` })
-        .where(eq(medication.id, med.id));
+        .set({ stock: sql`${medication.stock} - 1` })
+        .where(and(eq(medication.id, med.id), gt(medication.stock, 0)))
+        .returning({ stock: medication.stock });
+
+      if (decremented.length > 0) {
+        await tx
+          .update(medicationIntake)
+          .set({ stockDecremented: true })
+          .where(eq(medicationIntake.id, inserted[0].id));
+      }
     }
 
     return "ok";
@@ -172,15 +175,18 @@ export async function unmarkIntake(
 
     if (deleted.length === 0) return false;
 
-    await tx
-      .update(medication)
-      .set({ stock: sql`${medication.stock} + 1` })
-      .where(
-        and(
-          eq(medication.id, input.medicationId),
-          sql`${medication.stock} is not null`,
-        ),
-      );
+    // Devolve estoque só se esta toma realmente descontou (evita unidade fantasma no clamp de 0)
+    if (deleted[0].stockDecremented) {
+      await tx
+        .update(medication)
+        .set({ stock: sql`${medication.stock} + 1` })
+        .where(
+          and(
+            eq(medication.id, input.medicationId),
+            sql`${medication.stock} is not null`,
+          ),
+        );
+    }
 
     return true;
   });
