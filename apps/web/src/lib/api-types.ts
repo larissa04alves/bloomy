@@ -54,3 +54,69 @@ export type IntakeSlot = {
 
 /** ml por garrafa — unidade de contagem da hidratação. */
 export const GARRAFA_ML = 500;
+
+// ── Treino ────────────────────────────────────────────────────────────────
+
+export type Focus = "chest" | "back" | "legs" | "cardio";
+
+/** Rótulos PT-BR dos focos (ordem de exibição no modal). */
+export const FOCUS_LABELS: Record<Focus, string> = {
+  chest: "Peito",
+  back: "Costas",
+  legs: "Pernas",
+  cardio: "Cardio",
+};
+
+export type Exercise = {
+  id: string;
+  name: string;
+  targetSets: number;
+  position: number;
+};
+
+export type Workout = {
+  id: string;
+  name: string;
+  focus: Focus;
+  active: boolean;
+  createdAt: string;
+};
+
+export type WorkoutWithExercises = Workout & { exercises: Exercise[] };
+
+export type WorkoutSummary = {
+  weekCount: number;
+  weekTarget: number;
+  streak: number;
+  weekDays: boolean[]; // 7 posições, seg..dom
+};
+
+export type SetLog = {
+  id: string;
+  exerciseId: string | null; // FK com onDelete:"set null" no back
+  exerciseName: string;
+  setIndex: number;
+  reps: number | null;
+  load: number | null;
+  done: boolean;
+};
+
+export type SessionExercise = {
+  exerciseId: string;
+  name: string;
+  targetSets: number;
+  position: number;
+  sets: SetLog[];
+  lastPerformance: { reps: number | null; load: number | null } | null;
+};
+
+export type SessionDetail = {
+  session: {
+    id: string;
+    workoutId: string;
+    day: string;
+    startedAt: string;
+    completedAt: string | null;
+  };
+  exercises: SessionExercise[];
+};
