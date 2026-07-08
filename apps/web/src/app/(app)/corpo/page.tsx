@@ -38,6 +38,7 @@ export default function CorpoPage() {
       />
 
       <HidratacaoSection
+        totalMl={hidr.totalMl}
         done={hidr.done}
         target={hidr.target}
         onAddGarrafa={() => hidr.addWater(GARRAFA_ML)}

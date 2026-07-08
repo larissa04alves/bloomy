@@ -3,11 +3,13 @@
 import { DropIcon, PlusIcon } from "@phosphor-icons/react";
 
 export function HidratacaoSection({
+  totalMl,
   done,
   target,
   onAddGarrafa,
   onOpenModal,
 }: {
+  totalMl: number;
   done: number;
   target: number;
   onAddGarrafa: () => void;
@@ -15,11 +17,14 @@ export function HidratacaoSection({
 }) {
   return (
     <section className="flex flex-col gap-3">
-      <div className="flex items-center justify-between">
+      <div className="flex items-end justify-between">
         <h2 className="font-display text-[15px] font-bold text-ink">Hidratação</h2>
-        <span className="text-[13px] font-semibold text-ink-read">
-          {done} de {target} garrafas
-        </span>
+        <div className="text-right">
+          <span className="font-display text-[15px] font-bold text-lilac-deep">{totalMl} ml</span>
+          <span className="block text-[12px] font-semibold text-ink-read">
+            {done} de {target} garrafas
+          </span>
+        </div>
       </div>
       <div className="flex flex-wrap gap-2">
         {Array.from({ length: target }, (_, i) => (
