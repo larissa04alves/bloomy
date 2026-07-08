@@ -15,7 +15,7 @@ async function handle<T>(res: Response): Promise<T> {
       const body = (await res.json()) as { error?: string };
       if (body?.error) message = body.error;
     } catch {
-      /* corpo não-JSON: mantém statusText */
+      /* non-JSON body: keep statusText */
     }
     throw new ApiError(res.status, message);
   }

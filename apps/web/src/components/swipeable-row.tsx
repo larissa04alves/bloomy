@@ -48,6 +48,8 @@ export function SwipeableRow({
     dragging.current = true;
     startX.current = e.clientX;
     startOffset.current = offset;
+    // Mantém os eventos ligados a este elemento mesmo se o ponteiro sair dele.
+    e.currentTarget.setPointerCapture?.(e.pointerId);
   };
 
   const onPointerMove = (e: React.PointerEvent) => {

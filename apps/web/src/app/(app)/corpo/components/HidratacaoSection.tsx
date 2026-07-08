@@ -26,7 +26,7 @@ export function HidratacaoSection({
           </span>
         </div>
       </div>
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-2" aria-hidden="true">
         {Array.from({ length: target }, (_, i) => (
           <DropIcon
             key={i}

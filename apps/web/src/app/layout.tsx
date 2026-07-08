@@ -30,7 +30,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" suppressHydrationWarning>
       <body
-        className={`${quicksand.variable} ${nunito.variable} bg-board text-ink font-sans antialiased`}
+        className={`${quicksand.variable} ${nunito.variable} bg-board text-ink antialiased`}
       >
         <div className="mx-auto flex min-h-dvh w-full max-w-105 flex-col bg-bg sm:shadow-device">
           {children}

@@ -9,7 +9,7 @@ export function ToggleSwitch({
 }: {
   checked: boolean;
   onCheckedChange: (next: boolean) => void;
-  label?: string;
+  label: string;
 }) {
   return (
     <button

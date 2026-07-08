@@ -82,6 +82,7 @@ export function MedicationModal({
         {(field) => (
           <input
             value={field.state.value}
+            aria-label="Nome do remédio"
             onChange={(e) => field.handleChange(e.target.value)}
             placeholder="Nome do remédio"
             className="rounded-control border border-hairline bg-white px-4 py-3 text-[14px] font-semibold text-ink placeholder:text-ink-faint focus:border-lilac focus:outline-none"
@@ -94,6 +95,7 @@ export function MedicationModal({
           {(field) => (
             <input
               value={field.state.value}
+              aria-label="Dose"
               onChange={(e) => field.handleChange(e.target.value)}
               placeholder="Dose (ex.: 1 comp.)"
               className="flex-1 rounded-control border border-hairline bg-white px-4 py-3 text-[14px] font-semibold text-ink placeholder:text-ink-faint focus:border-lilac focus:outline-none"
@@ -104,6 +106,7 @@ export function MedicationModal({
           {(field) => (
             <input
               value={field.state.value}
+              aria-label="Estoque"
               inputMode="numeric"
               onChange={(e) => field.handleChange(e.target.value.replace(/\D/g, ""))}
               placeholder="Estoque"
@@ -145,6 +148,7 @@ export function MedicationModal({
           ))}
           <input
             type="time"
+            aria-label="Novo horário"
             value={newTime}
             onChange={(e) => setNewTime(e.target.value)}
             className="rounded-control border border-hairline bg-white px-3 py-2 text-[13px] font-semibold text-ink focus:border-lilac focus:outline-none"

@@ -35,7 +35,7 @@ export function MealModal({
         .filter(Boolean);
       setItems(parsed && parsed.length > 0 ? parsed : [""]);
     }
-  }, [open, initialType, editing]);
+  }, [open, initialType, editing?.type, editing?.description]);
 
   // Itens viram uma descrição única ("arroz, feijão") — a API guarda um texto só.
   const description = items

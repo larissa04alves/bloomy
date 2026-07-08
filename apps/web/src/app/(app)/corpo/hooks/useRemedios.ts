@@ -16,6 +16,8 @@ export function useRemedios() {
 
   const toggle = useCallback(
     async (slot: IntakeSlot) => {
+      // Toma de um remédio recém-criado (id temporário) ainda não existe no back.
+      if (slot.medicationId.startsWith("tmp-")) return;
       const prev = data;
       const next = intakes.map((s) =>
         s.medicationId === slot.medicationId && s.time === slot.time

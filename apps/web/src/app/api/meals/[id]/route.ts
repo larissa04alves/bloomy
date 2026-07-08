@@ -11,10 +11,14 @@ import {
 } from "@/server/shared/api";
 import { deleteMeal, updateMeal } from "@/server/meals/service";
 
-const updateMealSchema = z.object({
-  type: z.enum(["breakfast", "lunch", "dinner", "snack"]).optional(),
-  description: z.string().trim().min(1, "Conta o que você comeu").optional(),
-});
+const updateMealSchema = z
+  .object({
+    type: z.enum(["breakfast", "lunch", "dinner", "snack"]).optional(),
+    description: z.string().trim().min(1, "Conta o que você comeu").optional(),
+  })
+  .refine((v) => v.type !== undefined || v.description !== undefined, {
+    message: "Informe ao menos um campo",
+  });
 
 export async function PUT(
   request: Request,
