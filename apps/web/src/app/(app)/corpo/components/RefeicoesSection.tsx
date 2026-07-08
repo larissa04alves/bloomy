@@ -11,6 +11,7 @@ import {
 } from "@phosphor-icons/react";
 
 import { IconChip } from "@/components/icon-chip";
+import { SwipeableRow } from "@/components/swipeable-row";
 import { MEAL_LABELS, type Meal, type MealType } from "@/lib/api-types";
 
 /** Um ícone por refeição (visual do mock). */
@@ -25,10 +26,14 @@ export function RefeicoesSection({
   meals,
   pendingTypes,
   onOpenModal,
+  onEdit,
+  onDelete,
 }: {
   meals: Meal[];
   pendingTypes: MealType[];
   onOpenModal: (type?: MealType) => void;
+  onEdit: (meal: Meal) => void;
+  onDelete: (id: string) => void;
 }) {
   return (
     <section className="flex flex-col gap-3">
@@ -46,14 +51,16 @@ export function RefeicoesSection({
       {meals.map((m) => {
         const MealIcon = MEAL_ICONS[m.type];
         return (
-          <div key={m.id} className="flex items-center gap-3 rounded-card bg-white p-3 shadow-card-sm">
-            <IconChip tone="green" icon={<MealIcon size={22} weight="fill" />} />
-            <div className="flex flex-1 flex-col">
-              <span className="text-[13px] font-bold text-ink">{MEAL_LABELS[m.type]}</span>
-              <span className="text-[12px] font-semibold text-ink-read">{m.description}</span>
+          <SwipeableRow key={m.id} onEdit={() => onEdit(m)} onDelete={() => onDelete(m.id)}>
+            <div className="flex items-center gap-3 rounded-card bg-white p-3 shadow-card-sm">
+              <IconChip tone="green" icon={<MealIcon size={22} weight="fill" />} />
+              <div className="flex flex-1 flex-col">
+                <span className="text-[13px] font-bold text-ink">{MEAL_LABELS[m.type]}</span>
+                <span className="text-[12px] font-semibold text-ink-read">{m.description}</span>
+              </div>
+              <CheckCircleIcon size={24} weight="fill" className="text-green-deep" />
             </div>
-            <CheckCircleIcon size={24} weight="fill" className="text-green-deep" />
-          </div>
+          </SwipeableRow>
         );
       })}
 

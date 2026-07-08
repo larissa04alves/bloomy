@@ -50,14 +50,27 @@ export function useRemedios() {
       stock?: number;
       times: string[];
     }) => {
+      const prev = data;
+      const newSlots: IntakeSlot[] = input.times.map((time) => ({
+        medicationId: `tmp-${crypto.randomUUID()}`,
+        name: input.name,
+        dose: input.dose ?? null,
+        time,
+        taken: false,
+      }));
+      const next = [...intakes, ...newSlots].sort(
+        (a, b) => a.time.localeCompare(b.time) || a.name.localeCompare(b.name),
+      );
+      setData({ intakes: next }); // otimista
       try {
         await api.post<{ medication: Medication }>("/api/medications", input);
         reload();
       } catch (e) {
+        if (prev) setData(prev);
         toastError(e, "Não foi possível cadastrar o remédio");
       }
     },
-    [reload],
+    [data, intakes, setData, reload],
   );
 
   const taken = intakes.filter((s) => s.taken).length;

@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 import { Screen } from "@/components/screen";
-import { GARRAFA_ML, type MealType } from "@/lib/api-types";
+import { GARRAFA_ML, type Meal, type MealType } from "@/lib/api-types";
 
 import { HidratacaoSection } from "./components/HidratacaoSection";
 import { MealModal } from "./components/MealModal";
@@ -26,6 +26,7 @@ export default function CorpoPage() {
   const [waterOpen, setWaterOpen] = useState(false);
   const [mealOpen, setMealOpen] = useState(false);
   const [mealType, setMealType] = useState<MealType | undefined>();
+  const [editingMeal, setEditingMeal] = useState<Meal | null>(null);
   const [medOpen, setMedOpen] = useState(false);
 
   return (
@@ -47,15 +48,30 @@ export default function CorpoPage() {
         meals={ref.meals}
         pendingTypes={ref.pendingTypes}
         onOpenModal={(t) => {
+          setEditingMeal(null);
           setMealType(t);
           setMealOpen(true);
         }}
+        onEdit={(m) => {
+          setEditingMeal(m);
+          setMealOpen(true);
+        }}
+        onDelete={ref.deleteMeal}
       />
 
       <RemediosSection intakes={rem.intakes} onToggle={rem.toggle} onOpenModal={() => setMedOpen(true)} />
 
       <WaterModal open={waterOpen} onOpenChange={setWaterOpen} onConfirm={hidr.addWater} />
-      <MealModal open={mealOpen} onOpenChange={setMealOpen} initialType={mealType} onSubmit={ref.addMeal} />
+      <MealModal
+        open={mealOpen}
+        onOpenChange={setMealOpen}
+        initialType={mealType}
+        editing={editingMeal ? { type: editingMeal.type, description: editingMeal.description } : undefined}
+        onSubmit={(input) => {
+          if (editingMeal) ref.editMeal(editingMeal.id, input);
+          else ref.addMeal(input);
+        }}
+      />
       <MedicationModal open={medOpen} onOpenChange={setMedOpen} onSubmit={rem.addMedication} />
     </Screen>
   );

@@ -13,23 +13,29 @@ export function MealModal({
   open,
   onOpenChange,
   initialType,
+  editing,
   onSubmit,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   initialType?: MealType;
+  editing?: { type: MealType; description: string };
   onSubmit: (input: { type: MealType; description: string }) => void;
 }) {
   const [type, setType] = useState<MealType>(initialType ?? "breakfast");
   const [items, setItems] = useState<string[]>([""]);
 
-  // Ao (re)abrir: reseta e reflete o tipo pré-selecionado do card pendente.
+  // Ao (re)abrir: pré-preenche do modo edição, ou reseta com o tipo pendente.
   useEffect(() => {
     if (open) {
-      setType(initialType ?? "breakfast");
-      setItems([""]);
+      setType(editing?.type ?? initialType ?? "breakfast");
+      const parsed = editing?.description
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean);
+      setItems(parsed && parsed.length > 0 ? parsed : [""]);
     }
-  }, [open, initialType]);
+  }, [open, initialType, editing]);
 
   // Itens viram uma descrição única ("arroz, feijão") — a API guarda um texto só.
   const description = items
@@ -54,7 +60,7 @@ export function MealModal({
     <BottomSheet
       open={open}
       onOpenChange={onOpenChange}
-      title="Adicionar refeição"
+      title={editing ? "Editar refeição" : "Adicionar refeição"}
       tone="green"
       icon={<ForkKnifeIcon size={22} weight="fill" />}
       footer={
