@@ -29,6 +29,24 @@ export async function addMeal(
   return created;
 }
 
+export async function updateMeal(
+  db: Db,
+  userId: string,
+  mealId: string,
+  input: { type?: MealType; description?: string },
+): Promise<Meal | null> {
+  const [updated] = await db
+    .update(meal)
+    .set({
+      ...(input.type !== undefined && { type: input.type }),
+      ...(input.description !== undefined && { description: input.description }),
+    })
+    .where(and(eq(meal.id, mealId), eq(meal.userId, userId)))
+    .returning();
+
+  return updated ?? null;
+}
+
 export async function deleteMeal(db: Db, userId: string, mealId: string): Promise<boolean> {
   const deleted = await db
     .delete(meal)

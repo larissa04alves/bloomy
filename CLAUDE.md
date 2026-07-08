@@ -2,6 +2,14 @@
 
 Diário pessoal (app "Diário") — monorepo Turborepo + Bun.
 
+## Git
+
+**NUNCA commitar sem eu mandar.** Só commite quando eu disser explicitamente pra commitar
+("commita", "pode commitar X"). Eu faço os commits e reviso o trabalho antes. Em qualquer
+dúvida ou instrução ambígua sobre commit, **pergunte** — não assuma autorização. Ao despachar
+subagent, não instrua "commite por task" a menos que eu tenha pedido; entregue como mudanças
+não-commitadas.
+
 ## Estrutura
 
 - `apps/web` — Next.js 16 (App Router, `src/{app,components,lib}`), porta 3001
