@@ -41,7 +41,7 @@ export function SessaoAtiva({
           onPersist={(setId, patch) => sessao.persistSet(setId, patch)}
           onDone={async (setId, patch) => {
             const ok = await sessao.markDone(setId, patch);
-            if (ok) descanso.start();
+            if (ok) descanso.start(exercise.restSeconds); // descanso do exercício ativo
           }}
         />
         {descanso.resting ? (

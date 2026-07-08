@@ -2,11 +2,19 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { clampRest, loadRestPrefs, type RestPrefs, saveRestPrefs, tickRest } from "./rest";
+import {
+  clampRest,
+  loadRestPrefs,
+  REST_DEFAULT,
+  type RestPrefs,
+  saveRestPrefs,
+  tickRest,
+} from "./rest";
 
 export function useDescanso() {
   const [prefs, setPrefs] = useState<RestPrefs>(() => loadRestPrefs());
   const [left, setLeft] = useState<number | null>(null); // null = descanso inativo
+  const [total, setTotal] = useState<number>(REST_DEFAULT); // duração do descanso corrente (anel)
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const clear = useCallback(() => {
@@ -21,26 +29,28 @@ export function useDescanso() {
     setLeft(null);
   }, [clear]);
 
-  const start = useCallback(() => {
-    if (!prefs.auto) return;
-    clear();
-    setLeft(prefs.seconds);
-    timer.current = setInterval(() => {
-      setLeft((v) => {
-        const next = tickRest(v);
-        if (next === null) clear();
-        return next;
-      });
-    }, 1000);
-  }, [prefs.auto, prefs.seconds, clear]);
+  // Inicia o descanso. `seconds` = descanso do exercício ativo; sem valor usa o default.
+  const start = useCallback(
+    (seconds?: number) => {
+      if (!prefs.auto) return;
+      clear();
+      const secs = clampRest(seconds ?? prefs.seconds);
+      setTotal(secs);
+      setLeft(secs);
+      timer.current = setInterval(() => {
+        setLeft((v) => {
+          const next = tickRest(v);
+          if (next === null) clear();
+          return next;
+        });
+      }, 1000);
+    },
+    [prefs.auto, prefs.seconds, clear],
+  );
 
-  // Ajusta o descanso corrente e o default (persistido).
+  // Ajusta o descanso corrente (contagem + anel), sem mexer no default global.
   const adjust = useCallback((delta: number) => {
-    setPrefs((p) => {
-      const np = { ...p, seconds: clampRest(p.seconds + delta) };
-      saveRestPrefs(np);
-      return np;
-    });
+    setTotal((t) => clampRest(t + delta));
     setLeft((v) => (v === null ? v : clampRest(v + delta)));
   }, []);
 
@@ -57,7 +67,7 @@ export function useDescanso() {
   return {
     resting: left !== null,
     left: left ?? 0,
-    seconds: prefs.seconds,
+    seconds: total,
     auto: prefs.auto,
     start,
     stop,

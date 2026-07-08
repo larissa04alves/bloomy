@@ -18,7 +18,13 @@ import { dayFor } from "@/server/shared/day";
 
 export type Focus = Workout["focus"];
 
-export type ExerciseInput = { name: string; targetSets: number; position: number };
+export type ExerciseInput = {
+  name: string;
+  targetSets: number;
+  targetReps: number;
+  restSeconds: number;
+  position: number;
+};
 export type WorkoutInput = { name: string; focus: Focus; exercises: ExerciseInput[] };
 export type WorkoutWithExercises = Workout & { exercises: Exercise[] };
 
@@ -61,6 +67,8 @@ export async function createWorkout(
       userId,
       name: e.name,
       targetSets: e.targetSets,
+      targetReps: e.targetReps,
+      restSeconds: e.restSeconds,
       position: e.position,
     }));
     const exercises = rows.length ? await tx.insert(exercise).values(rows).returning() : [];
@@ -96,6 +104,8 @@ export async function updateWorkout(
         userId,
         name: e.name,
         targetSets: e.targetSets,
+        targetReps: e.targetReps,
+        restSeconds: e.restSeconds,
         position: e.position,
       }));
       exercises = rows.length ? await tx.insert(exercise).values(rows).returning() : [];
@@ -128,6 +138,7 @@ export type SessionExercise = {
   exerciseId: string;
   name: string;
   targetSets: number;
+  restSeconds: number;
   position: number;
   sets: SetLog[];
   lastPerformance: { reps: number | null; load: number | null } | null;
@@ -204,6 +215,7 @@ async function buildSessionDetail(
       exerciseId: ex.id,
       name: ex.name,
       targetSets: ex.targetSets,
+      restSeconds: ex.restSeconds,
       position: ex.position,
       sets: sets.filter((s) => s.exerciseId === ex.id),
       lastPerformance: perfByName?.has(ex.name)
@@ -262,7 +274,7 @@ export async function startSession(
         userId,
         exerciseName: ex.name,
         setIndex: i + 1,
-        reps: last?.reps ?? null,
+        reps: last?.reps ?? ex.targetReps, // sem histórico → reps-alvo do template
         load: last?.load ?? null,
         done: false,
       }));

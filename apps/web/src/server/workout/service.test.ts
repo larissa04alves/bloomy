@@ -45,7 +45,7 @@ describe("startSession / completeSession (db em arquivo)", () => {
     const w = await createWorkout(db, userId, {
       name: "Peito",
       focus: "chest",
-      exercises: [{ name: "Supino", targetSets: 2, position: 0 }],
+      exercises: [{ name: "Supino", targetSets: 2, targetReps: 12, restSeconds: 45, position: 0 }],
     });
 
     // 1ª sessão: registra carga e conclui → vira "último treino"
@@ -74,7 +74,7 @@ describe("startSession / completeSession (db em arquivo)", () => {
     const w = await createWorkout(db, userId, {
       name: "Costas",
       focus: "back",
-      exercises: [{ name: "Remada", targetSets: 1, position: 0 }],
+      exercises: [{ name: "Remada", targetSets: 1, targetReps: 12, restSeconds: 45, position: 0 }],
     });
     const s = await startSession(db, userId, w.id);
     if (s === "already_active" || s === "not_found") throw new Error("unreachable");

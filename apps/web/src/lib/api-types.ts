@@ -57,13 +57,29 @@ export const GARRAFA_ML = 500;
 
 // ── Treino ────────────────────────────────────────────────────────────────
 
-export type Focus = "chest" | "back" | "legs" | "cardio";
+/** Focos disponíveis (ordem de exibição no modal). Fonte única do enum. */
+export const FOCUS_VALUES = [
+  "chest",
+  "back",
+  "legs",
+  "shoulders",
+  "glutes",
+  "arms",
+  "abs",
+  "cardio",
+] as const;
 
-/** Rótulos PT-BR dos focos (ordem de exibição no modal). */
+export type Focus = (typeof FOCUS_VALUES)[number];
+
+/** Rótulos PT-BR dos focos (grupos musculares). */
 export const FOCUS_LABELS: Record<Focus, string> = {
   chest: "Peito",
   back: "Costas",
   legs: "Pernas",
+  shoulders: "Ombros",
+  glutes: "Glúteos",
+  arms: "Braços",
+  abs: "Abdômen",
   cardio: "Cardio",
 };
 
@@ -71,6 +87,8 @@ export type Exercise = {
   id: string;
   name: string;
   targetSets: number;
+  targetReps: number;
+  restSeconds: number;
   position: number;
 };
 
@@ -105,6 +123,7 @@ export type SessionExercise = {
   exerciseId: string;
   name: string;
   targetSets: number;
+  restSeconds: number;
   position: number;
   sets: SetLog[];
   lastPerformance: { reps: number | null; load: number | null } | null;

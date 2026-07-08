@@ -9,6 +9,7 @@ function ex(id: string, sets: { id: string; done: boolean }[]): SessionExercise 
     exerciseId: id,
     name: id,
     targetSets: sets.length,
+    restSeconds: 45,
     position: 0,
     lastPerformance: null,
     sets: sets.map((s, i) => ({

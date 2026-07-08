@@ -13,7 +13,9 @@ export const workout = sqliteTable(
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
     name: text("name").notNull(),
-    focus: text("focus").$type<"chest" | "back" | "legs" | "cardio">().notNull(),
+    focus: text("focus")
+      .$type<"chest" | "back" | "legs" | "shoulders" | "glutes" | "arms" | "abs" | "cardio">()
+      .notNull(),
     active: integer("active", { mode: "boolean" }).default(true).notNull(),
     createdAt: timestampMs("created_at"),
     updatedAt: timestampMs("updated_at"),
@@ -35,6 +37,8 @@ export const exercise = sqliteTable(
       .references(() => user.id, { onDelete: "cascade" }),
     name: text("name").notNull(),
     targetSets: integer("target_sets").notNull(),
+    targetReps: integer("target_reps").notNull().default(12),
+    restSeconds: integer("rest_seconds").notNull().default(45),
     position: integer("position").notNull(),
     createdAt: timestampMs("created_at"),
   },

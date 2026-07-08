@@ -10,7 +10,13 @@ import { useResource } from "@/lib/use-resource";
 export type WorkoutInput = {
   name: string;
   focus: Focus;
-  exercises: { name: string; targetSets: number; position: number }[];
+  exercises: {
+    name: string;
+    targetSets: number;
+    targetReps: number;
+    restSeconds: number;
+    position: number;
+  }[];
 };
 
 export function useTreinos() {
