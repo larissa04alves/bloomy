@@ -1,9 +1,15 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
+
+import type { CatalogExercise } from "@/lib/api-types";
+
 import type { useSessao } from "../hooks/useSessao";
+import { useCatalogo } from "../hooks/useCatalogo";
 import { useDescanso } from "../hooks/useDescanso";
 import { DescansoOverlay } from "./DescansoOverlay";
 import { ExercicioList } from "./ExercicioList";
+import { GifViewer } from "./GifViewer";
 import { SerieList } from "./SerieList";
 import { SessaoFim } from "./SessaoFim";
 
@@ -15,7 +21,16 @@ export function SessaoAtiva({
   workoutName: string;
 }) {
   const descanso = useDescanso();
+  const { catalog } = useCatalogo();
+  const catalogById = useMemo(() => new Map(catalog.map((c) => [c.id, c])), [catalog]);
+  const [preview, setPreview] = useState<CatalogExercise | null>(null);
   const { detail, view, activeEx, finishSummary } = sessao;
+
+  // Fecha o "ver execução" ao navegar entre exercícios ou voltar pra lista
+  // (não depende do overlay do GifViewer cobrir a tela inteira).
+  useEffect(() => {
+    setPreview(null);
+  }, [activeEx, view]);
 
   if (!detail) return null;
 
@@ -31,10 +46,12 @@ export function SessaoAtiva({
 
   if (view === "ex") {
     const exercise = detail.exercises[activeEx];
+    const activeCatalog = exercise.catalogId ? catalogById.get(exercise.catalogId) ?? null : null;
     return (
       <>
         <SerieList
           exercise={exercise}
+          catalogExercise={activeCatalog}
           onBack={sessao.backToList}
           onChangeReps={(setId, reps) => sessao.setSetValue(setId, { reps })}
           onChangeLoad={(setId, load) => sessao.setSetValue(setId, { load })}
@@ -42,6 +59,9 @@ export function SessaoAtiva({
           onDone={async (setId, patch) => {
             const ok = await sessao.markDone(setId, patch);
             if (ok) descanso.start(exercise.restSeconds); // descanso do exercício ativo
+          }}
+          onVerExecucao={() => {
+            if (activeCatalog) setPreview(activeCatalog);
           }}
         />
         {descanso.resting ? (
@@ -52,6 +72,7 @@ export function SessaoAtiva({
             onSkip={descanso.stop}
           />
         ) : null}
+        {preview ? <GifViewer exercise={preview} onClose={() => setPreview(null)} /> : null}
       </>
     );
   }

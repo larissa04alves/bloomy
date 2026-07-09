@@ -20,6 +20,7 @@
   "dependencies": {
     "@bloomy/env": "workspace:*",
     "@libsql/client": "catalog:",
+    "csv-parse": "catalog:",
     "dotenv": "catalog:",
     "drizzle-orm": "catalog:",
     "libsql": "catalog:",
@@ -27,6 +28,7 @@
   },
   "devDependencies": {
     "@bloomy/config": "workspace:*",
+    "@types/bun": "^1.2.23",
     "drizzle-kit": "^0.31.10",
     "typescript": "catalog:"
   }

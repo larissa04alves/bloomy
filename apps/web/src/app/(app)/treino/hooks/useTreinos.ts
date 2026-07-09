@@ -16,6 +16,8 @@ export type WorkoutInput = {
     targetReps: number;
     restSeconds: number;
     position: number;
+    catalogId: string | null;
+    muscleGroup: Focus | null;
   }[];
 };
 

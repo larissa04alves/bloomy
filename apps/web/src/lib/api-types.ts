@@ -90,6 +90,18 @@ export type Exercise = {
   targetReps: number;
   restSeconds: number;
   position: number;
+  catalogId: string | null;
+  muscleGroup: Focus | null;
+};
+
+export type CatalogExercise = {
+  id: string;
+  name: string;
+  namePt: string;
+  group: Focus;
+  bodyPart: string;
+  target: string;
+  secondaryMuscles: string[];
 };
 
 export type Workout = {
@@ -125,6 +137,7 @@ export type SessionExercise = {
   targetSets: number;
   restSeconds: number;
   position: number;
+  catalogId: string | null;
   sets: SetLog[];
   lastPerformance: { reps: number | null; load: number | null } | null;
 };

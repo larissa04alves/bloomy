@@ -40,10 +40,30 @@ export const exercise = sqliteTable(
     targetReps: integer("target_reps").notNull().default(12),
     restSeconds: integer("rest_seconds").notNull().default(45),
     position: integer("position").notNull(),
+    catalogId: text("catalog_id").references(() => exerciseCatalog.id, {
+      onDelete: "set null",
+    }),
+    muscleGroup: text("muscle_group").$type<
+      "chest" | "back" | "legs" | "shoulders" | "glutes" | "arms" | "abs" | "cardio"
+    >(),
     createdAt: timestampMs("created_at"),
   },
   (table) => [index("exercise_workout_idx").on(table.workoutId)],
 );
+
+export const exerciseCatalog = sqliteTable("exercise_catalog", {
+  id: text("id").primaryKey(), // id do dataset ("0025") — também a chave do GIF
+  name: text("name").notNull(), // inglês, interno
+  namePt: text("name_pt").notNull(), // exibição PT
+  group: text("group")
+    .$type<"chest" | "back" | "legs" | "shoulders" | "glutes" | "arms" | "abs" | "cardio">()
+    .notNull(),
+  bodyPart: text("body_part").notNull(),
+  target: text("target").notNull(),
+  equipment: text("equipment").notNull(),
+  secondaryMuscles: text("secondary_muscles", { mode: "json" }).$type<string[]>().notNull(),
+  createdAt: timestampMs("created_at"),
+});
 
 export const workoutSession = sqliteTable(
   "workout_session",
@@ -91,5 +111,6 @@ export const setLog = sqliteTable(
 
 export type Workout = typeof workout.$inferSelect;
 export type Exercise = typeof exercise.$inferSelect;
+export type ExerciseCatalog = typeof exerciseCatalog.$inferSelect;
 export type WorkoutSession = typeof workoutSession.$inferSelect;
 export type SetLog = typeof setLog.$inferSelect;

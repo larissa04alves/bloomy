@@ -1,21 +1,27 @@
-import { ArrowLeftIcon, CheckCircleIcon } from "@phosphor-icons/react";
+import { ArrowLeftIcon, ArrowsOutIcon, CheckCircleIcon } from "@phosphor-icons/react";
 
-import type { SessionExercise } from "@/lib/api-types";
+import type { CatalogExercise, SessionExercise } from "@/lib/api-types";
+
+import { GifThumb } from "./GifThumb";
 
 export function SerieList({
   exercise,
+  catalogExercise,
   onBack,
   onChangeReps,
   onChangeLoad,
   onPersist,
   onDone,
+  onVerExecucao,
 }: {
   exercise: SessionExercise;
+  catalogExercise?: CatalogExercise | null;
   onBack: () => void;
   onChangeReps: (setId: string, reps: number) => void;
   onChangeLoad: (setId: string, load: number) => void;
   onPersist: (setId: string, patch: { reps: number | null; load: number | null }) => void;
   onDone: (setId: string, patch: { reps: number | null; load: number | null }) => void;
+  onVerExecucao?: () => void;
 }) {
   const doneN = exercise.sets.filter((s) => s.done).length;
   const last = exercise.lastPerformance;
@@ -31,12 +37,26 @@ export function SerieList({
         >
           <ArrowLeftIcon size={20} weight="bold" />
         </button>
+        {catalogExercise ? (
+          <button type="button" aria-label="Ver execução" onClick={onVerExecucao}>
+            <GifThumb id={catalogExercise.id} alt="" className="size-12 rounded-control" />
+          </button>
+        ) : null}
         <div className="flex flex-col">
           <h1 className="font-display text-xl font-bold text-ink">{exercise.name}</h1>
           <p className="text-[13px] font-semibold text-ink-read">
             {doneN} de {exercise.sets.length} séries
           </p>
         </div>
+        {catalogExercise ? (
+          <button
+            type="button"
+            onClick={onVerExecucao}
+            className="ml-auto flex items-center gap-1 rounded-full bg-pink-tint px-2.5 py-1 text-[11px] font-bold text-pink-deep"
+          >
+            <ArrowsOutIcon size={12} weight="bold" /> ver execução
+          </button>
+        ) : null}
       </header>
 
       {last?.load != null ? (

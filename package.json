@@ -7,8 +7,10 @@
       "packages/*"
     ],
     "catalog": {
+      "csv-parse": "^5.5.6",
       "dotenv": "^17.4.2",
       "drizzle-orm": "^0.45.2",
+      "fuse.js": "^7.1.0",
       "zod": "^4.4.3",
       "typescript": "^6",
       "lucide-react": "^1.23.0",

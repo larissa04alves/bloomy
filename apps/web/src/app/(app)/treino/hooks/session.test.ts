@@ -11,6 +11,7 @@ function ex(id: string, sets: { id: string; done: boolean }[]): SessionExercise 
     targetSets: sets.length,
     restSeconds: 45,
     position: 0,
+    catalogId: null,
     lastPerformance: null,
     sets: sets.map((s, i) => ({
       id: s.id,

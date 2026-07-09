@@ -57,6 +57,13 @@
       "when": 1783536175998,
       "tag": "0007_perfect_penance",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1783597452987,
+      "tag": "0008_colorful_blizzard",
+      "breakpoints": true
     }
   ]
 }

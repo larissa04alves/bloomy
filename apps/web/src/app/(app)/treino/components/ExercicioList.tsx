@@ -9,6 +9,7 @@ import type { SessionExercise } from "@/lib/api-types";
 
 import { mmss } from "../hooks/format";
 import { doneCount } from "../hooks/session";
+import { GifThumb } from "./GifThumb";
 
 export function ExercicioList({
   name,
@@ -64,7 +65,11 @@ export function ExercicioList({
               onClick={() => onOpenExercise(i)}
               className="flex items-center gap-3 rounded-card bg-white p-3 text-left shadow-card-sm"
             >
-              <IconChip tone="pink" icon={<BarbellIcon size={22} weight="fill" />} />
+              {ex.catalogId ? (
+                <GifThumb id={ex.catalogId} alt="" className="size-10.5 rounded-[14px]" />
+              ) : (
+                <IconChip tone="pink" icon={<BarbellIcon size={22} weight="fill" />} />
+              )}
               <div className="flex flex-1 flex-col">
                 <span className="text-[14px] font-bold text-ink">{ex.name}</span>
                 <span className="text-[12px] font-semibold text-ink-read">

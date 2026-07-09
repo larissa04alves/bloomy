@@ -24,6 +24,8 @@ export type ExerciseInput = {
   targetReps: number;
   restSeconds: number;
   position: number;
+  catalogId?: string | null;
+  muscleGroup?: Focus | null;
 };
 export type WorkoutInput = { name: string; focus: Focus; exercises: ExerciseInput[] };
 export type WorkoutWithExercises = Workout & { exercises: Exercise[] };
@@ -70,6 +72,8 @@ export async function createWorkout(
       targetReps: e.targetReps,
       restSeconds: e.restSeconds,
       position: e.position,
+      catalogId: e.catalogId ?? null,
+      muscleGroup: e.catalogId ? null : (e.muscleGroup ?? null),
     }));
     const exercises = rows.length ? await tx.insert(exercise).values(rows).returning() : [];
 
@@ -107,6 +111,8 @@ export async function updateWorkout(
         targetReps: e.targetReps,
         restSeconds: e.restSeconds,
         position: e.position,
+        catalogId: e.catalogId ?? null,
+        muscleGroup: e.catalogId ? null : (e.muscleGroup ?? null),
       }));
       exercises = rows.length ? await tx.insert(exercise).values(rows).returning() : [];
     } else {
@@ -140,6 +146,7 @@ export type SessionExercise = {
   targetSets: number;
   restSeconds: number;
   position: number;
+  catalogId: string | null;
   sets: SetLog[];
   lastPerformance: { reps: number | null; load: number | null } | null;
 };
@@ -217,6 +224,7 @@ async function buildSessionDetail(
       targetSets: ex.targetSets,
       restSeconds: ex.restSeconds,
       position: ex.position,
+      catalogId: ex.catalogId,
       sets: sets.filter((s) => s.exerciseId === ex.id),
       lastPerformance: perfByName?.has(ex.name)
         ? (perfByName.get(ex.name) ?? null)

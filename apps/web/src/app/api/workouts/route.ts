@@ -11,6 +11,8 @@ const EXERCISE_SCHEMA = z.object({
   targetReps: z.number().int().min(1).max(50),
   restSeconds: z.number().int().min(0).max(600),
   position: z.number().int().min(0),
+  catalogId: z.string().nullable().optional(),
+  muscleGroup: z.enum(FOCUS_VALUES).nullable().optional(),
 });
 
 const BODY_SCHEMA = z.object({

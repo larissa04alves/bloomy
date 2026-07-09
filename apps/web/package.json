@@ -22,6 +22,7 @@
     "better-auth": "catalog:",
     "dotenv": "catalog:",
     "drizzle-orm": "catalog:",
+    "fuse.js": "catalog:",
     "libsql": "catalog:",
     "lucide-react": "catalog:",
     "next": "^16.2.0",

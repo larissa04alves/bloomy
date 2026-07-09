@@ -1,6 +1,8 @@
 {
   "extends": "@bloomy/config/tsconfig.base.json",
   "compilerOptions": {
+    // "types" restringe a auto-inclusão de @types/*; bun é necessário p/ os testes bun:test em src/seed/.
+    "types": ["bun", "node"],
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
