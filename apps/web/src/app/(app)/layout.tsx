@@ -20,7 +20,7 @@ export default async function AppLayout({
 
   return (
     <div className="flex min-h-dvh flex-col">
-      <main className="flex-1 pb-2">{children}</main>
+      <main className="flex flex-1 flex-col pb-2">{children}</main>
       <TabBar />
     </div>
   );

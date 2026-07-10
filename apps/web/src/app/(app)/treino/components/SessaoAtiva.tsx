@@ -41,6 +41,7 @@ export function SessaoAtiva({
       <SessaoFim
         durationSec={finishSummary.durationSec}
         exerciseCount={finishSummary.exerciseCount}
+        summary={finishSummary.summary}
         onRestart={sessao.reset}
       />
     );

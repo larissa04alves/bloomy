@@ -3,7 +3,7 @@
 import { useCallback, useState } from "react";
 
 import { api, ApiError } from "@/lib/api";
-import type { SessionDetail } from "@/lib/api-types";
+import type { SessionDetail, WorkoutSummary } from "@/lib/api-types";
 import { toastError } from "@/lib/toast";
 import { useResource } from "@/lib/use-resource";
 
@@ -11,7 +11,7 @@ import { applySetPatch } from "./session";
 
 type View = "lista" | "ex" | "fim";
 type SetPatch = { reps?: number | null; load?: number | null };
-type FinishSummary = { durationSec: number; exerciseCount: number };
+type FinishSummary = { durationSec: number; exerciseCount: number; summary: WorkoutSummary };
 
 // O back aceita reps/load como z.number().optional() (não .nullable()): enviar null → 400.
 // Só mandamos chaves com número de fato; done sempre que definido.

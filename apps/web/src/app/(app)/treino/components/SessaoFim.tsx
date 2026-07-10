@@ -1,22 +1,44 @@
-import { CheckCircleIcon } from "@phosphor-icons/react";
+import { CheckCircleIcon, FireIcon } from "@phosphor-icons/react";
+
+import type { WorkoutSummary } from "@/lib/api-types";
 
 import { formatDuration } from "../hooks/format";
+
+const DOW = ["S", "T", "Q", "Q", "S", "S", "D"]; // seg..dom
+const todayIndex = (new Date().getDay() + 6) % 7;
 
 export function SessaoFim({
   durationSec,
   exerciseCount,
+  summary,
   onRestart,
 }: {
   durationSec: number;
   exerciseCount: number;
+  summary: WorkoutSummary;
   onRestart: () => void;
 }) {
   return (
-    <div className="flex flex-col items-center h-full gap-5 px-5.5 pt-16 pb-8 text-center">
-      <CheckCircleIcon size={88} weight="fill" className="text-green-deep" />
+    <div className="flex flex-1 flex-col items-center justify-center gap-5 px-5.5 pb-8 text-center">
+      <div className="relative">
+        <div className="absolute -inset-3.5 rounded-full bg-green-deep animate-halo" />
+        <CheckCircleIcon
+          size={92}
+          weight="fill"
+          className="relative text-green-deep"
+        />
+      </div>
+
       <h1 className="font-display text-2xl font-bold text-ink">
         Treino concluído!
       </h1>
+
+      {summary.streak > 0 ? (
+        <span className="flex items-center gap-1.5 rounded-full bg-white px-4 py-2 font-display text-[15px] font-bold text-pink-deep shadow-card-sm">
+          <FireIcon size={16} weight="fill" /> {summary.streak}{" "}
+          {summary.streak === 1 ? "semana seguida" : "semanas seguidas"}
+        </span>
+      ) : null}
 
       <div className="flex w-full gap-3">
         <div className="flex flex-1 flex-col items-center rounded-card bg-white py-4 shadow-card-sm">
@@ -35,6 +57,21 @@ export function SessaoFim({
             duração
           </span>
         </div>
+      </div>
+
+      <div className="flex gap-2.5">
+        {summary.weekDays.map((active, i) => (
+          <span
+            key={i}
+            className={`grid size-8 place-items-center rounded-full text-[12px] font-bold ${
+              active
+                ? "bg-pink-bright text-white"
+                : "bg-white text-pink-deep/50 shadow-card-sm"
+            } ${i === todayIndex ? "shadow-[0_0_0_3px_rgba(224,138,176,0.35)]" : ""}`}
+          >
+            {DOW[i]}
+          </span>
+        ))}
       </div>
 
       <button

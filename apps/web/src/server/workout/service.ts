@@ -344,7 +344,12 @@ export async function completeSession(
   db: Db,
   userId: string,
   sessionId: string,
-): Promise<{ completedAt: Date; durationSec: number; exerciseCount: number } | null> {
+): Promise<{
+  completedAt: Date;
+  durationSec: number;
+  exerciseCount: number;
+  summary: Awaited<ReturnType<typeof workoutSummary>>;
+} | null> {
   const completedAt = new Date();
   // update atômico: só conclui se ainda estava em andamento — double-tap perde a corrida e recebe null
   const [session] = await db
@@ -360,13 +365,14 @@ export async function completeSession(
     .returning();
   if (!session) return null;
 
-  const [{ n: exerciseCount }] = await db
-    .select({ n: count() })
-    .from(exercise)
-    .where(eq(exercise.workoutId, session.workoutId));
+  // count e resumo da semana em paralelo; o summary já enxerga esta sessão (completedAt gravado acima)
+  const [exCount, summary] = await Promise.all([
+    db.select({ n: count() }).from(exercise).where(eq(exercise.workoutId, session.workoutId)),
+    workoutSummary(db, userId, completedAt),
+  ]);
 
   const durationSec = Math.round((completedAt.getTime() - session.startedAt.getTime()) / 1000);
-  return { completedAt, durationSec, exerciseCount };
+  return { completedAt, durationSec, exerciseCount: exCount[0].n, summary };
 }
 
 /**
