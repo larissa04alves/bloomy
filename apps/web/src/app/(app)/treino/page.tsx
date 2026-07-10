@@ -45,6 +45,7 @@ export default function TreinoPage() {
 
       <TreinoList
         workouts={treinos.workouts}
+        startingId={sessao.startingId}
         onStart={sessao.start}
         onEdit={(w) => {
           setEditing(w);

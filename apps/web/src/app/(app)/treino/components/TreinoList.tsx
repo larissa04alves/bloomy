@@ -1,6 +1,6 @@
 "use client";
 
-import { BarbellIcon, PlayIcon } from "@phosphor-icons/react";
+import { BarbellIcon, CircleNotchIcon, PlayIcon } from "@phosphor-icons/react";
 
 import { IconChip } from "@/components/icon-chip";
 import { SwipeableRow } from "@/components/swipeable-row";
@@ -8,11 +8,13 @@ import { FOCUS_LABELS, type WorkoutWithExercises } from "@/lib/api-types";
 
 export function TreinoList({
   workouts,
+  startingId,
   onStart,
   onEdit,
   onDelete,
 }: {
   workouts: WorkoutWithExercises[];
+  startingId: string | null;
   onStart: (workoutId: string) => void;
   onEdit: (workout: WorkoutWithExercises) => void;
   onDelete: (workoutId: string) => void;
@@ -41,9 +43,14 @@ export function TreinoList({
               type="button"
               aria-label={`Iniciar ${w.name}`}
               onClick={() => onStart(w.id)}
-              className="grid size-11 place-items-center rounded-full bg-pink-bright text-white shadow-btn"
+              disabled={startingId !== null}
+              className="grid size-11 place-items-center rounded-full bg-pink-bright text-white shadow-btn disabled:cursor-default"
             >
-              <PlayIcon size={20} weight="fill" />
+              {startingId === w.id ? (
+                <CircleNotchIcon size={20} weight="bold" className="animate-spin" />
+              ) : (
+                <PlayIcon size={20} weight="fill" />
+              )}
             </button>
           </div>
         </SwipeableRow>

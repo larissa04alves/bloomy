@@ -32,6 +32,8 @@ export function useSessao() {
   const [view, setView] = useState<View>("lista");
   const [activeEx, setActiveEx] = useState(0);
   const [finishSummary, setFinishSummary] = useState<FinishSummary | null>(null);
+  const [startingId, setStartingId] = useState<string | null>(null);
+  const [completing, setCompleting] = useState(false);
 
   const patchLocal = useCallback(
     (setId: string, patch: SetPatch & { done?: boolean }) => {
@@ -45,6 +47,7 @@ export function useSessao() {
 
   const start = useCallback(
     async (workoutId: string) => {
+      setStartingId(workoutId);
       try {
         const { session } = await api.post<{ session: SessionDetail }>(
           `/api/workouts/${workoutId}/sessions`,
@@ -58,6 +61,8 @@ export function useSessao() {
           return;
         }
         toastError(e, "Não foi possível iniciar o treino");
+      } finally {
+        setStartingId(null);
       }
     },
     [setData, reload],
@@ -108,12 +113,15 @@ export function useSessao() {
 
   const complete = useCallback(async () => {
     if (!detail) return;
+    setCompleting(true);
     try {
       const summary = await api.post<FinishSummary>(`/api/sessions/${detail.session.id}/complete`);
       setFinishSummary(summary);
       setView("fim");
     } catch (e) {
       toastError(e, "Não foi possível concluir o treino");
+    } finally {
+      setCompleting(false);
     }
   }, [detail]);
 
@@ -130,6 +138,8 @@ export function useSessao() {
     view,
     activeEx,
     finishSummary,
+    startingId,
+    completing,
     start,
     openExercise,
     backToList,

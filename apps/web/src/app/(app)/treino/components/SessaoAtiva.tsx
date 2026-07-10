@@ -88,6 +88,7 @@ export function SessaoAtiva({
       onToggleAuto={descanso.setAuto}
       onOpenExercise={sessao.openExercise}
       onComplete={sessao.complete}
+      completing={sessao.completing}
     />
   );
 }

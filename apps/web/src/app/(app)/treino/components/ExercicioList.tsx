@@ -1,6 +1,12 @@
 "use client";
 
-import { BarbellIcon, CaretRightIcon, CheckCircleIcon, TimerIcon } from "@phosphor-icons/react";
+import {
+  BarbellIcon,
+  CaretRightIcon,
+  CheckCircleIcon,
+  CircleNotchIcon,
+  TimerIcon,
+} from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
 
 import { IconChip } from "@/components/icon-chip";
@@ -19,6 +25,7 @@ export function ExercicioList({
   onToggleAuto,
   onOpenExercise,
   onComplete,
+  completing,
 }: {
   name: string;
   exercises: SessionExercise[];
@@ -27,6 +34,7 @@ export function ExercicioList({
   onToggleAuto: (v: boolean) => void;
   onOpenExercise: (i: number) => void;
   onComplete: () => void;
+  completing: boolean;
 }) {
   const [elapsed, setElapsed] = useState(0);
   useEffect(() => {
@@ -95,9 +103,17 @@ export function ExercicioList({
       <button
         type="button"
         onClick={onComplete}
-        className="mt-2 w-full rounded-full bg-pink-bright py-3.5 font-display font-bold text-white shadow-btn"
+        disabled={completing}
+        className="mt-2 flex w-full items-center justify-center gap-2.5 rounded-full bg-pink-bright py-3.5 font-display font-bold text-white shadow-btn transition-opacity disabled:opacity-70"
       >
-        Concluir treino
+        {completing ? (
+          <>
+            <CircleNotchIcon size={18} weight="bold" className="animate-spin" />
+            Concluindo…
+          </>
+        ) : (
+          "Concluir treino"
+        )}
       </button>
     </div>
   );
