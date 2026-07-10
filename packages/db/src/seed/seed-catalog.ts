@@ -1,14 +1,3 @@
-/**
- * Seed one-shot do catálogo de exercícios (idempotente).
- *
- * Rodar localmente 1x, com as credenciais do R2 e do Turso em `apps/web/.env`:
- *   cd packages/db && bun run db:seed:catalog
- *
- * Faz: baixa o CSV + os GIFs do repo omercotkd/exercises-gifs (commit fixado),
- * sobe cada GIF pro bucket R2 (`{id}.gif`) e faz upsert em `exercise_catalog`
- * com os campos crus + a curadoria PT (`CATALOG_PT`). Reexecutável: sobrescreve
- * o GIF e atualiza a linha.
- */
 import path from "node:path";
 
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
@@ -20,17 +9,38 @@ import { CATALOG_PT } from "./catalog-pt";
 import { parseExercisesCsv } from "./parse-csv";
 
 // .env fica em apps/web/.env (mesmo padrão do drizzle.config).
-dotenv.config({ path: path.resolve(import.meta.dir, "../../../../apps/web/.env") });
+dotenv.config({
+  path: path.resolve(import.meta.dir, "../../../../apps/web/.env"),
+});
 
 // Commit fixado do dataset (mesma origem do catalog-pt.json).
 const COMMIT = "ebf642cd90fdf73a6c73e7127e93b607b12c229e";
 const SOURCE = `https://cdn.jsdelivr.net/gh/omercotkd/exercises-gifs@${COMMIT}`;
-const CONCURRENCY = 8;
+const CONCURRENCY = 5;
+const RETRIES = 5;
 
 function requireEnv(name: string): string {
   const v = process.env[name];
   if (!v) throw new Error(`env ${name} não definida — preencha apps/web/.env`);
   return v;
+}
+
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+/** Baixa o GIF com retry — o CDN (jsdelivr) recusa conexão (ECONNREFUSED) sob carga. */
+async function fetchGifBytes(id: string): Promise<Uint8Array> {
+  let lastErr: unknown;
+  for (let attempt = 1; attempt <= RETRIES; attempt++) {
+    try {
+      const res = await fetch(`${SOURCE}/assets/${id}.gif`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return new Uint8Array(await res.arrayBuffer());
+    } catch (e) {
+      lastErr = e;
+      if (attempt < RETRIES) await sleep(400 * attempt); // backoff linear
+    }
+  }
+  throw lastErr instanceof Error ? lastErr : new Error(String(lastErr));
 }
 
 async function main() {
@@ -60,9 +70,7 @@ async function main() {
     await Promise.all(
       rows.slice(i, i + CONCURRENCY).map(async (r) => {
         try {
-          const res = await fetch(`${SOURCE}/assets/${r.id}.gif`);
-          if (!res.ok) throw new Error(`GIF HTTP ${res.status}`);
-          const body = new Uint8Array(await res.arrayBuffer());
+          const body = await fetchGifBytes(r.id);
           await r2.send(
             new PutObjectCommand({
               Bucket: bucket,

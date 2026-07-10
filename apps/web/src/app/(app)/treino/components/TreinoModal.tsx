@@ -136,11 +136,11 @@ export function TreinoModal({
 }) {
   const [name, setName] = useState("");
   const [focus, setFocus] = useState<Focus>("chest");
-  const [rows, setRows] = useState<ExRow[]>([NEW_ROW]);
+  const [rows, setRows] = useState<ExRow[]>([]);
   const [view, setView] = useState<"form" | "busca">("form");
   const [preview, setPreview] = useState<CatalogExercise | null>(null);
 
-  const { catalog } = useCatalogo();
+  const { catalog } = useCatalogo(open); // só busca o catálogo com o modal aberto
   const catalogById = useMemo(() => new Map(catalog.map((c) => [c.id, c])), [catalog]);
 
   useEffect(() => {
@@ -151,7 +151,8 @@ export function TreinoModal({
       setPreview(null);
       setRows(
         editing && editing.exercises.length > 0
-          ? editing.exercises.map((e) => ({
+          ? // edição: carrega os exercícios salvos
+            editing.exercises.map((e) => ({
               name: e.name,
               targetSets: clamp(e.targetSets, 1, 20),
               targetReps: clamp(e.targetReps, 1, 50),
@@ -159,7 +160,8 @@ export function TreinoModal({
               catalogId: e.catalogId,
               muscleGroup: e.muscleGroup,
             }))
-          : [NEW_ROW],
+          : // novo treino: começa vazio — adiciona pela busca do catálogo
+            [],
       );
     }
   }, [open, editing]);

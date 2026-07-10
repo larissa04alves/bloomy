@@ -21,7 +21,9 @@ export function SessaoAtiva({
   workoutName: string;
 }) {
   const descanso = useDescanso();
-  const { catalog } = useCatalogo();
+  // Só busca o catálogo se a sessão tiver algum exercício de catálogo (GIF a resolver).
+  const needsCatalog = !!sessao.detail?.exercises.some((e) => e.catalogId);
+  const { catalog } = useCatalogo(needsCatalog);
   const catalogById = useMemo(() => new Map(catalog.map((c) => [c.id, c])), [catalog]);
   const [preview, setPreview] = useState<CatalogExercise | null>(null);
   const { detail, view, activeEx, finishSummary } = sessao;

@@ -12,7 +12,7 @@ import {
   type WorkoutSession,
 } from "@bloomy/db/schema/workout";
 import { goal } from "@bloomy/db/schema/goals";
-import { and, asc, desc, eq, inArray, isNotNull, isNull } from "drizzle-orm";
+import { and, asc, count, desc, eq, inArray, isNotNull, isNull } from "drizzle-orm";
 
 import { dayFor } from "@/server/shared/day";
 
@@ -203,12 +203,16 @@ async function buildSessionDetail(
   session: WorkoutSession,
   userId: string,
   perfByName?: PerfCache,
+  preExercises?: Exercise[],
 ): Promise<SessionDetail> {
-  const exercises = await db
-    .select()
-    .from(exercise)
-    .where(eq(exercise.workoutId, session.workoutId))
-    .orderBy(asc(exercise.position));
+  // reusa os exercises já carregados (startSession) ou busca — evita um round-trip
+  const exercises =
+    preExercises ??
+    (await db
+      .select()
+      .from(exercise)
+      .where(eq(exercise.workoutId, session.workoutId))
+      .orderBy(asc(exercise.position)));
 
   const sets = await db
     .select()
@@ -260,13 +264,14 @@ export async function startSession(
     .where(eq(exercise.workoutId, workoutId))
     .orderBy(asc(exercise.position));
 
-  // pré-computa o último treino de cada exercício antes da transação (evita atrito tx/db)
-  const perfByName: PerfCache = new Map();
-  for (const ex of exercises) {
-    if (!perfByName.has(ex.name)) {
-      perfByName.set(ex.name, await lastPerformance(db, userId, ex.name));
-    }
-  }
+  // pré-computa o último treino de cada exercício (por nome) em paralelo antes da
+  // transação — 1 lote concorrente em vez de N round-trips sequenciais
+  const uniqueNames = [...new Set(exercises.map((e) => e.name))];
+  const perfByName: PerfCache = new Map(
+    await Promise.all(
+      uniqueNames.map(async (name) => [name, await lastPerformance(db, userId, name)] as const),
+    ),
+  );
 
   const session = await db.transaction(async (tx) => {
     const [s] = await tx
@@ -274,9 +279,10 @@ export async function startSession(
       .values({ userId, workoutId, day: dayFor() })
       .returning();
 
-    for (const ex of exercises) {
+    // um único insert com todas as séries de todos os exercícios (evita N inserts)
+    const rows = exercises.flatMap((ex) => {
       const last = perfByName.get(ex.name) ?? null;
-      const rows = Array.from({ length: ex.targetSets }, (_, i) => ({
+      return Array.from({ length: ex.targetSets }, (_, i) => ({
         sessionId: s.id,
         exerciseId: ex.id,
         userId,
@@ -286,12 +292,12 @@ export async function startSession(
         load: last?.load ?? null,
         done: false,
       }));
-      if (rows.length) await tx.insert(setLog).values(rows);
-    }
+    });
+    if (rows.length) await tx.insert(setLog).values(rows);
     return s;
   });
 
-  return buildSessionDetail(db, session, userId, perfByName);
+  return buildSessionDetail(db, session, userId, perfByName, exercises);
 }
 
 export async function getActiveSession(
@@ -354,13 +360,13 @@ export async function completeSession(
     .returning();
   if (!session) return null;
 
-  const exercises = await db
-    .select({ id: exercise.id })
+  const [{ n: exerciseCount }] = await db
+    .select({ n: count() })
     .from(exercise)
     .where(eq(exercise.workoutId, session.workoutId));
 
   const durationSec = Math.round((completedAt.getTime() - session.startedAt.getTime()) / 1000);
-  return { completedAt, durationSec, exerciseCount: exercises.length };
+  return { completedAt, durationSec, exerciseCount };
 }
 
 /**

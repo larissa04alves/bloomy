@@ -1,8 +1,7 @@
 "use client";
 
 import { BarbellIcon, XIcon } from "@phosphor-icons/react";
-import { useEffect, useState } from "react";
-import { createPortal } from "react-dom";
+import { useState } from "react";
 
 import type { CatalogExercise } from "@/lib/api-types";
 import { FOCUS_LABELS } from "@/lib/api-types";
@@ -12,6 +11,10 @@ import { gifUrl } from "../hooks/gif";
 /**
  * `secondaryMuscles` vêm crus em EN da API — sem mapa PT ainda (fora do escopo
  * desta task), então mostramos só o chip do grupo (PT garantido via FOCUS_LABELS).
+ *
+ * Renderizado inline (sem portal): dentro do BottomSheet do vaul, um portal pro
+ * body faria o clique de fechar contar como "clique-fora" e o vaul fecharia o
+ * sheet junto. Inline, o vaul ignora — fechar só fecha o ver-grande.
  */
 export function GifViewer({
   exercise,
@@ -21,14 +24,14 @@ export function GifViewer({
   onClose: () => void;
 }) {
   const [broken, setBroken] = useState(false);
-  const [mounted, setMounted] = useState(false);
 
-  useEffect(() => setMounted(true), []);
-
-  if (!mounted) return null;
-
-  return createPortal(
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-ink/55 px-4 pb-6">
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-end justify-center bg-ink/55 px-4 pb-6"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
       <div className="w-full max-w-105 rounded-card-lg bg-white p-4 pb-6 shadow-sheet">
         <button
           type="button"
@@ -58,7 +61,6 @@ export function GifViewer({
         </div>
         <p className="mt-3 text-right text-[10px] text-ink-faint">© Gym Visual</p>
       </div>
-    </div>,
-    document.body,
+    </div>
   );
 }

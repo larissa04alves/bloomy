@@ -22,7 +22,10 @@ export function SwipeableRow({
   const [offset, setOffset] = useState(0); // + = editar (dir), - = excluir (esq)
   const startX = useRef(0);
   const startOffset = useRef(0);
-  const dragging = useRef(false);
+  const down = useRef(false); // ponteiro pressionado
+  const dragging = useRef(false); // já passou do limiar → é swipe de fato
+
+  const DRAG_THRESHOLD = 6; // px antes de considerar swipe (deixa o tap/click passar)
 
   const close = () => setOffset(0);
 
@@ -45,26 +48,32 @@ export function SwipeableRow({
   }, [offset]);
 
   const onPointerDown = (e: React.PointerEvent) => {
-    dragging.current = true;
+    down.current = true;
+    dragging.current = false;
     startX.current = e.clientX;
     startOffset.current = offset;
-    // Mantém os eventos ligados a este elemento mesmo se o ponteiro sair dele.
-    e.currentTarget.setPointerCapture?.(e.pointerId);
+    // NÃO capturar aqui: setPointerCapture no pointerdown faz o `click` mirar o
+    // container capturador em vez do botão interno (play/etc), suprimindo o onClick.
+    // Só capturamos quando vira swipe de fato (onPointerMove, após o limiar).
   };
 
   const onPointerMove = (e: React.PointerEvent) => {
-    if (!dragging.current) return;
+    if (!down.current) return;
+    const dx = e.clientX - startX.current;
+    if (!dragging.current) {
+      if (Math.abs(dx) < DRAG_THRESHOLD) return; // ainda é um tap, deixa passar
+      dragging.current = true;
+      e.currentTarget.setPointerCapture?.(e.pointerId);
+    }
     const max = onEdit ? ACTION_W : 0;
     const min = onDelete ? -ACTION_W : 0;
-    const next = Math.max(
-      min,
-      Math.min(max, startOffset.current + (e.clientX - startX.current)),
-    );
+    const next = Math.max(min, Math.min(max, startOffset.current + dx));
     setOffset(next);
   };
 
   const onPointerUp = () => {
-    if (!dragging.current) return;
+    down.current = false;
+    if (!dragging.current) return; // foi um tap: não mexe no offset, deixa o click passar
     dragging.current = false;
     if (offset > ACTION_W / 2) {
       for (const [key, fn] of openRows) if (key !== id) fn();
