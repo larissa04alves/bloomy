@@ -44,7 +44,7 @@ export function SerieList({
         ) : null}
         <div className="flex flex-col">
           <h1 className="font-display text-xl font-bold text-ink">{exercise.name}</h1>
-          <p className="text-[13px] font-semibold text-ink-read">
+          <p className="text-sm font-semibold text-ink-read">
             {doneN} de {exercise.sets.length} séries
           </p>
         </div>
@@ -52,7 +52,7 @@ export function SerieList({
           <button
             type="button"
             onClick={onVerExecucao}
-            className="ml-auto flex items-center gap-1 rounded-full bg-pink-tint px-2.5 py-1 text-[11px] font-bold text-pink-deep"
+            className="ml-auto flex items-center gap-1 rounded-full bg-pink-tint px-2.5 py-1 text-xs font-bold text-pink-deep"
           >
             <ArrowsOutIcon size={12} weight="bold" /> ver execução
           </button>
@@ -60,7 +60,7 @@ export function SerieList({
       </header>
 
       {last?.load != null ? (
-        <p className="rounded-control bg-pink-tint px-4 py-2.5 text-[13px] font-semibold text-pink-deep">
+        <p className="rounded-control bg-pink-tint px-4 py-2.5 text-sm font-semibold text-pink-deep">
           Último treino: {last.load} kg{last.reps != null ? ` · ${last.reps} reps` : ""}
         </p>
       ) : null}
@@ -73,7 +73,7 @@ export function SerieList({
               key={s.id}
               className={`flex items-center gap-2 rounded-card p-3 ${current ? "bg-lilac-tint" : "bg-white shadow-card-sm"}`}
             >
-              <span className="w-16 text-[13px] font-bold text-ink">Série {s.setIndex}</span>
+              <span className="w-16 text-sm font-bold text-ink">Série {s.setIndex}</span>
 
               <label className="flex items-center gap-1 rounded-control border border-hairline bg-white px-2 py-1.5">
                 <input
@@ -82,10 +82,10 @@ export function SerieList({
                   value={s.reps ?? ""}
                   onChange={(e) => onChangeReps(s.id, Number(e.target.value))}
                   onBlur={() => onPersist(s.id, { reps: s.reps, load: s.load })}
-                  className="w-9 bg-transparent text-center text-[14px] font-bold text-ink outline-none"
+                  className="w-9 bg-transparent text-center text-sm font-bold text-ink outline-none"
                   aria-label={`Repetições da série ${s.setIndex}`}
                 />
-                <span className="text-[11px] font-bold text-ink-read">reps</span>
+                <span className="text-xs font-bold text-ink-read">reps</span>
               </label>
 
               <label className="flex items-center gap-1 rounded-control border border-hairline bg-white px-2 py-1.5">
@@ -95,10 +95,10 @@ export function SerieList({
                   value={s.load ?? ""}
                   onChange={(e) => onChangeLoad(s.id, Number(e.target.value))}
                   onBlur={() => onPersist(s.id, { reps: s.reps, load: s.load })}
-                  className="w-11 bg-transparent text-center text-[14px] font-bold text-ink outline-none"
+                  className="w-11 bg-transparent text-center text-sm font-bold text-ink outline-none"
                   aria-label={`Carga da série ${s.setIndex}`}
                 />
-                <span className="text-[11px] font-bold text-ink-read">kg</span>
+                <span className="text-xs font-bold text-ink-read">kg</span>
               </label>
 
               {s.done ? (
@@ -107,7 +107,7 @@ export function SerieList({
                 <button
                   type="button"
                   onClick={() => onDone(s.id, { reps: s.reps, load: s.load })}
-                  className="ml-auto rounded-full bg-pink-bright px-4 py-2 text-[13px] font-bold text-white"
+                  className="ml-auto rounded-full bg-pink-bright px-4 py-2 text-sm font-bold text-white"
                 >
                   Feito
                 </button>

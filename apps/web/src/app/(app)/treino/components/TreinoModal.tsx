@@ -70,9 +70,9 @@ function NumField({
         value={value}
         onChange={(e) => onChange(clamp(Number(e.target.value), min, max))}
         aria-label={ariaLabel}
-        className="w-9 bg-transparent text-center text-[14px] font-bold text-ink outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+        className="w-9 bg-transparent text-center text-sm font-bold text-ink outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
       />
-      <span className="text-[11px] font-bold text-ink-read">{label}</span>
+      <span className="text-xs font-bold text-ink-read">{label}</span>
     </label>
   );
 }
@@ -93,7 +93,7 @@ function MuscleGroupPicker({
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
         aria-label="Escolher grupo muscular"
-        className={`flex items-center gap-1.5 self-start rounded-full border px-3 py-1.5 text-[12.5px] font-bold ${
+        className={`flex items-center gap-1.5 self-start rounded-full border px-3 py-1.5 text-xs font-bold ${
           value
             ? "border-pink-bright bg-pink-tint text-pink-deep"
             : "border-hairline bg-lilac-tint-soft text-ink-read"
@@ -249,7 +249,7 @@ export function TreinoModal({
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Nome do treino (ex.: Peito e tríceps)"
-            className="w-full rounded-control border border-hairline bg-white px-4 py-3 text-[14px] font-semibold text-ink placeholder:text-ink-faint focus:border-pink-bright focus:outline-none"
+            className="w-full rounded-control border border-hairline bg-white px-4 py-3 text-sm font-semibold text-ink placeholder:text-ink-faint focus:border-pink-bright focus:outline-none"
           />
 
           <div className="flex flex-wrap gap-2">
@@ -285,9 +285,9 @@ export function TreinoModal({
                         className="size-12 shrink-0 rounded-control"
                       />
                       <div className="flex flex-1 flex-col items-start gap-1">
-                        <span className="text-[14px] font-bold text-ink">{r.name}</span>
+                        <span className="text-sm font-bold text-ink">{r.name}</span>
                         {group ? (
-                          <span className="rounded-full bg-pink-tint px-2 py-0.5 text-[11px] font-bold text-pink-deep">
+                          <span className="rounded-full bg-pink-tint px-2 py-0.5 text-xs font-bold text-pink-deep">
                             {FOCUS_LABELS[group]}
                           </span>
                         ) : null}
@@ -295,7 +295,7 @@ export function TreinoModal({
                       <button
                         type="button"
                         onClick={() => setPreview(catalogById.get(r.catalogId!) ?? null)}
-                        className="shrink-0 text-[12px] font-bold text-pink-deep"
+                        className="shrink-0 text-xs font-bold text-pink-deep"
                       >
                         ⤢ ver execução
                       </button>
@@ -324,7 +324,7 @@ export function TreinoModal({
                           placeholder={
                             i === 0 ? "Nome do exercício" : "Mais um exercício…"
                           }
-                          className="flex-1 bg-transparent text-[14px] font-semibold text-ink placeholder:text-ink-faint outline-none"
+                          className="flex-1 bg-transparent text-sm font-semibold text-ink placeholder:text-ink-faint outline-none"
                           aria-label={`Nome do exercício ${i + 1}`}
                         />
                         {rows.length > 1 ? (
@@ -376,7 +376,7 @@ export function TreinoModal({
             <button
               type="button"
               onClick={() => setView("busca")}
-              className="flex items-center justify-center gap-1 rounded-control border border-dashed border-hairline py-2.5 text-[13px] font-bold text-pink-deep"
+              className="flex items-center justify-center gap-1 rounded-control border border-dashed border-hairline py-2.5 text-sm font-bold text-pink-deep"
             >
               <PlusIcon size={16} weight="bold" /> Adicionar exercício
             </button>

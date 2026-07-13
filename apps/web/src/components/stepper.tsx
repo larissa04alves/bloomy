@@ -31,7 +31,7 @@ export function Stepper({
       </button>
       <div className="flex flex-col items-center">
         <span className="font-display text-4xl font-bold text-ink">{value}</span>
-        {unit ? <span className="text-[13px] font-semibold text-ink-read">{unit}</span> : null}
+        {unit ? <span className="text-sm font-semibold text-ink-read">{unit}</span> : null}
       </div>
       <button
         type="button"

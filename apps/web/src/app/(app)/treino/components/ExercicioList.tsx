@@ -53,16 +53,16 @@ export function ExercicioList({
       <header className="flex items-center gap-3">
         <div className="flex flex-1 flex-col">
           <h1 className="font-display text-2xl font-bold text-ink">{name}</h1>
-          <p className="text-[13px] font-semibold text-ink-read">
+          <p className="text-sm font-semibold text-ink-read">
             {doneEx} de {exercises.length} exercícios
           </p>
         </div>
-        <span className="flex items-center gap-1 rounded-full bg-pink-tint px-3 py-1.5 font-display text-[13px] font-bold text-pink-deep tabular-nums">
+        <span className="flex items-center gap-1 rounded-full bg-pink-tint px-3 py-1.5 font-display text-sm font-bold text-pink-deep tabular-nums">
           <TimerIcon size={16} weight="fill" /> {mmss(elapsed)}
         </span>
       </header>
 
-      <p className="text-[13px] font-semibold text-ink-read">Toque num exercício para registrar as séries.</p>
+      <p className="text-sm font-semibold text-ink-read">Toque num exercício para registrar as séries.</p>
 
       <div className="flex flex-col gap-2">
         {exercises.map((ex, i) => {
@@ -80,8 +80,8 @@ export function ExercicioList({
                 <IconChip tone="pink" icon={<BarbellIcon size={22} weight="fill" />} />
               )}
               <div className="flex flex-1 flex-col">
-                <span className="text-[14px] font-bold text-ink">{ex.name}</span>
-                <span className="text-[12px] font-semibold text-ink-read">
+                <span className="text-sm font-bold text-ink">{ex.name}</span>
+                <span className="text-xs font-semibold text-ink-read">
                   {doneCount(ex)}/{ex.targetSets} séries
                   {ex.lastPerformance?.load != null ? ` · ${ex.lastPerformance.load} kg` : ""}
                 </span>
@@ -97,7 +97,7 @@ export function ExercicioList({
       </div>
 
       <label className="flex items-center justify-between rounded-card bg-white p-3 shadow-card-sm">
-        <span className="text-[13px] font-bold text-ink">Descanso automático</span>
+        <span className="text-sm font-bold text-ink">Descanso automático</span>
         <ToggleSwitch checked={auto} onCheckedChange={onToggleAuto} label="Descanso automático" />
       </label>
 

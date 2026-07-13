@@ -96,7 +96,7 @@ export function MealModal({
                 }
               }}
               placeholder={i === 0 ? "O que você comeu?" : "Mais um item…"}
-              className="flex-1 rounded-control border border-hairline bg-white px-4 py-3 text-[14px] font-semibold text-ink placeholder:text-ink-faint focus:border-lilac focus:outline-none"
+              className="flex-1 rounded-control border border-hairline bg-white px-4 py-3 text-sm font-semibold text-ink placeholder:text-ink-faint focus:border-lilac focus:outline-none"
             />
             {items.length > 1 ? (
               <button
@@ -114,7 +114,7 @@ export function MealModal({
         <button
           type="button"
           onClick={addItem}
-          className="flex items-center justify-center gap-1 rounded-control border border-dashed border-hairline py-2.5 text-[13px] font-bold text-green-deep"
+          className="flex items-center justify-center gap-1 rounded-control border border-dashed border-hairline py-2.5 text-sm font-bold text-green-deep"
         >
           <PlusIcon size={16} weight="bold" /> Adicionar mais
         </button>

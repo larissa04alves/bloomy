@@ -55,11 +55,11 @@ export function GifViewer({
         )}
         <h2 className="mt-4 font-display text-xl font-bold text-ink">{exercise.namePt}</h2>
         <div className="mt-2 flex flex-wrap gap-1.5">
-          <span className="rounded-full bg-pink-tint px-3 py-1 text-[12px] font-bold text-pink-deep">
+          <span className="rounded-full bg-pink-tint px-3 py-1 text-xs font-bold text-pink-deep">
             {FOCUS_LABELS[exercise.group]}
           </span>
         </div>
-        <p className="mt-3 text-right text-[10px] text-ink-faint">© Gym Visual</p>
+        <p className="mt-3 text-right text-xs text-ink-faint">© Gym Visual</p>
       </div>
     </div>
   );

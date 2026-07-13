@@ -42,7 +42,7 @@ export function DescansoOverlay({
         </div>
 
         <div className="flex flex-1 flex-col gap-2">
-          <span className="text-[10px] font-extrabold tracking-widest text-white/70">DESCANSO</span>
+          <span className="text-xs font-extrabold tracking-widest text-white/70">DESCANSO</span>
           <div className="flex items-center gap-2">
             <button
               type="button"
@@ -63,7 +63,7 @@ export function DescansoOverlay({
             <button
               type="button"
               onClick={onSkip}
-              className="ml-auto rounded-full bg-white/15 px-4 py-2 text-[13px] font-bold"
+              className="ml-auto rounded-full bg-white/15 px-4 py-2 text-sm font-bold"
             >
               Pular
             </button>

@@ -30,3 +30,8 @@ Glossário canônico em `CONTEXT.md` (nesta pasta). Decisões em `/docs/adr/`.
   estoque muda na mesma transação do mark/unmark.
 - Testes: `bun test` (rodar de apps/web) roda com `--conditions react-server`
   (neutraliza `server-only` nos imports). Cobertura mínima = pontos críticos.
+- **Tamanho de texto: sempre a escala nomeada do Tailwind** (`text-xs`, `text-sm`,
+  `text-base`, `text-lg`, `text-xl`, `text-2xl`...) — **nunca** valor arbitrário
+  (`text-[13px]`, `text-[15px]`). A escala não tem `text-md`: o passo entre `sm`
+  e `lg` é `text-base`. (Cor arbitrária como `text-[#c9a8b8]` é permitida — a regra
+  é só sobre tamanho de fonte.)

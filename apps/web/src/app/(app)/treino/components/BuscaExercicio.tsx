@@ -52,7 +52,7 @@ export function BuscaExercicio({
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="buscar exercício…"
-            className="w-full bg-transparent py-2.5 text-[14px] font-semibold text-ink outline-none placeholder:text-ink-faint"
+            className="w-full bg-transparent py-2.5 text-sm font-semibold text-ink outline-none placeholder:text-ink-faint"
           />
         </label>
         <button
@@ -67,7 +67,7 @@ export function BuscaExercicio({
         >
           <FunnelIcon size={18} weight={group ? "fill" : "regular"} />
           {group ? (
-            <span className="absolute -right-1.5 -top-1.5 grid size-4.5 place-items-center rounded-full bg-pink-bright text-[10px] font-extrabold text-white">
+            <span className="absolute -right-1.5 -top-1.5 grid size-4.5 place-items-center rounded-full bg-pink-bright text-xs font-extrabold text-white">
               1
             </span>
           ) : null}
@@ -89,7 +89,7 @@ export function BuscaExercicio({
 
       <div className="flex flex-col gap-1">
         {loading ? (
-          <p className="py-6 text-center text-[13px] font-semibold text-ink-read">Carregando…</p>
+          <p className="py-6 text-center text-sm font-semibold text-ink-read">Carregando…</p>
         ) : null}
         {results.map((ex) => (
           <div key={ex.id} className="flex items-center gap-3 rounded-card p-2">
@@ -101,8 +101,8 @@ export function BuscaExercicio({
               onClick={() => onPick(ex)}
               className="flex flex-1 flex-col items-start text-left"
             >
-              <span className="text-[14px] font-bold text-ink">{ex.namePt}</span>
-              <span className="mt-0.5 rounded-full bg-pink-tint px-2 py-0.5 text-[11px] font-bold text-pink-deep">
+              <span className="text-sm font-bold text-ink">{ex.namePt}</span>
+              <span className="mt-0.5 rounded-full bg-pink-tint px-2 py-0.5 text-xs font-bold text-pink-deep">
                 {FOCUS_LABELS[ex.group]}
               </span>
             </button>
@@ -117,14 +117,14 @@ export function BuscaExercicio({
           </div>
         ))}
         {!loading && results.length === 0 ? (
-          <p className="py-6 text-center text-[13px] font-semibold text-ink-read">
+          <p className="py-6 text-center text-sm font-semibold text-ink-read">
             Nada encontrado.
           </p>
         ) : null}
         <button
           type="button"
           onClick={onCustom}
-          className="mt-1 flex items-center justify-center gap-1 rounded-control border border-dashed border-hairline py-3 text-[13px] font-bold text-pink-deep"
+          className="mt-1 flex items-center justify-center gap-1 rounded-control border border-dashed border-hairline py-3 text-sm font-bold text-pink-deep"
         >
           <PlusIcon size={16} weight="bold" /> Adicionar exercício personalizado
         </button>
@@ -148,7 +148,7 @@ function Chip({
     <button
       type="button"
       onClick={onClick}
-      className={`flex-none rounded-full border px-3 py-1.5 text-[12.5px] font-bold ${
+      className={`flex-none rounded-full border px-3 py-1.5 text-xs font-bold ${
         active
           ? "border-pink-bright bg-pink-bright text-white"
           : "border-hairline bg-lilac-tint-soft text-ink-read"

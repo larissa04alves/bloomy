@@ -20,9 +20,9 @@ export function ResumoCard({
         <div key={c.label} className="flex flex-col items-center gap-0.5">
           <span className={`font-display text-2xl font-bold ${TONE[c.tone].deep}`}>
             {c.done}
-            <span className="text-[15px] opacity-60">/{c.target}</span>
+            <span className="text-base opacity-60">/{c.target}</span>
           </span>
-          <span className={`text-[11px] font-bold ${TONE[c.tone].deep}`}>{c.label}</span>
+          <span className={`text-xs font-bold ${TONE[c.tone].deep}`}>{c.label}</span>
         </div>
       ))}
     </div>

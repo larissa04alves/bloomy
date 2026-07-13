@@ -33,7 +33,7 @@ export default function TreinoPage() {
       {treinos.summary ? <ResumoTreinoCard summary={treinos.summary} /> : null}
 
       <div className="flex items-center justify-between">
-        <h2 className="font-display text-[15px] font-bold text-ink">
+        <h2 className="font-display text-base font-bold text-ink">
           Seus treinos
         </h2>
         <button
@@ -42,7 +42,7 @@ export default function TreinoPage() {
             setEditing(undefined);
             setModalOpen(true);
           }}
-          className="flex items-center gap-1 text-[13px] font-bold text-pink-deep"
+          className="flex items-center gap-1 text-sm font-bold text-pink-deep"
         >
           <PlusIcon size={16} weight="bold" /> Novo treino
         </button>

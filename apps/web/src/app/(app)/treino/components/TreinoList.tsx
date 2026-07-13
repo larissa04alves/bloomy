@@ -21,7 +21,7 @@ export function TreinoList({
 }) {
   if (workouts.length === 0) {
     return (
-      <p className="rounded-card border border-dashed border-hairline p-5 text-center text-[13px] font-semibold text-ink-read">
+      <p className="rounded-card border border-dashed border-hairline p-5 text-center text-sm font-semibold text-ink-read">
         Nenhum treino ainda. Crie o primeiro no botão acima.
       </p>
     );
@@ -34,8 +34,8 @@ export function TreinoList({
           <div className="flex items-center gap-3 rounded-card bg-white p-3 shadow-card-sm">
             <IconChip tone="pink" icon={<BarbellIcon size={22} weight="fill" />} />
             <div className="flex flex-1 flex-col">
-              <span className="text-[14px] font-bold text-ink">{w.name}</span>
-              <span className="text-[12px] font-semibold text-ink-read">
+              <span className="text-sm font-bold text-ink">{w.name}</span>
+              <span className="text-xs font-semibold text-ink-read">
                 {w.exercises.length} exercícios · {FOCUS_LABELS[w.focus]}
               </span>
             </div>

@@ -34,7 +34,7 @@ export function SessaoFim({
       </h1>
 
       {summary.streak > 0 ? (
-        <span className="flex items-center gap-1.5 rounded-full bg-white px-4 py-2 font-display text-[15px] font-bold text-pink-deep shadow-card-sm">
+        <span className="flex items-center gap-1.5 rounded-full bg-white px-4 py-2 font-display text-base font-bold text-pink-deep shadow-card-sm">
           <FireIcon size={16} weight="fill" /> {summary.streak}{" "}
           {summary.streak === 1 ? "dia seguido" : "dias seguidos"}
         </span>
@@ -45,7 +45,7 @@ export function SessaoFim({
           <span className="font-display text-3xl font-bold text-ink">
             {exerciseCount}
           </span>
-          <span className="text-[12px] font-semibold text-ink-read">
+          <span className="text-xs font-semibold text-ink-read">
             exercícios
           </span>
         </div>
@@ -53,7 +53,7 @@ export function SessaoFim({
           <span className="font-display text-3xl font-bold text-ink">
             {formatDuration(durationSec)}
           </span>
-          <span className="text-[12px] font-semibold text-ink-read">
+          <span className="text-xs font-semibold text-ink-read">
             duração
           </span>
         </div>
@@ -63,7 +63,7 @@ export function SessaoFim({
         {summary.weekDays.map((active, i) => (
           <span
             key={i}
-            className={`grid size-8 place-items-center rounded-full text-[12px] font-bold ${
+            className={`grid size-8 place-items-center rounded-full text-xs font-bold ${
               active
                 ? "bg-pink-bright text-white"
                 : "bg-white text-pink-deep/50 shadow-card-sm"
