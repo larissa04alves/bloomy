@@ -5,6 +5,7 @@ import {
   CaretRightIcon,
   CheckCircleIcon,
   CircleNotchIcon,
+  FlagCheckeredIcon,
   TimerIcon,
 } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
@@ -104,7 +105,7 @@ export function ExercicioList({
         type="button"
         onClick={onComplete}
         disabled={completing}
-        className="mt-2 flex w-full items-center justify-center gap-2.5 rounded-full bg-pink-bright py-3.5 font-display font-bold text-white shadow-btn transition-opacity disabled:opacity-70"
+        className="mt-2 flex w-full items-center justify-center gap-2.5 rounded-full bg-lilac py-3.5 font-display font-bold text-white shadow-btn transition-opacity disabled:opacity-70"
       >
         {completing ? (
           <>
@@ -112,7 +113,10 @@ export function ExercicioList({
             Concluindo…
           </>
         ) : (
-          "Concluir treino"
+          <>
+            <FlagCheckeredIcon size={18} weight="fill" />
+            Concluir treino
+          </>
         )}
       </button>
     </div>

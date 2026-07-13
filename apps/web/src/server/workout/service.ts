@@ -378,12 +378,11 @@ export async function completeSession(
 /**
  * Resumo da semana + streak. Pura para testar isolada.
  * `weekDays`: 7 bools (seg..dom) da semana corrente.
- * `streak`: semanas fechadas consecutivas com nº de dias ativos >= meta;
- *   a semana corrente soma ao streak quando já bateu a meta (celebra), e nunca o quebra.
+ * `streak`: dias consecutivos com treino terminando hoje (ou ontem, se hoje
+ *   ainda não treinou — o dia em curso não quebra o streak).
  */
 export function summarizeWorkouts(
   days: string[],
-  target: number,
   now: Date,
 ): { weekCount: number; streak: number; weekDays: boolean[] } {
   const weekStart = mondayOf(dayFor(now));
@@ -392,20 +391,13 @@ export function summarizeWorkouts(
   const weekDays = weekDates.map((d) => daySet.has(d));
   const weekCount = weekDays.filter(Boolean).length;
 
-  const perWeek = new Map<string, Set<string>>();
-  for (const d of days) {
-    const wk = mondayOf(d);
-    if (!perWeek.has(wk)) perWeek.set(wk, new Set());
-    perWeek.get(wk)!.add(d);
-  }
-
+  const today = dayFor(now);
+  let cursor = daySet.has(today) ? today : addDaysStr(today, -1);
   let streak = 0;
-  let cursor = addDaysStr(weekStart, -7);
-  while ((perWeek.get(cursor)?.size ?? 0) >= target) {
+  while (daySet.has(cursor)) {
     streak += 1;
-    cursor = addDaysStr(cursor, -7);
+    cursor = addDaysStr(cursor, -1);
   }
-  if (weekCount >= target) streak += 1;
 
   return { weekCount, streak, weekDays };
 }
@@ -429,5 +421,5 @@ export async function workoutSummary(
     .from(workoutSession)
     .where(and(eq(workoutSession.userId, userId), isNotNull(workoutSession.completedAt)));
 
-  return { weekTarget, ...summarizeWorkouts(sessions.map((s) => s.day), weekTarget, now) };
+  return { weekTarget, ...summarizeWorkouts(sessions.map((s) => s.day), now) };
 }

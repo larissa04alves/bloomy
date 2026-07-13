@@ -36,7 +36,7 @@ export function SessaoFim({
       {summary.streak > 0 ? (
         <span className="flex items-center gap-1.5 rounded-full bg-white px-4 py-2 font-display text-[15px] font-bold text-pink-deep shadow-card-sm">
           <FireIcon size={16} weight="fill" /> {summary.streak}{" "}
-          {summary.streak === 1 ? "semana seguida" : "semanas seguidas"}
+          {summary.streak === 1 ? "dia seguido" : "dias seguidos"}
         </span>
       ) : null}
 

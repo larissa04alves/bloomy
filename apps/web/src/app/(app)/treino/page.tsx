@@ -17,20 +17,25 @@ export default function TreinoPage() {
   const sessao = useSessao();
   const treinos = useTreinos();
   const [modalOpen, setModalOpen] = useState(false);
-  const [editing, setEditing] = useState<WorkoutWithExercises | undefined>(undefined);
+  const [editing, setEditing] = useState<WorkoutWithExercises | undefined>(
+    undefined,
+  );
 
   if (sessao.detail) {
     const workoutName =
-      treinos.workouts.find((w) => w.id === sessao.detail!.session.workoutId)?.name ?? "Treino";
+      treinos.workouts.find((w) => w.id === sessao.detail!.session.workoutId)
+        ?.name ?? "Treino";
     return <SessaoAtiva sessao={sessao} workoutName={workoutName} />;
   }
 
   return (
-    <Screen title="Treino" subtitle="Seu ritual de hoje">
+    <Screen title="Treino" subtitle="Escolha o treino de hoje">
       {treinos.summary ? <ResumoTreinoCard summary={treinos.summary} /> : null}
 
       <div className="flex items-center justify-between">
-        <h2 className="font-display text-[15px] font-bold text-ink">Seus treinos</h2>
+        <h2 className="font-display text-[15px] font-bold text-ink">
+          Seus treinos
+        </h2>
         <button
           type="button"
           onClick={() => {
