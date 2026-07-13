@@ -3,6 +3,8 @@
 import { PlusIcon } from "@phosphor-icons/react";
 import { useState } from "react";
 
+import { BicepsFlexedIcon } from "@/components/icons/biceps-flexed";
+import { LoadingOverlay } from "@/components/loading-overlay";
 import { Screen } from "@/components/screen";
 import type { WorkoutWithExercises } from "@/lib/api-types";
 
@@ -68,6 +70,12 @@ export default function TreinoPage() {
           else treinos.create(input);
         }}
       />
+
+      {treinos.creating ? (
+        <LoadingOverlay label="Criando treino…">
+          <BicepsFlexedIcon animate size={40} className="text-pink-bright" />
+        </LoadingOverlay>
+      ) : null}
     </Screen>
   );
 }

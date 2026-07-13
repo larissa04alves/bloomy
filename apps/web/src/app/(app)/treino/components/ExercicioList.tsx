@@ -46,7 +46,9 @@ export function ExercicioList({
     return () => clearInterval(id);
   }, [startedAt]);
 
-  const doneEx = exercises.filter((ex) => ex.sets.length > 0 && ex.sets.every((s) => s.done)).length;
+  const doneEx = exercises.filter(
+    (ex) => ex.sets.length > 0 && ex.sets.every((s) => s.done),
+  ).length;
 
   return (
     <div className="flex flex-col gap-4 px-5.5 pt-6 pb-28">
@@ -62,7 +64,9 @@ export function ExercicioList({
         </span>
       </header>
 
-      <p className="text-sm font-semibold text-ink-read">Toque num exercício para registrar as séries.</p>
+      <p className="text-sm font-semibold text-ink-read">
+        Toque em um exercício para registrar as séries.
+      </p>
 
       <div className="flex flex-col gap-2">
         {exercises.map((ex, i) => {
@@ -75,19 +79,32 @@ export function ExercicioList({
               className="flex items-center gap-3 rounded-card bg-white p-3 text-left shadow-card-sm"
             >
               {ex.catalogId ? (
-                <GifThumb id={ex.catalogId} alt="" className="size-10.5 rounded-[14px]" />
+                <GifThumb
+                  id={ex.catalogId}
+                  alt=""
+                  className="size-10.5 rounded-[14px]"
+                />
               ) : (
-                <IconChip tone="pink" icon={<BarbellIcon size={22} weight="fill" />} />
+                <IconChip
+                  tone="pink"
+                  icon={<BarbellIcon size={22} weight="fill" />}
+                />
               )}
               <div className="flex flex-1 flex-col">
                 <span className="text-sm font-bold text-ink">{ex.name}</span>
                 <span className="text-xs font-semibold text-ink-read">
                   {doneCount(ex)}/{ex.targetSets} séries
-                  {ex.lastPerformance?.load != null ? ` · ${ex.lastPerformance.load} kg` : ""}
+                  {ex.lastPerformance?.load != null
+                    ? ` · ${ex.lastPerformance.load} kg`
+                    : ""}
                 </span>
               </div>
               {done ? (
-                <CheckCircleIcon size={24} weight="fill" className="text-green-deep" />
+                <CheckCircleIcon
+                  size={24}
+                  weight="fill"
+                  className="text-green-deep"
+                />
               ) : (
                 <CaretRightIcon size={20} className="text-ink-faint" />
               )}
@@ -98,14 +115,18 @@ export function ExercicioList({
 
       <label className="flex items-center justify-between rounded-card bg-white p-3 shadow-card-sm">
         <span className="text-sm font-bold text-ink">Descanso automático</span>
-        <ToggleSwitch checked={auto} onCheckedChange={onToggleAuto} label="Descanso automático" />
+        <ToggleSwitch
+          checked={auto}
+          onCheckedChange={onToggleAuto}
+          label="Descanso automático"
+        />
       </label>
 
       <button
         type="button"
         onClick={onComplete}
         disabled={completing}
-        className="mt-2 flex w-full items-center justify-center gap-2.5 rounded-full bg-lilac py-3.5 font-display font-bold text-white shadow-btn transition-opacity disabled:opacity-70"
+        className="mt-2 flex w-full items-center justify-center gap-2.5 rounded-full bg-pink-deep py-3.5 font-display font-bold text-white shadow-btn transition-opacity disabled:opacity-70"
       >
         {completing ? (
           <>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 
 import { api } from "@/lib/api";
 import type { Focus, WorkoutSummary, WorkoutWithExercises } from "@/lib/api-types";
@@ -30,14 +30,23 @@ export function useTreinos() {
   );
 
   const workouts = list.data?.workouts ?? [];
+  const [creating, setCreating] = useState(false);
 
   const create = useCallback(
     async (input: WorkoutInput) => {
+      setCreating(true);
       try {
         await api.post("/api/workouts", input);
-        list.reload();
+        // Recarrega e espera a lista já com o novo treino antes de esconder o
+        // overlay — assim o carregamento cobre até o item aparecer.
+        const data = await api.get<{ workouts: WorkoutWithExercises[] }>(
+          "/api/workouts",
+        );
+        list.setData(data);
       } catch (e) {
         toastError(e, "Não foi possível criar o treino");
+      } finally {
+        setCreating(false);
       }
     },
     [list],
@@ -73,6 +82,7 @@ export function useTreinos() {
     workouts,
     summary: sum.data,
     loading: list.loading,
+    creating,
     reload: () => {
       list.reload();
       sum.reload();

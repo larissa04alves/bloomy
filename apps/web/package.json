@@ -25,6 +25,7 @@
     "fuse.js": "catalog:",
     "libsql": "catalog:",
     "lucide-react": "catalog:",
+    "motion": "catalog:",
     "next": "^16.2.0",
     "next-themes": "catalog:",
     "react": "catalog:",
