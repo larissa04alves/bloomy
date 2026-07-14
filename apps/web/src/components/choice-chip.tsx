@@ -22,7 +22,7 @@ export function ChoiceChip({
       aria-pressed={selected}
       onClick={onClick}
       className={cn(
-        "min-h-9 rounded-full px-4 py-2 text-[13px] font-semibold transition-colors",
+        "min-h-9 rounded-full px-4 py-2 text-sm font-semibold transition-colors",
         selected ? cn(t.solid, "text-white") : cn("bg-lilac-tint-soft", t.deep),
       )}
     >

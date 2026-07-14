@@ -2,13 +2,13 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
-export function useResource<T>(fetcher: () => Promise<T>) {
+export function useResource<T>(fetcher: () => Promise<T>, enabled = true) {
   const fetcherRef = useRef(fetcher);
   fetcherRef.current = fetcher;
 
   const [data, setData] = useState<T | null>(null);
   const [error, setError] = useState<Error | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(enabled);
 
   const requestId = useRef(0);
   const mounted = useRef(true);
@@ -41,8 +41,9 @@ export function useResource<T>(fetcher: () => Promise<T>) {
   }, []);
 
   useEffect(() => {
-    reload();
-  }, [reload]);
+    if (enabled) reload();
+    else setLoading(false);
+  }, [reload, enabled]);
 
   return { data, error, loading, reload, setData };
 }

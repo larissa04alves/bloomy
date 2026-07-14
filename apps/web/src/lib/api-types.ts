@@ -54,3 +54,101 @@ export type IntakeSlot = {
 
 /** ml por garrafa — unidade de contagem da hidratação. */
 export const GARRAFA_ML = 500;
+
+// ── Treino ────────────────────────────────────────────────────────────────
+
+/** Focos disponíveis (ordem de exibição no modal). Fonte única do enum. */
+export const FOCUS_VALUES = [
+  "chest",
+  "back",
+  "legs",
+  "shoulders",
+  "glutes",
+  "arms",
+  "abs",
+  "cardio",
+] as const;
+
+export type Focus = (typeof FOCUS_VALUES)[number];
+
+/** Rótulos PT-BR dos focos (grupos musculares). */
+export const FOCUS_LABELS: Record<Focus, string> = {
+  chest: "Peito",
+  back: "Costas",
+  legs: "Pernas",
+  shoulders: "Ombros",
+  glutes: "Glúteos",
+  arms: "Braços",
+  abs: "Abdômen",
+  cardio: "Cardio",
+};
+
+export type Exercise = {
+  id: string;
+  name: string;
+  targetSets: number;
+  targetReps: number;
+  restSeconds: number;
+  position: number;
+  catalogId: string | null;
+  muscleGroup: Focus | null;
+};
+
+export type CatalogExercise = {
+  id: string;
+  name: string;
+  namePt: string;
+  group: Focus;
+  bodyPart: string;
+  target: string;
+  secondaryMuscles: string[];
+};
+
+export type Workout = {
+  id: string;
+  name: string;
+  focus: Focus;
+  active: boolean;
+  createdAt: string;
+};
+
+export type WorkoutWithExercises = Workout & { exercises: Exercise[] };
+
+export type WorkoutSummary = {
+  weekCount: number;
+  weekTarget: number;
+  streak: number;
+  weekDays: boolean[]; // 7 posições, seg..dom
+};
+
+export type SetLog = {
+  id: string;
+  exerciseId: string | null; // FK com onDelete:"set null" no back
+  exerciseName: string;
+  setIndex: number;
+  reps: number | null;
+  load: number | null;
+  done: boolean;
+};
+
+export type SessionExercise = {
+  exerciseId: string;
+  name: string;
+  targetSets: number;
+  restSeconds: number;
+  position: number;
+  catalogId: string | null;
+  sets: SetLog[];
+  lastPerformance: { reps: number | null; load: number | null } | null;
+};
+
+export type SessionDetail = {
+  session: {
+    id: string;
+    workoutId: string;
+    day: string;
+    startedAt: string;
+    completedAt: string | null;
+  };
+  exercises: SessionExercise[];
+};

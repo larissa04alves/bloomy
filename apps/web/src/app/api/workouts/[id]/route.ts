@@ -1,6 +1,7 @@
 import { db } from "@bloomy/db";
 import { z } from "zod";
 
+import { FOCUS_VALUES } from "@/lib/api-types";
 import {
   invalidBody,
   notFound,
@@ -13,12 +14,16 @@ import { deactivateWorkout, updateWorkout } from "@/server/workout/service";
 const EXERCISE_SCHEMA = z.object({
   name: z.string().min(1).max(120),
   targetSets: z.number().int().min(1).max(20),
+  targetReps: z.number().int().min(1).max(50),
+  restSeconds: z.number().int().min(0).max(600),
   position: z.number().int().min(0),
+  catalogId: z.string().nullable().optional(),
+  muscleGroup: z.enum(FOCUS_VALUES).nullable().optional(),
 });
 
 const BODY_SCHEMA = z.object({
   name: z.string().min(1).max(120).optional(),
-  focus: z.enum(["chest", "back", "legs", "cardio"]).optional(),
+  focus: z.enum(FOCUS_VALUES).optional(),
   exercises: z.array(EXERCISE_SCHEMA).max(30).optional(),
 });
 

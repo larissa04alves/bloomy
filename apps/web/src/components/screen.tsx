@@ -14,7 +14,7 @@ export function Screen({
       <header className="flex flex-col gap-1">
         <h1 className="font-display text-2xl font-bold text-ink">{title}</h1>
         {subtitle ? (
-          <p className="text-[13px] font-semibold text-ink-read">{subtitle}</p>
+          <p className="text-sm font-semibold text-ink-read">{subtitle}</p>
         ) : null}
       </header>
       {children}
@@ -28,7 +28,7 @@ export function ScreenSkeleton({ label }: { label: string }) {
       <div className="h-7 w-40 animate-pulse rounded-control bg-lilac-tint" />
       <div className="h-24 w-full animate-pulse rounded-card bg-lilac-tint-soft" />
       <div className="h-24 w-full animate-pulse rounded-card bg-lilac-tint-soft" />
-      <p className="pt-2 text-center text-[11px] font-bold text-ink-faint">
+      <p className="pt-2 text-center text-xs font-bold text-ink-faint">
         {label} · em breve
       </p>
     </div>

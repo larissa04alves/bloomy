@@ -1,4 +1,10 @@
-import { index, integer, real, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import {
+  index,
+  integer,
+  real,
+  sqliteTable,
+  text,
+} from "drizzle-orm/sqlite-core";
 
 import { user } from "./auth";
 import { timestampMs } from "./_columns";
@@ -13,7 +19,18 @@ export const workout = sqliteTable(
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
     name: text("name").notNull(),
-    focus: text("focus").$type<"chest" | "back" | "legs" | "cardio">().notNull(),
+    focus: text("focus")
+      .$type<
+        | "chest"
+        | "back"
+        | "legs"
+        | "shoulders"
+        | "glutes"
+        | "arms"
+        | "abs"
+        | "cardio"
+      >()
+      .notNull(),
     active: integer("active", { mode: "boolean" }).default(true).notNull(),
     createdAt: timestampMs("created_at"),
     updatedAt: timestampMs("updated_at"),
@@ -35,11 +52,51 @@ export const exercise = sqliteTable(
       .references(() => user.id, { onDelete: "cascade" }),
     name: text("name").notNull(),
     targetSets: integer("target_sets").notNull(),
+    targetReps: integer("target_reps").notNull().default(12),
+    restSeconds: integer("rest_seconds").notNull().default(45),
     position: integer("position").notNull(),
+    catalogId: text("catalog_id").references(() => exerciseCatalog.id, {
+      onDelete: "set null",
+    }),
+    muscleGroup: text("muscle_group").$type<
+      | "chest"
+      | "back"
+      | "legs"
+      | "shoulders"
+      | "glutes"
+      | "arms"
+      | "abs"
+      | "cardio"
+    >(),
     createdAt: timestampMs("created_at"),
   },
   (table) => [index("exercise_workout_idx").on(table.workoutId)],
 );
+
+export const exerciseCatalog = sqliteTable("exercise_catalog", {
+  id: text("id").primaryKey(), // id do dataset ("0025") — também a chave do GIF
+  name: text("name").notNull(), // inglês, interno
+  namePt: text("name_pt").notNull(), // exibição PT
+  group: text("group")
+    .$type<
+      | "chest"
+      | "back"
+      | "legs"
+      | "shoulders"
+      | "glutes"
+      | "arms"
+      | "abs"
+      | "cardio"
+    >()
+    .notNull(),
+  bodyPart: text("body_part").notNull(),
+  target: text("target").notNull(),
+  equipment: text("equipment").notNull(),
+  secondaryMuscles: text("secondary_muscles", { mode: "json" })
+    .$type<string[]>()
+    .notNull(),
+  createdAt: timestampMs("created_at"),
+});
 
 export const workoutSession = sqliteTable(
   "workout_session",
@@ -58,7 +115,9 @@ export const workoutSession = sqliteTable(
     completedAt: integer("completed_at", { mode: "timestamp_ms" }),
     createdAt: timestampMs("created_at"),
   },
-  (table) => [index("workout_session_user_day_idx").on(table.userId, table.day)],
+  (table) => [
+    index("workout_session_user_day_idx").on(table.userId, table.day),
+  ],
 );
 
 export const setLog = sqliteTable(
@@ -70,7 +129,9 @@ export const setLog = sqliteTable(
     sessionId: text("session_id")
       .notNull()
       .references(() => workoutSession.id, { onDelete: "cascade" }),
-    exerciseId: text("exercise_id").references(() => exercise.id, { onDelete: "set null" }),
+    exerciseId: text("exercise_id").references(() => exercise.id, {
+      onDelete: "set null",
+    }),
     userId: text("user_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
@@ -82,10 +143,14 @@ export const setLog = sqliteTable(
     doneAt: integer("done_at", { mode: "timestamp_ms" }),
     createdAt: timestampMs("created_at"),
   },
-  (table) => [index("set_log_session_idx").on(table.sessionId)],
+  (table) => [
+    index("set_log_session_idx").on(table.sessionId),
+    index("set_log_user_exercise_idx").on(table.userId, table.exerciseName),
+  ],
 );
 
 export type Workout = typeof workout.$inferSelect;
 export type Exercise = typeof exercise.$inferSelect;
+export type ExerciseCatalog = typeof exerciseCatalog.$inferSelect;
 export type WorkoutSession = typeof workoutSession.$inferSelect;
 export type SetLog = typeof setLog.$inferSelect;

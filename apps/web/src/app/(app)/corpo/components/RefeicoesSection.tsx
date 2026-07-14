@@ -38,11 +38,11 @@ export function RefeicoesSection({
   return (
     <section className="flex flex-col gap-3">
       <div className="flex items-center justify-between">
-        <h2 className="font-display text-[15px] font-bold text-ink">Alimentação</h2>
+        <h2 className="font-display text-base font-bold text-ink">Alimentação</h2>
         <button
           type="button"
           onClick={() => onOpenModal()}
-          className="flex items-center gap-1 text-[13px] font-bold text-green-deep"
+          className="flex items-center gap-1 text-sm font-bold text-green-deep"
         >
           <PlusIcon size={16} weight="bold" /> Adicionar
         </button>
@@ -55,8 +55,8 @@ export function RefeicoesSection({
             <div className="flex items-center gap-3 rounded-card bg-white p-3 shadow-card-sm">
               <IconChip tone="green" icon={<MealIcon size={22} weight="fill" />} />
               <div className="flex flex-1 flex-col">
-                <span className="text-[13px] font-bold text-ink">{MEAL_LABELS[m.type]}</span>
-                <span className="text-[12px] font-semibold text-ink-read">{m.description}</span>
+                <span className="text-sm font-bold text-ink">{MEAL_LABELS[m.type]}</span>
+                <span className="text-xs font-semibold text-ink-read">{m.description}</span>
               </div>
               <CheckCircleIcon size={24} weight="fill" className="text-green-deep" />
             </div>
@@ -74,7 +74,7 @@ export function RefeicoesSection({
             className="flex items-center gap-3 rounded-card border border-dashed border-hairline p-3 text-left"
           >
             <IconChip tone="green" variant="white" icon={<MealIcon size={22} weight="fill" />} />
-            <span className="flex-1 text-[13px] font-semibold text-ink-read">
+            <span className="flex-1 text-sm font-semibold text-ink-read">
               {MEAL_LABELS[t]} — registrar
             </span>
             <PlusIcon size={20} weight="bold" className="text-ink-faint" />

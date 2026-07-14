@@ -1,0 +1,5294 @@
+{
+  "1000": {
+    "namePt": "Elevação de panturrilha invertida unilateral com elástico",
+    "group": "legs"
+  },
+  "1001": {
+    "namePt": "Afundo unilateral com elástico",
+    "group": "legs"
+  },
+  "1002": {
+    "namePt": "Elevação de pernas retas deitado com elástico",
+    "group": "abs"
+  },
+  "1003": {
+    "namePt": "Agachamento com remada com elástico",
+    "group": "glutes"
+  },
+  "1004": {
+    "namePt": "Agachamento com elástico",
+    "group": "glutes"
+  },
+  "1005": {
+    "namePt": "Abdominal em pé com elástico",
+    "group": "abs"
+  },
+  "1007": {
+    "namePt": "Abdominal com rotação em pé com elástico",
+    "group": "abs"
+  },
+  "1008": {
+    "namePt": "Subida no step com elástico",
+    "group": "glutes"
+  },
+  "1009": {
+    "namePt": "Levantamento terra perna rígida com elástico",
+    "group": "glutes"
+  },
+  "1010": {
+    "namePt": "Levantamento terra pernas retas com elástico",
+    "group": "back"
+  },
+  "1011": {
+    "namePt": "Rotação de tronco sentado com elástico",
+    "group": "abs"
+  },
+  "1012": {
+    "namePt": "Desenvolvimento acima da cabeça com rotação com elástico",
+    "group": "shoulders"
+  },
+  "1013": {
+    "namePt": "Puxada pegada supinada com elástico",
+    "group": "back"
+  },
+  "1014": {
+    "namePt": "Abdominal V com elástico",
+    "group": "abs"
+  },
+  "1015": {
+    "namePt": "Pallof press vertical com elástico",
+    "group": "abs"
+  },
+  "1016": {
+    "namePt": "Rosca de punho com elástico",
+    "group": "arms"
+  },
+  "1017": {
+    "namePt": "Elevação em Y com elástico",
+    "group": "shoulders"
+  },
+  "1018": {
+    "namePt": "Encolhimento de ombros com elástico",
+    "group": "back"
+  },
+  "1022": {
+    "namePt": "Remada para deltoide posterior em pé com elástico",
+    "group": "shoulders"
+  },
+  "1023": {
+    "namePt": "Levantamento terra costas retas e pernas rígidas com elástico",
+    "group": "glutes"
+  },
+  "1160": {
+    "namePt": "Burpee",
+    "group": "cardio"
+  },
+  "1167": {
+    "namePt": "Alongamento dinâmico de peito",
+    "group": "chest"
+  },
+  "1201": {
+    "namePt": "Burpee com halteres",
+    "group": "cardio"
+  },
+  "1253": {
+    "namePt": "Panturrilha burro na máquina",
+    "group": "legs"
+  },
+  "1254": {
+    "namePt": "Supino reto com elástico",
+    "group": "chest"
+  },
+  "1255": {
+    "namePt": "Pullover declinado com barra",
+    "group": "chest"
+  },
+  "1256": {
+    "namePt": "Supino declinado pegada invertida com barra",
+    "group": "chest"
+  },
+  "1257": {
+    "namePt": "Supino inclinado pegada invertida com barra",
+    "group": "chest"
+  },
+  "1258": {
+    "namePt": "Supino pegada aberta invertida com barra",
+    "group": "chest"
+  },
+  "1259": {
+    "namePt": "Alongamento de peito por trás da cabeça",
+    "group": "chest"
+  },
+  "1260": {
+    "namePt": "Supino declinado unilateral na polia",
+    "group": "chest"
+  },
+  "1261": {
+    "namePt": "Supino declinado na polia",
+    "group": "chest"
+  },
+  "1262": {
+    "namePt": "Crucifixo declinado unilateral na polia",
+    "group": "chest"
+  },
+  "1263": {
+    "namePt": "Crucifixo unilateral na polia com bola suíça",
+    "group": "chest"
+  },
+  "1264": {
+    "namePt": "Crucifixo inclinado unilateral na polia com bola suíça",
+    "group": "chest"
+  },
+  "1265": {
+    "namePt": "Supino inclinado unilateral na polia",
+    "group": "chest"
+  },
+  "1266": {
+    "namePt": "Supino inclinado unilateral na polia com bola suíça",
+    "group": "chest"
+  },
+  "1267": {
+    "namePt": "Supino unilateral na polia com bola suíça",
+    "group": "chest"
+  },
+  "1268": {
+    "namePt": "Supino na polia com bola suíça",
+    "group": "chest"
+  },
+  "1269": {
+    "namePt": "Crossover em pé na polia",
+    "group": "chest"
+  },
+  "1270": {
+    "namePt": "Crossover para peito superior na polia",
+    "group": "chest"
+  },
+  "1271": {
+    "namePt": "Alongamento de peito e ombro anterior",
+    "group": "chest"
+  },
+  "1272": {
+    "namePt": "Alongamento de peito com bola suíça",
+    "group": "chest"
+  },
+  "1273": {
+    "namePt": "Flexão com palmas",
+    "group": "chest"
+  },
+  "1274": {
+    "namePt": "Flexão profunda",
+    "group": "chest"
+  },
+  "1275": {
+    "namePt": "Flexão com queda",
+    "group": "chest"
+  },
+  "1276": {
+    "namePt": "Crucifixo declinado unilateral com halteres",
+    "group": "chest"
+  },
+  "1277": {
+    "namePt": "Crucifixo na bola suíça com halteres",
+    "group": "chest"
+  },
+  "1278": {
+    "namePt": "Crucifixo inclinado na bola suíça com halteres",
+    "group": "chest"
+  },
+  "1279": {
+    "namePt": "Crucifixo inclinado unilateral com halteres",
+    "group": "chest"
+  },
+  "1280": {
+    "namePt": "Crucifixo inclinado unilateral na bola suíça com halteres",
+    "group": "chest"
+  },
+  "1281": {
+    "namePt": "Supino inclinado unilateral com halteres",
+    "group": "chest"
+  },
+  "1282": {
+    "namePt": "Supino inclinado unilateral na bola suíça com halteres",
+    "group": "chest"
+  },
+  "1283": {
+    "namePt": "Supino inclinado na bola suíça com halteres",
+    "group": "chest"
+  },
+  "1284": {
+    "namePt": "Pullover deitado na bola suíça com halteres",
+    "group": "chest"
+  },
+  "1285": {
+    "namePt": "Crucifixo unilateral no banco com halteres",
+    "group": "chest"
+  },
+  "1286": {
+    "namePt": "Crucifixo unilateral na bola suíça com halteres",
+    "group": "chest"
+  },
+  "1287": {
+    "namePt": "Supino declinado unilateral com halteres",
+    "group": "chest"
+  },
+  "1288": {
+    "namePt": "Crucifixo unilateral com halteres na bola suíça",
+    "group": "chest"
+  },
+  "1289": {
+    "namePt": "Supino inclinado unilateral com halteres",
+    "group": "chest"
+  },
+  "1290": {
+    "namePt": "Desenvolvimento unilateral com halteres na bola suíça",
+    "group": "chest"
+  },
+  "1291": {
+    "namePt": "Pullover unilateral com halteres na bola suíça",
+    "group": "chest"
+  },
+  "1292": {
+    "namePt": "Crucifixo com halteres na bola suíça, apoio em uma perna",
+    "group": "chest"
+  },
+  "1293": {
+    "namePt": "Supino com halteres na bola suíça",
+    "group": "chest"
+  },
+  "1294": {
+    "namePt": "Pullover com extensão de quadril na bola suíça com halteres",
+    "group": "chest"
+  },
+  "1295": {
+    "namePt": "Pullover com halteres na bola suíça",
+    "group": "chest"
+  },
+  "1296": {
+    "namePt": "Flexão pike na bola suíça",
+    "group": "chest"
+  },
+  "1297": {
+    "namePt": "Contração isométrica de peito",
+    "group": "chest"
+  },
+  "1298": {
+    "namePt": "Supino unilateral no chão com kettlebell",
+    "group": "chest"
+  },
+  "1299": {
+    "namePt": "Supino inclinado na máquina",
+    "group": "chest"
+  },
+  "1300": {
+    "namePt": "Supino declinado na máquina",
+    "group": "chest"
+  },
+  "1301": {
+    "namePt": "Supino interno na máquina",
+    "group": "chest"
+  },
+  "1302": {
+    "namePt": "Passe de peito com bola medicinal",
+    "group": "chest"
+  },
+  "1303": {
+    "namePt": "Empurrão de peito com bola medicinal (posição de 3 apoios)",
+    "group": "chest"
+  },
+  "1304": {
+    "namePt": "Empurrão de peito com bola medicinal (resposta múltipla)",
+    "group": "chest"
+  },
+  "1305": {
+    "namePt": "Empurrão de peito com bola medicinal (resposta única)",
+    "group": "chest"
+  },
+  "1306": {
+    "namePt": "Flexão pliométrica",
+    "group": "chest"
+  },
+  "1307": {
+    "namePt": "Flexão de braço na bosu",
+    "group": "chest"
+  },
+  "1308": {
+    "namePt": "Supino pegada aberta no smith",
+    "group": "chest"
+  },
+  "1309": {
+    "namePt": "Supino declinado pegada aberta no smith",
+    "group": "chest"
+  },
+  "1310": {
+    "namePt": "Flexão pliométrica com peso",
+    "group": "chest"
+  },
+  "1311": {
+    "namePt": "Flexão com mãos afastadas",
+    "group": "chest"
+  },
+  "1312": {
+    "namePt": "Empurrão de peito com bola medicinal com corrida e soltura",
+    "group": "chest"
+  },
+  "1313": {
+    "namePt": "Remada unilateral na máquina",
+    "group": "back"
+  },
+  "1314": {
+    "namePt": "Extensão lombar na bola suíça",
+    "group": "back"
+  },
+  "1316": {
+    "namePt": "Pullover com braços flexionados com barra",
+    "group": "back"
+  },
+  "1317": {
+    "namePt": "Remada no banco inclinado pegada invertida com barra",
+    "group": "back"
+  },
+  "1318": {
+    "namePt": "Remada inclinada na polia",
+    "group": "back"
+  },
+  "1319": {
+    "namePt": "Remada com rotação de pulso na polia",
+    "group": "back"
+  },
+  "1320": {
+    "namePt": "Remada sentado na polia com corda (crossover)",
+    "group": "back"
+  },
+  "1321": {
+    "namePt": "Remada sentado elevada na polia com corda",
+    "group": "back"
+  },
+  "1322": {
+    "namePt": "Remada inclinada na polia com corda (extensão)",
+    "group": "back"
+  },
+  "1323": {
+    "namePt": "Remada sentado na polia com corda",
+    "group": "back"
+  },
+  "1324": {
+    "namePt": "Remada alta na polia",
+    "group": "back"
+  },
+  "1325": {
+    "namePt": "Puxada atrás da nuca pegada aberta na polia",
+    "group": "back"
+  },
+  "1326": {
+    "namePt": "Barra fixa (pegada supinada)",
+    "group": "back"
+  },
+  "1327": {
+    "namePt": "Barra fixa pegada supinada fechada",
+    "group": "back"
+  },
+  "1328": {
+    "namePt": "Remada deitado para deltoide posterior com halteres",
+    "group": "back"
+  },
+  "1329": {
+    "namePt": "Remada curvada com rotação de pulso com halteres",
+    "group": "back"
+  },
+  "1330": {
+    "namePt": "Remada unilateral pegada invertida no banco inclinado com halteres",
+    "group": "back"
+  },
+  "1331": {
+    "namePt": "Remada bilateral pegada invertida no banco inclinado com halteres",
+    "group": "back"
+  },
+  "1332": {
+    "namePt": "Elevação alternada de braços na bola suíça",
+    "group": "back"
+  },
+  "1333": {
+    "namePt": "Extensão lombar na bola suíça com braços estendidos",
+    "group": "back"
+  },
+  "1334": {
+    "namePt": "Extensão lombar na bola suíça com mãos na cabeça",
+    "group": "back"
+  },
+  "1335": {
+    "namePt": "Extensão lombar na bola suíça com joelhos elevados",
+    "group": "back"
+  },
+  "1336": {
+    "namePt": "Extensão lombar na bola suíça com rotação",
+    "group": "back"
+  },
+  "1338": {
+    "namePt": "Abraço na bola suíça",
+    "group": "back"
+  },
+  "1339": {
+    "namePt": "Alongamento de dorsais na bola suíça",
+    "group": "back"
+  },
+  "1341": {
+    "namePt": "Alongamento lombar na bola suíça (pirâmide)",
+    "group": "back"
+  },
+  "1342": {
+    "namePt": "Alongamento lateral de dorsais deitado na bola suíça",
+    "group": "back"
+  },
+  "1343": {
+    "namePt": "Elevação de pernas em prono na bola suíça",
+    "group": "back"
+  },
+  "1344": {
+    "namePt": "Remada curvada pegada inversa com barra W",
+    "group": "back"
+  },
+  "1345": {
+    "namePt": "Remada com kettlebell (dois braços)",
+    "group": "back"
+  },
+  "1346": {
+    "namePt": "Alongamento de dorsais ajoelhado",
+    "group": "back"
+  },
+  "1347": {
+    "namePt": "Puxada aberta unilateral na máquina",
+    "group": "back"
+  },
+  "1348": {
+    "namePt": "Remada vertical pegada invertida na máquina",
+    "group": "back"
+  },
+  "1349": {
+    "namePt": "Remada cavalinho pegada invertida na máquina",
+    "group": "back"
+  },
+  "1350": {
+    "namePt": "Remada sentada na máquina",
+    "group": "back"
+  },
+  "1351": {
+    "namePt": "Remada cavalinho pegada invertida na máquina",
+    "group": "back"
+  },
+  "1352": {
+    "namePt": "Flexão de lombar",
+    "group": "back"
+  },
+  "1353": {
+    "namePt": "Recepção e arremesso acima da cabeça com bola medicinal",
+    "group": "back"
+  },
+  "1354": {
+    "namePt": "Arremesso no chão acima da cabeça com bola medicinal",
+    "group": "back"
+  },
+  "1355": {
+    "namePt": "Alongamento de dorsal com um braço na parede",
+    "group": "back"
+  },
+  "1356": {
+    "namePt": "Remada alta lateral unilateral na máquina",
+    "group": "back"
+  },
+  "1358": {
+    "namePt": "Alongamento lateral deitado no chão",
+    "group": "back"
+  },
+  "1359": {
+    "namePt": "Remada curvada no smith",
+    "group": "back"
+  },
+  "1360": {
+    "namePt": "Remada unilateral no smith",
+    "group": "back"
+  },
+  "1361": {
+    "namePt": "Remada curvada pegada invertida no smith",
+    "group": "back"
+  },
+  "1362": {
+    "namePt": "Esfinge",
+    "group": "back"
+  },
+  "1363": {
+    "namePt": "Alongamento de coluna",
+    "group": "back"
+  },
+  "1364": {
+    "namePt": "Inclinação pélvica em pé",
+    "group": "back"
+  },
+  "1365": {
+    "namePt": "Alongamento da parte superior das costas",
+    "group": "back"
+  },
+  "1366": {
+    "namePt": "Cachorro olhando para cima",
+    "group": "back"
+  },
+  "1367": {
+    "namePt": "Barra fixa pegada aberta por trás",
+    "group": "back"
+  },
+  "1368": {
+    "namePt": "Círculos de tornozelo",
+    "group": "legs"
+  },
+  "1369": {
+    "namePt": "Elevação de panturrilha com as duas pernas com elástico (elástico sob as duas pernas) v. 2",
+    "group": "legs"
+  },
+  "1370": {
+    "namePt": "Elevação de panturrilha no chão com barra",
+    "group": "legs"
+  },
+  "1371": {
+    "namePt": "Elevação de panturrilha sentado com barra",
+    "group": "legs"
+  },
+  "1372": {
+    "namePt": "Elevação de panturrilha em pé com barra",
+    "group": "legs"
+  },
+  "1373": {
+    "namePt": "Elevação de panturrilha em pé (peso do corpo)",
+    "group": "legs"
+  },
+  "1374": {
+    "namePt": "Salto da caixa com estabilização em uma perna",
+    "group": "legs"
+  },
+  "1375": {
+    "namePt": "Elevação de panturrilha em pé na polia",
+    "group": "legs"
+  },
+  "1376": {
+    "namePt": "Elevação de panturrilha unilateral em pé na polia",
+    "group": "legs"
+  },
+  "1377": {
+    "namePt": "Alongamento de panturrilha na parede",
+    "group": "legs"
+  },
+  "1378": {
+    "namePt": "Alongamento de panturrilha com corda",
+    "group": "legs"
+  },
+  "1379": {
+    "namePt": "Panturrilha sentado com halteres",
+    "group": "legs"
+  },
+  "1380": {
+    "namePt": "Panturrilha sentado unilateral pegada martelo com halteres",
+    "group": "legs"
+  },
+  "1381": {
+    "namePt": "Panturrilha sentado unilateral pegada supinada com halteres",
+    "group": "legs"
+  },
+  "1382": {
+    "namePt": "Elevação de panturrilha na bola suíça contra a parede",
+    "group": "legs"
+  },
+  "1383": {
+    "namePt": "Elevação de panturrilha no hack",
+    "group": "legs"
+  },
+  "1384": {
+    "namePt": "Elevação de panturrilha unilateral no hack",
+    "group": "legs"
+  },
+  "1385": {
+    "namePt": "Panturrilha agachado no leg press",
+    "group": "legs"
+  },
+  "1386": {
+    "namePt": "Panturrilha burrinho unilateral",
+    "group": "legs"
+  },
+  "1387": {
+    "namePt": "Panturrilha unilateral no chão",
+    "group": "legs"
+  },
+  "1388": {
+    "namePt": "Alongamento dos peroneais",
+    "group": "legs"
+  },
+  "1389": {
+    "namePt": "Alongamento do tibial posterior",
+    "group": "legs"
+  },
+  "1390": {
+    "namePt": "Alongamento de panturrilha sentado (masculino)",
+    "group": "legs"
+  },
+  "1391": {
+    "namePt": "Panturrilha no leg press",
+    "group": "legs"
+  },
+  "1392": {
+    "namePt": "Panturrilha unilateral no leg press",
+    "group": "legs"
+  },
+  "1393": {
+    "namePt": "Panturrilha unilateral no chão no smith",
+    "group": "legs"
+  },
+  "1394": {
+    "namePt": "Panturrilha invertida no smith",
+    "group": "legs"
+  },
+  "1395": {
+    "namePt": "Panturrilha sentado unilateral no smith",
+    "group": "legs"
+  },
+  "1396": {
+    "namePt": "Elevação de ponta dos pés no smith",
+    "group": "legs"
+  },
+  "1397": {
+    "namePt": "Panturrilha em pé",
+    "group": "legs"
+  },
+  "1398": {
+    "namePt": "Alongamento de panturrilha em pé",
+    "group": "legs"
+  },
+  "1399": {
+    "namePt": "Mergulho no banco (pés no chão)",
+    "group": "arms"
+  },
+  "1401": {
+    "namePt": "Muscle up na barra vertical",
+    "group": "back"
+  },
+  "1403": {
+    "namePt": "Alongamento lateral do pescoço",
+    "group": "shoulders"
+  },
+  "1405": {
+    "namePt": "Alongamento das costas (peitoral)",
+    "group": "back"
+  },
+  "1407": {
+    "namePt": "Alongamento de panturrilha empurrando a parede",
+    "group": "legs"
+  },
+  "1408": {
+    "namePt": "Elevação de quadril com elástico",
+    "group": "glutes"
+  },
+  "1409": {
+    "namePt": "Ponte de glúteo com barra",
+    "group": "glutes"
+  },
+  "1410": {
+    "namePt": "Afundo lateral com barra",
+    "group": "glutes"
+  },
+  "1411": {
+    "namePt": "Rosca de punho pronada com barra no banco",
+    "group": "arms"
+  },
+  "1412": {
+    "namePt": "Rosca de punho supinada com barra no banco",
+    "group": "arms"
+  },
+  "1413": {
+    "namePt": "Rosca inversa unilateral na polia",
+    "group": "arms"
+  },
+  "1414": {
+    "namePt": "Rosca inversa no banco scott unilateral com halteres",
+    "group": "arms"
+  },
+  "1415": {
+    "namePt": "Rosca de punho neutra sentado unilateral com halteres",
+    "group": "arms"
+  },
+  "1416": {
+    "namePt": "Rotação de quadril em prono com uma perna na bola suíça",
+    "group": "glutes"
+  },
+  "1417": {
+    "namePt": "Flexora unilateral diagonal na bola suíça",
+    "group": "glutes"
+  },
+  "1418": {
+    "namePt": "Abraçar os joelhos no peito",
+    "group": "glutes"
+  },
+  "1419": {
+    "namePt": "Alongamento cruz de ferro",
+    "group": "glutes"
+  },
+  "1420": {
+    "namePt": "Agachamento com salto (a partir do ajoelhado)",
+    "group": "glutes"
+  },
+  "1421": {
+    "namePt": "Flexão modificada até os antebraços",
+    "group": "arms"
+  },
+  "1422": {
+    "namePt": "Inclinação pélvica com ponte",
+    "group": "glutes"
+  },
+  "1423": {
+    "namePt": "Extensão lombar invertida no banco reto",
+    "group": "glutes"
+  },
+  "1424": {
+    "namePt": "Alongamento de glúteo sentado",
+    "group": "glutes"
+  },
+  "1425": {
+    "namePt": "Leg press 45° unilateral",
+    "group": "glutes"
+  },
+  "1426": {
+    "namePt": "Rosca de punho sentado no smith",
+    "group": "arms"
+  },
+  "1427": {
+    "namePt": "Abdução de quadril com perna estendida",
+    "group": "legs"
+  },
+  "1428": {
+    "namePt": "Círculos de punho",
+    "group": "arms"
+  },
+  "1429": {
+    "namePt": "Barra fixa pegada aberta",
+    "group": "back"
+  },
+  "1430": {
+    "namePt": "Mergulho para peito (na gaiola de paralelas)",
+    "group": "chest"
+  },
+  "1431": {
+    "namePt": "Barra fixa pegada supinada em pé assistida",
+    "group": "back"
+  },
+  "1432": {
+    "namePt": "Barra fixa em pé assistida",
+    "group": "back"
+  },
+  "1433": {
+    "namePt": "Agachamento frontal pegada de clean no smith",
+    "group": "glutes"
+  },
+  "1434": {
+    "namePt": "Agachamento low bar no smith",
+    "group": "glutes"
+  },
+  "1435": {
+    "namePt": "Agachamento com barra baixa",
+    "group": "glutes"
+  },
+  "1436": {
+    "namePt": "Agachamento com barra alta",
+    "group": "glutes"
+  },
+  "1437": {
+    "namePt": "Rosca de dedos com halteres",
+    "group": "arms"
+  },
+  "1438": {
+    "namePt": "Desenvolvimento militar sentado com kettlebell (dois braços)",
+    "group": "shoulders"
+  },
+  "1439": {
+    "namePt": "Encolhimento sem pegada na máquina v. 2",
+    "group": "back"
+  },
+  "1441": {
+    "namePt": "Rosca de punho invertida unilateral no banco com halteres",
+    "group": "arms"
+  },
+  "1451": {
+    "namePt": "Mergulho sentado na máquina",
+    "group": "arms"
+  },
+  "1452": {
+    "namePt": "Abdominal (crunch) sentado na máquina",
+    "group": "abs"
+  },
+  "1456": {
+    "namePt": "Desenvolvimento militar pegada fechada em pé com barra",
+    "group": "shoulders"
+  },
+  "1457": {
+    "namePt": "Desenvolvimento militar pegada aberta em pé com barra",
+    "group": "shoulders"
+  },
+  "1458": {
+    "namePt": "Rosca sentado com barra W",
+    "group": "arms"
+  },
+  "1459": {
+    "namePt": "Levantamento terra romeno com halteres",
+    "group": "glutes"
+  },
+  "1460": {
+    "namePt": "Avanço caminhando",
+    "group": "glutes"
+  },
+  "1461": {
+    "namePt": "Agachamento completo com barra (vista de trás)",
+    "group": "glutes"
+  },
+  "1462": {
+    "namePt": "Agachamento completo com barra (vista lateral)",
+    "group": "glutes"
+  },
+  "1463": {
+    "namePt": "Leg press 45° (vista lateral)",
+    "group": "glutes"
+  },
+  "1464": {
+    "namePt": "Leg press 45° (vista posterior)",
+    "group": "glutes"
+  },
+  "1466": {
+    "namePt": "Elevação de quadril com torção",
+    "group": "glutes"
+  },
+  "1467": {
+    "namePt": "Flexão de braço com antebraços apoiados",
+    "group": "arms"
+  },
+  "1468": {
+    "namePt": "Giro de caranguejo com toque no pé",
+    "group": "abs"
+  },
+  "1471": {
+    "namePt": "Lagartixa (inchworm)",
+    "group": "abs"
+  },
+  "1472": {
+    "namePt": "Salto para frente",
+    "group": "legs"
+  },
+  "1473": {
+    "namePt": "Salto para trás",
+    "group": "legs"
+  },
+  "1476": {
+    "namePt": "Agachamento com uma perna",
+    "group": "glutes"
+  },
+  "1479": {
+    "namePt": "Supino inclinado na máquina v. 2",
+    "group": "chest"
+  },
+  "1489": {
+    "namePt": "Agachamento sissy",
+    "group": "legs"
+  },
+  "1490": {
+    "namePt": "Panturrilha em pé na escada",
+    "group": "legs"
+  },
+  "1494": {
+    "namePt": "Postura da borboleta (yoga)",
+    "group": "legs"
+  },
+  "1495": {
+    "namePt": "Abdominal oblíquo v. 2",
+    "group": "abs"
+  },
+  "1496": {
+    "namePt": "Marretada (sledgehammer)",
+    "group": "abs"
+  },
+  "1511": {
+    "namePt": "Alongamento de posterior de coxa",
+    "group": "legs"
+  },
+  "1512": {
+    "namePt": "Alongamento de quadríceps apoiado nos quatro apoios",
+    "group": "legs"
+  },
+  "1545": {
+    "namePt": "Agachamento zercher completo com barra",
+    "group": "glutes"
+  },
+  "1548": {
+    "namePt": "Alongamento de perna estendida na cadeira",
+    "group": "legs"
+  },
+  "1559": {
+    "namePt": "Alongamento de flexor de quadril na bola suíça",
+    "group": "glutes"
+  },
+  "1560": {
+    "namePt": "Alongamento de posterior de coxa sentado na bola suíça",
+    "group": "legs"
+  },
+  "1564": {
+    "namePt": "Alongamento intermediário de flexor de quadril e quadríceps",
+    "group": "legs"
+  },
+  "1576": {
+    "namePt": "Alongamento de posterior de coxa com perna elevada",
+    "group": "legs"
+  },
+  "1582": {
+    "namePt": "Postura reclinada do dedão do pé com corda",
+    "group": "legs"
+  },
+  "1585": {
+    "namePt": "Alongamento do corredor",
+    "group": "legs"
+  },
+  "1587": {
+    "namePt": "Sequência da postura do ângulo aberto sentado",
+    "group": "legs"
+  },
+  "1599": {
+    "namePt": "Alongamento de posterior e panturrilha em pé com faixa",
+    "group": "legs"
+  },
+  "1604": {
+    "namePt": "Alongamento world's greatest stretch",
+    "group": "legs"
+  },
+  "1614": {
+    "namePt": "Rosca scott na máquina v. 2",
+    "group": "arms"
+  },
+  "1615": {
+    "namePt": "Rosca scott pegada martelo na máquina",
+    "group": "arms"
+  },
+  "1616": {
+    "namePt": "Rosca scott pegada invertida na máquina",
+    "group": "arms"
+  },
+  "1617": {
+    "namePt": "Supino declinado unilateral pegada martelo com halteres",
+    "group": "arms"
+  },
+  "1618": {
+    "namePt": "Supino inclinado pegada martelo na bola suíça com halteres",
+    "group": "arms"
+  },
+  "1619": {
+    "namePt": "Supino inclinado unilateral pegada martelo com halteres",
+    "group": "arms"
+  },
+  "1620": {
+    "namePt": "Supino inclinado unilateral pegada martelo na bola suíça com halteres",
+    "group": "arms"
+  },
+  "1621": {
+    "namePt": "Desenvolvimento pegada martelo unilateral com halteres na bola suíça",
+    "group": "arms"
+  },
+  "1622": {
+    "namePt": "Supino pegada invertida unilateral com halteres",
+    "group": "chest"
+  },
+  "1623": {
+    "namePt": "Supino inclinado pegada neutra com halteres",
+    "group": "arms"
+  },
+  "1624": {
+    "namePt": "Supino pegada invertida com halteres",
+    "group": "chest"
+  },
+  "1625": {
+    "namePt": "Supino declinado pegada fechada no smith",
+    "group": "arms"
+  },
+  "1626": {
+    "namePt": "Supino declinado pegada fechada invertida no smith",
+    "group": "chest"
+  },
+  "1627": {
+    "namePt": "Rosca scott pegada fechada com barra W",
+    "group": "arms"
+  },
+  "1628": {
+    "namePt": "Rosca spider com barra W",
+    "group": "arms"
+  },
+  "1629": {
+    "namePt": "Rosca direta pegada aberta em pé com barra",
+    "group": "arms"
+  },
+  "1630": {
+    "namePt": "Rosca pegada fechada na polia",
+    "group": "arms"
+  },
+  "1631": {
+    "namePt": "Rosca concentrada na polia",
+    "group": "arms"
+  },
+  "1632": {
+    "namePt": "Rosca drag na polia",
+    "group": "arms"
+  },
+  "1633": {
+    "namePt": "Rosca scott unilateral na polia",
+    "group": "arms"
+  },
+  "1634": {
+    "namePt": "Rosca bíceps deitado na polia",
+    "group": "arms"
+  },
+  "1635": {
+    "namePt": "Rosca scott inversa unilateral na polia",
+    "group": "arms"
+  },
+  "1636": {
+    "namePt": "Rosca por trás da cabeça na polia",
+    "group": "arms"
+  },
+  "1637": {
+    "namePt": "Rosca por trás da cabeça na polia com bola suíça",
+    "group": "arms"
+  },
+  "1638": {
+    "namePt": "Rosca bíceps na polia (puxada)",
+    "group": "arms"
+  },
+  "1639": {
+    "namePt": "Rosca scott martelo na polia com corda",
+    "group": "arms"
+  },
+  "1640": {
+    "namePt": "Rosca scott martelo unilateral na polia com corda",
+    "group": "arms"
+  },
+  "1641": {
+    "namePt": "Rosca sentado na polia",
+    "group": "arms"
+  },
+  "1642": {
+    "namePt": "Rosca concentrada unilateral sentado na polia",
+    "group": "arms"
+  },
+  "1643": {
+    "namePt": "Rosca por trás da cabeça sentado na polia",
+    "group": "arms"
+  },
+  "1644": {
+    "namePt": "Rosca com agachamento na polia",
+    "group": "arms"
+  },
+  "1645": {
+    "namePt": "Rosca bíceps no banco inclinado na polia",
+    "group": "arms"
+  },
+  "1646": {
+    "namePt": "Rosca martelo alternada no banco scott com halteres",
+    "group": "arms"
+  },
+  "1647": {
+    "namePt": "Rosca alternada no banco scott com halteres",
+    "group": "arms"
+  },
+  "1648": {
+    "namePt": "Rosca martelo alternada sentado com halteres",
+    "group": "arms"
+  },
+  "1649": {
+    "namePt": "Rosca bíceps alternada com halteres e perna elevada na bola suíça",
+    "group": "arms"
+  },
+  "1650": {
+    "namePt": "Rosca bíceps alternada sentado na bola suíça com halteres",
+    "group": "arms"
+  },
+  "1651": {
+    "namePt": "Rosca bíceps com avanço e movimento de boliche com halteres",
+    "group": "arms"
+  },
+  "1652": {
+    "namePt": "Rosca bíceps na bola suíça com perna elevada",
+    "group": "arms"
+  },
+  "1653": {
+    "namePt": "Rosca bíceps com halteres em posição de equilíbrio (perna única)",
+    "group": "arms"
+  },
+  "1654": {
+    "namePt": "Rosca bíceps inversa com halteres",
+    "group": "arms"
+  },
+  "1655": {
+    "namePt": "Rosca bíceps com agachamento (halteres)",
+    "group": "arms"
+  },
+  "1656": {
+    "namePt": "Rosca bíceps em V-sit no bosu com halteres",
+    "group": "arms"
+  },
+  "1657": {
+    "namePt": "Rosca martelo cruzada com halteres (variação 2)",
+    "group": "arms"
+  },
+  "1658": {
+    "namePt": "Avanço com rosca bíceps (halteres)",
+    "group": "arms"
+  },
+  "1659": {
+    "namePt": "Rosca martelo na bola suíça com halteres",
+    "group": "arms"
+  },
+  "1660": {
+    "namePt": "Rosca bíceps ajoelhado na bola suíça com halteres",
+    "group": "arms"
+  },
+  "1661": {
+    "namePt": "Rosca bíceps deitado com halteres",
+    "group": "arms"
+  },
+  "1662": {
+    "namePt": "Rosca ampla deitado com halteres",
+    "group": "arms"
+  },
+  "1663": {
+    "namePt": "Rosca martelo no banco scott unilateral com halteres",
+    "group": "arms"
+  },
+  "1664": {
+    "namePt": "Rosca alta com halteres",
+    "group": "arms"
+  },
+  "1665": {
+    "namePt": "Rosca prona unilateral com halteres",
+    "group": "arms"
+  },
+  "1666": {
+    "namePt": "Rosca martelo prona unilateral com halteres",
+    "group": "arms"
+  },
+  "1667": {
+    "namePt": "Rosca spider invertida unilateral com halteres",
+    "group": "arms"
+  },
+  "1668": {
+    "namePt": "Rosca bíceps sentado unilateral com halteres na bola suíça",
+    "group": "arms"
+  },
+  "1669": {
+    "namePt": "Rosca martelo sentado unilateral com halteres",
+    "group": "arms"
+  },
+  "1670": {
+    "namePt": "Rosca em pé unilateral com halteres",
+    "group": "arms"
+  },
+  "1671": {
+    "namePt": "Rosca martelo em pé unilateral com halteres",
+    "group": "arms"
+  },
+  "1672": {
+    "namePt": "Rosca zottman no banco scott unilateral com halteres",
+    "group": "arms"
+  },
+  "1673": {
+    "namePt": "Rosca no banco scott com halteres na bola suíça",
+    "group": "arms"
+  },
+  "1674": {
+    "namePt": "Rosca martelo inclinada prona com halteres",
+    "group": "arms"
+  },
+  "1675": {
+    "namePt": "Rosca spider invertida com halteres",
+    "group": "arms"
+  },
+  "1676": {
+    "namePt": "Rosca martelo alternada sentado com halteres na bola suíça",
+    "group": "arms"
+  },
+  "1677": {
+    "namePt": "Rosca bíceps sentado com halteres",
+    "group": "arms"
+  },
+  "1678": {
+    "namePt": "Rosca martelo sentado com halteres",
+    "group": "arms"
+  },
+  "1679": {
+    "namePt": "Rosca bíceps unilateral sentado na bola suíça com perna elevada com halteres",
+    "group": "arms"
+  },
+  "1680": {
+    "namePt": "Rosca unilateral em pé com halteres apoiado em banco inclinado",
+    "group": "arms"
+  },
+  "1682": {
+    "namePt": "Rosca concentrada sentado pegada fechada com barra W",
+    "group": "arms"
+  },
+  "1683": {
+    "namePt": "Rosca bíceps no smith",
+    "group": "arms"
+  },
+  "1684": {
+    "namePt": "Step up com equilíbrio unilateral e rosca bíceps com halteres",
+    "group": "arms"
+  },
+  "1685": {
+    "namePt": "Agachamento com alcance sobre a cabeça",
+    "group": "legs"
+  },
+  "1686": {
+    "namePt": "Agachamento com alcance sobre a cabeça e torção",
+    "group": "legs"
+  },
+  "1687": {
+    "namePt": "Passada posterior com alcance sobre a cabeça",
+    "group": "abs"
+  },
+  "1688": {
+    "namePt": "Afundo com torção",
+    "group": "abs"
+  },
+  "1689": {
+    "namePt": "Empurra e puxa (peso do corpo)",
+    "group": "chest"
+  },
+  "1700": {
+    "namePt": "Push press com halteres",
+    "group": "shoulders"
+  },
+  "1701": {
+    "namePt": "Flexão pegada fechada com bola medicinal",
+    "group": "arms"
+  },
+  "1705": {
+    "namePt": "Agachamento no bosu",
+    "group": "legs"
+  },
+  "1707": {
+    "namePt": "Torção deitado de frente na bola suíça",
+    "group": "abs"
+  },
+  "1708": {
+    "namePt": "Alongamento de panturrilha deitado assistido",
+    "group": "legs"
+  },
+  "1709": {
+    "namePt": "Alongamento de glúteos deitado assistido",
+    "group": "glutes"
+  },
+  "1710": {
+    "namePt": "Alongamento de glúteo e piriforme deitado assistido",
+    "group": "glutes"
+  },
+  "1712": {
+    "namePt": "Alongamento de adutores deitado de lado assistido",
+    "group": "legs"
+  },
+  "1713": {
+    "namePt": "Alongamento de quadríceps em prono assistido",
+    "group": "legs"
+  },
+  "1714": {
+    "namePt": "Alongamento de reto femoral em prono assistido",
+    "group": "abs"
+  },
+  "1716": {
+    "namePt": "Alongamento de peitoral maior sentado com bola suíça assistido",
+    "group": "chest"
+  },
+  "1717": {
+    "namePt": "Remada com agachamento na polia (com corda)",
+    "group": "back"
+  },
+  "1718": {
+    "namePt": "Tríceps testa por trás da nuca pegada fechada sentado com barra",
+    "group": "arms"
+  },
+  "1719": {
+    "namePt": "Supino inclinado pegada fechada com barra",
+    "group": "arms"
+  },
+  "1720": {
+    "namePt": "Tríceps testa deitado por trás da cabeça com barra",
+    "group": "arms"
+  },
+  "1721": {
+    "namePt": "Tríceps testa pegada invertida com barra",
+    "group": "arms"
+  },
+  "1722": {
+    "namePt": "Tríceps francês na polia alta",
+    "group": "arms"
+  },
+  "1723": {
+    "namePt": "Tríceps na polia unilateral",
+    "group": "arms"
+  },
+  "1724": {
+    "namePt": "Tríceps francês na polia alta com corda",
+    "group": "arms"
+  },
+  "1725": {
+    "namePt": "Extensão de tríceps inclinada na polia com corda",
+    "group": "arms"
+  },
+  "1726": {
+    "namePt": "Extensão de tríceps deitado no chão na polia com corda",
+    "group": "arms"
+  },
+  "1727": {
+    "namePt": "Extensão de tríceps por trás da cabeça unilateral em pé pegada inversa na polia",
+    "group": "arms"
+  },
+  "1728": {
+    "namePt": "Kickback de tríceps na polia (dois braços)",
+    "group": "arms"
+  },
+  "1729": {
+    "namePt": "Tríceps testa deitado alternado com halteres",
+    "group": "arms"
+  },
+  "1730": {
+    "namePt": "Tríceps kickback alternado curvado sentado com halteres",
+    "group": "arms"
+  },
+  "1731": {
+    "namePt": "Supino pegada fechada com halteres",
+    "group": "arms"
+  },
+  "1732": {
+    "namePt": "Avanço com extensão de tríceps (halteres)",
+    "group": "arms"
+  },
+  "1733": {
+    "namePt": "Extensão de tríceps inclinada com dois braços (halteres)",
+    "group": "arms"
+  },
+  "1734": {
+    "namePt": "Tríceps coice na bola suíça com halteres",
+    "group": "arms"
+  },
+  "1735": {
+    "namePt": "Tríceps testa unilateral deitado com halteres",
+    "group": "arms"
+  },
+  "1736": {
+    "namePt": "Tríceps francês unilateral com halteres na bola suíça",
+    "group": "arms"
+  },
+  "1737": {
+    "namePt": "Extensão de tríceps curvado sentado com halteres",
+    "group": "arms"
+  },
+  "1738": {
+    "namePt": "Tríceps francês unilateral pegada invertida sentado com halteres",
+    "group": "arms"
+  },
+  "1739": {
+    "namePt": "Tríceps kickback alternado em pé com halteres",
+    "group": "arms"
+  },
+  "1740": {
+    "namePt": "Extensão de tríceps unilateral curvado em pé com halteres",
+    "group": "arms"
+  },
+  "1741": {
+    "namePt": "Extensão de tríceps bilateral curvado em pé com halteres",
+    "group": "arms"
+  },
+  "1742": {
+    "namePt": "Tríceps coice com halteres (apoio unilateral)",
+    "group": "arms"
+  },
+  "1743": {
+    "namePt": "Supino com halteres e rotação",
+    "group": "arms"
+  },
+  "1744": {
+    "namePt": "Mergulho na bola suíça",
+    "group": "arms"
+  },
+  "1745": {
+    "namePt": "Alongamento de tríceps sentado na bola suíça",
+    "group": "arms"
+  },
+  "1746": {
+    "namePt": "Extensão de tríceps supino na bola suíça",
+    "group": "arms"
+  },
+  "1747": {
+    "namePt": "Tríceps francês com barra W na bola suíça",
+    "group": "arms"
+  },
+  "1748": {
+    "namePt": "Tríceps testa com barra W pegada fechada atrás da cabeça",
+    "group": "arms"
+  },
+  "1749": {
+    "namePt": "Tríceps francês em pé com barra W",
+    "group": "arms"
+  },
+  "1750": {
+    "namePt": "Arremesso de peito em supino com bola medicinal",
+    "group": "arms"
+  },
+  "1751": {
+    "namePt": "Supino com barra nos pinos",
+    "group": "arms"
+  },
+  "1752": {
+    "namePt": "Extensão de tríceps inclinada no smith",
+    "group": "arms"
+  },
+  "1753": {
+    "namePt": "Mergulho com três bancos",
+    "group": "arms"
+  },
+  "1754": {
+    "namePt": "Mergulho com três bancos e peso",
+    "group": "arms"
+  },
+  "1755": {
+    "namePt": "Mergulho para tríceps com peso",
+    "group": "arms"
+  },
+  "1756": {
+    "namePt": "Levantamento terra unilateral com barra",
+    "group": "glutes"
+  },
+  "1757": {
+    "namePt": "Levantamento terra unilateral com halteres",
+    "group": "glutes"
+  },
+  "1758": {
+    "namePt": "Abdominal assistido",
+    "group": "abs"
+  },
+  "1759": {
+    "namePt": "Agachamento unilateral (pistol) (masculino)",
+    "group": "glutes"
+  },
+  "1760": {
+    "namePt": "Agachamento goblet com halteres",
+    "group": "legs"
+  },
+  "1761": {
+    "namePt": "Elevação de joelhos oblíqua na barra",
+    "group": "abs"
+  },
+  "1763": {
+    "namePt": "Barra fixa pegada na largura dos ombros",
+    "group": "back"
+  },
+  "1764": {
+    "namePt": "Elevação de quadril e pernas na barra",
+    "group": "abs"
+  },
+  "1765": {
+    "namePt": "Remada alta com halteres (vista de trás)",
+    "group": "shoulders"
+  },
+  "1766": {
+    "namePt": "Flexora inversa autoassistida",
+    "group": "legs"
+  },
+  "1767": {
+    "namePt": "Mergulho para tríceps na paralela alta com peso",
+    "group": "arms"
+  },
+  "1769": {
+    "namePt": "Rosca bíceps deitado de lado (peso do corpo)",
+    "group": "arms"
+  },
+  "1770": {
+    "namePt": "Rosca concentrada com apoio na perna",
+    "group": "arms"
+  },
+  "1771": {
+    "namePt": "Tríceps ajoelhado (peso do corpo)",
+    "group": "arms"
+  },
+  "1772": {
+    "namePt": "Elevação de cotovelo (flexão invertida)",
+    "group": "back"
+  },
+  "1773": {
+    "namePt": "Remada unilateral com toalha",
+    "group": "back"
+  },
+  "1774": {
+    "namePt": "Prancha lateral com abdução de quadril",
+    "group": "legs"
+  },
+  "1775": {
+    "namePt": "Prancha lateral com adução de quadril",
+    "group": "legs"
+  },
+  "2133": {
+    "namePt": "Caminhada do fazendeiro",
+    "group": "legs"
+  },
+  "2135": {
+    "namePt": "Prancha frontal com peso",
+    "group": "abs"
+  },
+  "2136": {
+    "namePt": "Desenvolvimento cubano com halteres (variação 2)",
+    "group": "shoulders"
+  },
+  "2137": {
+    "namePt": "Desenvolvimento Arnold com halteres",
+    "group": "shoulders"
+  },
+  "2138": {
+    "namePt": "Bicicleta ergométrica - ritmo de corrida v. 3",
+    "group": "cardio"
+  },
+  "2139": {
+    "namePt": "Bicicleta com as mãos",
+    "group": "chest"
+  },
+  "2141": {
+    "namePt": "Caminhada no elíptico",
+    "group": "cardio"
+  },
+  "2142": {
+    "namePt": "Ergômetro de esqui",
+    "group": "arms"
+  },
+  "2143": {
+    "namePt": "Elevação circular de ombro em pé com halteres",
+    "group": "shoulders"
+  },
+  "2144": {
+    "namePt": "Supino sentado na polia",
+    "group": "chest"
+  },
+  "2186": {
+    "namePt": "Tríceps testa declinado com barra W",
+    "group": "arms"
+  },
+  "2187": {
+    "namePt": "Supino pegada fechada e invertida com barra",
+    "group": "arms"
+  },
+  "2188": {
+    "namePt": "Extensão de tríceps sentado com halteres",
+    "group": "arms"
+  },
+  "2189": {
+    "namePt": "Extensão de tríceps sentado com halteres",
+    "group": "arms"
+  },
+  "2202": {
+    "namePt": "Alongamento de quadril no rolo",
+    "group": "glutes"
+  },
+  "2203": {
+    "namePt": "Mobilidade de ombro sentado no rolo",
+    "group": "chest"
+  },
+  "2204": {
+    "namePt": "Serra corporal no rolo",
+    "group": "abs"
+  },
+  "2205": {
+    "namePt": "Alongamento de quadril e lombar no rolo",
+    "group": "glutes"
+  },
+  "2206": {
+    "namePt": "Abdominal reverso no rolo",
+    "group": "abs"
+  },
+  "2207": {
+    "namePt": "Alongamento lateral de dorsais no rolo",
+    "group": "back"
+  },
+  "2208": {
+    "namePt": "Alongamento de costas no rolo",
+    "group": "back"
+  },
+  "2209": {
+    "namePt": "Mobilidade de ombro sentado unilateral no rolo",
+    "group": "chest"
+  },
+  "2271": {
+    "namePt": "Gancho de esquerda (boxe)",
+    "group": "shoulders"
+  },
+  "2285": {
+    "namePt": "Pullover na máquina",
+    "group": "back"
+  },
+  "2286": {
+    "namePt": "Extensão de quadril na máquina v. 2",
+    "group": "glutes"
+  },
+  "2287": {
+    "namePt": "Leg press alternado na máquina",
+    "group": "legs"
+  },
+  "2288": {
+    "namePt": "Fortalecimento de pegada na máquina",
+    "group": "arms"
+  },
+  "2289": {
+    "namePt": "Panturrilha no leg press",
+    "group": "legs"
+  },
+  "2292": {
+    "namePt": "Elevação para deltoide posterior com halteres",
+    "group": "shoulders"
+  },
+  "2293": {
+    "namePt": "Rosca zottman no banco scott em pé com halteres",
+    "group": "arms"
+  },
+  "2294": {
+    "namePt": "Rosca zottman no banco scott com halteres",
+    "group": "arms"
+  },
+  "2297": {
+    "namePt": "Abdominal na bola suíça (amplitude total, mãos na cabeça)",
+    "group": "abs"
+  },
+  "2298": {
+    "namePt": "Remada invertida no banco",
+    "group": "back"
+  },
+  "2300": {
+    "namePt": "Remada invertida com joelhos flexionados",
+    "group": "back"
+  },
+  "2311": {
+    "namePt": "Caminhada no stepmill",
+    "group": "cardio"
+  },
+  "2312": {
+    "namePt": "Cotovelo ao joelho deitado",
+    "group": "abs"
+  },
+  "2315": {
+    "namePt": "Panturrilha rotativa na máquina",
+    "group": "legs"
+  },
+  "2317": {
+    "namePt": "Elevação lateral com cotovelo flexionado sentado com halteres",
+    "group": "shoulders"
+  },
+  "2318": {
+    "namePt": "Desenvolvimento na máquina v. 3",
+    "group": "shoulders"
+  },
+  "2321": {
+    "namePt": "Rosca bíceps interna em pé com halteres v. 2",
+    "group": "arms"
+  },
+  "2327": {
+    "namePt": "Remada pegada invertida com halteres (feminino)",
+    "group": "back"
+  },
+  "2328": {
+    "namePt": "Flexão fechada na bola suíça",
+    "group": "arms"
+  },
+  "2329": {
+    "namePt": "Torção de coluna",
+    "group": "abs"
+  },
+  "2330": {
+    "namePt": "Puxada frontal na polia (amplitude total)",
+    "group": "back"
+  },
+  "2331": {
+    "namePt": "Elíptico (cross trainer)",
+    "group": "cardio"
+  },
+  "2333": {
+    "namePt": "Balanço lateral pendurado com pernas retas",
+    "group": "abs"
+  },
+  "2334": {
+    "namePt": "Panturrilha deitado no leg press",
+    "group": "legs"
+  },
+  "2335": {
+    "namePt": "Panturrilha sentada no leg press",
+    "group": "legs"
+  },
+  "2355": {
+    "namePt": "Balanço lateral pendurado com joelhos flexionados",
+    "group": "abs"
+  },
+  "2363": {
+    "namePt": "Mergulho para peito pegada aberta na paralela alta",
+    "group": "chest"
+  },
+  "2364": {
+    "namePt": "Mergulho para peito pegada aberta assistido (ajoelhado)",
+    "group": "chest"
+  },
+  "2368": {
+    "namePt": "Afundo (split squat)",
+    "group": "legs"
+  },
+  "2371": {
+    "namePt": "Torção russa com peso v.2",
+    "group": "abs"
+  },
+  "2397": {
+    "namePt": "Desenvolvimento no banco scott com halteres",
+    "group": "shoulders"
+  },
+  "2398": {
+    "namePt": "Flexão com pegada fechada (com joelhos apoiados)",
+    "group": "arms"
+  },
+  "2399": {
+    "namePt": "Giro de tronco sentado na polia",
+    "group": "abs"
+  },
+  "2400": {
+    "namePt": "Flexora inversa (na máquina de puxada)",
+    "group": "legs"
+  },
+  "2401": {
+    "namePt": "Rosca bíceps com halteres (com arm blaster)",
+    "group": "arms"
+  },
+  "2402": {
+    "namePt": "Rosca martelo com halteres (com arm blaster)",
+    "group": "arms"
+  },
+  "2403": {
+    "namePt": "Rosca bíceps alternada com halteres (com arm blaster)",
+    "group": "arms"
+  },
+  "2404": {
+    "namePt": "Rosca com barra W (com arm blaster)",
+    "group": "arms"
+  },
+  "2405": {
+    "namePt": "Tríceps na polia (barra V) (com arm blaster)",
+    "group": "arms"
+  },
+  "2406": {
+    "namePt": "Tríceps na polia pegada inversa (barra W) (com arm blaster)",
+    "group": "arms"
+  },
+  "2407": {
+    "namePt": "Rosca bíceps com barra (com arm blaster)",
+    "group": "arms"
+  },
+  "2414": {
+    "namePt": "Rosca concentrada em pé com barra",
+    "group": "arms"
+  },
+  "2429": {
+    "namePt": "Abdominal sapinho",
+    "group": "abs"
+  },
+  "2432": {
+    "namePt": "Supino pegada fechada com barra W",
+    "group": "arms"
+  },
+  "2459": {
+    "namePt": "Giro de pneu",
+    "group": "glutes"
+  },
+  "2462": {
+    "namePt": "Mergulho para peito na barra reta",
+    "group": "chest"
+  },
+  "2464": {
+    "namePt": "Remada kayak na polia (Thibaudeau)",
+    "group": "back"
+  },
+  "2466": {
+    "namePt": "Ponte com escalador cruzado",
+    "group": "abs"
+  },
+  "2470": {
+    "namePt": "Elevação posterior de ombro deitado no chão com halteres",
+    "group": "shoulders"
+  },
+  "2567": {
+    "namePt": "Alongamento do piriforme sentado",
+    "group": "glutes"
+  },
+  "2571": {
+    "namePt": "Alongamento do sapo (balançando)",
+    "group": "glutes"
+  },
+  "2611": {
+    "namePt": "Leg press horizontal unilateral na máquina",
+    "group": "glutes"
+  },
+  "2612": {
+    "namePt": "Corda",
+    "group": "cardio"
+  },
+  "2616": {
+    "namePt": "Puxada lateral na polia com barra V",
+    "group": "back"
+  },
+  "2705": {
+    "namePt": "Pronação deitado no chão com halteres",
+    "group": "arms"
+  },
+  "2706": {
+    "namePt": "Supinação deitado no chão com halteres",
+    "group": "arms"
+  },
+  "2736": {
+    "namePt": "Puxada aberta pegada invertida na máquina",
+    "group": "back"
+  },
+  "2741": {
+    "namePt": "Rosca em pé pegada aberta com barra W",
+    "group": "arms"
+  },
+  "2796": {
+    "namePt": "Step up com afundo com halteres",
+    "group": "legs"
+  },
+  "2798": {
+    "namePt": "Agachamento com salto e afundo reverso com barra",
+    "group": "legs"
+  },
+  "2799": {
+    "namePt": "Elevação alternada de pernas sentado com barra",
+    "group": "abs"
+  },
+  "2800": {
+    "namePt": "Elevação alternada de pernas sentado com barra (feminino)",
+    "group": "abs"
+  },
+  "2801": {
+    "namePt": "Elevação de perna com torção (feminino)",
+    "group": "abs"
+  },
+  "2802": {
+    "namePt": "Elevação de perna com torção",
+    "group": "abs"
+  },
+  "2803": {
+    "namePt": "Agachamento com apoio com halteres",
+    "group": "legs"
+  },
+  "2805": {
+    "namePt": "Levantamento terra unilateral com halteres e apoio no step",
+    "group": "glutes"
+  },
+  "2808": {
+    "namePt": "Pull-through sumô com halteres",
+    "group": "glutes"
+  },
+  "2810": {
+    "namePt": "Afundo estático com barra (v. 2)",
+    "group": "legs"
+  },
+  "2812": {
+    "namePt": "Step up com afundo estático com halteres",
+    "group": "legs"
+  },
+  "2963": {
+    "namePt": "Elevação de pernas retas na cadeira romana",
+    "group": "abs"
+  },
+  "2987": {
+    "namePt": "Barra fixa pegada fechada supinada com peso na gaiola",
+    "group": "back"
+  },
+  "3006": {
+    "namePt": "Abdução de quadril sentado com elástico",
+    "group": "legs"
+  },
+  "3007": {
+    "namePt": "Cadeira extensora com elástico",
+    "group": "legs"
+  },
+  "3010": {
+    "namePt": "Pullover com barra W deitado com braços flexionados",
+    "group": "back"
+  },
+  "3011": {
+    "namePt": "Flexão de escápula inclinada",
+    "group": "shoulders"
+  },
+  "3012": {
+    "namePt": "Depressão escapular na barra",
+    "group": "back"
+  },
+  "3013": {
+    "namePt": "Ponte de glúteo baixa no chão",
+    "group": "glutes"
+  },
+  "3016": {
+    "namePt": "Abdominal parcial (curl-up)",
+    "group": "abs"
+  },
+  "3017": {
+    "namePt": "Remada pendlay com barra",
+    "group": "back"
+  },
+  "3019": {
+    "namePt": "Remada invertida no banco",
+    "group": "back"
+  },
+  "3021": {
+    "namePt": "Flexão escapular",
+    "group": "shoulders"
+  },
+  "3116": {
+    "namePt": "Puxada pegada supinada com elástico fixo nas costas",
+    "group": "back"
+  },
+  "3117": {
+    "namePt": "Puxada pegada fechada com elástico fixo nas costas",
+    "group": "back"
+  },
+  "3119": {
+    "namePt": "Agachamento profundo (potty squat)",
+    "group": "abs"
+  },
+  "3122": {
+    "namePt": "Desenvolvimento sentado com elástico",
+    "group": "shoulders"
+  },
+  "3123": {
+    "namePt": "Rosca bíceps sentado com elástico",
+    "group": "arms"
+  },
+  "3124": {
+    "namePt": "Supino sentado com elástico",
+    "group": "chest"
+  },
+  "3132": {
+    "namePt": "Agachamento profundo com apoio (potty squat)",
+    "group": "glutes"
+  },
+  "3142": {
+    "namePt": "Agachamento sumô no smith",
+    "group": "glutes"
+  },
+  "3144": {
+    "namePt": "Remada sentado com elástico (costas retas)",
+    "group": "back"
+  },
+  "3145": {
+    "namePt": "Flexão de braço plus",
+    "group": "chest"
+  },
+  "3147": {
+    "namePt": "Inclinação pélvica",
+    "group": "abs"
+  },
+  "3156": {
+    "namePt": "Remada unilateral pegada fechada em pé (peso do corpo)",
+    "group": "back"
+  },
+  "3158": {
+    "namePt": "Remada pegada fechada em pé (peso do corpo)",
+    "group": "back"
+  },
+  "3161": {
+    "namePt": "Remada unilateral em pé com toalha (peso do corpo)",
+    "group": "back"
+  },
+  "3162": {
+    "namePt": "Remada unilateral em pé (peso do corpo)",
+    "group": "back"
+  },
+  "3165": {
+    "namePt": "Remada em pé com toalha (peso do corpo)",
+    "group": "back"
+  },
+  "3166": {
+    "namePt": "Remada em pé (peso do corpo)",
+    "group": "back"
+  },
+  "3167": {
+    "namePt": "Remada agachada com toalha (peso do corpo)",
+    "group": "back"
+  },
+  "3168": {
+    "namePt": "Remada agachada (peso do corpo)",
+    "group": "back"
+  },
+  "3193": {
+    "namePt": "Elevação glúteo-isquiotibiais (GHR)",
+    "group": "legs"
+  },
+  "3194": {
+    "namePt": "Agachamento frankenstein",
+    "group": "glutes"
+  },
+  "3195": {
+    "namePt": "Mesa flexora 2:1 na máquina",
+    "group": "legs"
+  },
+  "3200": {
+    "namePt": "Remada curvada na máquina com barra V",
+    "group": "back"
+  },
+  "3201": {
+    "namePt": "Abdominal parcial (um quarto)",
+    "group": "abs"
+  },
+  "3202": {
+    "namePt": "Meio abdominal",
+    "group": "abs"
+  },
+  "3203": {
+    "namePt": "Abdominal parcial prisioneiro (masculino)",
+    "group": "abs"
+  },
+  "3204": {
+    "namePt": "Abdominal completo com braços elevados (homem)",
+    "group": "abs"
+  },
+  "3211": {
+    "namePt": "Flexão ajoelhada (masculino)",
+    "group": "chest"
+  },
+  "3212": {
+    "namePt": "Toque no dedo do pé (masculino)",
+    "group": "glutes"
+  },
+  "3213": {
+    "namePt": "Toque no pé lado a lado (masculino)",
+    "group": "abs"
+  },
+  "3214": {
+    "namePt": "Toque circular no pé com braços abertos (homem)",
+    "group": "glutes"
+  },
+  "3215": {
+    "namePt": "Toque circular no pé com mãos entrelaçadas (invertido)",
+    "group": "glutes"
+  },
+  "3216": {
+    "namePt": "Flexão com toque no peito",
+    "group": "chest"
+  },
+  "3217": {
+    "namePt": "Flexão hindu modificada (masculino)",
+    "group": "chest"
+  },
+  "3218": {
+    "namePt": "Toque circular no pé com mãos entrelaçadas",
+    "group": "glutes"
+  },
+  "3219": {
+    "namePt": "Salto tesoura (masculino)",
+    "group": "cardio"
+  },
+  "3220": {
+    "namePt": "Polichinelo (homem)",
+    "group": "cardio"
+  },
+  "3221": {
+    "namePt": "Meio agachamento",
+    "group": "cardio"
+  },
+  "3222": {
+    "namePt": "Salto com meio agachamento (masculino)",
+    "group": "cardio"
+  },
+  "3223": {
+    "namePt": "Salto em estrela",
+    "group": "cardio"
+  },
+  "3224": {
+    "namePt": "Polichinelo com salto",
+    "group": "cardio"
+  },
+  "3231": {
+    "namePt": "Toque nos dedos dos pés",
+    "group": "back"
+  },
+  "3234": {
+    "namePt": "Crucifixo alto com halteres",
+    "group": "chest"
+  },
+  "3235": {
+    "namePt": "Mesa flexora inversa assistida na polia",
+    "group": "legs"
+  },
+  "3236": {
+    "namePt": "Elevação de quadril com elástico apoiado nos joelhos (feminino)",
+    "group": "glutes"
+  },
+  "3237": {
+    "namePt": "Elevação lateral com landmine",
+    "group": "shoulders"
+  },
+  "3239": {
+    "namePt": "Prancha ajoelhada com toque no ombro (masculino)",
+    "group": "abs"
+  },
+  "3240": {
+    "namePt": "Elevação de panturrilha na bola suíça contra a parede (bola de tênis entre os joelhos)",
+    "group": "legs"
+  },
+  "3241": {
+    "namePt": "Elevação de panturrilha na bola suíça contra a parede (bola de tênis entre os tornozelos)",
+    "group": "legs"
+  },
+  "3281": {
+    "namePt": "Agachamento completo no smith",
+    "group": "glutes"
+  },
+  "3286": {
+    "namePt": "Muscle up com peso",
+    "group": "back"
+  },
+  "3287": {
+    "namePt": "Mergulho apoiado nos cotovelos",
+    "group": "arms"
+  },
+  "3288": {
+    "namePt": "Mergulho coreano",
+    "group": "chest"
+  },
+  "3289": {
+    "namePt": "Mergulho impossível",
+    "group": "arms"
+  },
+  "3290": {
+    "namePt": "Barra fixa unilateral com peso",
+    "group": "back"
+  },
+  "3291": {
+    "namePt": "Stalder press",
+    "group": "arms"
+  },
+  "3292": {
+    "namePt": "Elevador",
+    "group": "back"
+  },
+  "3293": {
+    "namePt": "Barra fixa arqueiro",
+    "group": "back"
+  },
+  "3294": {
+    "namePt": "Flexão de braço arqueiro",
+    "group": "chest"
+  },
+  "3295": {
+    "namePt": "Front lever com repetições",
+    "group": "back"
+  },
+  "3296": {
+    "namePt": "Front lever",
+    "group": "abs"
+  },
+  "3297": {
+    "namePt": "Back lever",
+    "group": "back"
+  },
+  "3298": {
+    "namePt": "Planche em straddle",
+    "group": "abs"
+  },
+  "3299": {
+    "namePt": "Planche completo",
+    "group": "abs"
+  },
+  "3300": {
+    "namePt": "Planche inclinada",
+    "group": "abs"
+  },
+  "3301": {
+    "namePt": "Planche de sapo",
+    "group": "abs"
+  },
+  "3302": {
+    "namePt": "Parada de mãos",
+    "group": "arms"
+  },
+  "3303": {
+    "namePt": "Bandeira humana",
+    "group": "abs"
+  },
+  "3304": {
+    "namePt": "Skin the cat",
+    "group": "back"
+  },
+  "3305": {
+    "namePt": "Thruster com barra",
+    "group": "shoulders"
+  },
+  "3312": {
+    "namePt": "Muscle up na barra com peso",
+    "group": "back"
+  },
+  "3313": {
+    "namePt": "Mergulho na barra reta com peso",
+    "group": "chest"
+  },
+  "3314": {
+    "namePt": "Maltês em straddle",
+    "group": "abs"
+  },
+  "3315": {
+    "namePt": "Maltês completo",
+    "group": "abs"
+  },
+  "3318": {
+    "namePt": "Swing 360 graus",
+    "group": "cardio"
+  },
+  "3327": {
+    "namePt": "Flexão em planche completo",
+    "group": "chest"
+  },
+  "3360": {
+    "namePt": "Caminhada do urso",
+    "group": "cardio"
+  },
+  "3361": {
+    "namePt": "Salto skater",
+    "group": "cardio"
+  },
+  "3418": {
+    "namePt": "Barra fixa em L",
+    "group": "back"
+  },
+  "3419": {
+    "namePt": "L-sit no chão",
+    "group": "abs"
+  },
+  "3420": {
+    "namePt": "Abdominal em V no chão",
+    "group": "abs"
+  },
+  "3433": {
+    "namePt": "Pernada de nadador v.2",
+    "group": "glutes"
+  },
+  "3470": {
+    "namePt": "Afundo para frente",
+    "group": "glutes"
+  },
+  "3523": {
+    "namePt": "Ponte de glúteo com pernas no banco",
+    "group": "glutes"
+  },
+  "3533": {
+    "namePt": "Quadríceps",
+    "group": "legs"
+  },
+  "3541": {
+    "namePt": "Elevação em Y inclinada com halteres",
+    "group": "back"
+  },
+  "3542": {
+    "namePt": "Elevação em T inclinada com halteres",
+    "group": "shoulders"
+  },
+  "3543": {
+    "namePt": "Agachamento com salto e queda (peso do corpo)",
+    "group": "glutes"
+  },
+  "3544": {
+    "namePt": "Prancha lateral inclinada (peso do corpo)",
+    "group": "abs"
+  },
+  "3545": {
+    "namePt": "Supino inclinado alternado com halteres",
+    "group": "chest"
+  },
+  "3546": {
+    "namePt": "Desenvolvimento de ombro alternado sentado com halteres",
+    "group": "shoulders"
+  },
+  "3547": {
+    "namePt": "Rosca bíceps seguida de desenvolvimento sentado com halteres",
+    "group": "arms"
+  },
+  "3548": {
+    "namePt": "Caminhada unilateral com halteres acima da cabeça",
+    "group": "shoulders"
+  },
+  "3552": {
+    "namePt": "Pés rápidos v. 2",
+    "group": "legs"
+  },
+  "3560": {
+    "namePt": "Rosca martelo alternada e desenvolvimento em pé com halteres",
+    "group": "arms"
+  },
+  "3561": {
+    "namePt": "Ponte de glúteo com marcha",
+    "group": "glutes"
+  },
+  "3562": {
+    "namePt": "Ponte de glúteo com pernas no banco com barra (homem)",
+    "group": "glutes"
+  },
+  "3563": {
+    "namePt": "Puxada unilateral na polia",
+    "group": "back"
+  },
+  "3582": {
+    "namePt": "Afundo com salto",
+    "group": "glutes"
+  },
+  "3635": {
+    "namePt": "Avanço contralateral com halteres",
+    "group": "glutes"
+  },
+  "3636": {
+    "namePt": "Elevação de joelhos contra a parede",
+    "group": "cardio"
+  },
+  "3637": {
+    "namePt": "Corrida na esteira de roda",
+    "group": "cardio"
+  },
+  "3638": {
+    "namePt": "Arranque para corrida",
+    "group": "cardio"
+  },
+  "3639": {
+    "namePt": "Giro deitado com joelhos flexionados (masculino)",
+    "group": "glutes"
+  },
+  "3640": {
+    "namePt": "Abdominal com toque no joelho",
+    "group": "abs"
+  },
+  "3641": {
+    "namePt": "Passo ajoelhado com balanço e peso",
+    "group": "shoulders"
+  },
+  "3642": {
+    "namePt": "Avanço com alongamento e peso",
+    "group": "glutes"
+  },
+  "3643": {
+    "namePt": "Agachamento cossaco com peso",
+    "group": "glutes"
+  },
+  "3644": {
+    "namePt": "Avanço com balanço e peso",
+    "group": "glutes"
+  },
+  "3645": {
+    "namePt": "Ponte unilateral com perna estendida",
+    "group": "glutes"
+  },
+  "3655": {
+    "namePt": "Avanço caminhando com joelho alto",
+    "group": "cardio"
+  },
+  "3656": {
+    "namePt": "Corrida com passadas curtas",
+    "group": "cardio"
+  },
+  "3662": {
+    "namePt": "Flexão pike para cobra",
+    "group": "glutes"
+  },
+  "3663": {
+    "namePt": "Prancha invertida com elevação de perna",
+    "group": "abs"
+  },
+  "3664": {
+    "namePt": "Prancha lateral com crucifixo invertido com halteres",
+    "group": "back"
+  },
+  "3665": {
+    "namePt": "Prancha power point",
+    "group": "abs"
+  },
+  "3666": {
+    "namePt": "Caminhada na esteira inclinada",
+    "group": "cardio"
+  },
+  "3667": {
+    "namePt": "Adução de quadril deitado de lado (masculino)",
+    "group": "legs"
+  },
+  "3669": {
+    "namePt": "Archer em pé",
+    "group": "back"
+  },
+  "3670": {
+    "namePt": "Abdominal declinado com peso",
+    "group": "abs"
+  },
+  "3671": {
+    "namePt": "Passo de esqui",
+    "group": "cardio"
+  },
+  "3672": {
+    "namePt": "Passo para frente e para trás",
+    "group": "cardio"
+  },
+  "3679": {
+    "namePt": "Abdominal com braços cruzados no peito",
+    "group": "abs"
+  },
+  "3697": {
+    "namePt": "Remada para deltoide posterior ajoelhado na polia (com corda)",
+    "group": "shoulders"
+  },
+  "3698": {
+    "namePt": "Lagartixa v. 2",
+    "group": "abs"
+  },
+  "3699": {
+    "namePt": "Toque de ombro (prancha)",
+    "group": "abs"
+  },
+  "3758": {
+    "namePt": "Supino em pé na máquina",
+    "group": "chest"
+  },
+  "3759": {
+    "namePt": "Bom dia sentado na máquina",
+    "group": "glutes"
+  },
+  "3760": {
+    "namePt": "Abdominal (crunch) sentado na máquina v. 2",
+    "group": "abs"
+  },
+  "3769": {
+    "namePt": "Agachamento cruzado (curtsey squat)",
+    "group": "glutes"
+  },
+  "3785": {
+    "namePt": "Flexão inclinada (no caixote)",
+    "group": "chest"
+  },
+  "3888": {
+    "namePt": "Arranco unilateral com halteres",
+    "group": "glutes"
+  },
+  "5201": {
+    "namePt": "Rosca garçom com halteres",
+    "group": "arms"
+  },
+  "0001": {
+    "namePt": "Abdominal 3/4",
+    "group": "abs"
+  },
+  "0002": {
+    "namePt": "Flexão lateral de tronco 45°",
+    "group": "abs"
+  },
+  "0003": {
+    "namePt": "Bicicleta no ar",
+    "group": "abs"
+  },
+  "0006": {
+    "namePt": "Toque alternado no calcanhar",
+    "group": "abs"
+  },
+  "0007": {
+    "namePt": "Puxada lateral alternada",
+    "group": "back"
+  },
+  "0009": {
+    "namePt": "Mergulho para peito assistido (ajoelhado)",
+    "group": "chest"
+  },
+  "0010": {
+    "namePt": "Elevação de joelhos pendurado com lançamento das pernas assistida",
+    "group": "abs"
+  },
+  "0011": {
+    "namePt": "Elevação de joelhos pendurado assistida",
+    "group": "abs"
+  },
+  "0012": {
+    "namePt": "Elevação de perna deitado com lançamento lateral assistida",
+    "group": "abs"
+  },
+  "0013": {
+    "namePt": "Elevação de perna deitado com lançamento assistida",
+    "group": "abs"
+  },
+  "0014": {
+    "namePt": "Rotação russa assistida",
+    "group": "abs"
+  },
+  "0015": {
+    "namePt": "Barra fixa pegada fechada paralela assistida",
+    "group": "back"
+  },
+  "0016": {
+    "namePt": "Alongamento de posterior de coxa em prono assistido",
+    "group": "legs"
+  },
+  "0017": {
+    "namePt": "Barra fixa assistida",
+    "group": "back"
+  },
+  "0018": {
+    "namePt": "Extensão de tríceps em pé assistida (com toalha)",
+    "group": "arms"
+  },
+  "0019": {
+    "namePt": "Mergulho para tríceps assistido (ajoelhado)",
+    "group": "arms"
+  },
+  "0020": {
+    "namePt": "Prancha de equilíbrio",
+    "group": "legs"
+  },
+  "0022": {
+    "namePt": "Pullover com barra e supino",
+    "group": "back"
+  },
+  "0023": {
+    "namePt": "Rosca bíceps alternada com barra",
+    "group": "arms"
+  },
+  "0024": {
+    "namePt": "Agachamento frontal no banco com barra",
+    "group": "legs"
+  },
+  "0025": {
+    "namePt": "Supino reto com barra",
+    "group": "chest"
+  },
+  "0026": {
+    "namePt": "Agachamento no banco com barra",
+    "group": "legs"
+  },
+  "0027": {
+    "namePt": "Remada curvada com barra",
+    "group": "back"
+  },
+  "0028": {
+    "namePt": "Clean and press com barra",
+    "group": "legs"
+  },
+  "0029": {
+    "namePt": "Agachamento frontal pegada de clean com barra",
+    "group": "glutes"
+  },
+  "0030": {
+    "namePt": "Supino pegada fechada com barra",
+    "group": "arms"
+  },
+  "0031": {
+    "namePt": "Rosca direta com barra",
+    "group": "arms"
+  },
+  "0032": {
+    "namePt": "Levantamento terra com barra",
+    "group": "glutes"
+  },
+  "0033": {
+    "namePt": "Supino declinado com barra",
+    "group": "chest"
+  },
+  "0034": {
+    "namePt": "Pullover declinado com braços flexionados com barra",
+    "group": "back"
+  },
+  "0035": {
+    "namePt": "Tríceps testa declinado pegada fechada com barra",
+    "group": "arms"
+  },
+  "0036": {
+    "namePt": "Supino declinado pegada aberta com barra",
+    "group": "chest"
+  },
+  "0037": {
+    "namePt": "Pullover declinado pegada aberta com barra",
+    "group": "back"
+  },
+  "0038": {
+    "namePt": "Rosca arrastada com barra",
+    "group": "arms"
+  },
+  "0039": {
+    "namePt": "Agachamento frontal com barra no peito",
+    "group": "glutes"
+  },
+  "0040": {
+    "namePt": "Elevação frontal e pullover com barra",
+    "group": "chest"
+  },
+  "0041": {
+    "namePt": "Elevação frontal com barra",
+    "group": "shoulders"
+  },
+  "0042": {
+    "namePt": "Agachamento frontal com barra",
+    "group": "glutes"
+  },
+  "0043": {
+    "namePt": "Agachamento completo com barra",
+    "group": "glutes"
+  },
+  "0044": {
+    "namePt": "Bom dia com barra",
+    "group": "legs"
+  },
+  "0045": {
+    "namePt": "Supino guilhotina com barra",
+    "group": "chest"
+  },
+  "0046": {
+    "namePt": "Agachamento hack com barra",
+    "group": "glutes"
+  },
+  "0047": {
+    "namePt": "Supino inclinado com barra",
+    "group": "chest"
+  },
+  "0048": {
+    "namePt": "Supino inclinado pegada invertida com barra",
+    "group": "arms"
+  },
+  "0049": {
+    "namePt": "Remada inclinada com barra",
+    "group": "back"
+  },
+  "0050": {
+    "namePt": "Elevação de ombro inclinada com barra",
+    "group": "shoulders"
+  },
+  "0051": {
+    "namePt": "Agachamento jefferson com barra",
+    "group": "glutes"
+  },
+  "0052": {
+    "namePt": "Supino JM com barra",
+    "group": "arms"
+  },
+  "0053": {
+    "namePt": "Agachamento com salto com barra",
+    "group": "glutes"
+  },
+  "0054": {
+    "namePt": "Afundo com barra",
+    "group": "glutes"
+  },
+  "0055": {
+    "namePt": "Press pegada fechada deitado com barra",
+    "group": "arms"
+  },
+  "0056": {
+    "namePt": "Tríceps testa pegada fechada com barra",
+    "group": "arms"
+  },
+  "0057": {
+    "namePt": "Tríceps testa com barra",
+    "group": "arms"
+  },
+  "0058": {
+    "namePt": "Elevação de quadril deitado com barra",
+    "group": "glutes"
+  },
+  "0059": {
+    "namePt": "Rosca scott deitado com barra",
+    "group": "arms"
+  },
+  "0060": {
+    "namePt": "Tríceps testa com barra (skull crusher)",
+    "group": "arms"
+  },
+  "0061": {
+    "namePt": "Tríceps testa com barra",
+    "group": "arms"
+  },
+  "0063": {
+    "namePt": "Agachamento com barra pés unidos",
+    "group": "glutes"
+  },
+  "0064": {
+    "namePt": "Remada curvada unilateral com barra",
+    "group": "back"
+  },
+  "0065": {
+    "namePt": "Supino no chão unilateral com barra",
+    "group": "arms"
+  },
+  "0066": {
+    "namePt": "Levantamento terra lateral unilateral com barra",
+    "group": "glutes"
+  },
+  "0067": {
+    "namePt": "Arranco unilateral com barra",
+    "group": "shoulders"
+  },
+  "0068": {
+    "namePt": "Agachamento unilateral com barra",
+    "group": "legs"
+  },
+  "0069": {
+    "namePt": "Agachamento overhead com barra",
+    "group": "legs"
+  },
+  "0070": {
+    "namePt": "Rosca scott com barra",
+    "group": "arms"
+  },
+  "0071": {
+    "namePt": "Abdominal com desenvolvimento e barra",
+    "group": "abs"
+  },
+  "0072": {
+    "namePt": "Rosca spider com barra",
+    "group": "arms"
+  },
+  "0073": {
+    "namePt": "Pullover com barra",
+    "group": "back"
+  },
+  "0074": {
+    "namePt": "Rack pull com barra",
+    "group": "glutes"
+  },
+  "0075": {
+    "namePt": "Elevação para deltoide posterior com barra",
+    "group": "shoulders"
+  },
+  "0076": {
+    "namePt": "Remada para deltoide posterior com barra",
+    "group": "shoulders"
+  },
+  "0077": {
+    "namePt": "Avanço reverso com barra (v. 2)",
+    "group": "glutes"
+  },
+  "0078": {
+    "namePt": "Avanço reverso com barra",
+    "group": "glutes"
+  },
+  "0079": {
+    "namePt": "Rosca de punho invertida com barra (v. 2)",
+    "group": "arms"
+  },
+  "0080": {
+    "namePt": "Rosca inversa com barra",
+    "group": "arms"
+  },
+  "0081": {
+    "namePt": "Rosca scott inversa com barra",
+    "group": "arms"
+  },
+  "0082": {
+    "namePt": "Rosca de punho invertida com barra",
+    "group": "arms"
+  },
+  "0083": {
+    "namePt": "Rollout com barra a partir do banco",
+    "group": "abs"
+  },
+  "0084": {
+    "namePt": "Rollout com barra",
+    "group": "abs"
+  },
+  "0085": {
+    "namePt": "Levantamento terra romeno com barra",
+    "group": "glutes"
+  },
+  "0086": {
+    "namePt": "Desenvolvimento militar sentado por trás da nuca com barra",
+    "group": "shoulders"
+  },
+  "0087": {
+    "namePt": "Desenvolvimento Bradford sentado com barra",
+    "group": "shoulders"
+  },
+  "0088": {
+    "namePt": "Elevação de panturrilha sentado com barra",
+    "group": "legs"
+  },
+  "0089": {
+    "namePt": "Rosca concentrada pegada fechada sentado com barra",
+    "group": "arms"
+  },
+  "0090": {
+    "namePt": "Bom dia sentado com barra",
+    "group": "glutes"
+  },
+  "0091": {
+    "namePt": "Desenvolvimento sentado com barra",
+    "group": "shoulders"
+  },
+  "0092": {
+    "namePt": "Tríceps francês sentado com barra",
+    "group": "arms"
+  },
+  "0094": {
+    "namePt": "Giro de tronco sentado com barra",
+    "group": "abs"
+  },
+  "0095": {
+    "namePt": "Encolhimento com barra",
+    "group": "back"
+  },
+  "0096": {
+    "namePt": "Flexão lateral de tronco com barra (v. 2)",
+    "group": "abs"
+  },
+  "0097": {
+    "namePt": "Agachamento afastado lateral com barra (v. 2)",
+    "group": "legs"
+  },
+  "0098": {
+    "namePt": "Agachamento afastado lateral com barra",
+    "group": "legs"
+  },
+  "0099": {
+    "namePt": "Afundo estático unilateral com barra",
+    "group": "legs"
+  },
+  "0100": {
+    "namePt": "Esqui com barra",
+    "group": "shoulders"
+  },
+  "0101": {
+    "namePt": "Agachamento rápido com barra",
+    "group": "glutes"
+  },
+  "0102": {
+    "namePt": "Agachamento com barra ajoelhado",
+    "group": "legs"
+  },
+  "0103": {
+    "namePt": "Rollout abdominal em pé com barra",
+    "group": "abs"
+  },
+  "0104": {
+    "namePt": "Rosca de punho invertida em pé com barra",
+    "group": "arms"
+  },
+  "0105": {
+    "namePt": "Desenvolvimento Bradford em pé com barra",
+    "group": "shoulders"
+  },
+  "0106": {
+    "namePt": "Rosca direta pegada fechada em pé com barra",
+    "group": "arms"
+  },
+  "0107": {
+    "namePt": "Elevação frontal por cima da cabeça em pé com barra",
+    "group": "shoulders"
+  },
+  "0108": {
+    "namePt": "Elevação de panturrilha em pé com barra",
+    "group": "legs"
+  },
+  "0109": {
+    "namePt": "Tríceps francês em pé com barra",
+    "group": "arms"
+  },
+  "0110": {
+    "namePt": "Rosca inversa em pé com barra",
+    "group": "arms"
+  },
+  "0111": {
+    "namePt": "Elevação de panturrilha em pé com barra (balanceada)",
+    "group": "legs"
+  },
+  "0112": {
+    "namePt": "Giro de tronco em pé com barra",
+    "group": "abs"
+  },
+  "0113": {
+    "namePt": "Rosca direta pegada aberta em pé com barra",
+    "group": "arms"
+  },
+  "0114": {
+    "namePt": "Subida no step com barra",
+    "group": "glutes"
+  },
+  "0115": {
+    "namePt": "Bom dia pernas retas com barra",
+    "group": "glutes"
+  },
+  "0116": {
+    "namePt": "Levantamento terra pernas retas com barra",
+    "group": "legs"
+  },
+  "0117": {
+    "namePt": "Levantamento terra sumô com barra",
+    "group": "glutes"
+  },
+  "0118": {
+    "namePt": "Remada curvada pegada invertida com barra",
+    "group": "back"
+  },
+  "0119": {
+    "namePt": "Remada alta com barra (v. 2)",
+    "group": "shoulders"
+  },
+  "0120": {
+    "namePt": "Remada alta com barra",
+    "group": "shoulders"
+  },
+  "0121": {
+    "namePt": "Remada alta com barra (v. 3)",
+    "group": "shoulders"
+  },
+  "0122": {
+    "namePt": "Supino reto pegada aberta com barra",
+    "group": "chest"
+  },
+  "0123": {
+    "namePt": "Remada alta pegada aberta com barra",
+    "group": "shoulders"
+  },
+  "0124": {
+    "namePt": "Agachamento com barra pernas afastadas",
+    "group": "legs"
+  },
+  "0125": {
+    "namePt": "Rosca de punho com barra (v. 2)",
+    "group": "arms"
+  },
+  "0126": {
+    "namePt": "Rosca de punho com barra",
+    "group": "arms"
+  },
+  "0127": {
+    "namePt": "Agachamento zercher com barra",
+    "group": "glutes"
+  },
+  "0128": {
+    "namePt": "Corda naval",
+    "group": "shoulders"
+  },
+  "0129": {
+    "namePt": "Mergulho no banco (joelhos flexionados)",
+    "group": "arms"
+  },
+  "0130": {
+    "namePt": "Extensão de quadril no banco",
+    "group": "glutes"
+  },
+  "0137": {
+    "namePt": "Body-up (tríceps)",
+    "group": "arms"
+  },
+  "0138": {
+    "namePt": "Elevação de quadril (bottoms-up)",
+    "group": "abs"
+  },
+  "0139": {
+    "namePt": "Barra fixa pegada fechada",
+    "group": "arms"
+  },
+  "0140": {
+    "namePt": "Barra fixa",
+    "group": "arms"
+  },
+  "0148": {
+    "namePt": "Desenvolvimento alternado na polia",
+    "group": "shoulders"
+  },
+  "0149": {
+    "namePt": "Tríceps na polia alternado",
+    "group": "arms"
+  },
+  "0150": {
+    "namePt": "Puxada lateral na polia com barra",
+    "group": "back"
+  },
+  "0151": {
+    "namePt": "Supino na polia",
+    "group": "chest"
+  },
+  "0152": {
+    "namePt": "Tríceps concentrado na polia (apoio no joelho)",
+    "group": "arms"
+  },
+  "0153": {
+    "namePt": "Puxada lateral cruzada na polia",
+    "group": "back"
+  },
+  "0154": {
+    "namePt": "Crucifixo invertido cruzado na polia",
+    "group": "shoulders"
+  },
+  "0155": {
+    "namePt": "Crucifixo cruzado na polia (variação)",
+    "group": "chest"
+  },
+  "0157": {
+    "namePt": "Levantamento terra na polia",
+    "group": "glutes"
+  },
+  "0158": {
+    "namePt": "Crucifixo declinado na polia",
+    "group": "chest"
+  },
+  "0159": {
+    "namePt": "Remada sentado pegada aberta declinada na polia",
+    "group": "back"
+  },
+  "0160": {
+    "namePt": "Remada sentado no chão pegada aberta na polia",
+    "group": "back"
+  },
+  "0161": {
+    "namePt": "Elevação frontal na polia",
+    "group": "shoulders"
+  },
+  "0162": {
+    "namePt": "Elevação frontal na polia",
+    "group": "shoulders"
+  },
+  "0164": {
+    "namePt": "Elevação frontal de ombro na polia",
+    "group": "shoulders"
+  },
+  "0165": {
+    "namePt": "Rosca martelo na polia (com corda)",
+    "group": "arms"
+  },
+  "0167": {
+    "namePt": "Remada alta na polia (ajoelhado)",
+    "group": "back"
+  },
+  "0168": {
+    "namePt": "Adução de quadril na polia",
+    "group": "legs"
+  },
+  "0169": {
+    "namePt": "Supino inclinado na polia",
+    "group": "chest"
+  },
+  "0170": {
+    "namePt": "Crucifixo inclinado na polia (com bola suíça)",
+    "group": "chest"
+  },
+  "0171": {
+    "namePt": "Crucifixo inclinado na polia",
+    "group": "chest"
+  },
+  "0172": {
+    "namePt": "Puxada inclinada na polia",
+    "group": "back"
+  },
+  "0173": {
+    "namePt": "Extensão de tríceps inclinada na polia",
+    "group": "arms"
+  },
+  "0174": {
+    "namePt": "Giro judô na polia",
+    "group": "abs"
+  },
+  "0175": {
+    "namePt": "Abdominal ajoelhado na polia",
+    "group": "abs"
+  },
+  "0176": {
+    "namePt": "Extensão de tríceps ajoelhado na polia",
+    "group": "arms"
+  },
+  "0177": {
+    "namePt": "Puxada lateral na polia (com corda)",
+    "group": "back"
+  },
+  "0178": {
+    "namePt": "Elevação lateral na polia",
+    "group": "shoulders"
+  },
+  "0179": {
+    "namePt": "Crucifixo baixo na polia",
+    "group": "chest"
+  },
+  "0180": {
+    "namePt": "Remada baixa sentado na polia",
+    "group": "back"
+  },
+  "0182": {
+    "namePt": "Rosca deitado na polia pegada fechada",
+    "group": "arms"
+  },
+  "0184": {
+    "namePt": "Pullover deitado na polia (com corda)",
+    "group": "back"
+  },
+  "0185": {
+    "namePt": "Crucifixo deitado na polia",
+    "group": "chest"
+  },
+  "0186": {
+    "namePt": "Extensão de tríceps deitado na polia v. 2",
+    "group": "arms"
+  },
+  "0188": {
+    "namePt": "Crucifixo médio na polia",
+    "group": "chest"
+  },
+  "0189": {
+    "namePt": "Remada curvada unilateral na polia",
+    "group": "back"
+  },
+  "0190": {
+    "namePt": "Rosca unilateral na polia",
+    "group": "arms"
+  },
+  "0191": {
+    "namePt": "Crossover curvado unilateral na polia",
+    "group": "chest"
+  },
+  "0192": {
+    "namePt": "Elevação lateral unilateral na polia",
+    "group": "shoulders"
+  },
+  "0193": {
+    "namePt": "Remada alta ajoelhado unilateral na polia (costas retas)",
+    "group": "back"
+  },
+  "0194": {
+    "namePt": "Extensão de tríceps por trás da cabeça na polia (com corda)",
+    "group": "arms"
+  },
+  "0195": {
+    "namePt": "Rosca scott na polia",
+    "group": "arms"
+  },
+  "0196": {
+    "namePt": "Pull-through na polia (com corda)",
+    "group": "glutes"
+  },
+  "0197": {
+    "namePt": "Puxada na polia (barra pro lat)",
+    "group": "back"
+  },
+  "0198": {
+    "namePt": "Puxada na polia",
+    "group": "back"
+  },
+  "0199": {
+    "namePt": "Puxada de braços retos na polia v. 2",
+    "group": "back"
+  },
+  "0200": {
+    "namePt": "Tríceps na polia (com corda)",
+    "group": "arms"
+  },
+  "0201": {
+    "namePt": "Tríceps na polia",
+    "group": "arms"
+  },
+  "0202": {
+    "namePt": "Remada para deltoide posterior na polia (alças)",
+    "group": "shoulders"
+  },
+  "0203": {
+    "namePt": "Remada para deltoide posterior na polia (com corda)",
+    "group": "shoulders"
+  },
+  "0204": {
+    "namePt": "Extensão de tríceps para trás na polia",
+    "group": "arms"
+  },
+  "0205": {
+    "namePt": "Puxada por trás na polia",
+    "group": "back"
+  },
+  "0206": {
+    "namePt": "Rosca inversa na polia",
+    "group": "arms"
+  },
+  "0207": {
+    "namePt": "Tríceps na polia pegada inversa",
+    "group": "arms"
+  },
+  "0208": {
+    "namePt": "Remada alta sentado pegada inversa na polia (costas retas)",
+    "group": "back"
+  },
+  "0209": {
+    "namePt": "Rosca scott inversa na polia",
+    "group": "arms"
+  },
+  "0210": {
+    "namePt": "Rosca de punho inversa na polia",
+    "group": "arms"
+  },
+  "0211": {
+    "namePt": "Giro russo na polia (com bola suíça)",
+    "group": "abs"
+  },
+  "0212": {
+    "namePt": "Abdominal sentado na polia",
+    "group": "abs"
+  },
+  "0213": {
+    "namePt": "Remada alta sentado na polia (barra V)",
+    "group": "back"
+  },
+  "0214": {
+    "namePt": "Remada sentado alternada unilateral na polia",
+    "group": "back"
+  },
+  "0215": {
+    "namePt": "Elevação lateral posterior sentado na polia",
+    "group": "shoulders"
+  },
+  "0216": {
+    "namePt": "Rotação interna de ombro sentado na polia",
+    "group": "shoulders"
+  },
+  "0218": {
+    "namePt": "Remada sentado pegada aberta na polia",
+    "group": "back"
+  },
+  "0219": {
+    "namePt": "Desenvolvimento na polia",
+    "group": "shoulders"
+  },
+  "0220": {
+    "namePt": "Encolhimento na polia",
+    "group": "back"
+  },
+  "0221": {
+    "namePt": "Abdominal com flexão lateral na polia (bosu)",
+    "group": "abs"
+  },
+  "0222": {
+    "namePt": "Flexão lateral de tronco na polia",
+    "group": "abs"
+  },
+  "0223": {
+    "namePt": "Abdominal lateral na polia",
+    "group": "abs"
+  },
+  "0224": {
+    "namePt": "Rosca de punho inversa em pé na polia",
+    "group": "arms"
+  },
+  "0225": {
+    "namePt": "Crucifixo inverso alto crossover em pé na polia",
+    "group": "shoulders"
+  },
+  "0226": {
+    "namePt": "Abdominal em pé na polia",
+    "group": "abs"
+  },
+  "0227": {
+    "namePt": "Crucifixo em pé na polia",
+    "group": "chest"
+  },
+  "0228": {
+    "namePt": "Extensão de quadril em pé na polia",
+    "group": "glutes"
+  },
+  "0229": {
+    "namePt": "Rosca em pé na polia (pegada interna)",
+    "group": "arms"
+  },
+  "0230": {
+    "namePt": "Elevação diagonal em pé na polia",
+    "group": "abs"
+  },
+  "0231": {
+    "namePt": "Extensão de tríceps unilateral em pé na polia",
+    "group": "arms"
+  },
+  "0232": {
+    "namePt": "Rosca na polia alta em pé (com corda)",
+    "group": "arms"
+  },
+  "0233": {
+    "namePt": "Remada para deltoide posterior em pé na polia (com corda)",
+    "group": "shoulders"
+  },
+  "0234": {
+    "namePt": "Remada em pé na polia (barra V)",
+    "group": "back"
+  },
+  "0235": {
+    "namePt": "Rotação externa de ombro em pé na polia",
+    "group": "shoulders"
+  },
+  "0236": {
+    "namePt": "Remada com giro em pé na polia (barra V)",
+    "group": "back"
+  },
+  "0237": {
+    "namePt": "Puxada de braços retos na polia (com corda)",
+    "group": "back"
+  },
+  "0238": {
+    "namePt": "Puxada de braços retos na polia",
+    "group": "back"
+  },
+  "0239": {
+    "namePt": "Remada sentado na polia (costas retas)",
+    "group": "back"
+  },
+  "0240": {
+    "namePt": "Crucifixo inverso supinado na polia",
+    "group": "shoulders"
+  },
+  "0241": {
+    "namePt": "Tríceps na polia (barra V)",
+    "group": "arms"
+  },
+  "0242": {
+    "namePt": "Abdominal inverso encolhido na polia",
+    "group": "abs"
+  },
+  "0243": {
+    "namePt": "Giro de tronco na polia",
+    "group": "abs"
+  },
+  "0244": {
+    "namePt": "Puxada com giro na polia",
+    "group": "back"
+  },
+  "0245": {
+    "namePt": "Puxada pegada supinada na polia",
+    "group": "back"
+  },
+  "0246": {
+    "namePt": "Remada vertical na polia",
+    "group": "shoulders"
+  },
+  "0247": {
+    "namePt": "Rosca de punho na polia",
+    "group": "arms"
+  },
+  "0248": {
+    "namePt": "Remada deitado com barra curva",
+    "group": "back"
+  },
+  "0251": {
+    "namePt": "Mergulho para peito",
+    "group": "chest"
+  },
+  "0253": {
+    "namePt": "Barra fixa pegada paralela fechada",
+    "group": "back"
+  },
+  "0257": {
+    "namePt": "Alongamento de joelho em círculos",
+    "group": "legs"
+  },
+  "0258": {
+    "namePt": "Flexão relógio",
+    "group": "chest"
+  },
+  "0259": {
+    "namePt": "Flexão com pegada fechada",
+    "group": "arms"
+  },
+  "0260": {
+    "namePt": "Abdominal cocoon",
+    "group": "abs"
+  },
+  "0262": {
+    "namePt": "Abdominal cruzado",
+    "group": "abs"
+  },
+  "0267": {
+    "namePt": "Abdominal com braços estendidos acima da cabeça",
+    "group": "abs"
+  },
+  "0271": {
+    "namePt": "Abdominal na bola suíça",
+    "group": "abs"
+  },
+  "0272": {
+    "namePt": "Abdominal na bola suíça com braços estendidos",
+    "group": "abs"
+  },
+  "0274": {
+    "namePt": "Abdominal no chão",
+    "group": "abs"
+  },
+  "0276": {
+    "namePt": "Dead bug (abdominal)",
+    "group": "abs"
+  },
+  "0277": {
+    "namePt": "Abdominal declinado",
+    "group": "abs"
+  },
+  "0279": {
+    "namePt": "Flexão declinada",
+    "group": "chest"
+  },
+  "0282": {
+    "namePt": "Abdominal supra declinado",
+    "group": "abs"
+  },
+  "0283": {
+    "namePt": "Flexão diamante",
+    "group": "arms"
+  },
+  "0284": {
+    "namePt": "Elevação de panturrilha burro",
+    "group": "legs"
+  },
+  "0285": {
+    "namePt": "Rosca bíceps alternada com halteres",
+    "group": "arms"
+  },
+  "0286": {
+    "namePt": "Desenvolvimento lateral alternado com halteres",
+    "group": "shoulders"
+  },
+  "0287": {
+    "namePt": "Desenvolvimento Arnold com halteres (variação 2)",
+    "group": "shoulders"
+  },
+  "0288": {
+    "namePt": "Pullover circular com halteres",
+    "group": "chest"
+  },
+  "0289": {
+    "namePt": "Supino reto com halteres",
+    "group": "chest"
+  },
+  "0290": {
+    "namePt": "Desenvolvimento sentado com halteres",
+    "group": "shoulders"
+  },
+  "0291": {
+    "namePt": "Agachamento no banco com halteres",
+    "group": "glutes"
+  },
+  "0292": {
+    "namePt": "Remada curvada unilateral com halteres",
+    "group": "back"
+  },
+  "0293": {
+    "namePt": "Remada curvada com halteres",
+    "group": "back"
+  },
+  "0294": {
+    "namePt": "Rosca bíceps com halteres",
+    "group": "arms"
+  },
+  "0295": {
+    "namePt": "Clean com halteres",
+    "group": "glutes"
+  },
+  "0296": {
+    "namePt": "Supino pegada fechada com halteres",
+    "group": "arms"
+  },
+  "0297": {
+    "namePt": "Rosca concentrada com halteres",
+    "group": "arms"
+  },
+  "0298": {
+    "namePt": "Rosca martelo cruzada com halteres",
+    "group": "arms"
+  },
+  "0299": {
+    "namePt": "Desenvolvimento cubano com halteres",
+    "group": "shoulders"
+  },
+  "0300": {
+    "namePt": "Levantamento terra com halteres",
+    "group": "glutes"
+  },
+  "0301": {
+    "namePt": "Supino declinado com halteres",
+    "group": "chest"
+  },
+  "0302": {
+    "namePt": "Crucifixo declinado com halteres",
+    "group": "chest"
+  },
+  "0303": {
+    "namePt": "Supino declinado pegada martelo com halteres",
+    "group": "chest"
+  },
+  "0304": {
+    "namePt": "Encolhimento declinado com halteres (variação 2)",
+    "group": "back"
+  },
+  "0305": {
+    "namePt": "Encolhimento declinado com halteres",
+    "group": "back"
+  },
+  "0306": {
+    "namePt": "Tríceps testa declinado com halteres",
+    "group": "arms"
+  },
+  "0307": {
+    "namePt": "Crucifixo declinado com rotação (halteres)",
+    "group": "chest"
+  },
+  "0308": {
+    "namePt": "Crucifixo com halteres",
+    "group": "chest"
+  },
+  "0309": {
+    "namePt": "Elevação frontal com halteres (variação 2)",
+    "group": "shoulders"
+  },
+  "0310": {
+    "namePt": "Elevação frontal com halteres",
+    "group": "shoulders"
+  },
+  "0311": {
+    "namePt": "Elevação lateral com halteres (pegada lata cheia)",
+    "group": "shoulders"
+  },
+  "0312": {
+    "namePt": "Rosca martelo com halteres (variação 2)",
+    "group": "arms"
+  },
+  "0313": {
+    "namePt": "Rosca martelo com halteres",
+    "group": "arms"
+  },
+  "0314": {
+    "namePt": "Supino inclinado com halteres",
+    "group": "chest"
+  },
+  "0315": {
+    "namePt": "Rosca bíceps inclinada com halteres",
+    "group": "arms"
+  },
+  "0316": {
+    "namePt": "Crucifixo inclinado com halteres",
+    "group": "chest"
+  },
+  "0317": {
+    "namePt": "Rosca inclinada com halteres (variação 2)",
+    "group": "arms"
+  },
+  "0318": {
+    "namePt": "Rosca inclinada com halteres",
+    "group": "arms"
+  },
+  "0319": {
+    "namePt": "Crucifixo inclinado com halteres",
+    "group": "chest"
+  },
+  "0320": {
+    "namePt": "Rosca martelo inclinada com halteres",
+    "group": "arms"
+  },
+  "0321": {
+    "namePt": "Supino inclinado pegada martelo com halteres",
+    "group": "chest"
+  },
+  "0322": {
+    "namePt": "Rosca bíceps inclinada pegada interna com halteres",
+    "group": "arms"
+  },
+  "0323": {
+    "namePt": "Elevação lateral inclinada unilateral com halteres",
+    "group": "shoulders"
+  },
+  "0324": {
+    "namePt": "Supino inclinado com halteres pegada palmas para dentro",
+    "group": "chest"
+  },
+  "0325": {
+    "namePt": "Elevação inclinada com halteres",
+    "group": "shoulders"
+  },
+  "0326": {
+    "namePt": "Elevação posterior inclinada com halteres",
+    "group": "shoulders"
+  },
+  "0327": {
+    "namePt": "Remada inclinada com halteres",
+    "group": "back"
+  },
+  "0328": {
+    "namePt": "Elevação de ombro inclinada com halteres",
+    "group": "shoulders"
+  },
+  "0329": {
+    "namePt": "Encolhimento inclinado com halteres",
+    "group": "back"
+  },
+  "0330": {
+    "namePt": "Tríceps testa inclinado com halteres",
+    "group": "arms"
+  },
+  "0331": {
+    "namePt": "Crucifixo inclinado com rotação (halteres)",
+    "group": "chest"
+  },
+  "0332": {
+    "namePt": "Crucifixo cruz de ferro com halteres",
+    "group": "shoulders"
+  },
+  "0333": {
+    "namePt": "Tríceps coice com halteres",
+    "group": "arms"
+  },
+  "0334": {
+    "namePt": "Elevação lateral com halteres",
+    "group": "shoulders"
+  },
+  "0335": {
+    "namePt": "Elevação lateral para frontal com halteres",
+    "group": "shoulders"
+  },
+  "0336": {
+    "namePt": "Avanço com halteres",
+    "group": "glutes"
+  },
+  "0337": {
+    "namePt": "Tríceps testa deitado com halteres",
+    "group": "arms"
+  },
+  "0338": {
+    "namePt": "Supino com halteres cotovelos fechados (deitado)",
+    "group": "arms"
+  },
+  "0339": {
+    "namePt": "Mesa flexora deitado com halteres",
+    "group": "legs"
+  },
+  "0340": {
+    "namePt": "Supino pegada martelo deitado com halteres",
+    "group": "chest"
+  },
+  "0341": {
+    "namePt": "Elevação posterior de ombro unilateral deitado com halteres",
+    "group": "shoulders"
+  },
+  "0342": {
+    "namePt": "Supino unilateral deitado com halteres (variação 2)",
+    "group": "chest"
+  },
+  "0343": {
+    "namePt": "Supino unilateral deitado com halteres",
+    "group": "chest"
+  },
+  "0344": {
+    "namePt": "Tríceps testa unilateral pegada pronada deitado com halteres",
+    "group": "arms"
+  },
+  "0345": {
+    "namePt": "Elevação posterior unilateral deitado com halteres",
+    "group": "shoulders"
+  },
+  "0346": {
+    "namePt": "Tríceps testa unilateral pegada supinada deitado com halteres",
+    "group": "arms"
+  },
+  "0347": {
+    "namePt": "Pronação deitado com halteres",
+    "group": "arms"
+  },
+  "0348": {
+    "namePt": "Elevação lateral posterior deitado com halteres",
+    "group": "shoulders"
+  },
+  "0349": {
+    "namePt": "Supinação deitado com halteres",
+    "group": "arms"
+  },
+  "0350": {
+    "namePt": "Rosca deitado com halteres",
+    "group": "arms"
+  },
+  "0351": {
+    "namePt": "Tríceps testa deitado com halteres",
+    "group": "arms"
+  },
+  "0352": {
+    "namePt": "Supino pegada neutra com halteres",
+    "group": "arms"
+  },
+  "0353": {
+    "namePt": "Rosca concentrada unilateral na bola suíça com halteres",
+    "group": "arms"
+  },
+  "0354": {
+    "namePt": "Tríceps kickback unilateral com halteres",
+    "group": "arms"
+  },
+  "0355": {
+    "namePt": "Elevação lateral unilateral com halteres",
+    "group": "shoulders"
+  },
+  "0356": {
+    "namePt": "Elevação lateral unilateral com halteres e apoio",
+    "group": "shoulders"
+  },
+  "0358": {
+    "namePt": "Rosca de punho invertida unilateral com halteres",
+    "group": "arms"
+  },
+  "0359": {
+    "namePt": "Crucifixo invertido unilateral com halteres e apoio",
+    "group": "shoulders"
+  },
+  "0360": {
+    "namePt": "Desenvolvimento unilateral com halteres v. 2",
+    "group": "shoulders"
+  },
+  "0361": {
+    "namePt": "Desenvolvimento unilateral com halteres",
+    "group": "shoulders"
+  },
+  "0362": {
+    "namePt": "Extensão de tríceps unilateral com halteres no banco",
+    "group": "arms"
+  },
+  "0363": {
+    "namePt": "Remada alta unilateral com halteres",
+    "group": "shoulders"
+  },
+  "0364": {
+    "namePt": "Rosca de punho unilateral com halteres",
+    "group": "arms"
+  },
+  "0365": {
+    "namePt": "Rosca de punho neutra no banco com halteres",
+    "group": "arms"
+  },
+  "0366": {
+    "namePt": "Rosca de punho neutra unilateral no banco com halteres",
+    "group": "arms"
+  },
+  "0367": {
+    "namePt": "Rosca de punho unilateral no banco com halteres",
+    "group": "arms"
+  },
+  "0368": {
+    "namePt": "Rosca de punho invertida no banco com halteres",
+    "group": "arms"
+  },
+  "0369": {
+    "namePt": "Rosca de punho no banco com halteres",
+    "group": "arms"
+  },
+  "0370": {
+    "namePt": "Rosca martelo no banco scott com halteres",
+    "group": "arms"
+  },
+  "0371": {
+    "namePt": "Agachamento pliométrico com halteres",
+    "group": "glutes"
+  },
+  "0372": {
+    "namePt": "Rosca no banco scott com halteres",
+    "group": "arms"
+  },
+  "0373": {
+    "namePt": "Extensão de tríceps pegada pronada com halteres",
+    "group": "arms"
+  },
+  "0374": {
+    "namePt": "Rosca inclinada prona com halteres",
+    "group": "arms"
+  },
+  "0375": {
+    "namePt": "Pullover com halteres",
+    "group": "chest"
+  },
+  "0376": {
+    "namePt": "Elevação com halteres",
+    "group": "shoulders"
+  },
+  "0377": {
+    "namePt": "Remada para deltoide posterior com halteres",
+    "group": "shoulders"
+  },
+  "0378": {
+    "namePt": "Crucifixo invertido com halteres",
+    "group": "shoulders"
+  },
+  "0379": {
+    "namePt": "Elevação lateral posterior com halteres e apoio de cabeça",
+    "group": "shoulders"
+  },
+  "0380": {
+    "namePt": "Elevação lateral posterior com halteres",
+    "group": "shoulders"
+  },
+  "0381": {
+    "namePt": "Afundo reverso com halteres",
+    "group": "glutes"
+  },
+  "0382": {
+    "namePt": "Rosca bíceps pegada invertida com halteres",
+    "group": "arms"
+  },
+  "0383": {
+    "namePt": "Crucifixo invertido com halteres",
+    "group": "shoulders"
+  },
+  "0384": {
+    "namePt": "Rosca inversa no banco scott com halteres",
+    "group": "arms"
+  },
+  "0385": {
+    "namePt": "Rosca de punho invertida com halteres",
+    "group": "arms"
+  },
+  "0386": {
+    "namePt": "Crucifixo invertido com rotação com halteres",
+    "group": "shoulders"
+  },
+  "0387": {
+    "namePt": "Elevação frontal alternada sentado com halteres",
+    "group": "shoulders"
+  },
+  "0388": {
+    "namePt": "Desenvolvimento alternado sentado com halteres",
+    "group": "shoulders"
+  },
+  "0389": {
+    "namePt": "Extensão de tríceps sentado no banco com halteres",
+    "group": "arms"
+  },
+  "0390": {
+    "namePt": "Rosca bíceps sentado na bola suíça com halteres",
+    "group": "arms"
+  },
+  "0391": {
+    "namePt": "Rosca sentado com halteres",
+    "group": "arms"
+  },
+  "0392": {
+    "namePt": "Elevação frontal sentado com halteres",
+    "group": "shoulders"
+  },
+  "0393": {
+    "namePt": "Rosca bíceps interna sentado com halteres",
+    "group": "arms"
+  },
+  "0394": {
+    "namePt": "Tríceps kickback sentado com halteres",
+    "group": "arms"
+  },
+  "0395": {
+    "namePt": "Elevação lateral sentado com halteres v. 2",
+    "group": "shoulders"
+  },
+  "0396": {
+    "namePt": "Elevação lateral sentado com halteres",
+    "group": "shoulders"
+  },
+  "0397": {
+    "namePt": "Rosca de punho neutra sentado com halteres",
+    "group": "arms"
+  },
+  "0398": {
+    "namePt": "Tríceps kickback unilateral sentado com halteres",
+    "group": "arms"
+  },
+  "0399": {
+    "namePt": "Rotação de antebraço unilateral sentado com halteres",
+    "group": "arms"
+  },
+  "0400": {
+    "namePt": "Panturrilha sentado unilateral com halteres",
+    "group": "legs"
+  },
+  "0401": {
+    "namePt": "Rosca de punho pegada supinada sentado com halteres",
+    "group": "arms"
+  },
+  "0402": {
+    "namePt": "Rosca no banco scott sentado com halteres",
+    "group": "arms"
+  },
+  "0403": {
+    "namePt": "Rosca concentrada pegada invertida sentado com halteres",
+    "group": "arms"
+  },
+  "0404": {
+    "namePt": "Desenvolvimento sentado pegada paralela com halteres",
+    "group": "shoulders"
+  },
+  "0405": {
+    "namePt": "Desenvolvimento sentado com halteres",
+    "group": "shoulders"
+  },
+  "0406": {
+    "namePt": "Encolhimento com halteres",
+    "group": "back"
+  },
+  "0407": {
+    "namePt": "Flexão lateral de tronco com halteres",
+    "group": "abs"
+  },
+  "0408": {
+    "namePt": "Elevação deitado de lado unilateral com halteres",
+    "group": "shoulders"
+  },
+  "0409": {
+    "namePt": "Panturrilha unilateral com halteres",
+    "group": "legs"
+  },
+  "0410": {
+    "namePt": "Afundo estático unilateral com halteres",
+    "group": "legs"
+  },
+  "0411": {
+    "namePt": "Agachamento unilateral com halteres",
+    "group": "glutes"
+  },
+  "0413": {
+    "namePt": "Agachamento com halteres",
+    "group": "glutes"
+  },
+  "0414": {
+    "namePt": "Desenvolvimento alternado em pé com halteres",
+    "group": "shoulders"
+  },
+  "0415": {
+    "namePt": "Elevação alternada em pé com halteres",
+    "group": "shoulders"
+  },
+  "0416": {
+    "namePt": "Rosca bíceps em pé com halteres",
+    "group": "arms"
+  },
+  "0417": {
+    "namePt": "Panturrilha em pé com halteres",
+    "group": "legs"
+  },
+  "0418": {
+    "namePt": "Rosca concentrada em pé com halteres",
+    "group": "arms"
+  },
+  "0419": {
+    "namePt": "Elevação frontal acima da cabeça em pé com halteres",
+    "group": "shoulders"
+  },
+  "0420": {
+    "namePt": "Tríceps kickback em pé com halteres",
+    "group": "arms"
+  },
+  "0421": {
+    "namePt": "Rosca concentrada unilateral em pé com halteres",
+    "group": "arms"
+  },
+  "0422": {
+    "namePt": "Rosca unilateral em pé com halteres apoiado em banco inclinado",
+    "group": "arms"
+  },
+  "0423": {
+    "namePt": "Extensão de tríceps unilateral em pé com halteres",
+    "group": "arms"
+  },
+  "0424": {
+    "namePt": "Desenvolvimento unilateral pegada neutra em pé com halteres",
+    "group": "shoulders"
+  },
+  "0425": {
+    "namePt": "Rosca inversa unilateral em pé com halteres",
+    "group": "arms"
+  },
+  "0426": {
+    "namePt": "Desenvolvimento em pé com halteres",
+    "group": "shoulders"
+  },
+  "0427": {
+    "namePt": "Desenvolvimento pegada neutra em pé com halteres",
+    "group": "shoulders"
+  },
+  "0428": {
+    "namePt": "Rosca no banco scott em pé com halteres",
+    "group": "arms"
+  },
+  "0429": {
+    "namePt": "Rosca inversa em pé com halteres",
+    "group": "arms"
+  },
+  "0430": {
+    "namePt": "Extensão de tríceps em pé com halteres",
+    "group": "arms"
+  },
+  "0431": {
+    "namePt": "Step up com halteres",
+    "group": "glutes"
+  },
+  "0432": {
+    "namePt": "Stiff com halteres",
+    "group": "glutes"
+  },
+  "0433": {
+    "namePt": "Pullover braços estendidos com halteres",
+    "group": "chest"
+  },
+  "0434": {
+    "namePt": "Levantamento terra pernas retas com halteres",
+    "group": "glutes"
+  },
+  "0436": {
+    "namePt": "Tate press com halteres",
+    "group": "arms"
+  },
+  "0437": {
+    "namePt": "Remada alta com halteres",
+    "group": "shoulders"
+  },
+  "0438": {
+    "namePt": "Desenvolvimento em W com halteres",
+    "group": "shoulders"
+  },
+  "0439": {
+    "namePt": "Rosca zottman com halteres",
+    "group": "arms"
+  },
+  "0443": {
+    "namePt": "Cotovelo no joelho",
+    "group": "abs"
+  },
+  "0445": {
+    "namePt": "Desenvolvimento anti-gravidade com barra W",
+    "group": "shoulders"
+  },
+  "0446": {
+    "namePt": "Rosca pegada fechada com barra W",
+    "group": "arms"
+  },
+  "0447": {
+    "namePt": "Rosca com barra W",
+    "group": "arms"
+  },
+  "0448": {
+    "namePt": "Tríceps testa declinado pegada fechada com barra W",
+    "group": "arms"
+  },
+  "0449": {
+    "namePt": "Tríceps testa inclinado com barra W",
+    "group": "arms"
+  },
+  "0450": {
+    "namePt": "Supino JM com barra W",
+    "group": "arms"
+  },
+  "0451": {
+    "namePt": "Rosca pegada inversa com barra W",
+    "group": "arms"
+  },
+  "0452": {
+    "namePt": "Rosca scott pegada inversa com barra W",
+    "group": "arms"
+  },
+  "0453": {
+    "namePt": "Tríceps testa sentado com barra W",
+    "group": "arms"
+  },
+  "0454": {
+    "namePt": "Rosca spider com barra W",
+    "group": "arms"
+  },
+  "0455": {
+    "namePt": "Rosca de dedos",
+    "group": "arms"
+  },
+  "0456": {
+    "namePt": "Abdominal com joelhos flexionados",
+    "group": "abs"
+  },
+  "0457": {
+    "namePt": "Abdominal com braços estendidos",
+    "group": "abs"
+  },
+  "0458": {
+    "namePt": "Crucifixo no chão com barra",
+    "group": "chest"
+  },
+  "0459": {
+    "namePt": "Tesourinha",
+    "group": "glutes"
+  },
+  "0464": {
+    "namePt": "Prancha frontal com rotação",
+    "group": "abs"
+  },
+  "0466": {
+    "namePt": "Barra fixa gironda (pegada no esterno)",
+    "group": "back"
+  },
+  "0467": {
+    "namePt": "Barra fixa gorila",
+    "group": "abs"
+  },
+  "0469": {
+    "namePt": "Abdominal com adução de virilha",
+    "group": "abs"
+  },
+  "0471": {
+    "namePt": "Flexão em parada de mãos",
+    "group": "arms"
+  },
+  "0472": {
+    "namePt": "Elevação de pernas na barra",
+    "group": "abs"
+  },
+  "0473": {
+    "namePt": "Pike na barra",
+    "group": "abs"
+  },
+  "0474": {
+    "namePt": "Elevação de quadril com pernas retas na barra",
+    "group": "abs"
+  },
+  "0475": {
+    "namePt": "Elevação de pernas retas na barra",
+    "group": "abs"
+  },
+  "0476": {
+    "namePt": "Elevação de quadril com pernas retas e rotação na barra",
+    "group": "abs"
+  },
+  "0484": {
+    "namePt": "Elevação de quadril com joelhos flexionados",
+    "group": "abs"
+  },
+  "0488": {
+    "namePt": "Hiperextensão no banco",
+    "group": "back"
+  },
+  "0489": {
+    "namePt": "Hiperextensão",
+    "group": "back"
+  },
+  "0490": {
+    "namePt": "Flexão inclinada pegada fechada",
+    "group": "arms"
+  },
+  "0491": {
+    "namePt": "Elevação de quadril inclinada com pernas retas",
+    "group": "abs"
+  },
+  "0492": {
+    "namePt": "Flexão inclinada com salto em profundidade",
+    "group": "chest"
+  },
+  "0493": {
+    "namePt": "Flexão inclinada",
+    "group": "chest"
+  },
+  "0494": {
+    "namePt": "Flexão inclinada pegada inversa",
+    "group": "chest"
+  },
+  "0495": {
+    "namePt": "Abdominal inclinado com rotação",
+    "group": "abs"
+  },
+  "0496": {
+    "namePt": "Mesa flexora inversa (apoio no banco)",
+    "group": "legs"
+  },
+  "0497": {
+    "namePt": "Remada invertida v. 2",
+    "group": "back"
+  },
+  "0498": {
+    "namePt": "Remada invertida com straps",
+    "group": "back"
+  },
+  "0499": {
+    "namePt": "Remada invertida",
+    "group": "back"
+  },
+  "0500": {
+    "namePt": "Limpador de para-brisa isométrico",
+    "group": "chest"
+  },
+  "0501": {
+    "namePt": "Burpee com polichinelo",
+    "group": "cardio"
+  },
+  "0507": {
+    "namePt": "Abdominal canivete",
+    "group": "abs"
+  },
+  "0508": {
+    "namePt": "Abdominal janda",
+    "group": "abs"
+  },
+  "0513": {
+    "namePt": "Agachamento com salto v. 2",
+    "group": "glutes"
+  },
+  "0514": {
+    "namePt": "Agachamento com salto",
+    "group": "glutes"
+  },
+  "0517": {
+    "namePt": "Windmill avançado com kettlebell",
+    "group": "abs"
+  },
+  "0518": {
+    "namePt": "Clean alternado com kettlebell",
+    "group": "arms"
+  },
+  "0519": {
+    "namePt": "Desenvolvimento alternado com kettlebell no chão",
+    "group": "chest"
+  },
+  "0520": {
+    "namePt": "Desenvolvimento alternado com kettlebell",
+    "group": "shoulders"
+  },
+  "0521": {
+    "namePt": "Remada renegade alternada com kettlebell",
+    "group": "back"
+  },
+  "0522": {
+    "namePt": "Remada alternada com kettlebell",
+    "group": "back"
+  },
+  "0523": {
+    "namePt": "Desenvolvimento arnold com kettlebell",
+    "group": "shoulders"
+  },
+  "0524": {
+    "namePt": "Bent press com kettlebell",
+    "group": "abs"
+  },
+  "0525": {
+    "namePt": "Clean bottoms-up com kettlebell a partir do hang",
+    "group": "arms"
+  },
+  "0526": {
+    "namePt": "Clean alternado duplo com kettlebell",
+    "group": "arms"
+  },
+  "0527": {
+    "namePt": "Jerk duplo com kettlebell",
+    "group": "shoulders"
+  },
+  "0528": {
+    "namePt": "Push press duplo com kettlebell",
+    "group": "shoulders"
+  },
+  "0529": {
+    "namePt": "Arranco duplo com kettlebell",
+    "group": "shoulders"
+  },
+  "0530": {
+    "namePt": "Windmill duplo com kettlebell",
+    "group": "abs"
+  },
+  "0531": {
+    "namePt": "Supino unilateral no chão com kettlebell (amplitude estendida)",
+    "group": "chest"
+  },
+  "0532": {
+    "namePt": "Figura 8 com kettlebell",
+    "group": "abs"
+  },
+  "0533": {
+    "namePt": "Agachamento frontal com kettlebell",
+    "group": "glutes"
+  },
+  "0534": {
+    "namePt": "Agachamento goblet com kettlebell",
+    "group": "glutes"
+  },
+  "0535": {
+    "namePt": "Hang clean com kettlebell",
+    "group": "legs"
+  },
+  "0536": {
+    "namePt": "Afundo com passagem de kettlebell",
+    "group": "glutes"
+  },
+  "0537": {
+    "namePt": "Arremesso unilateral com kettlebell (clean and jerk)",
+    "group": "shoulders"
+  },
+  "0538": {
+    "namePt": "Arremesso unilateral com kettlebell (jerk)",
+    "group": "shoulders"
+  },
+  "0539": {
+    "namePt": "Desenvolvimento militar unilateral lateral com kettlebell",
+    "group": "shoulders"
+  },
+  "0540": {
+    "namePt": "Push press unilateral com kettlebell",
+    "group": "shoulders"
+  },
+  "0541": {
+    "namePt": "Remada unilateral com kettlebell",
+    "group": "back"
+  },
+  "0542": {
+    "namePt": "Arranco unilateral com kettlebell",
+    "group": "shoulders"
+  },
+  "0543": {
+    "namePt": "Barco pirata com kettlebell",
+    "group": "shoulders"
+  },
+  "0544": {
+    "namePt": "Agachamento pistol com kettlebell",
+    "group": "glutes"
+  },
+  "0545": {
+    "namePt": "Flexão pliométrica com kettlebell",
+    "group": "chest"
+  },
+  "0546": {
+    "namePt": "Desenvolvimento sentado com kettlebell",
+    "group": "shoulders"
+  },
+  "0547": {
+    "namePt": "Desenvolvimento em gangorra com kettlebell",
+    "group": "shoulders"
+  },
+  "0548": {
+    "namePt": "Puxada alta sumô com kettlebell",
+    "group": "back"
+  },
+  "0549": {
+    "namePt": "Swing com kettlebell",
+    "group": "glutes"
+  },
+  "0550": {
+    "namePt": "Thruster com kettlebell",
+    "group": "shoulders"
+  },
+  "0551": {
+    "namePt": "Turkish get-up com kettlebell (estilo agachamento)",
+    "group": "glutes"
+  },
+  "0552": {
+    "namePt": "Clean com kettlebell (dois braços)",
+    "group": "shoulders"
+  },
+  "0553": {
+    "namePt": "Desenvolvimento militar com kettlebell (dois braços)",
+    "group": "shoulders"
+  },
+  "0554": {
+    "namePt": "Windmill com kettlebell",
+    "group": "abs"
+  },
+  "0555": {
+    "namePt": "Sentado com chute de perna",
+    "group": "legs"
+  },
+  "0558": {
+    "namePt": "Muscle up com kipping",
+    "group": "back"
+  },
+  "0562": {
+    "namePt": "Landmine 180",
+    "group": "abs"
+  },
+  "0570": {
+    "namePt": "Puxada de pernas no banco reto",
+    "group": "abs"
+  },
+  "0571": {
+    "namePt": "Remada sentada pegada fechada alternada na máquina",
+    "group": "back"
+  },
+  "0572": {
+    "namePt": "Barra fixa assistida na máquina (pegada supinada)",
+    "group": "back"
+  },
+  "0573": {
+    "namePt": "Extensão lombar na máquina",
+    "group": "back"
+  },
+  "0574": {
+    "namePt": "Remada curvada na máquina",
+    "group": "back"
+  },
+  "0575": {
+    "namePt": "Rosca bíceps na máquina",
+    "group": "arms"
+  },
+  "0576": {
+    "namePt": "Supino na máquina",
+    "group": "chest"
+  },
+  "0577": {
+    "namePt": "Supino na máquina",
+    "group": "chest"
+  },
+  "0578": {
+    "namePt": "Levantamento terra na máquina",
+    "group": "glutes"
+  },
+  "0579": {
+    "namePt": "Puxada frontal na máquina",
+    "group": "back"
+  },
+  "0580": {
+    "namePt": "Encolhimento sem pegada na máquina",
+    "group": "back"
+  },
+  "0581": {
+    "namePt": "Remada alta na máquina",
+    "group": "back"
+  },
+  "0582": {
+    "namePt": "Mesa flexora ajoelhada na máquina",
+    "group": "legs"
+  },
+  "0583": {
+    "namePt": "Torção ajoelhada na máquina",
+    "group": "abs"
+  },
+  "0584": {
+    "namePt": "Elevação lateral na máquina",
+    "group": "shoulders"
+  },
+  "0585": {
+    "namePt": "Cadeira extensora",
+    "group": "legs"
+  },
+  "0586": {
+    "namePt": "Mesa flexora na máquina",
+    "group": "legs"
+  },
+  "0587": {
+    "namePt": "Desenvolvimento militar na máquina",
+    "group": "shoulders"
+  },
+  "0588": {
+    "namePt": "Remada sentada pegada fechada na máquina",
+    "group": "back"
+  },
+  "0589": {
+    "namePt": "Remada curvada unilateral na máquina",
+    "group": "back"
+  },
+  "0590": {
+    "namePt": "Desenvolvimento unilateral na máquina",
+    "group": "shoulders"
+  },
+  "0591": {
+    "namePt": "Mergulho para tríceps pegada pronada na máquina",
+    "group": "arms"
+  },
+  "0592": {
+    "namePt": "Rosca scott na máquina",
+    "group": "arms"
+  },
+  "0593": {
+    "namePt": "Hiperextensão inversa na máquina",
+    "group": "glutes"
+  },
+  "0594": {
+    "namePt": "Panturrilha sentada na máquina",
+    "group": "legs"
+  },
+  "0595": {
+    "namePt": "Abdominal (crunch) sentado na máquina (apoio no peito)",
+    "group": "abs"
+  },
+  "0596": {
+    "namePt": "Crucifixo sentado na máquina",
+    "group": "chest"
+  },
+  "0597": {
+    "namePt": "Cadeira abdutora sentado na máquina",
+    "group": "legs"
+  },
+  "0598": {
+    "namePt": "Cadeira adutora sentado na máquina",
+    "group": "legs"
+  },
+  "0599": {
+    "namePt": "Cadeira flexora sentado na máquina",
+    "group": "legs"
+  },
+  "0600": {
+    "namePt": "Abdominal com elevação de pernas sentado na máquina",
+    "group": "abs"
+  },
+  "0601": {
+    "namePt": "Crucifixo inverso sentado na máquina (pegada paralela)",
+    "group": "shoulders"
+  },
+  "0602": {
+    "namePt": "Crucifixo inverso sentado na máquina",
+    "group": "shoulders"
+  },
+  "0603": {
+    "namePt": "Desenvolvimento na máquina",
+    "group": "shoulders"
+  },
+  "0604": {
+    "namePt": "Encolhimento na máquina",
+    "group": "back"
+  },
+  "0605": {
+    "namePt": "Panturrilha em pé na máquina",
+    "group": "legs"
+  },
+  "0606": {
+    "namePt": "Remada cavalinho na máquina",
+    "group": "back"
+  },
+  "0607": {
+    "namePt": "Extensão de tríceps na máquina",
+    "group": "arms"
+  },
+  "0613": {
+    "namePt": "Alongamento de quadríceps deitado de lado",
+    "group": "legs"
+  },
+  "0620": {
+    "namePt": "Elevação de pernas deitado no banco reto",
+    "group": "abs"
+  },
+  "0624": {
+    "namePt": "Agachamento na parede com marcha",
+    "group": "glutes"
+  },
+  "0627": {
+    "namePt": "Barra fixa pegada mista",
+    "group": "back"
+  },
+  "0628": {
+    "namePt": "Caminhada lateral com elástico (monster walk)",
+    "group": "glutes"
+  },
+  "0630": {
+    "namePt": "Escalador",
+    "group": "cardio"
+  },
+  "0631": {
+    "namePt": "Muscle up",
+    "group": "back"
+  },
+  "0634": {
+    "namePt": "Abdominal negativo (crunch)",
+    "group": "abs"
+  },
+  "0635": {
+    "namePt": "Abdominal oblíquo no chão",
+    "group": "abs"
+  },
+  "0636": {
+    "namePt": "Rosca martelo com barra olímpica",
+    "group": "arms"
+  },
+  "0637": {
+    "namePt": "Extensão de tríceps com barra olímpica",
+    "group": "arms"
+  },
+  "0638": {
+    "namePt": "Barra fixa unilateral (pegada supinada)",
+    "group": "back"
+  },
+  "0639": {
+    "namePt": "Mergulho com um braço",
+    "group": "arms"
+  },
+  "0640": {
+    "namePt": "Slam unilateral com bola medicinal",
+    "group": "abs"
+  },
+  "0641": {
+    "namePt": "Otis up",
+    "group": "abs"
+  },
+  "0642": {
+    "namePt": "Flexão de braço com chute de perna para fora",
+    "group": "glutes"
+  },
+  "0643": {
+    "namePt": "Alongamento de tríceps por trás da cabeça",
+    "group": "arms"
+  },
+  "0648": {
+    "namePt": "Power clean",
+    "group": "legs"
+  },
+  "0650": {
+    "namePt": "Encolhimento de pernas na bola suíça",
+    "group": "abs"
+  },
+  "0651": {
+    "namePt": "Barra fixa pegada neutra",
+    "group": "back"
+  },
+  "0652": {
+    "namePt": "Barra fixa",
+    "group": "back"
+  },
+  "0653": {
+    "namePt": "Flexão de braço na bosu",
+    "group": "chest"
+  },
+  "0655": {
+    "namePt": "Flexão de braço na bola suíça",
+    "group": "chest"
+  },
+  "0656": {
+    "namePt": "Flexão de braço na bola suíça",
+    "group": "chest"
+  },
+  "0658": {
+    "namePt": "Flexão de braço na parede v. 2",
+    "group": "chest"
+  },
+  "0659": {
+    "namePt": "Flexão de braço na parede",
+    "group": "chest"
+  },
+  "0660": {
+    "namePt": "Flexão de braço pegada fechada no halter",
+    "group": "arms"
+  },
+  "0661": {
+    "namePt": "Flexão de braço com chute de perna para dentro",
+    "group": "glutes"
+  },
+  "0662": {
+    "namePt": "Flexão de braço",
+    "group": "chest"
+  },
+  "0663": {
+    "namePt": "Flexão de braço com bola medicinal",
+    "group": "chest"
+  },
+  "0664": {
+    "namePt": "Flexão de braço com prancha lateral",
+    "group": "abs"
+  },
+  "0666": {
+    "namePt": "Flexão de braço unilateral com elevação",
+    "group": "chest"
+  },
+  "0668": {
+    "namePt": "Ponte declinada posterior",
+    "group": "glutes"
+  },
+  "0669": {
+    "namePt": "Alongamento de deltoide posterior",
+    "group": "shoulders"
+  },
+  "0670": {
+    "namePt": "Barra fixa por trás",
+    "group": "back"
+  },
+  "0672": {
+    "namePt": "Mergulho invertido",
+    "group": "arms"
+  },
+  "0673": {
+    "namePt": "Puxada frontal na máquina pegada invertida",
+    "group": "back"
+  },
+  "0674": {
+    "namePt": "Barra fixa pegada invertida",
+    "group": "back"
+  },
+  "0675": {
+    "namePt": "Extensão lombar invertida na bola suíça",
+    "group": "glutes"
+  },
+  "0677": {
+    "namePt": "Mergulho nos anéis",
+    "group": "arms"
+  },
+  "0678": {
+    "namePt": "Puxada rocky (pull-up/pulldown)",
+    "group": "back"
+  },
+  "0680": {
+    "namePt": "Subida em corda",
+    "group": "back"
+  },
+  "0684": {
+    "namePt": "Corrida (com equipamento)",
+    "group": "cardio"
+  },
+  "0685": {
+    "namePt": "Corrida",
+    "group": "cardio"
+  },
+  "0687": {
+    "namePt": "Giro russo",
+    "group": "abs"
+  },
+  "0688": {
+    "namePt": "Barra fixa escapular",
+    "group": "back"
+  },
+  "0689": {
+    "namePt": "Elevação de pernas sentado",
+    "group": "abs"
+  },
+  "0690": {
+    "namePt": "Alongamento lombar sentado",
+    "group": "back"
+  },
+  "0691": {
+    "namePt": "Abdominal oblíquo sentado (na parede)",
+    "group": "abs"
+  },
+  "0696": {
+    "namePt": "Flexora inversa autoassistida (no chão)",
+    "group": "legs"
+  },
+  "0697": {
+    "namePt": "Flexora inversa autoassistida",
+    "group": "legs"
+  },
+  "0699": {
+    "namePt": "Flexão de braço com toque no ombro",
+    "group": "chest"
+  },
+  "0705": {
+    "namePt": "Prancha lateral v. 2",
+    "group": "abs"
+  },
+  "0709": {
+    "namePt": "Quadril lateral nas paralelas",
+    "group": "abs"
+  },
+  "0710": {
+    "namePt": "Abdução de quadril lateral",
+    "group": "legs"
+  },
+  "0716": {
+    "namePt": "Alongamento de pescoço com empurrão lateral",
+    "group": "shoulders"
+  },
+  "0717": {
+    "namePt": "Flexão de braço lateral",
+    "group": "arms"
+  },
+  "0720": {
+    "namePt": "Barra fixa lado a lado",
+    "group": "back"
+  },
+  "0721": {
+    "namePt": "Alongamento de punho com puxada lateral",
+    "group": "arms"
+  },
+  "0725": {
+    "namePt": "Flexão de braço unilateral",
+    "group": "chest"
+  },
+  "0727": {
+    "namePt": "Elevação de panturrilha unilateral sobre halter",
+    "group": "legs"
+  },
+  "0730": {
+    "namePt": "Deslize de plataforma unilateral",
+    "group": "legs"
+  },
+  "0735": {
+    "namePt": "Abdominal v. 2",
+    "group": "abs"
+  },
+  "0738": {
+    "namePt": "Panturrilha no leg press 45°",
+    "group": "legs"
+  },
+  "0739": {
+    "namePt": "Leg press 45°",
+    "group": "glutes"
+  },
+  "0740": {
+    "namePt": "Leg press 45° com pernas afastadas",
+    "group": "glutes"
+  },
+  "0741": {
+    "namePt": "Agachamento hack com pernas fechadas",
+    "group": "glutes"
+  },
+  "0742": {
+    "namePt": "Panturrilha inclinada para frente no leg press",
+    "group": "legs"
+  },
+  "0743": {
+    "namePt": "Hack squat",
+    "group": "glutes"
+  },
+  "0744": {
+    "namePt": "Agachamento no leg press horizontal",
+    "group": "glutes"
+  },
+  "0746": {
+    "namePt": "Encolhimento de ombros no smith",
+    "group": "back"
+  },
+  "0747": {
+    "namePt": "Desenvolvimento por trás da nuca no smith",
+    "group": "shoulders"
+  },
+  "0748": {
+    "namePt": "Supino reto no smith",
+    "group": "chest"
+  },
+  "0749": {
+    "namePt": "Bom dia com joelhos flexionados no smith",
+    "group": "glutes"
+  },
+  "0750": {
+    "namePt": "Agachamento com apoio na cadeira no smith",
+    "group": "legs"
+  },
+  "0751": {
+    "namePt": "Supino pegada fechada no smith",
+    "group": "arms"
+  },
+  "0752": {
+    "namePt": "Levantamento terra no smith",
+    "group": "glutes"
+  },
+  "0753": {
+    "namePt": "Supino declinado no smith",
+    "group": "chest"
+  },
+  "0754": {
+    "namePt": "Supino declinado pegada invertida no smith",
+    "group": "chest"
+  },
+  "0755": {
+    "namePt": "Agachamento hack no smith",
+    "group": "glutes"
+  },
+  "0756": {
+    "namePt": "Elevação de quadril no smith",
+    "group": "abs"
+  },
+  "0757": {
+    "namePt": "Supino inclinado no smith",
+    "group": "chest"
+  },
+  "0758": {
+    "namePt": "Supino inclinado pegada invertida no smith",
+    "group": "chest"
+  },
+  "0759": {
+    "namePt": "Elevação de ombro inclinada no smith",
+    "group": "shoulders"
+  },
+  "0760": {
+    "namePt": "Leg press no smith",
+    "group": "glutes"
+  },
+  "0761": {
+    "namePt": "Remada pegada fechada no smith",
+    "group": "back"
+  },
+  "0762": {
+    "namePt": "Remada para deltoide posterior no smith",
+    "group": "shoulders"
+  },
+  "0763": {
+    "namePt": "Panturrilha invertida no smith",
+    "group": "legs"
+  },
+  "0764": {
+    "namePt": "Supino pegada invertida no smith",
+    "group": "chest"
+  },
+  "0765": {
+    "namePt": "Desenvolvimento sentado no smith",
+    "group": "shoulders"
+  },
+  "0766": {
+    "namePt": "Desenvolvimento no smith",
+    "group": "shoulders"
+  },
+  "0767": {
+    "namePt": "Encolhimento no smith",
+    "group": "back"
+  },
+  "0768": {
+    "namePt": "Afundo unilateral no smith",
+    "group": "legs"
+  },
+  "0769": {
+    "namePt": "Avanço tipo sprint no smith",
+    "group": "glutes"
+  },
+  "0770": {
+    "namePt": "Agachamento no smith",
+    "group": "glutes"
+  },
+  "0771": {
+    "namePt": "Extensão de punho em pé no smith",
+    "group": "arms"
+  },
+  "0772": {
+    "namePt": "Desenvolvimento militar por trás da nuca em pé no smith",
+    "group": "shoulders"
+  },
+  "0773": {
+    "namePt": "Panturrilha em pé no smith",
+    "group": "legs"
+  },
+  "0774": {
+    "namePt": "Desenvolvimento militar em pé no smith",
+    "group": "shoulders"
+  },
+  "0775": {
+    "namePt": "Remada alta no smith",
+    "group": "shoulders"
+  },
+  "0776": {
+    "namePt": "Puxada do arranco",
+    "group": "legs"
+  },
+  "0777": {
+    "namePt": "Giro de tronco em pé (spell caster)",
+    "group": "abs"
+  },
+  "0778": {
+    "namePt": "Flexão andar da aranha",
+    "group": "glutes"
+  },
+  "0786": {
+    "namePt": "Jerk com agachamento",
+    "group": "legs"
+  },
+  "0788": {
+    "namePt": "Desenvolvimento por trás da nuca em pé",
+    "group": "shoulders"
+  },
+  "0794": {
+    "namePt": "Alongamento lateral em pé",
+    "group": "back"
+  },
+  "0795": {
+    "namePt": "Flexora unilateral em pé",
+    "group": "legs"
+  },
+  "0796": {
+    "namePt": "Rodinha abdominal em pé",
+    "group": "abs"
+  },
+  "0798": {
+    "namePt": "Bicicleta ergométrica - ritmo de caminhada",
+    "group": "cardio"
+  },
+  "0803": {
+    "namePt": "Flexão superman",
+    "group": "chest"
+  },
+  "0805": {
+    "namePt": "Extensão abdominal suspensa (TRX)",
+    "group": "abs"
+  },
+  "0806": {
+    "namePt": "Flexão suspensa (TRX)",
+    "group": "chest"
+  },
+  "0807": {
+    "namePt": "Abdominal reverso suspenso (TRX)",
+    "group": "abs"
+  },
+  "0808": {
+    "namePt": "Remada suspensa (TRX)",
+    "group": "back"
+  },
+  "0809": {
+    "namePt": "Afundo suspenso (TRX)",
+    "group": "legs"
+  },
+  "0811": {
+    "namePt": "Levantamento terra com barra hexagonal",
+    "group": "glutes"
+  },
+  "0812": {
+    "namePt": "Mergulho para tríceps (pernas no banco)",
+    "group": "arms"
+  },
+  "0813": {
+    "namePt": "Mergulho para tríceps (entre bancos)",
+    "group": "arms"
+  },
+  "0814": {
+    "namePt": "Mergulho para tríceps",
+    "group": "arms"
+  },
+  "0815": {
+    "namePt": "Mergulho para tríceps no chão",
+    "group": "arms"
+  },
+  "0816": {
+    "namePt": "Extensão de tríceps",
+    "group": "arms"
+  },
+  "0817": {
+    "namePt": "Alongamento de tríceps",
+    "group": "arms"
+  },
+  "0818": {
+    "namePt": "Puxada frontal pegada paralela (pegador duplo)",
+    "group": "back"
+  },
+  "0826": {
+    "namePt": "Elevação de pernas na paralela",
+    "group": "abs"
+  },
+  "0830": {
+    "namePt": "Mergulho no banco com peso",
+    "group": "arms"
+  },
+  "0832": {
+    "namePt": "Abdominal com peso",
+    "group": "abs"
+  },
+  "0833": {
+    "namePt": "Panturrilha burro com peso",
+    "group": "legs"
+  },
+  "0834": {
+    "namePt": "Elevação frontal com peso",
+    "group": "shoulders"
+  },
+  "0835": {
+    "namePt": "Hiperextensão com peso na bola suíça",
+    "group": "back"
+  },
+  "0840": {
+    "namePt": "Abdominal com peso acima da cabeça na bola suíça",
+    "group": "abs"
+  },
+  "0841": {
+    "namePt": "Barra fixa com peso",
+    "group": "back"
+  },
+  "0844": {
+    "namePt": "Elevação lateral circular com peso",
+    "group": "shoulders"
+  },
+  "0845": {
+    "namePt": "Torção russa com peso (pernas elevadas)",
+    "group": "abs"
+  },
+  "0846": {
+    "namePt": "Torção russa com peso",
+    "group": "abs"
+  },
+  "0847": {
+    "namePt": "Rosca bíceps sentado com peso na bola suíça",
+    "group": "arms"
+  },
+  "0849": {
+    "namePt": "Torção sentado com peso na bola suíça",
+    "group": "abs"
+  },
+  "0850": {
+    "namePt": "Flexão lateral de tronco com peso na bola suíça",
+    "group": "abs"
+  },
+  "0851": {
+    "namePt": "Sissy squat com peso",
+    "group": "legs"
+  },
+  "0852": {
+    "namePt": "Agachamento com peso",
+    "group": "glutes"
+  },
+  "0853": {
+    "namePt": "Rosca bíceps em pé com peso",
+    "group": "arms"
+  },
+  "0854": {
+    "namePt": "Aperto de mão em pé com peso",
+    "group": "arms"
+  },
+  "0856": {
+    "namePt": "Svend press com peso",
+    "group": "chest"
+  },
+  "0857": {
+    "namePt": "Rodinha abdominal",
+    "group": "abs"
+  },
+  "0858": {
+    "namePt": "Tiros de velocidade",
+    "group": "abs"
+  },
+  "0859": {
+    "namePt": "Rolo de punho",
+    "group": "arms"
+  },
+  "0860": {
+    "namePt": "Kickback de tríceps na polia",
+    "group": "arms"
+  },
+  "0861": {
+    "namePt": "Remada sentado na polia",
+    "group": "back"
+  },
+  "0862": {
+    "namePt": "Giro de tronco na polia (cima-baixo)",
+    "group": "abs"
+  },
+  "0863": {
+    "namePt": "Rotação externa de ombro deitado com halteres",
+    "group": "shoulders"
+  },
+  "0864": {
+    "namePt": "Rotação externa de ombro em pé com halteres",
+    "group": "shoulders"
+  },
+  "0865": {
+    "namePt": "Elevação de pernas e quadril deitado",
+    "group": "abs"
+  },
+  "0866": {
+    "namePt": "Elevação de pernas e quadril na barra com peso",
+    "group": "abs"
+  },
+  "0868": {
+    "namePt": "Rosca na polia",
+    "group": "arms"
+  },
+  "0869": {
+    "namePt": "Desenvolvimento na máquina v. 2",
+    "group": "shoulders"
+  },
+  "0870": {
+    "namePt": "Elevação de glúteos (butt-up)",
+    "group": "abs"
+  },
+  "0871": {
+    "namePt": "Abdominal com pernas flexionadas (tuck)",
+    "group": "abs"
+  },
+  "0872": {
+    "namePt": "Abdominal reverso",
+    "group": "abs"
+  },
+  "0873": {
+    "namePt": "Abdominal inverso na polia",
+    "group": "abs"
+  },
+  "0874": {
+    "namePt": "Abdominal em pé na polia (com corda)",
+    "group": "abs"
+  },
+  "0968": {
+    "namePt": "Rosca bíceps alternada com elástico",
+    "group": "arms"
+  },
+  "0969": {
+    "namePt": "Abdominal V alternado com elástico",
+    "group": "abs"
+  },
+  "0970": {
+    "namePt": "Barra fixa assistida com elástico",
+    "group": "back"
+  },
+  "0971": {
+    "namePt": "Rollout com roda assistido com elástico",
+    "group": "abs"
+  },
+  "0972": {
+    "namePt": "Abdominal bicicleta com elástico",
+    "group": "abs"
+  },
+  "0974": {
+    "namePt": "Puxada pegada fechada com elástico",
+    "group": "back"
+  },
+  "0975": {
+    "namePt": "Flexão de braço pegada fechada com elástico",
+    "group": "arms"
+  },
+  "0976": {
+    "namePt": "Rosca concentrada com elástico",
+    "group": "arms"
+  },
+  "0977": {
+    "namePt": "Elevação lateral frontal com elástico",
+    "group": "shoulders"
+  },
+  "0978": {
+    "namePt": "Elevação frontal com elástico",
+    "group": "shoulders"
+  },
+  "0979": {
+    "namePt": "Pallof press horizontal com elástico",
+    "group": "abs"
+  },
+  "0980": {
+    "namePt": "Extensão de quadril inclinado com elástico",
+    "group": "glutes"
+  },
+  "0981": {
+    "namePt": "Abdominal canivete com elástico",
+    "group": "abs"
+  },
+  "0983": {
+    "namePt": "Puxada unilateral ajoelhado com elástico",
+    "group": "back"
+  },
+  "0984": {
+    "namePt": "Rotação interna de quadril deitado com elástico",
+    "group": "glutes"
+  },
+  "0985": {
+    "namePt": "Abdominal com rotação ajoelhado com elástico",
+    "group": "abs"
+  },
+  "0986": {
+    "namePt": "Rosca bíceps unilateral acima da cabeça com elástico",
+    "group": "arms"
+  },
+  "0987": {
+    "namePt": "Afundo unilateral com elástico (um braço)",
+    "group": "legs"
+  },
+  "0988": {
+    "namePt": "Remada baixa unilateral em pé com elástico",
+    "group": "back"
+  },
+  "0989": {
+    "namePt": "Supino unilateral com rotação com elástico",
+    "group": "chest"
+  },
+  "0990": {
+    "namePt": "Remada sentada unilateral com rotação com elástico",
+    "group": "back"
+  },
+  "0991": {
+    "namePt": "Pull through com elástico",
+    "group": "glutes"
+  },
+  "0992": {
+    "namePt": "Abdominal com empurrão com elástico",
+    "group": "abs"
+  },
+  "0993": {
+    "namePt": "Crucifixo invertido com elástico",
+    "group": "shoulders"
+  },
+  "0994": {
+    "namePt": "Rosca de punho invertida com elástico",
+    "group": "arms"
+  },
+  "0996": {
+    "namePt": "Rotação interna de quadril sentado com elástico",
+    "group": "glutes"
+  },
+  "0997": {
+    "namePt": "Desenvolvimento de ombro com elástico",
+    "group": "shoulders"
+  },
+  "0998": {
+    "namePt": "Extensão de tríceps lateral com elástico",
+    "group": "arms"
+  },
+  "0999": {
+    "namePt": "Elevação de panturrilha unilateral com elástico",
+    "group": "legs"
+  }
+}

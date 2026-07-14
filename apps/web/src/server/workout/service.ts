@@ -12,13 +12,21 @@ import {
   type WorkoutSession,
 } from "@bloomy/db/schema/workout";
 import { goal } from "@bloomy/db/schema/goals";
-import { and, asc, desc, eq, inArray, isNotNull, isNull } from "drizzle-orm";
+import { and, asc, count, desc, eq, inArray, isNotNull, isNull } from "drizzle-orm";
 
 import { dayFor } from "@/server/shared/day";
 
 export type Focus = Workout["focus"];
 
-export type ExerciseInput = { name: string; targetSets: number; position: number };
+export type ExerciseInput = {
+  name: string;
+  targetSets: number;
+  targetReps: number;
+  restSeconds: number;
+  position: number;
+  catalogId?: string | null;
+  muscleGroup?: Focus | null;
+};
 export type WorkoutInput = { name: string; focus: Focus; exercises: ExerciseInput[] };
 export type WorkoutWithExercises = Workout & { exercises: Exercise[] };
 
@@ -61,7 +69,11 @@ export async function createWorkout(
       userId,
       name: e.name,
       targetSets: e.targetSets,
+      targetReps: e.targetReps,
+      restSeconds: e.restSeconds,
       position: e.position,
+      catalogId: e.catalogId ?? null,
+      muscleGroup: e.catalogId ? null : (e.muscleGroup ?? null),
     }));
     const exercises = rows.length ? await tx.insert(exercise).values(rows).returning() : [];
 
@@ -96,7 +108,11 @@ export async function updateWorkout(
         userId,
         name: e.name,
         targetSets: e.targetSets,
+        targetReps: e.targetReps,
+        restSeconds: e.restSeconds,
         position: e.position,
+        catalogId: e.catalogId ?? null,
+        muscleGroup: e.catalogId ? null : (e.muscleGroup ?? null),
       }));
       exercises = rows.length ? await tx.insert(exercise).values(rows).returning() : [];
     } else {
@@ -128,7 +144,9 @@ export type SessionExercise = {
   exerciseId: string;
   name: string;
   targetSets: number;
+  restSeconds: number;
   position: number;
+  catalogId: string | null;
   sets: SetLog[];
   lastPerformance: { reps: number | null; load: number | null } | null;
 };
@@ -185,12 +203,16 @@ async function buildSessionDetail(
   session: WorkoutSession,
   userId: string,
   perfByName?: PerfCache,
+  preExercises?: Exercise[],
 ): Promise<SessionDetail> {
-  const exercises = await db
-    .select()
-    .from(exercise)
-    .where(eq(exercise.workoutId, session.workoutId))
-    .orderBy(asc(exercise.position));
+  // reusa os exercises já carregados (startSession) ou busca — evita um round-trip
+  const exercises =
+    preExercises ??
+    (await db
+      .select()
+      .from(exercise)
+      .where(eq(exercise.workoutId, session.workoutId))
+      .orderBy(asc(exercise.position)));
 
   const sets = await db
     .select()
@@ -204,7 +226,9 @@ async function buildSessionDetail(
       exerciseId: ex.id,
       name: ex.name,
       targetSets: ex.targetSets,
+      restSeconds: ex.restSeconds,
       position: ex.position,
+      catalogId: ex.catalogId,
       sets: sets.filter((s) => s.exerciseId === ex.id),
       lastPerformance: perfByName?.has(ex.name)
         ? (perfByName.get(ex.name) ?? null)
@@ -240,13 +264,14 @@ export async function startSession(
     .where(eq(exercise.workoutId, workoutId))
     .orderBy(asc(exercise.position));
 
-  // pré-computa o último treino de cada exercício antes da transação (evita atrito tx/db)
-  const perfByName: PerfCache = new Map();
-  for (const ex of exercises) {
-    if (!perfByName.has(ex.name)) {
-      perfByName.set(ex.name, await lastPerformance(db, userId, ex.name));
-    }
-  }
+  // pré-computa o último treino de cada exercício (por nome) em paralelo antes da
+  // transação — 1 lote concorrente em vez de N round-trips sequenciais
+  const uniqueNames = [...new Set(exercises.map((e) => e.name))];
+  const perfByName: PerfCache = new Map(
+    await Promise.all(
+      uniqueNames.map(async (name) => [name, await lastPerformance(db, userId, name)] as const),
+    ),
+  );
 
   const session = await db.transaction(async (tx) => {
     const [s] = await tx
@@ -254,24 +279,25 @@ export async function startSession(
       .values({ userId, workoutId, day: dayFor() })
       .returning();
 
-    for (const ex of exercises) {
+    // um único insert com todas as séries de todos os exercícios (evita N inserts)
+    const rows = exercises.flatMap((ex) => {
       const last = perfByName.get(ex.name) ?? null;
-      const rows = Array.from({ length: ex.targetSets }, (_, i) => ({
+      return Array.from({ length: ex.targetSets }, (_, i) => ({
         sessionId: s.id,
         exerciseId: ex.id,
         userId,
         exerciseName: ex.name,
         setIndex: i + 1,
-        reps: last?.reps ?? null,
+        reps: last?.reps ?? ex.targetReps, // sem histórico → reps-alvo do template
         load: last?.load ?? null,
         done: false,
       }));
-      if (rows.length) await tx.insert(setLog).values(rows);
-    }
+    });
+    if (rows.length) await tx.insert(setLog).values(rows);
     return s;
   });
 
-  return buildSessionDetail(db, session, userId, perfByName);
+  return buildSessionDetail(db, session, userId, perfByName, exercises);
 }
 
 export async function getActiveSession(
@@ -318,7 +344,12 @@ export async function completeSession(
   db: Db,
   userId: string,
   sessionId: string,
-): Promise<{ completedAt: Date; durationSec: number; exerciseCount: number } | null> {
+): Promise<{
+  completedAt: Date;
+  durationSec: number;
+  exerciseCount: number;
+  summary: Awaited<ReturnType<typeof workoutSummary>>;
+} | null> {
   const completedAt = new Date();
   // update atômico: só conclui se ainda estava em andamento — double-tap perde a corrida e recebe null
   const [session] = await db
@@ -334,24 +365,24 @@ export async function completeSession(
     .returning();
   if (!session) return null;
 
-  const exercises = await db
-    .select({ id: exercise.id })
-    .from(exercise)
-    .where(eq(exercise.workoutId, session.workoutId));
+  // count e resumo da semana em paralelo; o summary já enxerga esta sessão (completedAt gravado acima)
+  const [exCount, summary] = await Promise.all([
+    db.select({ n: count() }).from(exercise).where(eq(exercise.workoutId, session.workoutId)),
+    workoutSummary(db, userId, completedAt),
+  ]);
 
   const durationSec = Math.round((completedAt.getTime() - session.startedAt.getTime()) / 1000);
-  return { completedAt, durationSec, exerciseCount: exercises.length };
+  return { completedAt, durationSec, exerciseCount: exCount[0].n, summary };
 }
 
 /**
  * Resumo da semana + streak. Pura para testar isolada.
  * `weekDays`: 7 bools (seg..dom) da semana corrente.
- * `streak`: semanas fechadas consecutivas com nº de dias ativos >= meta;
- *   a semana corrente soma ao streak quando já bateu a meta (celebra), e nunca o quebra.
+ * `streak`: dias consecutivos com treino terminando hoje (ou ontem, se hoje
+ *   ainda não treinou — o dia em curso não quebra o streak).
  */
 export function summarizeWorkouts(
   days: string[],
-  target: number,
   now: Date,
 ): { weekCount: number; streak: number; weekDays: boolean[] } {
   const weekStart = mondayOf(dayFor(now));
@@ -360,20 +391,13 @@ export function summarizeWorkouts(
   const weekDays = weekDates.map((d) => daySet.has(d));
   const weekCount = weekDays.filter(Boolean).length;
 
-  const perWeek = new Map<string, Set<string>>();
-  for (const d of days) {
-    const wk = mondayOf(d);
-    if (!perWeek.has(wk)) perWeek.set(wk, new Set());
-    perWeek.get(wk)!.add(d);
-  }
-
+  const today = dayFor(now);
+  let cursor = daySet.has(today) ? today : addDaysStr(today, -1);
   let streak = 0;
-  let cursor = addDaysStr(weekStart, -7);
-  while ((perWeek.get(cursor)?.size ?? 0) >= target) {
+  while (daySet.has(cursor)) {
     streak += 1;
-    cursor = addDaysStr(cursor, -7);
+    cursor = addDaysStr(cursor, -1);
   }
-  if (weekCount >= target) streak += 1;
 
   return { weekCount, streak, weekDays };
 }
@@ -397,5 +421,5 @@ export async function workoutSummary(
     .from(workoutSession)
     .where(and(eq(workoutSession.userId, userId), isNotNull(workoutSession.completedAt)));
 
-  return { weekTarget, ...summarizeWorkouts(sessions.map((s) => s.day), weekTarget, now) };
+  return { weekTarget, ...summarizeWorkouts(sessions.map((s) => s.day), now) };
 }

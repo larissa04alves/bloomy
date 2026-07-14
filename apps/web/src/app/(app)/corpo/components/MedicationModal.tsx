@@ -85,7 +85,7 @@ export function MedicationModal({
             aria-label="Nome do remédio"
             onChange={(e) => field.handleChange(e.target.value)}
             placeholder="Nome do remédio"
-            className="rounded-control border border-hairline bg-white px-4 py-3 text-[14px] font-semibold text-ink placeholder:text-ink-faint focus:border-lilac focus:outline-none"
+            className="rounded-control border border-hairline bg-white px-4 py-3 text-sm font-semibold text-ink placeholder:text-ink-faint focus:border-lilac focus:outline-none"
           />
         )}
       </form.Field>
@@ -98,7 +98,7 @@ export function MedicationModal({
               aria-label="Dose"
               onChange={(e) => field.handleChange(e.target.value)}
               placeholder="Dose (ex.: 1 comp.)"
-              className="flex-1 rounded-control border border-hairline bg-white px-4 py-3 text-[14px] font-semibold text-ink placeholder:text-ink-faint focus:border-lilac focus:outline-none"
+              className="flex-1 rounded-control border border-hairline bg-white px-4 py-3 text-sm font-semibold text-ink placeholder:text-ink-faint focus:border-lilac focus:outline-none"
             />
           )}
         </form.Field>
@@ -110,14 +110,14 @@ export function MedicationModal({
               inputMode="numeric"
               onChange={(e) => field.handleChange(e.target.value.replace(/\D/g, ""))}
               placeholder="Estoque"
-              className="w-28 rounded-control border border-hairline bg-white px-4 py-3 text-[14px] font-semibold text-ink placeholder:text-ink-faint focus:border-lilac focus:outline-none"
+              className="w-28 rounded-control border border-hairline bg-white px-4 py-3 text-sm font-semibold text-ink placeholder:text-ink-faint focus:border-lilac focus:outline-none"
             />
           )}
         </form.Field>
       </div>
 
       <div className="flex flex-col gap-2">
-        <span className="text-[13px] font-bold text-ink">Frequência</span>
+        <span className="text-sm font-bold text-ink">Frequência</span>
         <div className="flex gap-2">
           {[1, 2, 3].map((n) => (
             <ChoiceChip
@@ -133,12 +133,12 @@ export function MedicationModal({
       </div>
 
       <div className="flex flex-col gap-2">
-        <span className="text-[13px] font-bold text-ink">Horários</span>
+        <span className="text-sm font-bold text-ink">Horários</span>
         <div className="flex flex-wrap items-center gap-2">
           {times.map((t) => (
             <span
               key={t}
-              className="flex items-center gap-1 rounded-full bg-coral-tint px-3 py-2 text-[13px] font-semibold text-coral"
+              className="flex items-center gap-1 rounded-full bg-coral-tint px-3 py-2 text-sm font-semibold text-coral"
             >
               {t}
               <button type="button" aria-label={`Remover ${t}`} onClick={() => removeTime(t)}>
@@ -151,7 +151,7 @@ export function MedicationModal({
             aria-label="Novo horário"
             value={newTime}
             onChange={(e) => setNewTime(e.target.value)}
-            className="rounded-control border border-hairline bg-white px-3 py-2 text-[13px] font-semibold text-ink focus:border-lilac focus:outline-none"
+            className="rounded-control border border-hairline bg-white px-3 py-2 text-sm font-semibold text-ink focus:border-lilac focus:outline-none"
           />
           <button
             type="button"

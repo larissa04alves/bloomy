@@ -28,10 +28,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR" suppressHydrationWarning>
-      <body
-        className={`${quicksand.variable} ${nunito.variable} bg-board text-ink antialiased`}
-      >
+    <html
+      lang="pt-BR"
+      className={`${quicksand.variable} ${nunito.variable}`}
+      suppressHydrationWarning
+    >
+      <body className="bg-board text-ink antialiased">
         <div className="mx-auto flex min-h-dvh w-full max-w-105 flex-col bg-bg sm:shadow-device">
           {children}
         </div>

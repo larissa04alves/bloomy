@@ -15,18 +15,22 @@
     "db:generate": "drizzle-kit generate",
     "db:studio": "drizzle-kit studio",
     "db:migrate": "drizzle-kit migrate",
+    "db:seed:catalog": "bun src/seed/seed-catalog.ts",
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
     "@bloomy/env": "workspace:*",
     "@libsql/client": "catalog:",
+    "csv-parse": "catalog:",
     "dotenv": "catalog:",
     "drizzle-orm": "catalog:",
     "libsql": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {
+    "@aws-sdk/client-s3": "catalog:",
     "@bloomy/config": "workspace:*",
+    "@types/bun": "^1.2.23",
     "drizzle-kit": "^0.31.10",
     "typescript": "catalog:"
   }

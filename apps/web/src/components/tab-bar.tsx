@@ -42,8 +42,8 @@ export function TabBar() {
             <span
               className={
                 active
-                  ? "text-[10px] font-extrabold text-lilac-deep"
-                  : "text-[10px] font-semibold text-nav-inactive"
+                  ? "text-xs font-extrabold text-lilac-deep"
+                  : "text-xs font-semibold text-nav-inactive"
               }
             >
               {label}

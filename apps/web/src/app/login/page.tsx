@@ -5,7 +5,7 @@ export default function LoginPage() {
         <span className="font-display text-3xl font-bold">B</span>
       </div>
       <h1 className="font-display text-2xl font-bold text-ink">Bloomy</h1>
-      <p className="text-[13px] font-semibold text-ink-read">
+      <p className="text-sm font-semibold text-ink-read">
         Tela de login — implementada na Fase 10.
       </p>
     </div>

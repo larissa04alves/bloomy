@@ -18,10 +18,14 @@ export function HidratacaoSection({
   return (
     <section className="flex flex-col gap-3">
       <div className="flex items-end justify-between">
-        <h2 className="font-display text-[15px] font-bold text-ink">Hidratação</h2>
+        <h2 className="font-display text-base font-bold text-ink">
+          Hidratação
+        </h2>
         <div className="text-right">
-          <span className="font-display text-[15px] font-bold text-lilac-deep">{totalMl} ml</span>
-          <span className="block text-[12px] font-semibold text-ink-read">
+          <span className="font-display text-base font-bold text-lilac-deep">
+            {totalMl} ml
+          </span>
+          <span className="block text-xs font-semibold text-ink-read">
             {done} de {target} garrafas
           </span>
         </div>
@@ -40,7 +44,7 @@ export function HidratacaoSection({
         <button
           type="button"
           onClick={onAddGarrafa}
-          className="flex flex-1 items-center justify-center gap-1 rounded-full bg-lilac py-3 font-display text-[15px] font-bold text-white shadow-btn"
+          className="flex flex-1 items-center justify-center gap-1 rounded-full bg-lilac font-bold text-white shadow-btn"
         >
           <PlusIcon size={18} weight="bold" /> Adicionar garrafa
         </button>
