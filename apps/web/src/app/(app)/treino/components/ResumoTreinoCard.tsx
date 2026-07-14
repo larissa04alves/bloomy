@@ -1,11 +1,15 @@
+"use client";
+
 import { FireIcon } from "@phosphor-icons/react/dist/ssr";
 
 import type { WorkoutSummary } from "@/lib/api-types";
 
+import { useTodayIndex } from "../hooks/today";
+
 const DOW = ["S", "T", "Q", "Q", "S", "S", "D"]; // seg..dom
-const todayIndex = (new Date().getDay() + 6) % 7; // seg=0..dom=6
 
 export function ResumoTreinoCard({ summary }: { summary: WorkoutSummary }) {
+  const todayIndex = useTodayIndex(); // resolvido após o mount (evita mismatch SSR)
   return (
     <section className="flex flex-col gap-3 rounded-card-lg bg-pink-tint p-4">
       <div className="flex items-center justify-between">

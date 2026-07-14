@@ -27,7 +27,16 @@ export default function TreinoPage() {
     const workoutName =
       treinos.workouts.find((w) => w.id === sessao.detail!.session.workoutId)
         ?.name ?? "Treino";
-    return <SessaoAtiva sessao={sessao} workoutName={workoutName} />;
+    return (
+      <SessaoAtiva
+        sessao={sessao}
+        workoutName={workoutName}
+        onExit={() => {
+          sessao.reset();
+          treinos.reload(); // o card semanal foi buscado à parte — recarrega
+        }}
+      />
+    );
   }
 
   return (

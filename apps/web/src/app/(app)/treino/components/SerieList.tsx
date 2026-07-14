@@ -35,6 +35,12 @@ function StepperField({
     onCommit(next);
   };
 
+  // Digitação manual: nunca deixa reps/carga ir para negativo ou NaN.
+  const sanitize = (raw: string) => {
+    const n = Number(raw);
+    return Number.isFinite(n) ? Math.max(0, n) : 0;
+  };
+
   return (
     <div className="flex flex-1 flex-col gap-0.5 rounded-xl bg-white px-2 py-2">
       <span className="px-1 text-xs font-bold text-ink-read">{label}</span>
@@ -49,9 +55,10 @@ function StepperField({
         </button>
         <input
           type="number"
+          min={0}
           inputMode={mode}
           value={value ?? ""}
-          onChange={(e) => onChange(Number(e.target.value))}
+          onChange={(e) => onChange(sanitize(e.target.value))}
           onBlur={onBlurCommit}
           className="w-full min-w-0 bg-transparent text-center text-base font-bold text-ink outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none"
           aria-label={ariaLabel}

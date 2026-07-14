@@ -44,16 +44,26 @@ describe("startSession / completeSession (db em arquivo)", () => {
   test("pré-preenche do último treino, 1 ativa por vez, conclui com duração", async () => {
     const db = await createTestDb();
     const userId = await createTestUser(db);
+    // valores não-default de propósito (defaults do schema são 12 reps / 45s).
     const w = await createWorkout(db, userId, {
       name: "Peito",
       focus: "chest",
-      exercises: [{ name: "Supino", targetSets: 2, targetReps: 12, restSeconds: 45, position: 0 }],
+      exercises: [{ name: "Supino", targetSets: 4, targetReps: 8, restSeconds: 90, position: 0 }],
     });
 
     // 1ª sessão: registra carga e conclui → vira "último treino"
     const s1 = await startSession(db, userId, w.id);
     if (s1 === "already_active" || s1 === "not_found") throw new Error("unreachable");
-    const firstSet = s1.exercises[0].sets[0];
+
+    // 1ª sessão (sem histórico): campos do template propagados, reps = alvo, carga vazia.
+    const ex1 = s1.exercises[0];
+    expect(ex1.targetSets).toBe(4);
+    expect(ex1.restSeconds).toBe(90);
+    expect(ex1.sets).toHaveLength(4);
+    expect(ex1.sets[0].reps).toBe(8);
+    expect(ex1.sets[0].load).toBeNull();
+
+    const firstSet = ex1.sets[0];
     await updateSet(db, userId, s1.session.id, firstSet.id, { reps: 10, load: 40, done: true });
     const done1 = await completeSession(db, userId, s1.session.id);
     expect(done1).not.toBeNull();

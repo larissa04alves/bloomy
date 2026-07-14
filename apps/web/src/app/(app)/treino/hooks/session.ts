@@ -17,7 +17,12 @@ export function applySetPatch(
   }));
 }
 
+/** Exercício concluído: tem ao menos uma série e todas estão feitas. */
+export function isExerciseDone(ex: SessionExercise): boolean {
+  return ex.sets.length > 0 && ex.sets.every((s) => s.done);
+}
+
 /** Nº de exercícios com todas as séries feitas. */
 export function completedExercises(exercises: SessionExercise[]): number {
-  return exercises.filter((ex) => ex.sets.length > 0 && ex.sets.every((s) => s.done)).length;
+  return exercises.filter(isExerciseDone).length;
 }

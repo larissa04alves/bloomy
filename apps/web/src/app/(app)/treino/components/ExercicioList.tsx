@@ -15,7 +15,7 @@ import { ToggleSwitch } from "@/components/toggle-switch";
 import type { SessionExercise } from "@/lib/api-types";
 
 import { mmss } from "../hooks/format";
-import { doneCount } from "../hooks/session";
+import { doneCount, isExerciseDone } from "../hooks/session";
 import { GifThumb } from "./GifThumb";
 
 export function ExercicioList({
@@ -46,9 +46,7 @@ export function ExercicioList({
     return () => clearInterval(id);
   }, [startedAt]);
 
-  const doneEx = exercises.filter(
-    (ex) => ex.sets.length > 0 && ex.sets.every((s) => s.done),
-  ).length;
+  const doneEx = exercises.filter(isExerciseDone).length;
 
   return (
     <div className="flex flex-col gap-4 px-5.5 pt-6 pb-28">
@@ -70,7 +68,7 @@ export function ExercicioList({
 
       <div className="flex flex-col gap-2">
         {exercises.map((ex, i) => {
-          const done = ex.sets.length > 0 && ex.sets.every((s) => s.done);
+          const done = isExerciseDone(ex);
           return (
             <button
               key={ex.exerciseId}

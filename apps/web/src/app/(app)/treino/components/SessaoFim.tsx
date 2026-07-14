@@ -1,11 +1,13 @@
+"use client";
+
 import { CheckCircleIcon, FireIcon } from "@phosphor-icons/react";
 
 import type { WorkoutSummary } from "@/lib/api-types";
 
 import { formatDuration } from "../hooks/format";
+import { useTodayIndex } from "../hooks/today";
 
 const DOW = ["S", "T", "Q", "Q", "S", "S", "D"]; // seg..dom
-const todayIndex = (new Date().getDay() + 6) % 7;
 
 export function SessaoFim({
   durationSec,
@@ -18,6 +20,7 @@ export function SessaoFim({
   summary: WorkoutSummary;
   onRestart: () => void;
 }) {
+  const todayIndex = useTodayIndex(); // resolvido após o mount (evita mismatch SSR)
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-5 px-5.5 pb-8 text-center">
       <div className="relative">

@@ -1,7 +1,7 @@
 "use client";
 
 import { BarbellIcon, XIcon } from "@phosphor-icons/react";
-import { useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 
 import type { CatalogExercise } from "@/lib/api-types";
 import { FOCUS_LABELS } from "@/lib/api-types";
@@ -24,6 +24,22 @@ export function GifViewer({
   onClose: () => void;
 }) {
   const [broken, setBroken] = useState(false);
+  const titleId = useId();
+  const closeRef = useRef<HTMLButtonElement>(null);
+
+  // Move o foco para "Fechar" ao abrir, aceita Escape e restaura o foco anterior.
+  useEffect(() => {
+    const previouslyFocused = document.activeElement as HTMLElement | null;
+    closeRef.current?.focus();
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+      previouslyFocused?.focus?.();
+    };
+  }, [onClose]);
 
   return (
     <div
@@ -32,8 +48,14 @@ export function GifViewer({
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="w-full max-w-105 rounded-card-lg bg-white p-4 pb-6 shadow-sheet">
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        className="w-full max-w-105 rounded-card-lg bg-white p-4 pb-6 shadow-sheet"
+      >
         <button
+          ref={closeRef}
           type="button"
           aria-label="Fechar"
           onClick={onClose}
@@ -53,7 +75,7 @@ export function GifViewer({
             className="mt-1 aspect-square w-full rounded-card object-cover"
           />
         )}
-        <h2 className="mt-4 font-display text-xl font-bold text-ink">{exercise.namePt}</h2>
+        <h2 id={titleId} className="mt-4 font-display text-xl font-bold text-ink">{exercise.namePt}</h2>
         <div className="mt-2 flex flex-wrap gap-1.5">
           <span className="rounded-full bg-pink-tint px-3 py-1 text-xs font-bold text-pink-deep">
             {FOCUS_LABELS[exercise.group]}

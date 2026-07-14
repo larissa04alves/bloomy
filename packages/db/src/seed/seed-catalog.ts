@@ -18,6 +18,7 @@ const COMMIT = "ebf642cd90fdf73a6c73e7127e93b607b12c229e";
 const SOURCE = `https://cdn.jsdelivr.net/gh/omercotkd/exercises-gifs@${COMMIT}`;
 const CONCURRENCY = 5;
 const RETRIES = 5;
+const FETCH_TIMEOUT_MS = 15_000; // aborta conexões penduradas (CDN lento)
 
 function requireEnv(name: string): string {
   const v = process.env[name];
@@ -32,7 +33,9 @@ async function fetchGifBytes(id: string): Promise<Uint8Array> {
   let lastErr: unknown;
   for (let attempt = 1; attempt <= RETRIES; attempt++) {
     try {
-      const res = await fetch(`${SOURCE}/assets/${id}.gif`);
+      const res = await fetch(`${SOURCE}/assets/${id}.gif`, {
+        signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+      });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       return new Uint8Array(await res.arrayBuffer());
     } catch (e) {
@@ -58,7 +61,11 @@ async function main() {
     authToken: process.env.DATABASE_AUTH_TOKEN,
   });
 
-  const csv = await (await fetch(`${SOURCE}/exercises.csv`)).text();
+  const csv = await (
+    await fetch(`${SOURCE}/exercises.csv`, {
+      signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+    })
+  ).text();
   // filtra p/ os ids presentes na curadoria (dropa 0609 sem GIF + não-mapeados).
   const rows = parseExercisesCsv(csv).filter((r) => CATALOG_PT[r.id]);
   console.log(`seed: ${rows.length} exercícios a processar`);

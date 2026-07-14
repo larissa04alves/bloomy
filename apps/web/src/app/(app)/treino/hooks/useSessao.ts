@@ -84,17 +84,19 @@ export function useSessao() {
       try {
         await api.put(`/api/sessions/${detail.session.id}/sets/${setId}`, toSetBody(patch));
       } catch (e) {
+        // Recarrega o estado canônico em vez de restaurar um snapshot local —
+        // um snapshot poderia sobrescrever escritas concorrentes já persistidas.
+        reload();
         toastError(e, "Não foi possível salvar a série");
       }
     },
-    [detail],
+    [detail, reload],
   );
 
   // Marca feito (otimista): grava reps/load atuais + done. Retorna true se marcou.
   const markDone = useCallback(
     async (setId: string, patch: SetPatch): Promise<boolean> => {
       if (!detail) return false;
-      const prev = data;
       patchLocal(setId, { ...patch, done: true });
       try {
         await api.put(
@@ -103,12 +105,14 @@ export function useSessao() {
         );
         return true;
       } catch (e) {
-        if (prev) setData(prev);
+        // Não restaura snapshot completo: se outra série foi marcada nesse meio
+        // tempo, o rollback apagaria a confirmação dela. Recarrega o canônico.
+        reload();
         toastError(e, "Não foi possível salvar a série");
         return false;
       }
     },
-    [detail, data, setData, patchLocal],
+    [detail, patchLocal, reload],
   );
 
   const complete = useCallback(async () => {

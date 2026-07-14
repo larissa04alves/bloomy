@@ -16,9 +16,11 @@ import { SessaoFim } from "./SessaoFim";
 export function SessaoAtiva({
   sessao,
   workoutName,
+  onExit,
 }: {
   sessao: ReturnType<typeof useSessao>;
   workoutName: string;
+  onExit: () => void;
 }) {
   const descanso = useDescanso();
   // Só busca o catálogo se a sessão tiver algum exercício de catálogo (GIF a resolver).
@@ -42,7 +44,7 @@ export function SessaoAtiva({
         durationSec={finishSummary.durationSec}
         exerciseCount={finishSummary.exerciseCount}
         summary={finishSummary.summary}
-        onRestart={sessao.reset}
+        onRestart={onExit}
       />
     );
   }

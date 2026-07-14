@@ -20,6 +20,13 @@ export function SwipeableRow({
   const id = useId();
   const rootRef = useRef<HTMLDivElement>(null);
   const [offset, setOffset] = useState(0); // + = editar (dir), - = excluir (esq)
+  // Espelha o offset num ref: o pointerup precisa do valor mais recente do gesto,
+  // não do capturado no fechamento do render (que pode estar obsoleto).
+  const offsetRef = useRef(0);
+  const applyOffset = (next: number) => {
+    offsetRef.current = next;
+    setOffset(next);
+  };
   const startX = useRef(0);
   const startOffset = useRef(0);
   const down = useRef(false); // ponteiro pressionado
@@ -27,7 +34,7 @@ export function SwipeableRow({
 
   const DRAG_THRESHOLD = 6; // px antes de considerar swipe (deixa o tap/click passar)
 
-  const close = () => setOffset(0);
+  const close = () => applyOffset(0);
 
   // Registra o close p/ "uma linha aberta por vez".
   useEffect(() => {
@@ -68,21 +75,22 @@ export function SwipeableRow({
     const max = onEdit ? ACTION_W : 0;
     const min = onDelete ? -ACTION_W : 0;
     const next = Math.max(min, Math.min(max, startOffset.current + dx));
-    setOffset(next);
+    applyOffset(next);
   };
 
   const onPointerUp = () => {
     down.current = false;
     if (!dragging.current) return; // foi um tap: não mexe no offset, deixa o click passar
     dragging.current = false;
-    if (offset > ACTION_W / 2) {
+    const current = offsetRef.current;
+    if (current > ACTION_W / 2) {
       for (const [key, fn] of openRows) if (key !== id) fn();
-      setOffset(ACTION_W);
-    } else if (offset < -ACTION_W / 2) {
+      applyOffset(ACTION_W);
+    } else if (current < -ACTION_W / 2) {
       for (const [key, fn] of openRows) if (key !== id) fn();
-      setOffset(-ACTION_W);
+      applyOffset(-ACTION_W);
     } else {
-      setOffset(0);
+      applyOffset(0);
     }
   };
 

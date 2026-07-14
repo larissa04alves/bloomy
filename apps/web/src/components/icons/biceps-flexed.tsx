@@ -77,22 +77,16 @@ const BicepsFlexedIcon = forwardRef<
 
     const handleMouseEnter = useCallback(
       (e: React.MouseEvent<HTMLDivElement>) => {
-        if (isControlledRef.current) {
-          onMouseEnter?.(e);
-        } else {
-          controls.start("animate");
-        }
+        onMouseEnter?.(e); // sempre repassa ao consumidor
+        if (!isControlledRef.current) controls.start("animate");
       },
       [controls, onMouseEnter],
     );
 
     const handleMouseLeave = useCallback(
       (e: React.MouseEvent<HTMLDivElement>) => {
-        if (isControlledRef.current) {
-          onMouseLeave?.(e);
-        } else {
-          controls.start("normal");
-        }
+        onMouseLeave?.(e); // sempre repassa ao consumidor
+        if (!isControlledRef.current) controls.start("normal");
       },
       [controls, onMouseLeave],
     );
