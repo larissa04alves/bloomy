@@ -25,14 +25,42 @@ export function GifViewer({
 }) {
   const [broken, setBroken] = useState(false);
   const titleId = useId();
+  const dialogRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
 
-  // Move o foco para "Fechar" ao abrir, aceita Escape e restaura o foco anterior.
+  // Move o foco para "Fechar" ao abrir, aceita Escape, restaura o foco anterior
+  // e retém o Tab dentro do diálogo (focus trap).
   useEffect(() => {
     const previouslyFocused = document.activeElement as HTMLElement | null;
     closeRef.current?.focus();
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") {
+        onClose();
+        return;
+      }
+      if (e.key !== "Tab") return;
+      const root = dialogRef.current;
+      if (!root) return;
+      const focusables = root.querySelectorAll<HTMLElement>(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+      );
+      if (focusables.length === 0) {
+        e.preventDefault();
+        return;
+      }
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      const active = document.activeElement;
+      if (!root.contains(active)) {
+        e.preventDefault();
+        first.focus();
+      } else if (e.shiftKey && active === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && active === last) {
+        e.preventDefault();
+        first.focus();
+      }
     };
     document.addEventListener("keydown", onKeyDown);
     return () => {
@@ -49,6 +77,7 @@ export function GifViewer({
       }}
     >
       <div
+        ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
