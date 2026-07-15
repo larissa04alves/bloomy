@@ -15,7 +15,7 @@ export default function MentePage() {
     <Screen title="Seu espaço" subtitle="Sem pressa e sem cobrança. Só um lugar pra registrar como você está.">
       <MoodCard value={today?.mood ?? null} onSelect={setMood} />
       <AnxietyCard value={today?.anxiety ?? null} onCommit={setAnxiety} />
-      <DiarioCard note={today?.note ?? null} onSave={saveNote} />
+      <DiarioCard onSave={saveNote} />
       <RegistrosList records={records} />
     </Screen>
   );

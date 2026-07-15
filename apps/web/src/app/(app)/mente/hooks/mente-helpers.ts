@@ -1,4 +1,4 @@
-import type { Checkin, Mood } from "@/lib/api-types";
+import type { Mood } from "@/lib/api-types";
 
 /** Humor do pior ao melhor — casa com a posição dos tiles na tela. */
 export const MOOD_ORDER: readonly Mood[] = ["sad", "meh", "neutral", "good", "great"];
@@ -39,13 +39,14 @@ export function relativeDay(day: string, today: string): string {
   return SHORT_FMT.format(parseDay(day)).replace(" de ", " ").replace(".", "");
 }
 
-/** Só check-ins com nota escrita (o histórico do mini-diário). */
-export function notesOnly(checkins: Checkin[]): Checkin[] {
-  return checkins.filter((c) => (c.note ?? "").trim() !== "");
-}
+const TIME_FMT = new Intl.DateTimeFormat("pt-BR", {
+  timeZone: "America/Sao_Paulo",
+  hour: "2-digit",
+  minute: "2-digit",
+  hour12: false,
+});
 
-/** Upsert por `day` mantendo ordem desc (mais recente primeiro). */
-export function mergeCheckin(list: Checkin[], checkin: Checkin): Checkin[] {
-  const rest = list.filter((c) => c.day !== checkin.day);
-  return [checkin, ...rest].sort((a, b) => (a.day < b.day ? 1 : -1));
+/** Hora local (America/Sao_Paulo) de um instante ISO — "HH:mm". */
+export function timeOf(createdAt: string): string {
+  return TIME_FMT.format(new Date(createdAt));
 }

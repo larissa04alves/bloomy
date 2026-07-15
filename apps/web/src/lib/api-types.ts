@@ -167,3 +167,12 @@ export type Checkin = {
   createdAt: string;
   updatedAt: string;
 };
+
+/** Relato do mini-diário (vários por dia). */
+export type MindNote = {
+  id: string;
+  day: string; // YYYY-MM-DD
+  mood: Mood | null;
+  note: string;
+  createdAt: string; // ISO
+};

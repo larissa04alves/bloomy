@@ -71,6 +71,13 @@
       "when": 1783692679301,
       "tag": "0009_nice_mephisto",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "6",
+      "when": 1784138830113,
+      "tag": "0010_jazzy_the_liberteens",
+      "breakpoints": true
     }
   ]
 }

@@ -1,7 +1,7 @@
 import "server-only";
 
 import type { Db } from "@bloomy/db";
-import { moodCheckin, type MoodCheckin } from "@bloomy/db/schema/mind";
+import { moodCheckin, type MoodCheckin, mindNote, type MindNote } from "@bloomy/db/schema/mind";
 import { and, desc, eq } from "drizzle-orm";
 
 import { dayFor } from "@/server/shared/day";
@@ -65,5 +65,35 @@ export async function listCheckins(
     .from(moodCheckin)
     .where(eq(moodCheckin.userId, userId))
     .orderBy(desc(moodCheckin.day))
+    .limit(limit);
+}
+
+export type NoteInput = { note: string; mood?: Mood | null };
+
+/** Cria um relato do dia (vários por dia — nunca sobrescreve). */
+export async function createNote(
+  db: Db,
+  userId: string,
+  input: NoteInput,
+): Promise<MindNote> {
+  const day = dayFor();
+  const [row] = await db
+    .insert(mindNote)
+    .values({ userId, day, note: input.note, mood: input.mood ?? null })
+    .returning();
+  return row;
+}
+
+/** Relatos do usuário, mais recentes primeiro. */
+export async function listNotes(
+  db: Db,
+  userId: string,
+  limit: number,
+): Promise<MindNote[]> {
+  return db
+    .select()
+    .from(mindNote)
+    .where(eq(mindNote.userId, userId))
+    .orderBy(desc(mindNote.createdAt))
     .limit(limit);
 }

@@ -1,29 +1,35 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 export function DiarioCard({
-  note,
   onSave,
 }: {
-  note: string | null;
-  onSave: (note: string) => void;
+  onSave: (note: string) => Promise<boolean>;
 }) {
-  const [text, setText] = useState<string>(note ?? "");
-
-  useEffect(() => {
-    setText(note ?? "");
-  }, [note]);
-
+  const [text, setText] = useState("");
+  const [saving, setSaving] = useState(false);
   const trimmed = text.trim();
-  const disabled = trimmed === "" || trimmed === (note ?? "");
+
+  async function handleSave() {
+    if (saving || trimmed === "") return;
+    setSaving(true);
+    try {
+      const ok = await onSave(trimmed);
+      if (ok) setText(""); // limpa pra escrever outro relato; preserva no erro
+    } finally {
+      setSaving(false);
+    }
+  }
 
   return (
     <section>
-      <h2 className="mb-3 font-display text-base font-bold text-ink">Mini-diário</h2>
+      <h2 className="mb-3 font-display text-base font-bold text-ink">
+        Mini-diário
+      </h2>
       <div className="rounded-card bg-pink-tint p-4">
         <p className="mb-3 text-sm font-semibold text-[#9a8290]">
-          Quer escrever o que passou pela sua cabeça? Fica só entre vocês dois.
+          Quer escrever o que passou pela sua cabeça?
         </p>
         <textarea
           value={text}
@@ -34,8 +40,8 @@ export function DiarioCard({
         />
         <button
           type="button"
-          disabled={disabled}
-          onClick={() => onSave(trimmed)}
+          disabled={trimmed === "" || saving}
+          onClick={handleSave}
           className="mt-3 w-full rounded-control bg-pink-bright py-2.5 font-display text-sm font-bold text-white disabled:opacity-50"
         >
           Salvar registro
