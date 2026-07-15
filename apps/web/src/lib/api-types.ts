@@ -152,3 +152,18 @@ export type SessionDetail = {
   };
   exercises: SessionExercise[];
 };
+
+// ── Mente ─────────────────────────────────────────────────────────────────
+
+export type Mood = "sad" | "meh" | "neutral" | "good" | "great";
+
+/** Check-in do dia (1 por dia, upsert). Datas ISO string. */
+export type Checkin = {
+  id: string;
+  day: string; // YYYY-MM-DD
+  mood: Mood | null;
+  anxiety: number | null; // 0–100
+  note: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
