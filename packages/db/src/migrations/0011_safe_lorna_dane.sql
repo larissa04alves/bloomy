@@ -1,0 +1,1 @@
+CREATE INDEX `mind_note_user_day_idx` ON `mind_note` (`user_id`,`day`);

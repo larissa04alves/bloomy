@@ -12,6 +12,19 @@ export function dayFor(date: Date = new Date()): string {
   return DAY_FORMATTER.format(date);
 }
 
+/** Os 7 dias (seg→dom) da semana de `reference` (default hoje), em YYYY-MM-DD, fuso BR. */
+export function weekDays(reference: string = dayFor()): string[] {
+  const [y, m, d] = reference.split("-").map(Number);
+  const monday = new Date(Date.UTC(y, m - 1, d));
+  const dow = monday.getUTCDay(); // 0=dom..6=sáb
+  monday.setUTCDate(monday.getUTCDate() - ((dow + 6) % 7));
+  return Array.from({ length: 7 }, (_, i) => {
+    const dt = new Date(monday);
+    dt.setUTCDate(monday.getUTCDate() + i);
+    return dt.toISOString().slice(0, 10);
+  });
+}
+
 export const DAY_SCHEMA = z.iso.date();
 
 /** Resolve o `day` da query (default hoje); inválido → `{ ok: false }`. */

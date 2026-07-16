@@ -1,12 +1,13 @@
 "use client";
 
+import type { Dispatch, SetStateAction } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 export function useResource<T>(fetcher: () => Promise<T>, enabled = true) {
   const fetcherRef = useRef(fetcher);
   fetcherRef.current = fetcher;
 
-  const [data, setData] = useState<T | null>(null);
+  const [data, setDataState] = useState<T | null>(null);
   const [error, setError] = useState<Error | null>(null);
   const [loading, setLoading] = useState(enabled);
 
@@ -27,7 +28,7 @@ export function useResource<T>(fetcher: () => Promise<T>, enabled = true) {
       .current()
       .then((d) => {
         if (isStale()) return;
-        setData(d);
+        setDataState(d);
         setError(null);
       })
       .catch((e: Error) => {
@@ -44,6 +45,14 @@ export function useResource<T>(fetcher: () => Promise<T>, enabled = true) {
     if (enabled) reload();
     else setLoading(false);
   }, [reload, enabled]);
+
+  const setData = useCallback<Dispatch<SetStateAction<T | null>>>((action) => {
+    // Invalida qualquer fetch em voo (bump do requestId) e encerra o loading —
+    // senão o `.finally` do fetch invalidado nunca roda setLoading(false).
+    requestId.current += 1;
+    setLoading(false);
+    setDataState(action);
+  }, []);
 
   return { data, error, loading, reload, setData };
 }

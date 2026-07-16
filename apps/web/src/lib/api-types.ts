@@ -152,3 +152,30 @@ export type SessionDetail = {
   };
   exercises: SessionExercise[];
 };
+
+// ── Mente ─────────────────────────────────────────────────────────────────
+
+export type Mood = "sad" | "meh" | "neutral" | "good" | "great";
+
+/** Check-in do dia (1 por dia, upsert). Datas ISO string. */
+export type Checkin = {
+  id: string;
+  day: string; // YYYY-MM-DD
+  mood: Mood | null;
+  anxiety: number | null; // 0–100
+  note: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
+/** Relato do mini-diário (vários por dia). */
+export type MindNote = {
+  id: string;
+  day: string; // YYYY-MM-DD
+  mood: Mood | null;
+  note: string;
+  createdAt: string; // ISO
+};
+
+/** Humor de um dia da semana (card "Como foi sua semana"). */
+export type WeekMood = { day: string; mood: Mood | null };

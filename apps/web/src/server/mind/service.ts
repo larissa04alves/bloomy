@@ -1,10 +1,10 @@
 import "server-only";
 
 import type { Db } from "@bloomy/db";
-import { moodCheckin, type MoodCheckin } from "@bloomy/db/schema/mind";
-import { and, desc, eq } from "drizzle-orm";
+import { moodCheckin, type MoodCheckin, mindNote, type MindNote } from "@bloomy/db/schema/mind";
+import { and, desc, eq, inArray } from "drizzle-orm";
 
-import { dayFor } from "@/server/shared/day";
+import { dayFor, weekDays } from "@/server/shared/day";
 
 export type Mood = NonNullable<MoodCheckin["mood"]>;
 
@@ -66,4 +66,47 @@ export async function listCheckins(
     .where(eq(moodCheckin.userId, userId))
     .orderBy(desc(moodCheckin.day))
     .limit(limit);
+}
+
+export type NoteInput = { note: string; mood?: Mood | null };
+
+/** Cria um relato do dia (vários por dia — nunca sobrescreve). */
+export async function createNote(
+  db: Db,
+  userId: string,
+  input: NoteInput,
+): Promise<MindNote> {
+  const day = dayFor();
+  const [row] = await db
+    .insert(mindNote)
+    .values({ userId, day, note: input.note, mood: input.mood ?? null })
+    .returning();
+  return row;
+}
+
+/** Relatos do usuário, mais recentes primeiro. */
+export async function listNotes(
+  db: Db,
+  userId: string,
+  limit: number,
+): Promise<MindNote[]> {
+  return db
+    .select()
+    .from(mindNote)
+    .where(eq(mindNote.userId, userId))
+    .orderBy(desc(mindNote.createdAt))
+    .limit(limit);
+}
+
+export type WeekMood = { day: string; mood: Mood | null };
+
+/** Humor de cada dia (seg→dom) da semana atual; null onde não houve check-in. */
+export async function weekMoods(db: Db, userId: string): Promise<WeekMood[]> {
+  const days = weekDays();
+  const rows = await db
+    .select({ day: moodCheckin.day, mood: moodCheckin.mood })
+    .from(moodCheckin)
+    .where(and(eq(moodCheckin.userId, userId), inArray(moodCheckin.day, days)));
+  const byDay = new Map(rows.map((r) => [r.day, r.mood]));
+  return days.map((day) => ({ day, mood: byDay.get(day) ?? null }));
 }

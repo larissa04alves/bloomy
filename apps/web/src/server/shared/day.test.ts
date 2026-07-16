@@ -1,6 +1,6 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, it, test } from "bun:test";
 
-import { dayFor } from "./day";
+import { dayFor, weekDays } from "./day";
 
 describe("dayFor (America/Sao_Paulo, UTC-3)", () => {
   test("02:59Z ainda é o dia anterior em SP", () => {
@@ -17,5 +17,20 @@ describe("dayFor (America/Sao_Paulo, UTC-3)", () => {
 
   test("virada de ano", () => {
     expect(dayFor(new Date("2026-01-01T01:00:00Z"))).toBe("2025-12-31");
+  });
+});
+
+describe("weekDays (seg→dom)", () => {
+  it("quarta 2026-07-15 → seg..dom da semana", () => {
+    expect(weekDays("2026-07-15")).toEqual([
+      "2026-07-13", "2026-07-14", "2026-07-15", "2026-07-16", "2026-07-17", "2026-07-18", "2026-07-19",
+    ]);
+  });
+  it("domingo pertence à semana da segunda anterior", () => {
+    expect(weekDays("2026-07-19")[0]).toBe("2026-07-13");
+    expect(weekDays("2026-07-19")[6]).toBe("2026-07-19");
+  });
+  it("segunda é o primeiro dia", () => {
+    expect(weekDays("2026-07-13")[0]).toBe("2026-07-13");
   });
 });
