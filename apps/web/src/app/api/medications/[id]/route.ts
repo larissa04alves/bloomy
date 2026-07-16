@@ -14,7 +14,7 @@ import { deactivateMedication, updateMedication } from "@/server/medications/ser
 const BODY_SCHEMA = z.object({
   name: z.string().min(1).max(120).optional(),
   dose: z.string().max(120).optional(),
-  stock: z.number().int().nonnegative().optional(),
+  stock: z.number().int().nonnegative().nullable().optional(),
   times: z.array(TIME_SCHEMA).min(1).max(6).optional(),
 });
 

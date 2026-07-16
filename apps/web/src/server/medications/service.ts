@@ -35,7 +35,7 @@ export function deriveIntakes(
 export type MedicationInput = {
   name: string;
   dose?: string;
-  stock?: number;
+  stock?: number | null;
   times: string[];
 };
 

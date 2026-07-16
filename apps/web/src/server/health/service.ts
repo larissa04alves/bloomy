@@ -180,13 +180,13 @@ export async function completeAppointment(
 export type ExamInput = {
   name: string;
   status?: Exam["status"];
-  scheduledAt?: Date;
+  scheduledAt?: Date | null;
 };
 
 export type ExamUpdate = {
   name?: string;
   status?: Exam["status"];
-  scheduledAt?: Date;
+  scheduledAt?: Date | null;
 };
 
 export async function listExams(db: Db, userId: string): Promise<Exam[]> {

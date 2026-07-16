@@ -179,3 +179,67 @@ export type MindNote = {
 
 /** Humor de um dia da semana (card "Como foi sua semana"). */
 export type WeekMood = { day: string; mood: Mood | null };
+
+// ── Saúde ─────────────────────────────────────────────────────────────────
+
+export type AppointmentStatus = "scheduled" | "completed" | "to_schedule";
+
+/** Consulta (instante, não coluna `day`). Datas ISO string. */
+export type Appointment = {
+  id: string;
+  professional: string;
+  specialty: string | null;
+  status: AppointmentStatus;
+  scheduledAt: string | null;
+  suggestedAt: string | null; // retorno sugerido
+  completedAt: string | null;
+  location: string | null;
+  remindDayBefore: boolean;
+  parentId: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type AppointmentInput = {
+  professional: string;
+  specialty?: string;
+  scheduledAt: string; // ISO
+  location?: string;
+  remindDayBefore?: boolean;
+};
+
+export type ExamStatus = "to_schedule" | "scheduled" | "result_available" | "completed";
+
+/** Rótulos PT-BR dos status de exame. */
+export const EXAM_STATUS_LABELS: Record<ExamStatus, string> = {
+  to_schedule: "a agendar",
+  scheduled: "agendada",
+  result_available: "resultado disponível",
+  completed: "concluído",
+};
+
+export type Exam = {
+  id: string;
+  name: string;
+  status: ExamStatus;
+  scheduledAt: string | null;
+  suggestedAt: string | null;
+  completedAt: string | null;
+  parentId: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type ExamInput = {
+  name: string;
+  status?: ExamStatus;
+  scheduledAt?: string | null; // ISO
+};
+
+/** Cadastro de remédio (input dos modais/hook de agenda). */
+export type MedicationInput = {
+  name: string;
+  dose?: string;
+  stock?: number | null;
+  times: string[];
+};

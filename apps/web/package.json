@@ -20,6 +20,7 @@
     "@tanstack/react-form": "^1.33.0",
     "babel-plugin-react-compiler": "^1.0.0",
     "better-auth": "catalog:",
+    "date-fns": "^4.4.0",
     "dotenv": "catalog:",
     "drizzle-orm": "catalog:",
     "fuse.js": "catalog:",

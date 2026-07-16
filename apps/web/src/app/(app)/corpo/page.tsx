@@ -7,7 +7,6 @@ import { GARRAFA_ML, type Meal, type MealType } from "@/lib/api-types";
 
 import { HidratacaoSection } from "./components/HidratacaoSection";
 import { MealModal } from "./components/MealModal";
-import { MedicationModal } from "./components/MedicationModal";
 import { RefeicoesSection } from "./components/RefeicoesSection";
 import { RemediosSection } from "./components/RemediosSection";
 import { ResumoCard } from "./components/ResumoCard";
@@ -27,7 +26,6 @@ export default function CorpoPage() {
   const [mealOpen, setMealOpen] = useState(false);
   const [mealType, setMealType] = useState<MealType | undefined>();
   const [editingMeal, setEditingMeal] = useState<Meal | null>(null);
-  const [medOpen, setMedOpen] = useState(false);
 
   return (
     <Screen title="Corpo" subtitle="Seu físico de hoje">
@@ -60,7 +58,7 @@ export default function CorpoPage() {
         onDelete={ref.deleteMeal}
       />
 
-      <RemediosSection intakes={rem.intakes} onToggle={rem.toggle} onOpenModal={() => setMedOpen(true)} />
+      <RemediosSection intakes={rem.intakes} onToggle={rem.toggle} />
 
       <WaterModal open={waterOpen} onOpenChange={setWaterOpen} onConfirm={hidr.addWater} />
       <MealModal
@@ -73,7 +71,6 @@ export default function CorpoPage() {
           else ref.addMeal(input);
         }}
       />
-      <MedicationModal open={medOpen} onOpenChange={setMedOpen} onSubmit={rem.addMedication} />
     </Screen>
   );
 }

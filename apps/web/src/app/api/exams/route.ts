@@ -7,7 +7,7 @@ import { createExam, listExams } from "@/server/health/service";
 const BODY_SCHEMA = z.object({
   name: z.string().min(1).max(120),
   status: z.enum(["to_schedule", "scheduled", "result_available", "completed"]).optional(),
-  scheduledAt: z.coerce.date().optional(),
+  scheduledAt: z.coerce.date().nullable().optional(),
 });
 
 export async function GET(request: Request) {
