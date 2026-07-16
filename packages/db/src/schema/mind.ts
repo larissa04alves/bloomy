@@ -38,7 +38,11 @@ export const mindNote = sqliteTable(
     note: text("note").notNull(),
     createdAt: timestampMs("created_at"),
   },
-  (table) => [index("mind_note_user_created_idx").on(table.userId, table.createdAt)],
+  (table) => [
+    index("mind_note_user_created_idx").on(table.userId, table.createdAt),
+    // Registro diário: índice composto (user_id, day) exigido pelo ADR-0002.
+    index("mind_note_user_day_idx").on(table.userId, table.day),
+  ],
 );
 
 export type MindNote = typeof mindNote.$inferSelect;

@@ -47,7 +47,10 @@ export function useResource<T>(fetcher: () => Promise<T>, enabled = true) {
   }, [reload, enabled]);
 
   const setData = useCallback<Dispatch<SetStateAction<T | null>>>((action) => {
+    // Invalida qualquer fetch em voo (bump do requestId) e encerra o loading —
+    // senão o `.finally` do fetch invalidado nunca roda setLoading(false).
     requestId.current += 1;
+    setLoading(false);
     setDataState(action);
   }, []);
 

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "bun:test";
 
-import { MOOD_ORDER, relativeDay, timeOf, weekSentence } from "./mente-helpers";
+import { MOOD_ORDER, dayMoodLabel, relativeDay, timeOf, weekSentence } from "./mente-helpers";
 
 describe("MOOD_ORDER", () => {
   it("vai do pior ao melhor humor, 5 valores", () => {
@@ -26,6 +26,16 @@ describe("relativeDay", () => {
 describe("timeOf", () => {
   it("converte ISO UTC para HH:mm no fuso BR (UTC-3)", () => {
     expect(timeOf("2026-07-15T17:32:00.000Z")).toBe("14:32");
+  });
+});
+
+describe("dayMoodLabel", () => {
+  it("dia com humor → 'Dia-da-semana: palavra'", () => {
+    // 2026-07-13 é uma segunda-feira
+    expect(dayMoodLabel("2026-07-13", "good")).toBe("Segunda-feira: bem");
+  });
+  it("dia sem humor → 'sem registro'", () => {
+    expect(dayMoodLabel("2026-07-19", null)).toBe("Domingo: sem registro");
   });
 });
 

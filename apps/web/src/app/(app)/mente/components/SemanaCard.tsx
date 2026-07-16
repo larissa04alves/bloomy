@@ -2,7 +2,7 @@
 
 import type { WeekMood } from "@/lib/api-types";
 
-import { MOOD_RECORD_COLOR, weekSentence } from "../hooks/mente-helpers";
+import { MOOD_RECORD_COLOR, dayMoodLabel, weekSentence } from "../hooks/mente-helpers";
 
 const WEEKDAY_LETTERS = ["S", "T", "Q", "Q", "S", "S", "D"];
 
@@ -14,8 +14,14 @@ export function SemanaCard({ days }: { days: WeekMood[] }) {
       </h2>
       <div className="flex justify-between">
         {days.map((d, i) => (
-          <div key={d.day} className="flex flex-col items-center gap-1.5">
+          <div
+            key={d.day}
+            role="img"
+            aria-label={dayMoodLabel(d.day, d.mood)}
+            className="flex flex-col items-center gap-1.5"
+          >
             <span
+              aria-hidden="true"
               className="size-5.5 rounded-full"
               style={
                 d.mood

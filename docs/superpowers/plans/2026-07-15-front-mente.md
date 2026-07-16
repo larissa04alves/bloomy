@@ -1,5 +1,12 @@
 # Front Mente — Implementation Plan
 
+> **Snapshot da fase v1 (histórico).** Este plano descreve a aba Mente original
+> (nota única/dia via `PUT /api/checkins`, `records: Checkin[]`). O contrato **atual**
+> evoluiu depois: múltiplos relatos/dia (`mind_note`, `POST/GET /api/checkins/notes`)
+> e análise da semana (`GET /api/checkins/week`). Fonte da verdade do contrato vigente:
+> `docs/superpowers/specs/2026-07-15-front-mente-design.md` (seções "Revisão v2" e "Revisão v3").
+> Planos são registros pontuais, não reescritos retroativamente.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Entregar a aba Mente ("Seu espaço") de ponta a ponta contra a API `/api/checkins` existente: check-in de humor + ansiedade (salvo na hora) e mini-diário com histórico ("Seus registros").

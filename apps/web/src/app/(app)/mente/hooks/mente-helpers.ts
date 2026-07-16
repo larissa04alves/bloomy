@@ -51,6 +51,21 @@ export function timeOf(createdAt: string): string {
   return TIME_FMT.format(new Date(createdAt));
 }
 
+/** Humor em palavra, para leitores de tela. */
+const MOOD_WORD: Record<Mood, string> = {
+  sad: "muito pra baixo",
+  meh: "pra baixo",
+  neutral: "neutro",
+  good: "bem",
+  great: "ótimo",
+};
+
+/** Rótulo acessível de um dia da semana: "Segunda-feira: bem" / "...: sem registro". */
+export function dayMoodLabel(day: string, mood: Mood | null): string {
+  const weekday = capitalize(WEEKDAY_FMT.format(parseDay(day)));
+  return `${weekday}: ${mood ? MOOD_WORD[mood] : "sem registro"}`;
+}
+
 /** Frase gentil da semana: celebra o leve, acolhe o difícil, nunca cobra. */
 export function weekSentence(days: WeekMood[]): string {
   const moods = days.map((d) => d.mood).filter((m): m is Mood => m !== null);

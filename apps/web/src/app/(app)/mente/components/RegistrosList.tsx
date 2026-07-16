@@ -28,7 +28,7 @@ export function RegistrosList({ records }: { records: MindNote[] }) {
                   <MoodFaceIcon mood={n.mood} size={18} color={MOOD_RECORD_COLOR[n.mood]} />
                 ) : null}
               </div>
-              <p className="mt-1 line-clamp-2 text-sm text-[#6b6386]">{n.note}</p>
+              <p className="mt-1 whitespace-pre-wrap text-sm text-[#6b6386]">{n.note}</p>
             </article>
           ))}
         </div>

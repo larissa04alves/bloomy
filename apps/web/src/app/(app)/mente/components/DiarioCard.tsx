@@ -34,6 +34,7 @@ export function DiarioCard({
         <textarea
           value={text}
           onChange={(e) => setText(e.target.value)}
+          aria-label="Escreva um relato no mini-diário"
           placeholder="Escreva o que vier..."
           maxLength={2000}
           className="min-h-13 w-full resize-none rounded-control bg-white px-3.5 py-3 text-sm text-ink placeholder:text-[#c6b6c0] focus:outline-none focus:ring-2 focus:ring-lilac"
