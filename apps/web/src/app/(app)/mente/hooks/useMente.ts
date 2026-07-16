@@ -17,7 +17,10 @@ export function useMente() {
     useCallback(() => api.get<CheckinResponse>("/api/checkins"), []),
   );
   const notesRes = useResource<NotesResponse>(
-    useCallback(() => api.get<NotesResponse>("/api/checkins/notes?limit=30"), []),
+    useCallback(
+      () => api.get<NotesResponse>("/api/checkins/notes?limit=30"),
+      [],
+    ),
   );
   const weekRes = useResource<WeekResponse>(
     useCallback(() => api.get<WeekResponse>("/api/checkins/week"), []),
@@ -32,7 +35,10 @@ export function useMente() {
     async (input: { mood?: Mood; anxiety?: number }, errMsg: string) => {
       const prev = todayRes.data;
       try {
-        const { checkin } = await api.put<CheckinResponse>("/api/checkins", input);
+        const { checkin } = await api.put<CheckinResponse>(
+          "/api/checkins",
+          input,
+        );
         if (checkin) todayRes.setData({ checkin });
       } catch (e) {
         todayRes.setData(prev);
@@ -45,14 +51,18 @@ export function useMente() {
   const setMood = useCallback(
     (mood: Mood) => {
       // Otimista: seleção reflete na hora (o PUT confirma).
-      if (todayRes.data) todayRes.setData({ checkin: { ...todayRes.data.checkin, mood } as Checkin });
+      if (todayRes.data)
+        todayRes.setData({
+          checkin: { ...todayRes.data.checkin, mood } as Checkin,
+        });
       void patchCheckin({ mood }, "Não foi possível registrar o humor");
     },
     [todayRes, patchCheckin],
   );
 
   const setAnxiety = useCallback(
-    (anxiety: number) => void patchCheckin({ anxiety }, "Não foi possível registrar a ansiedade"),
+    (anxiety: number) =>
+      void patchCheckin({ anxiety }, "Não foi possível registrar a ansiedade"),
     [patchCheckin],
   );
 
@@ -60,11 +70,16 @@ export function useMente() {
   const saveNote = useCallback(
     async (note: string): Promise<boolean> => {
       try {
-        const { note: created } = await api.post<NoteResponse>("/api/checkins/notes", {
-          note,
-          mood: today?.mood ?? null,
-        });
-        notesRes.setData({ notes: [created, ...(notesRes.data?.notes ?? [])] });
+        const { note: created } = await api.post<NoteResponse>(
+          "/api/checkins/notes",
+          {
+            note,
+            mood: today?.mood ?? null,
+          },
+        );
+        if (notesRes.data)
+          notesRes.setData({ notes: [created, ...notesRes.data.notes] });
+        else notesRes.reload();
         return true;
       } catch (e) {
         toastError(e, "Não foi possível salvar o registro");
