@@ -3,13 +3,14 @@
 import { useCallback } from "react";
 
 import { api } from "@/lib/api";
-import type { Checkin, MindNote, Mood } from "@/lib/api-types";
+import type { Checkin, MindNote, Mood, WeekMood } from "@/lib/api-types";
 import { toastError } from "@/lib/toast";
 import { useResource } from "@/lib/use-resource";
 
 type CheckinResponse = { checkin: Checkin | null };
 type NotesResponse = { notes: MindNote[] };
 type NoteResponse = { note: MindNote };
+type WeekResponse = { days: WeekMood[] };
 
 export function useMente() {
   const todayRes = useResource<CheckinResponse>(
@@ -18,9 +19,13 @@ export function useMente() {
   const notesRes = useResource<NotesResponse>(
     useCallback(() => api.get<NotesResponse>("/api/checkins/notes?limit=30"), []),
   );
+  const weekRes = useResource<WeekResponse>(
+    useCallback(() => api.get<WeekResponse>("/api/checkins/week"), []),
+  );
 
   const today = todayRes.data?.checkin ?? null;
   const records = notesRes.data?.notes ?? [];
+  const week = weekRes.data?.days ?? [];
 
   /** PUT parcial do check-in do dia (humor/ansiedade); rollback no catch. */
   const patchCheckin = useCallback(
@@ -72,7 +77,8 @@ export function useMente() {
   return {
     today,
     records,
-    loading: todayRes.loading || notesRes.loading,
+    week,
+    loading: todayRes.loading || notesRes.loading || weekRes.loading,
     setMood,
     setAnxiety,
     saveNote,

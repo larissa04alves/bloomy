@@ -1,4 +1,4 @@
-import type { Mood } from "@/lib/api-types";
+import type { Mood, WeekMood } from "@/lib/api-types";
 
 /** Humor do pior ao melhor — casa com a posição dos tiles na tela. */
 export const MOOD_ORDER: readonly Mood[] = ["sad", "meh", "neutral", "good", "great"];
@@ -49,4 +49,16 @@ const TIME_FMT = new Intl.DateTimeFormat("pt-BR", {
 /** Hora local (America/Sao_Paulo) de um instante ISO — "HH:mm". */
 export function timeOf(createdAt: string): string {
   return TIME_FMT.format(new Date(createdAt));
+}
+
+/** Frase gentil da semana: celebra o leve, acolhe o difícil, nunca cobra. */
+export function weekSentence(days: WeekMood[]): string {
+  const moods = days.map((d) => d.mood).filter((m): m is Mood => m !== null);
+  if (moods.length === 0) return "Sua semana vai aparecer aqui 🌱";
+  if (moods.length === 1) return "Começando a semana no seu ritmo 🌱";
+  const positive = moods.filter((m) => m === "good" || m === "great").length;
+  const heavy = moods.filter((m) => m === "sad" || m === "meh").length;
+  if (positive > heavy) return "Mais dias leves que pesados essa semana 🌿";
+  if (heavy > positive) return "Semana mais puxada — tá tudo bem sentir isso 💜";
+  return "Uma semana de altos e baixos — e você apareceu do mesmo jeito 💛";
 }

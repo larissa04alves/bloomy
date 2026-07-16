@@ -3,8 +3,8 @@ import { describe, expect, test } from "bun:test";
 import { mindNote, moodCheckin } from "@bloomy/db/schema/mind";
 
 import { createTestDb, createTestUser } from "@/server/shared/test-db";
-import { dayFor } from "@/server/shared/day";
-import { createNote, getCheckin, listNotes, upsertCheckin } from "./service";
+import { dayFor, weekDays } from "@/server/shared/day";
+import { createNote, getCheckin, listNotes, upsertCheckin, weekMoods } from "./service";
 
 describe("upsertCheckin (1 por dia)", () => {
   test("não duplica no mesmo dia e atualização parcial preserva campos", async () => {
@@ -48,5 +48,22 @@ describe("createNote (vários relatos por dia)", () => {
 
     const listed = await listNotes(db, userId, 30);
     expect(listed.map((n) => n.note)).toEqual(["novo", "antigo"]);
+  });
+});
+
+describe("weekMoods (seg→dom da semana atual)", () => {
+  test("preenche os 7 dias, null onde não há check-in", async () => {
+    const db = await createTestDb();
+    const userId = await createTestUser(db);
+    const days = weekDays();
+
+    await db.insert(moodCheckin).values({ userId, day: days[0], mood: "good" });
+    await db.insert(moodCheckin).values({ userId, day: days[2], mood: "sad" });
+
+    const week = await weekMoods(db, userId);
+    expect(week).toHaveLength(7);
+    expect(week[0]).toEqual({ day: days[0], mood: "good" });
+    expect(week[1]).toEqual({ day: days[1], mood: null });
+    expect(week[2]).toEqual({ day: days[2], mood: "sad" });
   });
 });

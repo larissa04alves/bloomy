@@ -224,3 +224,36 @@ de hoje, feed do tile Hoje e da meta `mind`).
 --conditions react-server` verde · `bun run build` PASS. Visual: salvar dois relatos no mesmo dia
 com humores diferentes → ambos aparecem em "Seus registros", cada um com sua carinha e hora, o
 campo limpa após salvar, nada é sobrescrito.
+
+---
+
+## Revisão v3 — Análise da semana ("Como foi sua semana")
+
+**Motivação (pós-brainstorm visual):** dar à pessoa uma leitura gentil de como foi a semana, pra ajudar no autoconhecimento. Explorou-se também tags e compartilhar; **ambos descartados** pra não inchar. Fica só a análise, apoiada no humor que já existe.
+
+**Decisões (via visual companion):** card minimalíssimo (opção A) — 7 bolinhas + frase gentil, **sem** contadores, **sem** tags, **sem** gráfico. Tom é regra: celebra semana leve, **acolhe** semana difícil, nunca cobra (Regra Sem-Vermelho).
+
+### Back-end
+- **`mood_checkin` inalterado; sem migration** — só agrega o que já existe.
+- **Week range** (`server/shared/day.ts`, client-safe): `weekDays(reference = dayFor()): string[]` → 7 dias `YYYY-MM-DD` de **segunda a domingo** da semana atual (fuso BR, ADR-0002). Puro/testável.
+- **Serviço** (`server/mind/service.ts`): `weekMoods(db, userId): Promise<WeekMood[]>` → 7 entradas `{ day, mood }` (seg→dom), humor do `mood_checkin` do dia ou `null`. Query `inArray(day, weekDays())`.
+- **Rota** (`app/api/checkins/week/route.ts`): `GET` → `{ days: WeekMood[] }` (7 itens). Auth guard.
+
+### Front
+- **DTO** `WeekMood = { day: string; mood: Mood | null }` em `lib/api-types.ts`.
+- **Helper puro** (`mente-helpers.ts`): `weekSentence(days: WeekMood[]): string` — deriva a frase do padrão de humor:
+  - 0 dias com humor → convite ("Sua semana vai aparecer aqui 🌱").
+  - poucos dias (1) → "Começando a semana no seu ritmo 🌱".
+  - positivos (good+great) > pesados (sad+meh) → "Mais dias leves que pesados essa semana 🌿".
+  - pesados > positivos → "Semana mais puxada — tá tudo bem sentir isso 💜" (acolhe).
+  - empate/neutro → "Uma semana de altos e baixos — e você apareceu do mesmo jeito 💛".
+- **Componente** `SemanaCard.tsx`: card branco "Como foi sua semana" + 7 bolinhas (seg→dom, cor por `MOOD_RECORD_COLOR`, tracejada se `null`) + `weekSentence`. Estado de poucos dias usa o convite.
+- **Hook** `useMente`: + `weekRes = useResource(GET /api/checkins/week)`, expõe `week: WeekMood[]`. **`page.tsx`**: `<SemanaCard days={week} />` **logo acima de** `<RegistrosList>`.
+
+### Testes
+- `weekDays`: quarta 2026-07-15 → seg 2026-07-13 … dom 2026-07-19 (7 dias, seg→dom).
+- `weekMoods`: preenche os 7 slots, `null` onde não há check-in.
+- `weekSentence`: cada tier (vazio, poucos, leve>pesado, pesado>leve, empate).
+
+### Aceitação (v3)
+`bun check-types` verde · `bun test --conditions react-server` verde · `bun run build` PASS (`/api/checkins/week` presente). Visual: card mostra as 7 bolinhas coloridas da semana + frase coerente; semana vazia mostra o convite, não cobrança.

@@ -176,3 +176,6 @@ export type MindNote = {
   note: string;
   createdAt: string; // ISO
 };
+
+/** Humor de um dia da semana (card "Como foi sua semana"). */
+export type WeekMood = { day: string; mood: Mood | null };

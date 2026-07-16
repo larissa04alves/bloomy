@@ -1,6 +1,6 @@
 import { describe, expect, it } from "bun:test";
 
-import { MOOD_ORDER, relativeDay, timeOf } from "./mente-helpers";
+import { MOOD_ORDER, relativeDay, timeOf, weekSentence } from "./mente-helpers";
 
 describe("MOOD_ORDER", () => {
   it("vai do pior ao melhor humor, 5 valores", () => {
@@ -26,5 +26,25 @@ describe("relativeDay", () => {
 describe("timeOf", () => {
   it("converte ISO UTC para HH:mm no fuso BR (UTC-3)", () => {
     expect(timeOf("2026-07-15T17:32:00.000Z")).toBe("14:32");
+  });
+});
+
+describe("weekSentence", () => {
+  const wk = (moods: (string | null)[]) =>
+    moods.map((m, i) => ({ day: `2026-07-1${i}`, mood: m })) as any;
+  it("sem humor → convite", () => {
+    expect(weekSentence(wk([null, null, null, null, null, null, null]))).toContain("aparecer aqui");
+  });
+  it("um dia só → começando", () => {
+    expect(weekSentence(wk(["good", null, null, null, null, null, null]))).toContain("no seu ritmo");
+  });
+  it("mais leves que pesados", () => {
+    expect(weekSentence(wk(["good", "great", "good", "sad", null, null, null]))).toContain("leves que pesados");
+  });
+  it("mais pesados → acolhe", () => {
+    expect(weekSentence(wk(["sad", "meh", "sad", "good", null, null, null]))).toContain("tá tudo bem");
+  });
+  it("empate → altos e baixos", () => {
+    expect(weekSentence(wk(["good", "sad", "neutral", null, null, null, null]))).toContain("altos e baixos");
   });
 });
