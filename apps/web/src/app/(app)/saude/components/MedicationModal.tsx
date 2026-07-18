@@ -9,6 +9,8 @@ import { BottomSheet } from "@/components/bottom-sheet";
 import { ChoiceChip } from "@/components/choice-chip";
 import type { Medication, MedicationInput } from "@/lib/api-types";
 
+import { TimeSelect } from "./TimeSelect";
+
 const schema = z.object({
   name: z.string().trim().min(1, "Dê um nome ao remédio"),
   dose: z.string(),
@@ -33,7 +35,8 @@ export function MedicationModal({
   onSubmit: (input: MedicationInput) => void;
 }) {
   const [times, setTimes] = useState<string[]>(["09:00"]);
-  const [newTime, setNewTime] = useState("12:00");
+  const [newHour, setNewHour] = useState("12");
+  const [newMinute, setNewMinute] = useState("00");
 
   const form = useForm({
     defaultValues: { name: "", dose: "", stock: "" },
@@ -60,8 +63,11 @@ export function MedicationModal({
     setTimes(initial?.times?.length ? initial.times : ["09:00"]);
   }, [open, initial, form]);
 
-  const addTime = () =>
-    setTimes((prev) => [...new Set([...prev, newTime])].sort());
+  const addTime = () => {
+    const h = (newHour === "" ? "00" : newHour).padStart(2, "0");
+    const m = (newMinute === "" ? "00" : newMinute).padStart(2, "0");
+    setTimes((prev) => [...new Set([...prev, `${h}:${m}`])].sort());
+  };
   const removeTime = (t: string) =>
     setTimes((prev) => prev.filter((x) => x !== t));
 
@@ -163,12 +169,13 @@ export function MedicationModal({
               </button>
             </span>
           ))}
-          <input
-            type="time"
-            aria-label="Novo horário"
-            value={newTime}
-            onChange={(e) => setNewTime(e.target.value)}
-            className="rounded-control border border-hairline bg-white px-3 py-2 text-sm font-semibold text-ink focus:border-lilac focus:outline-none"
+          <TimeSelect
+            hour={newHour}
+            minute={newMinute}
+            onChange={(t) => {
+              setNewHour(t.hour);
+              setNewMinute(t.minute);
+            }}
           />
           <button
             type="button"
