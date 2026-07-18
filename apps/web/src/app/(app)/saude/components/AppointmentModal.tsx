@@ -69,7 +69,8 @@ export function AppointmentModal({
     setMinute(t.minute);
   }, [open, initial, form]);
 
-  const isEdit = Boolean(initial);
+  // "Editar" só quando a consulta já tem horário; retorno "a agendar" (to_schedule) é agendamento.
+  const isEdit = Boolean(initial?.scheduledAt);
   const inputCls =
     "rounded-control border border-hairline bg-white px-4 py-3 text-sm font-semibold text-ink placeholder:text-ink-faint focus:border-lilac focus:outline-none";
 

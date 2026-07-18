@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 
+import { HeartPulseIcon } from "@/components/icons/heart-pulse";
+import { LoadingOverlay } from "@/components/loading-overlay";
 import { Screen } from "@/components/screen";
 import type { Appointment, Exam, Medication } from "@/lib/api-types";
 
@@ -134,6 +136,20 @@ export default function SaudePage() {
         title={history.title}
         items={history.items}
       />
+
+      {consultas.creating || exames.creating || agenda.creating ? (
+        <LoadingOverlay
+          label={
+            consultas.creating
+              ? "Agendando consulta…"
+              : exames.creating
+                ? "Adicionando exame…"
+                : "Cadastrando remédio…"
+          }
+        >
+          <HeartPulseIcon animate size={40} className="text-lilac-deep" />
+        </LoadingOverlay>
+      ) : null}
     </Screen>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 
 import { api } from "@/lib/api";
 import type { Exam, ExamInput } from "@/lib/api-types";
@@ -18,15 +18,22 @@ export function useExames() {
 
   const all = list.data?.exams ?? [];
   const ativos = sortByWhen(all.filter((e) => e.status !== "completed"));
-  const historico = byCompletedDesc(all.filter((e) => e.status === "completed"));
+  const historico = byCompletedDesc(
+    all.filter((e) => e.status === "completed"),
+  );
+  const [creating, setCreating] = useState(false);
 
   const create = useCallback(
     async (input: ExamInput) => {
+      setCreating(true);
       try {
         await api.post("/api/exams", input);
-        list.reload();
+        const data = await api.get<ListResponse>("/api/exams");
+        list.setData(data);
       } catch (e) {
         toastError(e, "Não foi possível adicionar o exame");
+      } finally {
+        setCreating(false);
       }
     },
     [list],
@@ -36,7 +43,9 @@ export function useExames() {
     async (id: string, input: ExamInput) => {
       const prev = list.data;
       if (list.data) {
-        list.setData({ exams: all.map((e) => (e.id === id ? { ...e, ...input } : e)) });
+        list.setData({
+          exams: all.map((e) => (e.id === id ? { ...e, ...input } : e)),
+        });
       }
       try {
         await api.put(`/api/exams/${id}`, input);
@@ -64,10 +73,15 @@ export function useExames() {
   );
 
   const complete = useCallback(
-    async (id: string, opts: { needsReturn: boolean; followUpMonths?: number }) => {
+    async (
+      id: string,
+      opts: { needsReturn: boolean; followUpMonths?: number },
+    ) => {
       const prev = list.data;
       list.setData({
-        exams: all.map((e) => (e.id === id ? { ...e, status: "completed" as const } : e)),
+        exams: all.map((e) =>
+          e.id === id ? { ...e, status: "completed" as const } : e,
+        ),
       });
       try {
         await api.post(`/api/exams/${id}/complete`, opts);
@@ -84,6 +98,7 @@ export function useExames() {
     ativos,
     historico,
     loading: list.loading,
+    creating,
     create,
     update,
     remove,

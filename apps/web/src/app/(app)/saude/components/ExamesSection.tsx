@@ -28,7 +28,11 @@ export function ExamesSection({
       <div className="flex items-center justify-between">
         <h2 className="font-display text-base font-bold text-ink">Exames</h2>
         <div className="flex items-center gap-3">
-          <button type="button" onClick={onHistory} className="text-sm font-bold text-lilac-deep">
+          <button
+            type="button"
+            onClick={onHistory}
+            className="text-sm font-bold text-lilac-deep"
+          >
             Ver histórico
           </button>
           <button
@@ -47,22 +51,42 @@ export function ExamesSection({
         </p>
       ) : (
         ativos.map((e) => (
-          <SwipeableRow key={e.id} onEdit={() => onEdit(e)} onDelete={() => onDelete(e.id)}>
+          <SwipeableRow
+            key={e.id}
+            onEdit={() => onEdit(e)}
+            onDelete={() => onDelete(e.id)}
+          >
             <div className="flex items-center gap-3 rounded-card bg-white p-3 shadow-card-sm">
-              <IconChip tone="lilac" icon={<TestTubeIcon size={22} weight="fill" />} />
+              <IconChip
+                tone="lilac"
+                icon={<TestTubeIcon size={22} weight="fill" />}
+              />
               <div className="flex flex-1 flex-col">
                 <span className="text-sm font-bold text-ink">{e.name}</span>
-                <span className={`text-xs font-semibold ${examStatusTone(e.status)}`}>
+                <span
+                  className={`text-xs font-semibold ${examStatusTone(e.status)}`}
+                >
                   {EXAM_STATUS_LABELS[e.status]}
                 </span>
               </div>
-              <button
-                type="button"
-                aria-label={`Concluir exame ${e.name}`}
-                onClick={() => onComplete(e)}
-              >
-                <CircleIcon size={24} className="text-control-off" />
-              </button>
+              {e.status === "to_schedule" ? (
+                <button
+                  type="button"
+                  aria-label={`Agendar exame ${e.name}`}
+                  onClick={() => onEdit(e)}
+                  className="rounded-full bg-lilac-tint px-3 py-1.5 text-xs font-bold text-lilac-deep"
+                >
+                  Agendar
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  aria-label={`Concluir exame ${e.name}`}
+                  onClick={() => onComplete(e)}
+                >
+                  <CircleIcon size={24} className="text-control-off" />
+                </button>
+              )}
             </div>
           </SwipeableRow>
         ))

@@ -33,7 +33,7 @@ export function RetornoSheet({
       tone="lilac"
       icon={<CalendarHeartIcon size={22} weight="fill" />}
       footer={
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-3">
           <button
             type="button"
             onClick={() => {
@@ -62,7 +62,11 @@ export function RetornoSheet({
       </p>
       <div className="flex flex-wrap gap-2">
         {MONTH_OPTIONS.map((n) => (
-          <ChoiceChip key={n} selected={months === n} onClick={() => setMonths(n)}>
+          <ChoiceChip
+            key={n}
+            selected={months === n}
+            onClick={() => setMonths(n)}
+          >
             {n === 1 ? "1 mês" : `${n} meses`}
           </ChoiceChip>
         ))}

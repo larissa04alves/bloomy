@@ -28,7 +28,11 @@ export function ConsultasSection({
       <div className="flex items-center justify-between">
         <h2 className="font-display text-base font-bold text-ink">Consultas</h2>
         <div className="flex items-center gap-3">
-          <button type="button" onClick={onHistory} className="text-sm font-bold text-lilac-deep">
+          <button
+            type="button"
+            onClick={onHistory}
+            className="text-sm font-bold text-lilac-deep"
+          >
             Ver histórico
           </button>
           <button
@@ -47,30 +51,56 @@ export function ConsultasSection({
         </p>
       ) : (
         ativas.map((a) => (
-          <SwipeableRow key={a.id} onEdit={() => onEdit(a)} onDelete={() => onDelete(a.id)}>
+          <SwipeableRow
+            key={a.id}
+            onEdit={() => onEdit(a)}
+            onDelete={() => onDelete(a.id)}
+          >
             <div className="flex items-center gap-3 rounded-card bg-white p-3 shadow-card-sm">
-              <IconChip tone="lilac" icon={<StethoscopeIcon size={22} weight="fill" />} />
+              <IconChip
+                tone="lilac"
+                icon={<StethoscopeIcon size={22} weight="fill" />}
+              />
               <div className="flex flex-1 flex-col">
-                <span className="text-sm font-bold text-ink">{a.professional}</span>
+                <span className="text-sm font-bold text-ink">
+                  {a.professional}
+                </span>
                 {a.specialty ? (
-                  <span className="text-xs font-semibold text-ink-read">{a.specialty}</span>
+                  <span className="text-xs font-semibold text-ink-read">
+                    {a.specialty}
+                  </span>
                 ) : null}
               </div>
-              {a.status === "scheduled" && a.scheduledAt ? (
-                <div className="flex flex-col items-end">
-                  <span className="text-xs font-bold text-lilac-deep">{weekdayDay(a.scheduledAt)}</span>
-                  <span className="text-xs font-semibold text-ink-read">{hourLabel(a.scheduledAt)}</span>
-                </div>
+              {a.status === "to_schedule" ? (
+                <button
+                  type="button"
+                  aria-label={`Agendar consulta ${a.professional}`}
+                  onClick={() => onEdit(a)}
+                  className="rounded-full bg-lilac-tint px-3 py-1.5 text-xs font-bold text-lilac-deep"
+                >
+                  Agendar
+                </button>
               ) : (
-                <span className="text-xs font-bold text-coral">a agendar</span>
+                <>
+                  {a.scheduledAt ? (
+                    <div className="flex flex-col items-end">
+                      <span className="text-xs font-bold text-lilac-deep">
+                        {weekdayDay(a.scheduledAt)}
+                      </span>
+                      <span className="text-xs font-semibold text-ink-read">
+                        {hourLabel(a.scheduledAt)}
+                      </span>
+                    </div>
+                  ) : null}
+                  <button
+                    type="button"
+                    aria-label={`Concluir consulta ${a.professional}`}
+                    onClick={() => onComplete(a)}
+                  >
+                    <CircleIcon size={24} className="text-control-off" />
+                  </button>
+                </>
               )}
-              <button
-                type="button"
-                aria-label={`Concluir consulta ${a.professional}`}
-                onClick={() => onComplete(a)}
-              >
-                <CircleIcon size={24} className="text-control-off" />
-              </button>
             </div>
           </SwipeableRow>
         ))

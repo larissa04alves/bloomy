@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 
 import { api } from "@/lib/api";
 import type { Appointment, AppointmentInput } from "@/lib/api-types";
@@ -22,16 +22,23 @@ export function useConsultas() {
 
   const all = list.data?.appointments ?? [];
   const ativas = sortByWhen(all.filter((a) => a.status !== "completed"));
-  const historico = byCompletedDesc(all.filter((a) => a.status === "completed"));
+  const historico = byCompletedDesc(
+    all.filter((a) => a.status === "completed"),
+  );
+  const [creating, setCreating] = useState(false);
 
   const create = useCallback(
     async (input: AppointmentInput) => {
+      setCreating(true);
       try {
         await api.post("/api/appointments", input);
-        list.reload();
+        const data = await api.get<ListResponse>("/api/appointments");
+        list.setData(data);
         next.reload();
       } catch (e) {
         toastError(e, "Não foi possível agendar a consulta");
+      } finally {
+        setCreating(false);
       }
     },
     [list, next],
@@ -74,9 +81,11 @@ export function useConsultas() {
   );
 
   const complete = useCallback(
-    async (id: string, opts: { needsReturn: boolean; followUpMonths?: number }) => {
+    async (
+      id: string,
+      opts: { needsReturn: boolean; followUpMonths?: number },
+    ) => {
       const prev = list.data;
-      // Otimista: sai da lista ativa na hora (o retorno chega no reload).
       list.setData({
         appointments: all.map((a) =>
           a.id === id ? { ...a, status: "completed" as const } : a,
@@ -99,6 +108,7 @@ export function useConsultas() {
     historico,
     proxima: next.data?.appointment ?? null,
     loading: list.loading,
+    creating,
     create,
     update,
     remove,

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 
 import { api } from "@/lib/api";
 import type { Medication, MedicationInput } from "@/lib/api-types";
@@ -15,14 +15,19 @@ export function useAgendaRemedios() {
   );
 
   const medications = list.data?.medications ?? [];
+  const [creating, setCreating] = useState(false);
 
   const create = useCallback(
     async (input: MedicationInput) => {
+      setCreating(true);
       try {
         await api.post("/api/medications", input);
-        list.reload();
+        const data = await api.get<ListResponse>("/api/medications");
+        list.setData(data);
       } catch (e) {
         toastError(e, "Não foi possível cadastrar o remédio");
+      } finally {
+        setCreating(false);
       }
     },
     [list],
@@ -33,7 +38,9 @@ export function useAgendaRemedios() {
       const prev = list.data;
       if (list.data) {
         list.setData({
-          medications: medications.map((m) => (m.id === id ? { ...m, ...input } : m)),
+          medications: medications.map((m) =>
+            m.id === id ? { ...m, ...input } : m,
+          ),
         });
       }
       try {
@@ -61,5 +68,12 @@ export function useAgendaRemedios() {
     [list, medications],
   );
 
-  return { medications, loading: list.loading, create, update, remove };
+  return {
+    medications,
+    loading: list.loading,
+    creating,
+    create,
+    update,
+    remove,
+  };
 }
