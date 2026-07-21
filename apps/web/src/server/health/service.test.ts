@@ -7,6 +7,33 @@ import {
   listAppointments,
   nextAppointment,
 } from "./service";
+import {
+  attachExam,
+  createExam,
+  deleteExam,
+  getExamAttachmentMeta,
+  removeExamAttachment,
+} from "./service";
+import type { ExamStorageError } from "./service";
+import type { ExamStorage } from "./r2";
+
+function fakeStorage() {
+  const calls: { put: string[]; del: string[] } = { put: [], del: [] };
+  const storage: ExamStorage = {
+    async put(key) {
+      calls.put.push(key);
+    },
+    async get() {
+      return { body: new ReadableStream() };
+    },
+    async delete(key) {
+      calls.del.push(key);
+    },
+  };
+  return { storage, calls };
+}
+
+const FILE = { body: new Uint8Array([1, 2, 3]), mime: "application/pdf", name: "r.pdf", size: 3 };
 
 describe("completeAppointment (ciclo de retorno)", () => {
   test("needsReturn cria retorno to_schedule copiando profissional", async () => {
@@ -90,5 +117,112 @@ describe("nextAppointment (janela de 30 dias)", () => {
 
     const next = await nextAppointment(db, userId);
     expect(next).toBeNull();
+  });
+});
+
+describe("attachExam", () => {
+  test("anexa em exame result_available: grava colunas e sobe pro R2", async () => {
+    const db = await createTestDb();
+    const userId = await createTestUser(db);
+    const exam = await createExam(db, userId, { name: "Hemograma", status: "result_available" });
+    const { storage, calls } = fakeStorage();
+
+    const result = await attachExam(db, storage, userId, exam.id, FILE);
+
+    expect(result).not.toBe("not_found");
+    expect(result).not.toBe("wrong_status");
+    const updated = result as Exclude<Awaited<ReturnType<typeof attachExam>>, ExamStorageError>;
+    expect(updated.attachmentName).toBe("r.pdf");
+    expect(updated.attachmentMime).toBe("application/pdf");
+    expect(updated.attachmentSize).toBe(3);
+    expect(updated.attachmentKey).toContain(`exam-attachments/${userId}/${exam.id}/`);
+    expect(calls.put).toHaveLength(1);
+    expect(calls.del).toHaveLength(0);
+  });
+
+  test("troca: sobe o novo e deleta a chave antiga do R2", async () => {
+    const db = await createTestDb();
+    const userId = await createTestUser(db);
+    const exam = await createExam(db, userId, { name: "Hemograma", status: "result_available" });
+    const { storage, calls } = fakeStorage();
+
+    const first = (await attachExam(db, storage, userId, exam.id, FILE)) as { attachmentKey: string };
+    await attachExam(db, storage, userId, exam.id, { ...FILE, name: "novo.pdf" });
+
+    expect(calls.put).toHaveLength(2);
+    expect(calls.del).toEqual([first.attachmentKey]);
+  });
+
+  test("exame de outra usuária → not_found", async () => {
+    const db = await createTestDb();
+    const owner = await createTestUser(db);
+    const exam = await createExam(db, owner, { name: "Hemograma", status: "result_available" });
+    const { storage } = fakeStorage();
+    const other = await createTestUser(db, "user-other");
+
+    expect(await attachExam(db, storage, other, exam.id, FILE)).toBe("not_found");
+  });
+
+  test("status ≠ result_available → wrong_status, sem tocar no R2", async () => {
+    const db = await createTestDb();
+    const userId = await createTestUser(db);
+    const exam = await createExam(db, userId, { name: "Hemograma", status: "scheduled" });
+    const { storage, calls } = fakeStorage();
+
+    expect(await attachExam(db, storage, userId, exam.id, FILE)).toBe("wrong_status");
+    expect(calls.put).toHaveLength(0);
+  });
+});
+
+describe("removeExamAttachment / getExamAttachmentMeta / deleteExam cleanup", () => {
+  test("remove: limpa colunas e deleta objeto", async () => {
+    const db = await createTestDb();
+    const userId = await createTestUser(db);
+    const exam = await createExam(db, userId, { name: "Hemograma", status: "result_available" });
+    const { storage, calls } = fakeStorage();
+    const attached = (await attachExam(db, storage, userId, exam.id, FILE)) as Exclude<
+      Awaited<ReturnType<typeof attachExam>>,
+      ExamStorageError
+    >;
+
+    const result = await removeExamAttachment(db, storage, userId, exam.id);
+
+    expect(result!.attachmentKey).toBeNull();
+    expect(result!.attachmentName).toBeNull();
+    expect(calls.del).toEqual([attached.attachmentKey!]);
+  });
+
+  test("getExamAttachmentMeta devolve chave/mime/nome do dono", async () => {
+    const db = await createTestDb();
+    const userId = await createTestUser(db);
+    const exam = await createExam(db, userId, { name: "Hemograma", status: "result_available" });
+    const { storage } = fakeStorage();
+    await attachExam(db, storage, userId, exam.id, FILE);
+
+    const meta = await getExamAttachmentMeta(db, userId, exam.id);
+    expect(meta!.name).toBe("r.pdf");
+    expect(meta!.mime).toBe("application/pdf");
+    expect(meta!.key).toContain("exam-attachments/");
+  });
+
+  test("getExamAttachmentMeta: sem anexo → null", async () => {
+    const db = await createTestDb();
+    const userId = await createTestUser(db);
+    const exam = await createExam(db, userId, { name: "Hemograma", status: "result_available" });
+    expect(await getExamAttachmentMeta(db, userId, exam.id)).toBeNull();
+  });
+
+  test("deleteExam com anexo remove o objeto do R2", async () => {
+    const db = await createTestDb();
+    const userId = await createTestUser(db);
+    const exam = await createExam(db, userId, { name: "Hemograma", status: "result_available" });
+    const { storage, calls } = fakeStorage();
+    const attached = (await attachExam(db, storage, userId, exam.id, FILE)) as Exclude<
+      Awaited<ReturnType<typeof attachExam>>,
+      ExamStorageError
+    >;
+
+    expect(await deleteExam(db, storage, userId, exam.id)).toBe(true);
+    expect(calls.del).toEqual([attached.attachmentKey!]);
   });
 });

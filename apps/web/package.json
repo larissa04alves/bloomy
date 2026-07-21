@@ -10,6 +10,7 @@
     "test": "bun test --conditions react-server src"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "catalog:",
     "@bloomy/auth": "workspace:*",
     "@bloomy/db": "workspace:*",
     "@bloomy/env": "workspace:*",

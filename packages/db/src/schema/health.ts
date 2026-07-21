@@ -63,6 +63,10 @@ export const exam = sqliteTable(
     parentId: text("parent_id").references((): AnySQLiteColumn => exam.id, {
       onDelete: "set null",
     }),
+    attachmentKey: text("attachment_key"),
+    attachmentMime: text("attachment_mime"),
+    attachmentName: text("attachment_name"),
+    attachmentSize: integer("attachment_size"),
     createdAt: timestampMs("created_at"),
     updatedAt: timestampMs("updated_at"),
   },

@@ -9,6 +9,7 @@ import {
   unauthorized,
 } from "@/server/shared/api";
 import { deleteExam, updateExam } from "@/server/health/service";
+import { examStorage } from "@/server/health/r2";
 
 const BODY_SCHEMA = z.object({
   name: z.string().min(1).max(120).optional(),
@@ -41,7 +42,7 @@ export async function DELETE(
   if (!userId) return unauthorized();
 
   const { id } = await params;
-  const deleted = await deleteExam(db, userId, id);
+  const deleted = await deleteExam(db, examStorage, userId, id);
   if (!deleted) return notFound();
 
   return Response.json({ ok: true });

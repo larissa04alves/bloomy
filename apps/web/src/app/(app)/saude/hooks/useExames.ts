@@ -7,6 +7,7 @@ import type { Exam, ExamInput } from "@/lib/api-types";
 import { toastError } from "@/lib/toast";
 import { useResource } from "@/lib/use-resource";
 
+import type { AttachmentIntent } from "../components/ExamModal";
 import { byCompletedDesc, sortByWhen } from "./format";
 
 type ListResponse = { exams: Exam[] };
@@ -23,11 +24,31 @@ export function useExames() {
   );
   const [creating, setCreating] = useState(false);
 
+  // Aplica a intenção de anexo depois que o exame já existe (tem id).
+  const applyAttachment = useCallback(
+    async (examId: string, attachment?: AttachmentIntent) => {
+      if (!attachment) return;
+      if (attachment.file) {
+        const form = new FormData();
+        form.append("file", attachment.file);
+        await api.upload(`/api/exams/${examId}/attachment`, form);
+      } else if (attachment.remove) {
+        await api.del(`/api/exams/${examId}/attachment`);
+      }
+    },
+    [],
+  );
+
   const create = useCallback(
-    async (input: ExamInput) => {
+    async (input: ExamInput, attachment?: AttachmentIntent) => {
       setCreating(true);
       try {
-        await api.post("/api/exams", input);
+        const { exam } = await api.post<{ exam: Exam }>("/api/exams", input);
+        try {
+          await applyAttachment(exam.id, attachment);
+        } catch (e) {
+          toastError(e, "Exame salvo, mas o anexo não pôde ser enviado — reanexe editando");
+        }
         const data = await api.get<ListResponse>("/api/exams");
         list.setData(data);
       } catch (e) {
@@ -36,11 +57,11 @@ export function useExames() {
         setCreating(false);
       }
     },
-    [list],
+    [list, applyAttachment],
   );
 
   const update = useCallback(
-    async (id: string, input: ExamInput) => {
+    async (id: string, input: ExamInput, attachment?: AttachmentIntent) => {
       const prev = list.data;
       if (list.data) {
         list.setData({
@@ -49,13 +70,19 @@ export function useExames() {
       }
       try {
         await api.put(`/api/exams/${id}`, input);
-        list.reload();
       } catch (e) {
         if (prev) list.setData(prev);
         toastError(e, "Não foi possível editar o exame");
+        return;
       }
+      try {
+        await applyAttachment(id, attachment);
+      } catch (e) {
+        toastError(e, "Exame salvo, mas o anexo não pôde ser enviado — reanexe editando");
+      }
+      list.reload();
     },
-    [list, all],
+    [list, all, applyAttachment],
   );
 
   const remove = useCallback(
@@ -98,6 +125,10 @@ export function useExames() {
           suggestedAt: suggested.toISOString(),
           completedAt: null,
           parentId: done.id,
+          attachmentKey: null,
+          attachmentMime: null,
+          attachmentName: null,
+          attachmentSize: null,
           createdAt: nowIso,
           updatedAt: nowIso,
         });

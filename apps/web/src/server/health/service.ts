@@ -1,5 +1,7 @@
 import "server-only";
 
+import { randomUUID } from "node:crypto";
+
 import type { Db } from "@bloomy/db";
 import {
   appointment,
@@ -8,6 +10,8 @@ import {
   type Exam,
 } from "@bloomy/db/schema/health";
 import { and, asc, eq, gte, isNotNull, lte, ne, or } from "drizzle-orm";
+
+import type { ExamStorage } from "./r2";
 
 const NEXT_WINDOW_DAYS = 30;
 
@@ -233,12 +237,28 @@ export async function updateExam(
   return updated ?? null;
 }
 
-export async function deleteExam(db: Db, userId: string, id: string): Promise<boolean> {
-  const deleted = await db
-    .delete(exam)
-    .where(and(eq(exam.id, id), eq(exam.userId, userId)))
-    .returning();
-  return deleted.length > 0;
+export async function deleteExam(
+  db: Db,
+  storage: ExamStorage,
+  userId: string,
+  id: string,
+): Promise<boolean> {
+  const [row] = await db
+    .select({ key: exam.attachmentKey })
+    .from(exam)
+    .where(and(eq(exam.id, id), eq(exam.userId, userId)));
+  if (!row) return false;
+
+  await db.delete(exam).where(and(eq(exam.id, id), eq(exam.userId, userId)));
+
+  if (row.key) {
+    try {
+      await storage.delete(row.key);
+    } catch (err) {
+      console.error(`R2 delete falhou (key=${row.key}):`, err);
+    }
+  }
+  return true;
 }
 
 export async function completeExam(
@@ -276,4 +296,105 @@ export async function completeExam(
     }
     return { completed, followUp };
   });
+}
+
+export type ExamStorageError = "not_found" | "wrong_status";
+const KEY_PREFIX = "exam-attachments";
+
+/** Anexa resultado a exame `result_available`; troca substitui e apaga a chave antiga do R2. */
+export async function attachExam(
+  db: Db,
+  storage: ExamStorage,
+  userId: string,
+  examId: string,
+  file: { body: Uint8Array; mime: string; name: string; size: number },
+): Promise<Exam | ExamStorageError> {
+  const [current] = await db
+    .select()
+    .from(exam)
+    .where(and(eq(exam.id, examId), eq(exam.userId, userId)));
+  if (!current) return "not_found";
+  if (current.status !== "result_available") return "wrong_status";
+
+  const oldKey = current.attachmentKey;
+  const safeName = file.name.replace(/[^\w.\-]+/g, "_").slice(0, 100) || "arquivo";
+  const key = `${KEY_PREFIX}/${userId}/${examId}/${randomUUID()}-${safeName}`;
+
+  await storage.put(key, file.body, file.mime);
+
+  const [updated] = await db
+    .update(exam)
+    .set({
+      attachmentKey: key,
+      attachmentMime: file.mime,
+      attachmentName: file.name,
+      attachmentSize: file.size,
+      updatedAt: new Date(),
+    })
+    .where(and(eq(exam.id, examId), eq(exam.userId, userId)))
+    .returning();
+
+  // troca: remove o objeto antigo só depois do update persistir.
+  if (oldKey) {
+    try {
+      await storage.delete(oldKey);
+    } catch (err) {
+      console.error(`R2 delete falhou (key=${oldKey}):`, err);
+    }
+  }
+  return updated;
+}
+
+/** Limpa colunas de anexo do exame e apaga o objeto correspondente no R2. */
+export async function removeExamAttachment(
+  db: Db,
+  storage: ExamStorage,
+  userId: string,
+  examId: string,
+): Promise<Exam | null> {
+  const [current] = await db
+    .select()
+    .from(exam)
+    .where(and(eq(exam.id, examId), eq(exam.userId, userId)));
+  if (!current) return null;
+  const oldKey = current.attachmentKey;
+
+  const [updated] = await db
+    .update(exam)
+    .set({
+      attachmentKey: null,
+      attachmentMime: null,
+      attachmentName: null,
+      attachmentSize: null,
+      updatedAt: new Date(),
+    })
+    .where(and(eq(exam.id, examId), eq(exam.userId, userId)))
+    .returning();
+
+  if (oldKey) {
+    try {
+      await storage.delete(oldKey);
+    } catch (err) {
+      console.error(`R2 delete falhou (key=${oldKey}):`, err);
+    }
+  }
+  return updated;
+}
+
+/** Metadados do anexo (p/ endpoint de download); só se todas as colunas estiverem preenchidas. */
+export async function getExamAttachmentMeta(
+  db: Db,
+  userId: string,
+  examId: string,
+): Promise<{ key: string; mime: string; name: string } | null> {
+  const [row] = await db
+    .select({
+      key: exam.attachmentKey,
+      mime: exam.attachmentMime,
+      name: exam.attachmentName,
+    })
+    .from(exam)
+    .where(and(eq(exam.id, examId), eq(exam.userId, userId)));
+  if (!row?.key || !row.mime || !row.name) return null;
+  return { key: row.key, mime: row.mime, name: row.name };
 }

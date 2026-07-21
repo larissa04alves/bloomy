@@ -226,6 +226,10 @@ export type Exam = {
   suggestedAt: string | null;
   completedAt: string | null;
   parentId: string | null;
+  attachmentKey: string | null;
+  attachmentMime: string | null;
+  attachmentName: string | null;
+  attachmentSize: number | null;
   createdAt: string;
   updatedAt: string;
 };

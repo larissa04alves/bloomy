@@ -104,8 +104,10 @@ export default function SaudePage() {
         open={examModal.open}
         onOpenChange={(open) => setExamModal((s) => ({ ...s, open }))}
         initial={examModal.initial}
-        onSubmit={(input) =>
-          examModal.initial ? exames.update(examModal.initial.id, input) : exames.create(input)
+        onSubmit={(input, attachment) =>
+          examModal.initial
+            ? exames.update(examModal.initial.id, input, attachment)
+            : exames.create(input, attachment)
         }
       />
 
