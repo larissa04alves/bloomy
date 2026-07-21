@@ -121,10 +121,10 @@ describe("nextAppointment (janela de 30 dias)", () => {
 });
 
 describe("attachExam", () => {
-  test("anexa em exame result_available: grava colunas e sobe pro R2", async () => {
+  test("anexa em exame awaiting_result: grava colunas e sobe pro R2", async () => {
     const db = await createTestDb();
     const userId = await createTestUser(db);
-    const exam = await createExam(db, userId, { name: "Hemograma", status: "result_available" });
+    const exam = await createExam(db, userId, { name: "Hemograma", status: "awaiting_result" });
     const { storage, calls } = fakeStorage();
 
     const result = await attachExam(db, storage, userId, exam.id, FILE);
@@ -143,7 +143,7 @@ describe("attachExam", () => {
   test("troca: sobe o novo e deleta a chave antiga do R2", async () => {
     const db = await createTestDb();
     const userId = await createTestUser(db);
-    const exam = await createExam(db, userId, { name: "Hemograma", status: "result_available" });
+    const exam = await createExam(db, userId, { name: "Hemograma", status: "awaiting_result" });
     const { storage, calls } = fakeStorage();
 
     const first = (await attachExam(db, storage, userId, exam.id, FILE)) as { attachmentKey: string };
@@ -156,14 +156,14 @@ describe("attachExam", () => {
   test("exame de outra usuária → not_found", async () => {
     const db = await createTestDb();
     const owner = await createTestUser(db);
-    const exam = await createExam(db, owner, { name: "Hemograma", status: "result_available" });
+    const exam = await createExam(db, owner, { name: "Hemograma", status: "awaiting_result" });
     const { storage } = fakeStorage();
     const other = await createTestUser(db, "user-other");
 
     expect(await attachExam(db, storage, other, exam.id, FILE)).toBe("not_found");
   });
 
-  test("status ≠ result_available → wrong_status, sem tocar no R2", async () => {
+  test("status ≠ awaiting_result → wrong_status, sem tocar no R2", async () => {
     const db = await createTestDb();
     const userId = await createTestUser(db);
     const exam = await createExam(db, userId, { name: "Hemograma", status: "scheduled" });
@@ -178,7 +178,7 @@ describe("removeExamAttachment / getExamAttachmentMeta / deleteExam cleanup", ()
   test("remove: limpa colunas e deleta objeto", async () => {
     const db = await createTestDb();
     const userId = await createTestUser(db);
-    const exam = await createExam(db, userId, { name: "Hemograma", status: "result_available" });
+    const exam = await createExam(db, userId, { name: "Hemograma", status: "awaiting_result" });
     const { storage, calls } = fakeStorage();
     const attached = (await attachExam(db, storage, userId, exam.id, FILE)) as Exclude<
       Awaited<ReturnType<typeof attachExam>>,
@@ -195,7 +195,7 @@ describe("removeExamAttachment / getExamAttachmentMeta / deleteExam cleanup", ()
   test("getExamAttachmentMeta devolve chave/mime/nome do dono", async () => {
     const db = await createTestDb();
     const userId = await createTestUser(db);
-    const exam = await createExam(db, userId, { name: "Hemograma", status: "result_available" });
+    const exam = await createExam(db, userId, { name: "Hemograma", status: "awaiting_result" });
     const { storage } = fakeStorage();
     await attachExam(db, storage, userId, exam.id, FILE);
 
@@ -208,14 +208,14 @@ describe("removeExamAttachment / getExamAttachmentMeta / deleteExam cleanup", ()
   test("getExamAttachmentMeta: sem anexo → null", async () => {
     const db = await createTestDb();
     const userId = await createTestUser(db);
-    const exam = await createExam(db, userId, { name: "Hemograma", status: "result_available" });
+    const exam = await createExam(db, userId, { name: "Hemograma", status: "awaiting_result" });
     expect(await getExamAttachmentMeta(db, userId, exam.id)).toBeNull();
   });
 
   test("deleteExam com anexo remove o objeto do R2", async () => {
     const db = await createTestDb();
     const userId = await createTestUser(db);
-    const exam = await createExam(db, userId, { name: "Hemograma", status: "result_available" });
+    const exam = await createExam(db, userId, { name: "Hemograma", status: "awaiting_result" });
     const { storage, calls } = fakeStorage();
     const attached = (await attachExam(db, storage, userId, exam.id, FILE)) as Exclude<
       Awaited<ReturnType<typeof attachExam>>,

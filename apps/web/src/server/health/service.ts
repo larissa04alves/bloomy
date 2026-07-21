@@ -301,7 +301,7 @@ export async function completeExam(
 export type ExamStorageError = "not_found" | "wrong_status";
 const KEY_PREFIX = "exam-attachments";
 
-/** Anexa resultado a exame `result_available`; troca substitui e apaga a chave antiga do R2. */
+/** Anexa resultado a exame `awaiting_result`; troca substitui e apaga a chave antiga do R2. */
 export async function attachExam(
   db: Db,
   storage: ExamStorage,
@@ -314,7 +314,7 @@ export async function attachExam(
     .from(exam)
     .where(and(eq(exam.id, examId), eq(exam.userId, userId)));
   if (!current) return "not_found";
-  if (current.status !== "result_available") return "wrong_status";
+  if (current.status !== "awaiting_result") return "wrong_status";
 
   const oldKey = current.attachmentKey;
   const safeName = file.name.replace(/[^\w.\-]+/g, "_").slice(0, 100) || "arquivo";

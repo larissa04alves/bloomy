@@ -28,11 +28,7 @@ const schema = z.object({
 });
 
 /** Status escolhíveis no modal (completed só via check no card). */
-const STATUS_OPTIONS: ExamStatus[] = [
-  "to_schedule",
-  "scheduled",
-  "result_available",
-];
+const STATUS_OPTIONS: ExamStatus[] = ["to_schedule", "scheduled"];
 
 export type AttachmentIntent = { file?: File; remove?: boolean };
 
@@ -88,7 +84,7 @@ export function ExamModal({
   }, [open, initial, form]);
 
   useEffect(() => {
-    if (status !== "result_available") {
+    if (status !== "awaiting_result") {
       setPendingFile(undefined);
       setRemoveAttachment(false);
     }
@@ -145,7 +141,7 @@ export function ExamModal({
         </div>
       </div>
 
-      {status === "result_available" ? (
+      {status === "awaiting_result" ? (
         <div className="flex flex-col gap-2">
           <span className="text-sm font-bold text-ink">Anexo do resultado</span>
           <input

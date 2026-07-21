@@ -145,6 +145,25 @@ export function useExames() {
     [list, all],
   );
 
+  const markDone = useCallback(
+    async (id: string) => {
+      const prev = list.data;
+      list.setData({
+        exams: all.map((e) =>
+          e.id === id ? { ...e, status: "awaiting_result" as const } : e,
+        ),
+      });
+      try {
+        await api.put(`/api/exams/${id}`, { status: "awaiting_result" });
+        list.reload();
+      } catch (e) {
+        if (prev) list.setData(prev);
+        toastError(e, "Não foi possível atualizar o exame");
+      }
+    },
+    [list, all],
+  );
+
   return {
     ativos,
     historico,
@@ -154,5 +173,6 @@ export function useExames() {
     update,
     remove,
     complete,
+    markDone,
   };
 }

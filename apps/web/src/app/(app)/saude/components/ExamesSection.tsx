@@ -13,6 +13,7 @@ export function ExamesSection({
   onAdd,
   onEdit,
   onDelete,
+  onMarkDone,
   onComplete,
   onHistory,
 }: {
@@ -20,6 +21,7 @@ export function ExamesSection({
   onAdd: () => void;
   onEdit: (e: Exam) => void;
   onDelete: (id: string) => void;
+  onMarkDone: (e: Exam) => void;
   onComplete: (e: Exam) => void;
   onHistory: () => void;
 }) {
@@ -78,10 +80,18 @@ export function ExamesSection({
                 >
                   Agendar
                 </button>
+              ) : e.status === "scheduled" ? (
+                <button
+                  type="button"
+                  aria-label={`Marcar exame ${e.name} como feito`}
+                  onClick={() => onMarkDone(e)}
+                >
+                  <CircleIcon size={24} className="text-control-off" />
+                </button>
               ) : (
                 <button
                   type="button"
-                  aria-label={`Concluir exame ${e.name}`}
+                  aria-label={`Finalizar exame ${e.name}`}
                   onClick={() => onComplete(e)}
                 >
                   <CircleIcon size={24} className="text-control-off" />

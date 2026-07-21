@@ -56,7 +56,7 @@ export function examStatusTone(status: ExamStatus): string {
       return "text-coral";
     case "scheduled":
       return "text-lilac-deep";
-    case "result_available":
+    case "awaiting_result":
       return "text-green-deep";
     case "completed":
       return "text-ink-read";

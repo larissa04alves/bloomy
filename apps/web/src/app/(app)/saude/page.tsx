@@ -68,6 +68,7 @@ export default function SaudePage() {
         onAdd={() => setExamModal({ open: true })}
         onEdit={(e) => setExamModal({ open: true, initial: e })}
         onDelete={exames.remove}
+        onMarkDone={(e) => exames.markDone(e.id)}
         onComplete={(e) => setRetorno({ open: true, target: { kind: "exame", id: e.id } })}
         onHistory={() =>
           setHistory({

@@ -54,7 +54,7 @@ export const exam = sqliteTable(
       .references(() => user.id, { onDelete: "cascade" }),
     name: text("name").notNull(),
     status: text("status")
-      .$type<"to_schedule" | "scheduled" | "result_available" | "completed">()
+      .$type<"to_schedule" | "scheduled" | "awaiting_result" | "completed">()
       .default("to_schedule")
       .notNull(),
     scheduledAt: integer("scheduled_at", { mode: "timestamp_ms" }),

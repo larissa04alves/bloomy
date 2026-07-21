@@ -208,13 +208,13 @@ export type AppointmentInput = {
   remindDayBefore?: boolean;
 };
 
-export type ExamStatus = "to_schedule" | "scheduled" | "result_available" | "completed";
+export type ExamStatus = "to_schedule" | "scheduled" | "awaiting_result" | "completed";
 
 /** Rótulos PT-BR dos status de exame. */
 export const EXAM_STATUS_LABELS: Record<ExamStatus, string> = {
   to_schedule: "a agendar",
   scheduled: "agendada",
-  result_available: "resultado disponível",
+  awaiting_result: "aguardando resultado",
   completed: "concluído",
 };
 

@@ -59,7 +59,7 @@ test("frequencyLabel", () => {
 test("examStatusTone", () => {
   expect(examStatusTone("to_schedule")).toBe("text-coral");
   expect(examStatusTone("scheduled")).toBe("text-lilac-deep");
-  expect(examStatusTone("result_available")).toBe("text-green-deep");
+  expect(examStatusTone("awaiting_result")).toBe("text-green-deep");
   expect(examStatusTone("completed")).toBe("text-ink-read");
 });
 
