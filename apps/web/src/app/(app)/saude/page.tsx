@@ -78,6 +78,9 @@ export default function SaudePage() {
               id: e.id,
               title: e.name,
               completedAt: e.completedAt,
+              attachment: e.attachmentName
+                ? { href: `/api/exams/${e.id}/attachment`, name: e.attachmentName }
+                : undefined,
             })),
           })
         }

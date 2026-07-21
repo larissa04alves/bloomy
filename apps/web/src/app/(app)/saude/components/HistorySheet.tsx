@@ -1,12 +1,17 @@
 "use client";
 
-import { ClockCounterClockwiseIcon } from "@phosphor-icons/react";
+import { ClockCounterClockwiseIcon, DownloadSimpleIcon } from "@phosphor-icons/react";
 
 import { BottomSheet } from "@/components/bottom-sheet";
 
 import { dayMonth } from "../hooks/format";
 
-export type HistoryItem = { id: string; title: string; completedAt: string | null };
+export type HistoryItem = {
+  id: string;
+  title: string;
+  completedAt: string | null;
+  attachment?: { href: string; name: string };
+};
 
 export function HistorySheet({
   open,
@@ -39,9 +44,21 @@ export function HistorySheet({
               className="flex items-center justify-between rounded-card bg-white p-3 shadow-card-sm"
             >
               <span className="text-sm font-bold text-ink">{it.title}</span>
-              <span className="text-xs font-semibold text-ink-read">
-                {it.completedAt ? `concluído em ${dayMonth(it.completedAt)}` : "concluído"}
-              </span>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-semibold text-ink-read">
+                  {it.completedAt ? `concluído em ${dayMonth(it.completedAt)}` : "concluído"}
+                </span>
+                {it.attachment ? (
+                  <a
+                    href={it.attachment.href}
+                    download={it.attachment.name}
+                    aria-label={`Baixar resultado de ${it.title}`}
+                    className="flex h-8 w-8 items-center justify-center rounded-control bg-lilac-tint text-lilac-deep"
+                  >
+                    <DownloadSimpleIcon size={18} weight="bold" />
+                  </a>
+                ) : null}
+              </div>
             </div>
           ))}
         </div>
