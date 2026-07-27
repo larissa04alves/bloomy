@@ -8,7 +8,7 @@ import { createMedication, listMedications } from "@/server/medications/service"
 const BODY_SCHEMA = z.object({
   name: z.string().min(1).max(120),
   dose: z.string().max(120).optional(),
-  stock: z.number().int().nonnegative().optional(),
+  stock: z.number().int().nonnegative().nullable().optional(),
   times: z.array(TIME_SCHEMA).min(1).max(6),
 });
 

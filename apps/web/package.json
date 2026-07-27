@@ -10,6 +10,7 @@
     "test": "bun test --conditions react-server src"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "catalog:",
     "@bloomy/auth": "workspace:*",
     "@bloomy/db": "workspace:*",
     "@bloomy/env": "workspace:*",
@@ -20,6 +21,7 @@
     "@tanstack/react-form": "^1.33.0",
     "babel-plugin-react-compiler": "^1.0.0",
     "better-auth": "catalog:",
+    "date-fns": "catalog:",
     "dotenv": "catalog:",
     "drizzle-orm": "catalog:",
     "fuse.js": "catalog:",

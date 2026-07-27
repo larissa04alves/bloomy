@@ -9,6 +9,7 @@
     "catalog": {
       "@aws-sdk/client-s3": "^3.700.0",
       "csv-parse": "^5.5.6",
+      "date-fns": "^4.4.0",
       "dotenv": "^17.4.2",
       "drizzle-orm": "^0.45.2",
       "fuse.js": "^7.1.0",
@@ -28,6 +29,7 @@
       "@types/react-dom": "^19.2.3",
       "tailwindcss": "^4.3.2",
       "@phosphor-icons/react": "^2.1.7",
+      "react-day-picker": "^10.0.1",
       "vaul": "^1.1.2"
     }
   },

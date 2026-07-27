@@ -7,6 +7,9 @@ import { z } from "zod";
 
 import { BottomSheet } from "@/components/bottom-sheet";
 import { ChoiceChip } from "@/components/choice-chip";
+import type { Medication, MedicationInput } from "@/lib/api-types";
+
+import { TimeSelect } from "./TimeSelect";
 
 const schema = z.object({
   name: z.string().trim().min(1, "Dê um nome ao remédio"),
@@ -23,14 +26,17 @@ const FREQ_TIMES: Record<number, string[]> = {
 export function MedicationModal({
   open,
   onOpenChange,
+  initial,
   onSubmit,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (input: { name: string; dose?: string; stock?: number; times: string[] }) => void;
+  initial?: Medication;
+  onSubmit: (input: MedicationInput) => void;
 }) {
   const [times, setTimes] = useState<string[]>(["09:00"]);
-  const [newTime, setNewTime] = useState("12:00");
+  const [newHour, setNewHour] = useState("12");
+  const [newMinute, setNewMinute] = useState("00");
 
   const form = useForm({
     defaultValues: { name: "", dose: "", stock: "" },
@@ -38,8 +44,8 @@ export function MedicationModal({
     onSubmit: ({ value }) => {
       onSubmit({
         name: value.name.trim(),
-        dose: value.dose?.trim() || undefined,
-        stock: value.stock ? Number(value.stock) : undefined,
+        dose: value.dose.trim(),
+        stock: value.stock ? Number(value.stock) : null,
         times,
       });
       onOpenChange(false);
@@ -47,20 +53,31 @@ export function MedicationModal({
   });
 
   useEffect(() => {
-    if (open) {
-      form.reset();
-      setTimes(["09:00"]);
-    }
-  }, [open, form]);
+    if (!open) return;
+    form.setFieldValue("name", initial?.name ?? "");
+    form.setFieldValue("dose", initial?.dose ?? "");
+    form.setFieldValue(
+      "stock",
+      initial?.stock != null ? String(initial.stock) : "",
+    );
+    setTimes(initial?.times?.length ? initial.times : ["09:00"]);
+  }, [open, initial, form]);
 
-  const addTime = () => setTimes((prev) => [...new Set([...prev, newTime])].sort());
-  const removeTime = (t: string) => setTimes((prev) => prev.filter((x) => x !== t));
+  const addTime = () => {
+    const h = (newHour === "" ? "00" : newHour).padStart(2, "0");
+    const m = (newMinute === "" ? "00" : newMinute).padStart(2, "0");
+    setTimes((prev) => [...new Set([...prev, `${h}:${m}`])].sort());
+  };
+  const removeTime = (t: string) =>
+    setTimes((prev) => prev.filter((x) => x !== t));
+
+  const isEdit = Boolean(initial);
 
   return (
     <BottomSheet
       open={open}
       onOpenChange={onOpenChange}
-      title="Cadastrar remédio"
+      title={isEdit ? "Editar remédio" : "Cadastrar remédio"}
       tone="coral"
       icon={<PillIcon size={22} weight="fill" />}
       footer={
@@ -72,7 +89,7 @@ export function MedicationModal({
               onClick={() => form.handleSubmit()}
               className="w-full rounded-full bg-coral py-3.5 font-display font-bold text-white shadow-btn disabled:opacity-60"
             >
-              Cadastrar
+              {isEdit ? "Salvar" : "Cadastrar"}
             </button>
           )}
         </form.Subscribe>
@@ -108,7 +125,9 @@ export function MedicationModal({
               value={field.state.value}
               aria-label="Estoque"
               inputMode="numeric"
-              onChange={(e) => field.handleChange(e.target.value.replace(/\D/g, ""))}
+              onChange={(e) =>
+                field.handleChange(e.target.value.replace(/\D/g, ""))
+              }
               placeholder="Estoque"
               className="w-28 rounded-control border border-hairline bg-white px-4 py-3 text-sm font-semibold text-ink placeholder:text-ink-faint focus:border-lilac focus:outline-none"
             />
@@ -141,17 +160,22 @@ export function MedicationModal({
               className="flex items-center gap-1 rounded-full bg-coral-tint px-3 py-2 text-sm font-semibold text-coral"
             >
               {t}
-              <button type="button" aria-label={`Remover ${t}`} onClick={() => removeTime(t)}>
+              <button
+                type="button"
+                aria-label={`Remover ${t}`}
+                onClick={() => removeTime(t)}
+              >
                 <XIcon size={14} weight="bold" />
               </button>
             </span>
           ))}
-          <input
-            type="time"
-            aria-label="Novo horário"
-            value={newTime}
-            onChange={(e) => setNewTime(e.target.value)}
-            className="rounded-control border border-hairline bg-white px-3 py-2 text-sm font-semibold text-ink focus:border-lilac focus:outline-none"
+          <TimeSelect
+            hour={newHour}
+            minute={newMinute}
+            onChange={(t) => {
+              setNewHour(t.hour);
+              setNewMinute(t.minute);
+            }}
           />
           <button
             type="button"

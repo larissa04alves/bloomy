@@ -2,6 +2,7 @@ import { db } from "@bloomy/db";
 import { z } from "zod";
 
 import {
+  badRequest,
   invalidBody,
   notFound,
   parseJson,
@@ -9,11 +10,12 @@ import {
   unauthorized,
 } from "@/server/shared/api";
 import { deleteExam, updateExam } from "@/server/health/service";
+import { examStorage } from "@/server/health/r2";
 
 const BODY_SCHEMA = z.object({
   name: z.string().min(1).max(120).optional(),
-  status: z.enum(["to_schedule", "scheduled", "result_available", "completed"]).optional(),
-  scheduledAt: z.coerce.date().optional(),
+  status: z.enum(["to_schedule", "scheduled"]).optional(),
+  scheduledAt: z.coerce.date().nullable().optional(),
 });
 
 export async function PUT(
@@ -29,6 +31,7 @@ export async function PUT(
   const { id } = await params;
   const exam = await updateExam(db, userId, id, parsed.data);
   if (!exam) return notFound();
+  if (exam === "missing_schedule") return badRequest("exame agendado precisa de data");
 
   return Response.json({ exam });
 }
@@ -41,7 +44,7 @@ export async function DELETE(
   if (!userId) return unauthorized();
 
   const { id } = await params;
-  const deleted = await deleteExam(db, userId, id);
+  const deleted = await deleteExam(db, examStorage, userId, id);
   if (!deleted) return notFound();
 
   return Response.json({ ok: true });
