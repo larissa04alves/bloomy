@@ -7,6 +7,7 @@ import { SwipeableRow } from "@/components/swipeable-row";
 import type { Appointment } from "@/lib/api-types";
 
 import { hourLabel, weekdayDay } from "../hooks/format";
+import { ReturnBadge } from "./ReturnBadge";
 
 export function ConsultasSection({
   ativas,
@@ -62,9 +63,12 @@ export function ConsultasSection({
                 icon={<StethoscopeIcon size={22} weight="fill" />}
               />
               <div className="flex flex-1 flex-col">
-                <span className="text-sm font-bold text-ink">
-                  {a.professional}
-                </span>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-sm font-bold text-ink">
+                    {a.professional}
+                  </span>
+                  {a.parentId ? <ReturnBadge /> : null}
+                </div>
                 {a.specialty ? (
                   <span className="text-xs font-semibold text-ink-read">
                     {a.specialty}

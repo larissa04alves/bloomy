@@ -2,6 +2,7 @@ import { db } from "@bloomy/db";
 import { z } from "zod";
 
 import {
+  badRequest,
   invalidBody,
   notFound,
   parseJson,
@@ -30,6 +31,7 @@ export async function PUT(
   const { id } = await params;
   const exam = await updateExam(db, userId, id, parsed.data);
   if (!exam) return notFound();
+  if (exam === "missing_schedule") return badRequest("exame agendado precisa de data");
 
   return Response.json({ exam });
 }

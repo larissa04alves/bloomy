@@ -99,20 +99,16 @@ export function useExames() {
     [list, all],
   );
 
-  const complete = useCallback(
-    async (
-      id: string,
-      opts: { needsReturn: boolean; followUpMonths?: number },
-    ) => {
+  /** Exame feito: vai pra "aguardando resultado" e cria o retorno, se pedido. Não conclui. */
+  const markDone = useCallback(
+    async (id: string, opts: { needsReturn: boolean; followUpMonths?: number }) => {
       const prev = list.data;
       const done = all.find((e) => e.id === id);
       const nowIso = new Date().toISOString();
       const optimistic = all.map((e) =>
-        e.id === id
-          ? { ...e, status: "completed" as const, completedAt: nowIso }
-          : e,
+        e.id === id ? { ...e, status: "awaiting_result" as const } : e,
       );
-      // Retorno otimista: o item `to_schedule` é derivável do concluído
+      // Retorno otimista: o item `to_schedule` é derivável do exame feito
       // (id/timestamps reais chegam no reload e reconciliam o temporário).
       if (opts.needsReturn && done) {
         const suggested = new Date();
@@ -135,7 +131,29 @@ export function useExames() {
       }
       list.setData({ exams: optimistic });
       try {
-        await api.post(`/api/exams/${id}/complete`, opts);
+        await api.post(`/api/exams/${id}/done`, opts);
+        list.reload();
+      } catch (e) {
+        if (prev) list.setData(prev);
+        toastError(e, "Não foi possível marcar o exame como feito");
+      }
+    },
+    [list, all],
+  );
+
+  /** Conclui sem laudo ("não vou anexar o resultado"): vai pro histórico. */
+  const complete = useCallback(
+    async (id: string) => {
+      const prev = list.data;
+      list.setData({
+        exams: all.map((e) =>
+          e.id === id
+            ? { ...e, status: "completed" as const, completedAt: new Date().toISOString() }
+            : e,
+        ),
+      });
+      try {
+        await api.post(`/api/exams/${id}/complete`, {});
         list.reload();
       } catch (e) {
         if (prev) list.setData(prev);
@@ -145,23 +163,35 @@ export function useExames() {
     [list, all],
   );
 
-  const markDone = useCallback(
-    async (id: string) => {
+  /** Anexa o laudo. Em "aguardando resultado" isso conclui o exame (sai dos ativos). */
+  const attach = useCallback(
+    async (id: string, file: File) => {
       const prev = list.data;
       list.setData({
         exams: all.map((e) =>
-          e.id === id ? { ...e, status: "awaiting_result" as const } : e,
+          e.id === id
+            ? {
+                ...e,
+                attachmentName: file.name,
+                attachmentMime: file.type,
+                attachmentSize: file.size,
+                ...(e.status === "awaiting_result" && {
+                  status: "completed" as const,
+                  completedAt: new Date().toISOString(),
+                }),
+              }
+            : e,
         ),
       });
       try {
-        await api.put(`/api/exams/${id}`, { status: "awaiting_result" });
+        await applyAttachment(id, { file });
         list.reload();
       } catch (e) {
         if (prev) list.setData(prev);
-        toastError(e, "Não foi possível atualizar o exame");
+        toastError(e, "Não foi possível anexar o resultado");
       }
     },
-    [list, all],
+    [list, all, applyAttachment],
   );
 
   return {
@@ -174,5 +204,6 @@ export function useExames() {
     remove,
     complete,
     markDone,
+    attach,
   };
 }

@@ -7,6 +7,7 @@ import { SwipeableRow } from "@/components/swipeable-row";
 import { EXAM_STATUS_LABELS, type Exam } from "@/lib/api-types";
 
 import { examStatusTone } from "../hooks/format";
+import { ReturnBadge } from "./ReturnBadge";
 
 export function ExamesSection({
   ativos,
@@ -64,7 +65,10 @@ export function ExamesSection({
                 icon={<TestTubeIcon size={22} weight="fill" />}
               />
               <div className="flex flex-1 flex-col">
-                <span className="text-sm font-bold text-ink">{e.name}</span>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-sm font-bold text-ink">{e.name}</span>
+                  {e.parentId ? <ReturnBadge /> : null}
+                </div>
                 <span
                   className={`text-xs font-semibold ${examStatusTone(e.status)}`}
                 >
@@ -89,9 +93,11 @@ export function ExamesSection({
                   <CircleIcon size={24} className="text-control-off" />
                 </button>
               ) : (
+                // aguardando resultado: abre o modal do resultado (anexar o laudo ou concluir sem ele).
                 <button
                   type="button"
-                  aria-label={`Finalizar exame ${e.name}`}
+                  aria-label={`Resultado do exame ${e.name}`}
+                  title="Informar resultado"
                   onClick={() => onComplete(e)}
                 >
                   <CircleIcon size={24} className="text-control-off" />

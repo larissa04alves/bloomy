@@ -40,7 +40,7 @@ export async function POST(request: Request, { params }: Ctx) {
     return Response.json({ error: "erro ao processar o anexo" }, { status: 500 });
   }
   if (result === "not_found") return notFound();
-  if (result === "wrong_status") return conflict("exame não está em resultado disponível");
+  if (result === "wrong_status") return conflict("exame ainda não foi feito");
   return Response.json({ exam: result });
 }
 
@@ -56,10 +56,12 @@ export async function GET(request: Request, { params }: Ctx) {
     const object = await examStorage.get(meta.key);
     const asciiName = meta.name.replace(/[^\x20-\x7e]/g, "_").replace(/["\\]/g, "_");
     const encodedName = encodeURIComponent(meta.name);
+    const viewable = meta.mime === "application/pdf" || meta.mime.startsWith("image/");
+    const disposition = viewable ? "inline" : "attachment";
     return new Response(object.body, {
       headers: {
         "content-type": meta.mime,
-        "content-disposition": `attachment; filename="${asciiName}"; filename*=UTF-8''${encodedName}`,
+        "content-disposition": `${disposition}; filename="${asciiName}"; filename*=UTF-8''${encodedName}`,
       },
     });
   } catch (err) {

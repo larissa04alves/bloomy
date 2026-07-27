@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  ArrowsClockwiseIcon,
-  TestTubeIcon,
-  TrashIcon,
-  UploadSimpleIcon,
-} from "@phosphor-icons/react";
+import { TestTubeIcon, UploadSimpleIcon } from "@phosphor-icons/react";
 import { useForm } from "@tanstack/react-form";
 import { useEffect, useRef, useState } from "react";
 import { z } from "zod";
@@ -20,6 +15,7 @@ import {
 } from "@/lib/api-types";
 
 import { combineDateTime, splitDateTime } from "../hooks/format";
+import { AttachmentPreview } from "./AttachmentPreview";
 import { DatePickerField } from "./DatePickerField";
 import { TimeSelect } from "./TimeSelect";
 
@@ -55,6 +51,8 @@ export function ExamModal({
     defaultValues: { name: "" },
     validators: { onChange: schema },
     onSubmit: ({ value }) => {
+      // "agendada" exige quando: sem data o back rejeita (400) e o card ficaria sem horário.
+      if (status === "scheduled" && !date) return;
       onSubmit(
         {
           name: value.name.trim(),
@@ -91,6 +89,7 @@ export function ExamModal({
   }, [status]);
 
   const isEdit = Boolean(initial);
+  const dateRequired = status === "scheduled";
 
   return (
     <BottomSheet
@@ -104,7 +103,7 @@ export function ExamModal({
           {(canSubmit) => (
             <button
               type="button"
-              disabled={!canSubmit}
+              disabled={!canSubmit || (dateRequired && !date)}
               onClick={() => form.handleSubmit()}
               className="w-full rounded-full bg-lilac py-3.5 font-display font-bold text-white shadow-btn disabled:opacity-60"
             >
@@ -180,47 +179,17 @@ export function ExamModal({
                 </button>
               );
             }
-            const name = pendingFile?.name ?? initial?.attachmentName ?? "";
-            const mime = pendingFile?.type ?? initial?.attachmentMime ?? "";
-            const size = pendingFile?.size ?? initial?.attachmentSize ?? null;
-            const isPdf = mime === "application/pdf";
             return (
-              <div className="flex items-center gap-3 rounded-control border border-hairline p-3">
-                <span
-                  className={`flex h-9 w-9 items-center justify-center rounded-control text-xs font-black ${isPdf ? "bg-[#fdecec] text-[#e0574f]" : "bg-[#eaf4ec] text-[#3fa15a]"}`}
-                >
-                  {isPdf ? "PDF" : "IMG"}
-                </span>
-                <div className="flex min-w-0 flex-1 flex-col">
-                  <span className="truncate text-sm font-bold text-ink">
-                    {name}
-                  </span>
-                  {size ? (
-                    <span className="text-xs font-semibold text-ink-faint">
-                      {(size / (1024 * 1024)).toFixed(1)} MB
-                    </span>
-                  ) : null}
-                </div>
-                <button
-                  type="button"
-                  aria-label="Trocar arquivo"
-                  onClick={() => fileInputRef.current?.click()}
-                  className="flex h-8.5 w-8.5 items-center justify-center rounded-control text-lilac-deep"
-                >
-                  <ArrowsClockwiseIcon size={19} weight="bold" />
-                </button>
-                <button
-                  type="button"
-                  aria-label="Remover anexo"
-                  onClick={() => {
-                    setPendingFile(undefined);
-                    setRemoveAttachment(true);
-                  }}
-                  className="flex h-8.5 w-8.5 items-center justify-center rounded-control text-[#c98a9a]"
-                >
-                  <TrashIcon size={19} weight="bold" />
-                </button>
-              </div>
+              <AttachmentPreview
+                name={pendingFile?.name ?? initial?.attachmentName ?? ""}
+                mime={pendingFile?.type ?? initial?.attachmentMime ?? ""}
+                size={pendingFile?.size ?? initial?.attachmentSize ?? null}
+                onSwap={() => fileInputRef.current?.click()}
+                onRemove={() => {
+                  setPendingFile(undefined);
+                  setRemoveAttachment(true);
+                }}
+              />
             );
           })()}
         </div>
@@ -228,11 +197,13 @@ export function ExamModal({
 
       <div className="flex items-end gap-3">
         <div className="flex flex-1 flex-col gap-2">
-          <span className="text-sm font-bold text-ink">Data (opcional)</span>
+          <span className="text-sm font-bold text-ink">
+            {dateRequired ? "Data" : "Data (opcional)"}
+          </span>
           <DatePickerField
             value={date}
             onChange={setDate}
-            placeholder="Sem data"
+            placeholder={dateRequired ? "Escolha a data" : "Sem data"}
           />
         </div>
         {date ? (
