@@ -1,6 +1,6 @@
 import { db } from "@bloomy/db";
 
-import { notFound, requireUserId, unauthorized } from "@/server/shared/api";
+import { conflict, notFound, requireUserId, unauthorized } from "@/server/shared/api";
 import { completeExam } from "@/server/health/service";
 
 /** Conclui o exame sem laudo ("não vou anexar o resultado"): manda pro histórico. */
@@ -13,7 +13,9 @@ export async function POST(
 
   const { id } = await params;
   const exam = await completeExam(db, userId, id);
-  if (!exam) return notFound();
+  if (exam === "not_found") return notFound();
+  if (exam === "wrong_status")
+    return conflict("exame não está aguardando resultado");
 
   return Response.json({ exam });
 }

@@ -92,7 +92,7 @@ export function ExamesSection({
                 >
                   <CircleIcon size={24} className="text-control-off" />
                 </button>
-              ) : (
+              ) : e.status === "awaiting_result" ? (
                 // aguardando resultado: abre o modal do resultado (anexar o laudo ou concluir sem ele).
                 <button
                   type="button"
@@ -102,7 +102,7 @@ export function ExamesSection({
                 >
                   <CircleIcon size={24} className="text-control-off" />
                 </button>
-              )}
+              ) : null}
             </div>
           </SwipeableRow>
         ))

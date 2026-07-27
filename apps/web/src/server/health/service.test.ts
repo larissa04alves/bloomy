@@ -18,7 +18,7 @@ import {
   removeExamAttachment,
   updateExam,
 } from "./service";
-import type { ExamStorageError } from "./service";
+import type { ExamStorageError, ExamTransitionError } from "./service";
 import type { ExamStorage } from "./r2";
 
 async function makeExam(...args: Parameters<typeof createExam>) {
@@ -268,14 +268,14 @@ describe("attachExam", () => {
     });
     const { storage } = fakeStorage();
     await attachExam(db, storage, userId, exam.id, FILE); // conclui
-    const first = await completeExam(db, userId, exam.id); // já concluído → null
+    const first = await completeExam(db, userId, exam.id); // já concluído → wrong_status
 
     const again = await attachExam(db, storage, userId, exam.id, {
       ...FILE,
       name: "novo.pdf",
     });
 
-    expect(first).toBeNull();
+    expect(first).toBe("wrong_status");
     expect((again as { attachmentName: string | null }).attachmentName).toBe(
       "novo.pdf",
     );
@@ -296,18 +296,21 @@ describe("markExamDone (exame feito, laudo pendente)", () => {
     const userId = await createTestUser(db);
     const exam = await makeExam(db, userId, scheduled);
 
-    const result = await markExamDone(db, userId, exam.id, {
+    const result = (await markExamDone(db, userId, exam.id, {
       needsReturn: true,
       followUpMonths: 3,
-    });
+    })) as Exclude<
+      Awaited<ReturnType<typeof markExamDone>>,
+      ExamTransitionError
+    >;
 
     // o original NÃO vai pro histórico: falta o laudo
-    expect(result!.done.status).toBe("awaiting_result");
-    expect(result!.done.completedAt).toBeNull();
-    expect(result!.followUp!.status).toBe("to_schedule");
-    expect(result!.followUp!.name).toBe("Hemograma");
-    expect(result!.followUp!.parentId).toBe(exam.id);
-    expect(result!.followUp!.suggestedAt).not.toBeNull();
+    expect(result.done.status).toBe("awaiting_result");
+    expect(result.done.completedAt).toBeNull();
+    expect(result.followUp!.status).toBe("to_schedule");
+    expect(result.followUp!.name).toBe("Hemograma");
+    expect(result.followUp!.parentId).toBe(exam.id);
+    expect(result.followUp!.suggestedAt).not.toBeNull();
   });
 
   test("sem retorno: fica em awaiting_result e não cria nada", async () => {
@@ -315,12 +318,15 @@ describe("markExamDone (exame feito, laudo pendente)", () => {
     const userId = await createTestUser(db);
     const exam = await makeExam(db, userId, scheduled);
 
-    const result = await markExamDone(db, userId, exam.id, {
+    const result = (await markExamDone(db, userId, exam.id, {
       needsReturn: false,
-    });
+    })) as Exclude<
+      Awaited<ReturnType<typeof markExamDone>>,
+      ExamTransitionError
+    >;
 
-    expect(result!.done.status).toBe("awaiting_result");
-    expect(result!.followUp).toBeNull();
+    expect(result.done.status).toBe("awaiting_result");
+    expect(result.followUp).toBeNull();
   });
 
   test("double-tap não cria um segundo retorno", async () => {
@@ -328,15 +334,18 @@ describe("markExamDone (exame feito, laudo pendente)", () => {
     const userId = await createTestUser(db);
     const exam = await makeExam(db, userId, scheduled);
 
-    const first = await markExamDone(db, userId, exam.id, {
+    const first = (await markExamDone(db, userId, exam.id, {
       needsReturn: true,
-    });
+    })) as Exclude<
+      Awaited<ReturnType<typeof markExamDone>>,
+      ExamTransitionError
+    >;
     const second = await markExamDone(db, userId, exam.id, {
       needsReturn: true,
     });
 
-    expect(first!.followUp).not.toBeNull();
-    expect(second).toBeNull();
+    expect(first.followUp).not.toBeNull();
+    expect(second).toBe("wrong_status");
     const retornos = (await listExams(db, userId)).filter(
       (e) => e.parentId === exam.id,
     );
@@ -349,14 +358,17 @@ describe("markExamDone (exame feito, laudo pendente)", () => {
     const exam = await makeExam(db, userId, scheduled);
     await markExamDone(db, userId, exam.id, { needsReturn: false });
 
-    const done = await completeExam(db, userId, exam.id);
+    const done = (await completeExam(db, userId, exam.id)) as Exclude<
+      Awaited<ReturnType<typeof completeExam>>,
+      ExamTransitionError
+    >;
 
-    expect(done!.status).toBe("completed");
-    expect(done!.completedAt).not.toBeNull();
-    expect(done!.attachmentName).toBeNull();
+    expect(done.status).toBe("completed");
+    expect(done.completedAt).not.toBeNull();
+    expect(done.attachmentName).toBeNull();
   });
 
-  test("exame de outra usuária → null", async () => {
+  test("exame de outra usuária → not_found", async () => {
     const db = await createTestDb();
     const owner = await createTestUser(db);
     const exam = await makeExam(db, owner, scheduled);
@@ -364,8 +376,62 @@ describe("markExamDone (exame feito, laudo pendente)", () => {
 
     expect(
       await markExamDone(db, other, exam.id, { needsReturn: true }),
-    ).toBeNull();
-    expect(await completeExam(db, other, exam.id)).toBeNull();
+    ).toBe("not_found");
+    expect(await completeExam(db, other, exam.id)).toBe("not_found");
+  });
+
+  test("markExamDone: id inexistente → not_found", async () => {
+    const db = await createTestDb();
+    const userId = await createTestUser(db);
+
+    expect(
+      await markExamDone(db, userId, "id-que-nao-existe", {
+        needsReturn: false,
+      }),
+    ).toBe("not_found");
+  });
+
+  test("markExamDone: status != scheduled → wrong_status", async () => {
+    const db = await createTestDb();
+    const userId = await createTestUser(db);
+    const exam = await makeExam(db, userId, { name: "Hemograma" }); // to_schedule
+
+    expect(
+      await markExamDone(db, userId, exam.id, { needsReturn: false }),
+    ).toBe("wrong_status");
+  });
+
+  test("completeExam: id inexistente → not_found", async () => {
+    const db = await createTestDb();
+    const userId = await createTestUser(db);
+
+    expect(await completeExam(db, userId, "id-que-nao-existe")).toBe(
+      "not_found",
+    );
+  });
+
+  test("completeExam: scheduled → wrong_status (pula awaiting_result)", async () => {
+    const db = await createTestDb();
+    const userId = await createTestUser(db);
+    const exam = await makeExam(db, userId, scheduled);
+
+    expect(await completeExam(db, userId, exam.id)).toBe("wrong_status");
+  });
+
+  test("completeExam: awaiting_result → conclui", async () => {
+    const db = await createTestDb();
+    const userId = await createTestUser(db);
+    const exam = await makeExam(db, userId, scheduled);
+    await markExamDone(db, userId, exam.id, { needsReturn: false });
+
+    const done = await completeExam(db, userId, exam.id);
+
+    expect((done as Exclude<typeof done, ExamTransitionError>).status).toBe(
+      "completed",
+    );
+    expect(
+      (done as Exclude<typeof done, ExamTransitionError>).completedAt,
+    ).not.toBeNull();
   });
 });
 
@@ -541,5 +607,41 @@ describe("exame agendado exige data", () => {
     const other = await createTestUser(db, "user-other");
 
     expect(await updateExam(db, other, exam.id, { name: "X" })).toBeNull();
+  });
+
+  test("updateExam: status completed grava completedAt", async () => {
+    const db = await createTestDb();
+    const userId = await createTestUser(db);
+    const exam = await makeExam(db, userId, {
+      name: "Hemograma",
+      status: "scheduled",
+      scheduledAt: WHEN,
+    });
+
+    const updated = await updateExam(db, userId, exam.id, {
+      status: "completed",
+    });
+
+    expect((updated as { status: string }).status).toBe("completed");
+    expect((updated as { completedAt: Date | null }).completedAt).not.toBeNull();
+  });
+
+  test("updateExam: sair de completed pra outro status limpa completedAt", async () => {
+    const db = await createTestDb();
+    const userId = await createTestUser(db);
+    const exam = await makeExam(db, userId, {
+      name: "Hemograma",
+      status: "scheduled",
+      scheduledAt: WHEN,
+    });
+    await updateExam(db, userId, exam.id, { status: "completed" });
+
+    const back = await updateExam(db, userId, exam.id, {
+      status: "scheduled",
+      scheduledAt: WHEN,
+    });
+
+    expect((back as { status: string }).status).toBe("scheduled");
+    expect((back as { completedAt: Date | null }).completedAt).toBeNull();
   });
 });

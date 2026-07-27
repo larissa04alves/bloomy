@@ -250,4 +250,3 @@ git commit -m "feat(exame): marcar como feito (agendada→aguardando) e finaliza
 - **Placeholders:** nenhum; código completo em cada passo (o `00XX` da migration é nome gerado pelo drizzle, não placeholder). ✔
 - **Consistência de tipos:** `awaiting_result` usado igual em schema/api-types/rotas/modal/service/format; `markDone`/`onMarkDone` casam entre hook, section e page. ✔
 - **Fora deste plano:** baixar anexo no histórico = Plano 2.
-```

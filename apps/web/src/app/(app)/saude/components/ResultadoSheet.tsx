@@ -1,13 +1,16 @@
 "use client";
 
 import { TestTubeIcon, UploadSimpleIcon } from "@phosphor-icons/react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 
 import { BottomSheet } from "@/components/bottom-sheet";
+import { toastError } from "@/lib/toast";
 
 import { AttachmentPreview } from "./AttachmentPreview";
 
 const ACCEPT = "application/pdf,image/png,image/jpeg,image/webp,image/heic";
+
+const MAX_BYTES = 4 * 1024 * 1024;
 
 /**
  * Fecha um exame em "aguardando resultado": anexar o laudo (opcional) e concluir.
@@ -26,10 +29,20 @@ export function ResultadoSheet({
 }) {
   const [file, setFile] = useState<File | undefined>();
   const inputRef = useRef<HTMLInputElement>(null);
+  const inputId = useId();
 
   useEffect(() => {
     if (open) setFile(undefined);
   }, [open]);
+
+  const handleFile = (picked: File | undefined) => {
+    if (!picked) return;
+    if (picked.size > MAX_BYTES) {
+      toastError(null, "Arquivo acima de 4 MB — escolha um arquivo menor.");
+      return;
+    }
+    setFile(picked);
+  };
 
   return (
     <BottomSheet
@@ -57,12 +70,12 @@ export function ResultadoSheet({
 
       <input
         ref={inputRef}
+        id={inputId}
         type="file"
         accept={ACCEPT}
         className="hidden"
         onChange={(e) => {
-          const picked = e.target.files?.[0];
-          if (picked) setFile(picked);
+          handleFile(e.target.files?.[0]);
           e.target.value = ""; // permite reescolher o mesmo arquivo
         }}
       />
@@ -76,22 +89,15 @@ export function ResultadoSheet({
           onRemove={() => setFile(undefined)}
         />
       ) : (
-        <label className="cursor-pointer rounded-control border border-dashed border-lilac bg-lilac-tint px-4 py-4 text-center text-sm font-bold text-lilac-deep">
+        <label
+          htmlFor={inputId}
+          className="cursor-pointer rounded-control border border-dashed border-lilac bg-lilac-tint px-4 py-4 text-center text-sm font-bold text-lilac-deep"
+        >
           <UploadSimpleIcon size={18} weight="bold" className="mr-1 inline" />
           Anexar resultado
           <span className="mt-1 block text-xs font-semibold text-ink-faint">
             PDF ou imagem · até 4 MB
           </span>
-          <input
-            type="file"
-            accept={ACCEPT}
-            className="hidden"
-            onChange={(e) => {
-              const picked = e.target.files?.[0];
-              if (picked) setFile(picked);
-              e.target.value = "";
-            }}
-          />
         </label>
       )}
     </BottomSheet>

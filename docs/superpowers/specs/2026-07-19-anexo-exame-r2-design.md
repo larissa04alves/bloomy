@@ -218,4 +218,3 @@ Registra, no formato dos ADRs existentes:
 - [ ] Rotas finas (ADR-0001), autenticadas com `requireUserId` + posse.
 - [ ] ADR novo registrando storage + modelo de acesso.
 - [ ] Objeto removido do R2 ao excluir exame ou trocar/remover anexo (sem órfãos).
-```

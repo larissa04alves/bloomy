@@ -8,7 +8,7 @@ import { toastError } from "@/lib/toast";
 import { useResource } from "@/lib/use-resource";
 
 import type { AttachmentIntent } from "../components/ExamModal";
-import { byCompletedDesc, sortByWhen } from "./format";
+import { byCompletedDesc, sortByWhen, tempId } from "./format";
 
 type ListResponse = { exams: Exam[] };
 
@@ -49,8 +49,12 @@ export function useExames() {
         } catch (e) {
           toastError(e, "Exame salvo, mas o anexo não pôde ser enviado — reanexe editando");
         }
-        const data = await api.get<ListResponse>("/api/exams");
-        list.setData(data);
+        try {
+          const data = await api.get<ListResponse>("/api/exams");
+          list.setData(data);
+        } catch (e) {
+          toastError(e, "Exame criado, mas a lista não atualizou — recarregue");
+        }
       } catch (e) {
         toastError(e, "Não foi possível adicionar o exame");
       } finally {
@@ -114,7 +118,7 @@ export function useExames() {
         const suggested = new Date();
         suggested.setMonth(suggested.getMonth() + (opts.followUpMonths ?? 1));
         optimistic.push({
-          id: `temp-${crypto.randomUUID()}`,
+          id: tempId(),
           name: done.name,
           status: "to_schedule",
           scheduledAt: null,

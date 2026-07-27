@@ -2,7 +2,7 @@
 
 ## Contexto
 
-Um exame em `result_available` pode ter o resultado anexado (PDF ou imagem).
+Um exame em `awaiting_result` pode ter o resultado anexado (PDF ou imagem).
 É dado de saúde — sensível — e só a dona pode acessar. O projeto já usa uma
 conta Cloudflare (bucket público para GIFs de exercício).
 
@@ -25,8 +25,13 @@ conta Cloudflare (bucket público para GIFs de exercício).
 
 ## Consequência
 
-- O ticket de histórico (#14) reaproveita o endpoint GET e este modelo de acesso;
-  a visualização é **download simples** (`Content-Disposition: attachment`) — o SO
-  do celular abre no app apropriado, sem viewer inline (o que também evita o
-  problema de HEIC não renderizar inline no Chrome/Firefox).
+- O ticket de histórico (#14) reaproveita o endpoint GET e este modelo de acesso.
+  A visualização é **inline** para `application/pdf` e `image/*`
+  (`Content-Disposition: inline`, `attachment` para o resto) e o link abre em nova
+  aba: o critério do #14 pede PDF em visualização e imagem em preview, e o
+  visualizador do navegador já oferece o download. HEIC não renderiza inline no
+  Chrome/Firefox — nesse caso o navegador cai no download, que é o comportamento
+  aceitável.
 - Órfãos no R2 são removidos ao excluir o exame, trocar ou remover o anexo.
+- Quem fecha o exame é o laudo: anexar em `awaiting_result` conclui o exame na
+  mesma operação (ver ADR-0004).

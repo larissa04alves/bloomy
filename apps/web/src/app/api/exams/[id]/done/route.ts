@@ -2,6 +2,7 @@ import { db } from "@bloomy/db";
 import { z } from "zod";
 
 import {
+  conflict,
   invalidBody,
   notFound,
   parseJson,
@@ -28,7 +29,9 @@ export async function POST(
 
   const { id } = await params;
   const result = await markExamDone(db, userId, id, parsed.data);
-  if (!result) return notFound();
+  if (result === "not_found") return notFound();
+  if (result === "wrong_status")
+    return conflict("exame não está agendado");
 
   return Response.json({ exam: result.done, followUp: result.followUp });
 }

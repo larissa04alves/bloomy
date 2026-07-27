@@ -23,6 +23,11 @@ const client = new S3Client({
     accessKeyId: env.R2_ACCESS_KEY_ID,
     secretAccessKey: env.R2_SECRET_ACCESS_KEY,
   },
+
+  requestHandler: {
+    connectionTimeout: 5_000,
+    requestTimeout: 60_000,
+  },
 });
 
 const Bucket = env.R2_EXAM_BUCKET;
@@ -30,7 +35,12 @@ const Bucket = env.R2_EXAM_BUCKET;
 export const examStorage: ExamStorage = {
   async put(key, body, contentType) {
     await client.send(
-      new PutObjectCommand({ Bucket, Key: key, Body: body, ContentType: contentType }),
+      new PutObjectCommand({
+        Bucket,
+        Key: key,
+        Body: body,
+        ContentType: contentType,
+      }),
     );
   },
   async get(key) {

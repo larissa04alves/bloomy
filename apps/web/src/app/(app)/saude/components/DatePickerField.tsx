@@ -47,7 +47,17 @@ export function DatePickerField({
     };
     place();
     window.addEventListener("resize", place);
-    return () => window.removeEventListener("resize", place);
+
+    document.addEventListener("scroll", place, true);
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      window.removeEventListener("resize", place);
+      document.removeEventListener("scroll", place, true);
+      document.removeEventListener("keydown", onKeyDown);
+    };
   }, [open]);
 
   return (

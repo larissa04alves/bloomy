@@ -1,17 +1,29 @@
 import type { ExamStatus } from "@/lib/api-types";
 
 const MONTHS_PT = [
-  "jan", "fev", "mar", "abr", "mai", "jun",
-  "jul", "ago", "set", "out", "nov", "dez",
+  "jan",
+  "fev",
+  "mar",
+  "abr",
+  "mai",
+  "jun",
+  "jul",
+  "ago",
+  "set",
+  "out",
+  "nov",
+  "dez",
 ];
 const WEEKDAYS_PT = ["dom", "seg", "ter", "qua", "qui", "sex", "sáb"];
 
-const startOfDay = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+const startOfDay = (d: Date) =>
+  new Date(d.getFullYear(), d.getMonth(), d.getDate());
 
 /** "hoje" | "amanhã" | "em N dias" | "em N semanas" (nunca no passado → "hoje"). */
 export function relativeDays(iso: string, now: Date = new Date()): string {
   const diff = Math.round(
-    (startOfDay(new Date(iso)).getTime() - startOfDay(now).getTime()) / 86_400_000,
+    (startOfDay(new Date(iso)).getTime() - startOfDay(now).getTime()) /
+      86_400_000,
   );
   if (diff <= 0) return "hoje";
   if (diff === 1) return "amanhã";
@@ -72,11 +84,22 @@ function whenMs(x: Datable): number {
 
 /** Ordena ativos asc por scheduledAt ?? suggestedAt (null vai pro fim). */
 export function sortByWhen<T extends Datable>(items: T[]): T[] {
-  return [...items].sort((a, b) => whenMs(a) - whenMs(b));
+  return [...items].sort((a, b) => {
+    const aMs = whenMs(a);
+    const bMs = whenMs(b);
+    const aHasDate = aMs !== Number.POSITIVE_INFINITY;
+    const bHasDate = bMs !== Number.POSITIVE_INFINITY;
+
+    if (aHasDate !== bHasDate) return aHasDate ? -1 : 1;
+    if (!aHasDate) return 0;
+    return aMs - bMs;
+  });
 }
 
 /** Ordena concluídos desc por completedAt (null por último). */
-export function byCompletedDesc<T extends { completedAt: string | null }>(items: T[]): T[] {
+export function byCompletedDesc<T extends { completedAt: string | null }>(
+  items: T[],
+): T[] {
   const ms = (x: { completedAt: string | null }) =>
     x.completedAt ? new Date(x.completedAt).getTime() : 0;
   return [...items].sort((a, b) => ms(b) - ms(a));
@@ -90,7 +113,11 @@ export function formatDateBR(date: Date): string {
 }
 
 /** Junta data + hora/minuto (strings "HH"/"MM") num instante ISO (hora local). */
-export function combineDateTime(date: Date, hour: string, minute: string): string {
+export function combineDateTime(
+  date: Date,
+  hour: string,
+  minute: string,
+): string {
   const d = new Date(date);
   d.setHours(Number(hour), Number(minute), 0, 0);
   return d.toISOString();
@@ -115,4 +142,11 @@ export function minuteOptions(extra?: string): string[] {
   const base = Array.from({ length: 12 }, (_, i) => pad2(i * 5));
   if (extra && !base.includes(extra)) return [...base, extra].sort();
   return base;
+}
+
+let tempIdSeq = 0;
+
+export function tempId(): string {
+  tempIdSeq += 1;
+  return `temp-${Date.now()}-${tempIdSeq}`;
 }

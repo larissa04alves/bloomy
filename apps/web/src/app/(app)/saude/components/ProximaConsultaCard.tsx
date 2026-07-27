@@ -11,7 +11,8 @@ export function ProximaConsultaCard({ proxima }: { proxima: Appointment | null }
   const title = (() => {
     if (!proxima) return "Nenhuma consulta marcada";
     if (proxima.status === "to_schedule") return "Retorno a agendar";
-    return `Próxima consulta ${relativeDays(proxima.scheduledAt ?? "")}`;
+    if (!proxima.scheduledAt) return "Próxima consulta";
+    return `Próxima consulta ${relativeDays(proxima.scheduledAt)}`;
   })();
 
   const subtitle = (() => {

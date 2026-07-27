@@ -254,6 +254,7 @@ export async function updateExam(
       input.scheduledAt !== undefined ? input.scheduledAt : current.scheduledAt;
     if (status === "scheduled" && !scheduledAt) return "missing_schedule";
 
+    const now = new Date();
     const [updated] = await tx
       .update(exam)
       .set({
@@ -262,7 +263,13 @@ export async function updateExam(
         ...(input.scheduledAt !== undefined && {
           scheduledAt: input.scheduledAt,
         }),
-        updatedAt: new Date(),
+
+        ...(input.status !== undefined &&
+          input.status === "completed" && { completedAt: now }),
+        ...(input.status !== undefined &&
+          input.status !== "completed" &&
+          current.status === "completed" && { completedAt: null }),
+        updatedAt: now,
       })
       .where(and(eq(exam.id, id), eq(exam.userId, userId)))
       .returning();
@@ -294,13 +301,22 @@ export async function deleteExam(
   return true;
 }
 
+export type ExamTransitionError = "not_found" | "wrong_status";
+
 export async function markExamDone(
   db: Db,
   userId: string,
   id: string,
   input: { needsReturn: boolean; followUpMonths?: number },
-): Promise<{ done: Exam; followUp: Exam | null } | null> {
+): Promise<{ done: Exam; followUp: Exam | null } | ExamTransitionError> {
   return db.transaction(async (tx) => {
+    const [current] = await tx
+      .select()
+      .from(exam)
+      .where(and(eq(exam.id, id), eq(exam.userId, userId)));
+    if (!current) return "not_found";
+    if (current.status !== "scheduled") return "wrong_status";
+
     const now = new Date();
     const [done] = await tx
       .update(exam)
@@ -314,7 +330,7 @@ export async function markExamDone(
         ),
       )
       .returning();
-    if (!done) return null;
+    if (!done) return "wrong_status";
 
     let followUp: Exam | null = null;
     if (input.needsReturn) {
@@ -340,21 +356,31 @@ export async function completeExam(
   db: Db,
   userId: string,
   id: string,
-): Promise<Exam | null> {
-  const now = new Date();
-  const [completed] = await db
-    .update(exam)
-    .set({ status: "completed", completedAt: now, updatedAt: now })
-    // guarda de idempotência: double-tap num item já concluído não remexe no completedAt
-    .where(
-      and(
-        eq(exam.id, id),
-        eq(exam.userId, userId),
-        ne(exam.status, "completed"),
-      ),
-    )
-    .returning();
-  return completed ?? null;
+): Promise<Exam | ExamTransitionError> {
+  return db.transaction(async (tx) => {
+    const [current] = await tx
+      .select()
+      .from(exam)
+      .where(and(eq(exam.id, id), eq(exam.userId, userId)));
+    if (!current) return "not_found";
+    if (current.status !== "awaiting_result") return "wrong_status";
+
+    const now = new Date();
+    const [completed] = await tx
+      .update(exam)
+      .set({ status: "completed", completedAt: now, updatedAt: now })
+      // guarda de idempotência: double-tap num item já concluído não remexe no completedAt
+      .where(
+        and(
+          eq(exam.id, id),
+          eq(exam.userId, userId),
+          ne(exam.status, "completed"),
+        ),
+      )
+      .returning();
+    if (!completed) return "wrong_status";
+    return completed;
+  });
 }
 
 export type ExamStorageError = "not_found" | "wrong_status";

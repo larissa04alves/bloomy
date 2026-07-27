@@ -46,6 +46,7 @@ export function ExamModal({
   const [pendingFile, setPendingFile] = useState<File | undefined>();
   const [removeAttachment, setRemoveAttachment] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const prefilledRef = useRef(false);
 
   const form = useForm({
     defaultValues: { name: "" },
@@ -66,7 +67,12 @@ export function ExamModal({
   });
 
   useEffect(() => {
-    if (!open) return;
+    if (!open) {
+      prefilledRef.current = false;
+      return;
+    }
+    if (prefilledRef.current) return;
+    prefilledRef.current = true;
     form.setFieldValue("name", initial?.name ?? "");
     setStatus(
       initial && initial.status !== "completed"
@@ -90,6 +96,11 @@ export function ExamModal({
 
   const isEdit = Boolean(initial);
   const dateRequired = status === "scheduled";
+
+  const statusOptions =
+    initial?.status === "awaiting_result"
+      ? [...STATUS_OPTIONS, "awaiting_result" as const]
+      : STATUS_OPTIONS;
 
   return (
     <BottomSheet
@@ -128,7 +139,7 @@ export function ExamModal({
       <div className="flex flex-col gap-2">
         <span className="text-sm font-bold text-ink">Status</span>
         <div className="flex flex-wrap gap-2">
-          {STATUS_OPTIONS.map((s) => (
+          {statusOptions.map((s) => (
             <ChoiceChip
               key={s}
               selected={status === s}
@@ -154,6 +165,7 @@ export function ExamModal({
                 setPendingFile(f);
                 setRemoveAttachment(false);
               }
+              e.target.value = ""; // permite reescolher o mesmo arquivo
             }}
           />
           {(() => {

@@ -9,6 +9,7 @@ import {
   monthShort,
   relativeDays,
   sortByWhen,
+  tempId,
   weekdayDay,
 } from "./format";
 
@@ -29,6 +30,12 @@ describe("relativeDays", () => {
   });
   test("em N semanas a partir de 14 dias", () => {
     expect(relativeDays("2026-08-06T09:00:00", NOW)).toBe("em 3 semanas");
+  });
+  test("fronteira: 13 dias ainda é 'em N dias'", () => {
+    expect(relativeDays("2026-07-29T09:00:00", NOW)).toBe("em 13 dias");
+  });
+  test("fronteira: 14 dias já vira 'em N semanas'", () => {
+    expect(relativeDays("2026-07-30T09:00:00", NOW)).toBe("em 2 semanas");
   });
 });
 
@@ -70,6 +77,23 @@ test("sortByWhen: to_schedule (null scheduledAt) vai pro fim, usa suggestedAt", 
     { id: "c", scheduledAt: "2026-07-18T00:00:00", suggestedAt: null },
   ];
   expect(sortByWhen(items).map((x) => x.id)).toEqual(["c", "b", "a"]);
+});
+
+test("sortByWhen: dois itens sem data não quebram a ordem (fim, estável)", () => {
+  const items = [
+    { id: "a", scheduledAt: null, suggestedAt: null },
+    { id: "b", scheduledAt: "2026-07-18T00:00:00", suggestedAt: null },
+    { id: "c", scheduledAt: null, suggestedAt: null },
+  ];
+  expect(sortByWhen(items).map((x) => x.id)).toEqual(["b", "a", "c"]);
+});
+
+test("tempId: prefixo 'temp-' e único entre chamadas consecutivas", () => {
+  const first = tempId();
+  const second = tempId();
+  expect(first).toMatch(/^temp-/);
+  expect(second).toMatch(/^temp-/);
+  expect(first).not.toBe(second);
 });
 
 test("byCompletedDesc: mais recente primeiro", () => {

@@ -12,7 +12,7 @@ import { AppointmentModal } from "./components/AppointmentModal";
 import { ConsultasSection } from "./components/ConsultasSection";
 import { ExamModal } from "./components/ExamModal";
 import { ExamesSection } from "./components/ExamesSection";
-import { HistorySheet, type HistoryItem } from "./components/HistorySheet";
+import { HistorySheet } from "./components/HistorySheet";
 import { MedicationModal } from "./components/MedicationModal";
 import { ProximaConsultaCard } from "./components/ProximaConsultaCard";
 import { ResultadoSheet } from "./components/ResultadoSheet";
@@ -20,6 +20,7 @@ import { RetornoSheet } from "./components/RetornoSheet";
 import { useAgendaRemedios } from "./hooks/useAgendaRemedios";
 import { useConsultas } from "./hooks/useConsultas";
 import { useExames } from "./hooks/useExames";
+import { useHistorySheet } from "./hooks/useHistorySheet";
 
 type RetornoTarget = { kind: "consulta" | "exame"; id: string };
 
@@ -37,31 +38,7 @@ export default function SaudePage() {
   const [retorno, setRetorno] = useState<{ open: boolean; target?: RetornoTarget }>({ open: false });
   // Sheet do resultado do exame (anexar o laudo ou concluir sem ele).
   const [resultado, setResultado] = useState<{ open: boolean; exam?: Exam }>({ open: false });
-  // Guarda só qual histórico está aberto: os itens são derivados do estado atual, para que
-  // anexar um resultado dali já troque o botão por "abrir" sem fechar o sheet.
-  const [history, setHistory] = useState<{ open: boolean; kind?: "consulta" | "exame" }>({
-    open: false,
-  });
-
-  const historyItems: HistoryItem[] =
-    history.kind === "exame"
-      ? exames.historico.map((e) => ({
-          id: e.id,
-          title: e.name,
-          completedAt: e.completedAt,
-          isReturn: Boolean(e.parentId),
-          attachment: e.attachmentName
-            ? { href: `/api/exams/${e.id}/attachment`, name: e.attachmentName }
-            : undefined,
-        }))
-      : history.kind === "consulta"
-        ? consultas.historico.map((a) => ({
-            id: a.id,
-            title: a.specialty ? `${a.professional} · ${a.specialty}` : a.professional,
-            completedAt: a.completedAt,
-            isReturn: Boolean(a.parentId),
-          }))
-        : [];
+  const history = useHistorySheet(exames.historico, consultas.historico);
 
   return (
     <Screen title="Saúde" subtitle="Consultas, exames e agenda de remédios">
@@ -73,7 +50,7 @@ export default function SaudePage() {
         onEdit={(a) => setApptModal({ open: true, initial: a })}
         onDelete={consultas.remove}
         onComplete={(a) => setRetorno({ open: true, target: { kind: "consulta", id: a.id } })}
-        onHistory={() => setHistory({ open: true, kind: "consulta" })}
+        onHistory={() => history.openHistory("consulta")}
       />
 
       <ExamesSection
@@ -84,7 +61,7 @@ export default function SaudePage() {
         // o retorno é decidido ao marcar como feito; o laudo, no modal de resultado.
         onMarkDone={(e) => setRetorno({ open: true, target: { kind: "exame", id: e.id } })}
         onComplete={(e) => setResultado({ open: true, exam: e })}
-        onHistory={() => setHistory({ open: true, kind: "exame" })}
+        onHistory={() => history.openHistory("exame")}
       />
 
       <AgendaRemediosSection
@@ -153,9 +130,9 @@ export default function SaudePage() {
 
       <HistorySheet
         open={history.open}
-        onOpenChange={(open) => setHistory((s) => ({ ...s, open }))}
-        title={history.kind === "exame" ? "Histórico de exames" : "Histórico de consultas"}
-        items={historyItems}
+        onOpenChange={history.onOpenChange}
+        title={history.title}
+        items={history.items}
       />
 
       {consultas.creating || exames.creating || agenda.creating ? (

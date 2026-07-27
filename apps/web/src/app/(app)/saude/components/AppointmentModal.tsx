@@ -2,7 +2,7 @@
 
 import { StethoscopeIcon } from "@phosphor-icons/react";
 import { useForm } from "@tanstack/react-form";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { z } from "zod";
 
 import { BottomSheet } from "@/components/bottom-sheet";
@@ -34,6 +34,7 @@ export function AppointmentModal({
   const [date, setDate] = useState<Date | undefined>();
   const [hour, setHour] = useState("09");
   const [minute, setMinute] = useState("00");
+  const prefilledRef = useRef(false);
 
   const form = useForm({
     defaultValues: {
@@ -57,13 +58,21 @@ export function AppointmentModal({
   });
 
   // setFieldValue por campo (form.reset(values) não repopula os inputs montados nesta versão).
+
   useEffect(() => {
-    if (!open) return;
+    if (!open) {
+      prefilledRef.current = false;
+      return;
+    }
+    if (prefilledRef.current) return;
+    prefilledRef.current = true;
     form.setFieldValue("professional", initial?.professional ?? "");
     form.setFieldValue("specialty", initial?.specialty ?? "");
     form.setFieldValue("location", initial?.location ?? "");
     form.setFieldValue("remindDayBefore", initial?.remindDayBefore ?? false);
-    const t = splitDateTime(initial?.scheduledAt ?? initial?.suggestedAt ?? null);
+    const t = splitDateTime(
+      initial?.scheduledAt ?? initial?.suggestedAt ?? null,
+    );
     setDate(t.date);
     setHour(t.hour);
     setMinute(t.minute);
@@ -151,7 +160,9 @@ export function AppointmentModal({
       <form.Field name="remindDayBefore">
         {(field) => (
           <div className="flex items-center justify-between rounded-control bg-lilac-tint-soft px-4 py-3">
-            <span className="text-sm font-bold text-ink">Lembrar 1 dia antes</span>
+            <span className="text-sm font-bold text-ink">
+              Lembrar 1 dia antes
+            </span>
             <ToggleSwitch
               checked={field.state.value}
               onCheckedChange={(v) => field.handleChange(v)}

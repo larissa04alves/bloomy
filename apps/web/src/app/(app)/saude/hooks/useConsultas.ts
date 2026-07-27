@@ -7,7 +7,7 @@ import type { Appointment, AppointmentInput } from "@/lib/api-types";
 import { toastError } from "@/lib/toast";
 import { useResource } from "@/lib/use-resource";
 
-import { byCompletedDesc, sortByWhen } from "./format";
+import { byCompletedDesc, sortByWhen, tempId } from "./format";
 
 type ListResponse = { appointments: Appointment[] };
 type NextResponse = { appointment: Appointment | null };
@@ -32,9 +32,13 @@ export function useConsultas() {
       setCreating(true);
       try {
         await api.post("/api/appointments", input);
-        const data = await api.get<ListResponse>("/api/appointments");
-        list.setData(data);
-        next.reload();
+        try {
+          const data = await api.get<ListResponse>("/api/appointments");
+          list.setData(data);
+          next.reload();
+        } catch (e) {
+          toastError(e, "Consulta agendada, mas a lista não atualizou — recarregue");
+        }
       } catch (e) {
         toastError(e, "Não foi possível agendar a consulta");
       } finally {
@@ -99,7 +103,7 @@ export function useConsultas() {
         const suggested = new Date();
         suggested.setMonth(suggested.getMonth() + (opts.followUpMonths ?? 1));
         optimistic.push({
-          id: `temp-${crypto.randomUUID()}`,
+          id: tempId(),
           professional: done.professional,
           specialty: done.specialty,
           status: "to_schedule",

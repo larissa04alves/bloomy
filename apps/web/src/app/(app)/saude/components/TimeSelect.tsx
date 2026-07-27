@@ -7,7 +7,8 @@ const inputCls =
 function clampField(raw: string, max: number): string {
   const digits = raw.replace(/\D/g, "").slice(0, 2);
   if (digits === "") return "";
-  return String(Math.min(Number(digits), max));
+
+  return Number(digits) > max ? String(max) : digits;
 }
 
 const pad2 = (v: string) => (v === "" ? "00" : v.padStart(2, "0"));
@@ -29,7 +30,9 @@ export function TimeSelect({
         aria-label="Hora"
         value={hour}
         placeholder="09"
-        onChange={(e) => onChange({ hour: clampField(e.target.value, 23), minute })}
+        onChange={(e) =>
+          onChange({ hour: clampField(e.target.value, 23), minute })
+        }
         onBlur={() => onChange({ hour: pad2(hour), minute })}
         className={inputCls}
       />
@@ -39,7 +42,9 @@ export function TimeSelect({
         aria-label="Minuto"
         value={minute}
         placeholder="00"
-        onChange={(e) => onChange({ hour, minute: clampField(e.target.value, 59) })}
+        onChange={(e) =>
+          onChange({ hour, minute: clampField(e.target.value, 59) })
+        }
         onBlur={() => onChange({ hour, minute: pad2(minute) })}
         className={inputCls}
       />
