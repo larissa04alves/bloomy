@@ -29,6 +29,9 @@ export function SessaoFim({
   onRestart: () => void;
 }) {
   const adjustCount = adjustments.added + adjustments.replaced + adjustments.removed;
+  // Reordenar sozinho também é mudança que vale salvar no treino — sem isso, uma sessão
+  // em que só mexeu na ordem não oferecia o botão e a ordem nova morria com a sessão.
+  const hasChanges = adjustCount > 0 || adjustments.reordered;
   const todayIndex = useTodayIndex(); // resolvido após o mount (evita mismatch SSR)
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-5 px-5.5 pb-8 text-center">
@@ -86,14 +89,24 @@ export function SessaoFim({
         ))}
       </div>
 
-      {adjustCount > 0 ? (
+      {hasChanges ? (
         <div className="flex w-full flex-col gap-3 rounded-card bg-white p-4 shadow-card-sm">
           <p className="text-sm font-semibold text-ink-read">
-            Você ajustou{" "}
-            <span className="font-bold text-ink">
-              {adjustCount === 1 ? "1 exercício" : `${adjustCount} exercícios`}
-            </span>{" "}
-            hoje. Salvar essas mudanças no treino?
+            {adjustCount > 0 ? (
+              <>
+                Você ajustou{" "}
+                <span className="font-bold text-ink">
+                  {adjustCount === 1 ? "1 exercício" : `${adjustCount} exercícios`}
+                </span>
+                {adjustments.reordered ? " e mudou a ordem" : ""} hoje. Salvar essas mudanças
+                no treino?
+              </>
+            ) : (
+              <>
+                Você mudou a <span className="font-bold text-ink">ordem dos exercícios</span>{" "}
+                hoje. Salvar essa ordem no treino?
+              </>
+            )}
           </p>
           {applied ? (
             <span className="flex items-center justify-center gap-1.5 text-sm font-bold text-green-deep">

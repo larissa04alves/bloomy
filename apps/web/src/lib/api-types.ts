@@ -156,7 +156,13 @@ export type SessionDetail = {
   exercises: SessionExercise[];
 };
 
-export type SessionAdjustments = { added: number; replaced: number; removed: number };
+export type SessionAdjustments = {
+  added: number;
+  replaced: number;
+  removed: number;
+  /** true quando os exercícios herdados do template estão em ordem diferente da dele. */
+  reordered: boolean;
+};
 
 // ── Mente ─────────────────────────────────────────────────────────────────
 

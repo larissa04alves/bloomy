@@ -227,7 +227,13 @@ export async function updateSet(
   return updated ?? null;
 }
 
-export type SessionAdjustments = { added: number; replaced: number; removed: number };
+export type SessionAdjustments = {
+  added: number;
+  replaced: number;
+  removed: number;
+  /** true quando os exercícios herdados do template estão em ordem diferente da dele. */
+  reordered: boolean;
+};
 
 /** Diferença entre a lista da sessão e o template. `removed`: itens do template ausentes. */
 export async function sessionAdjustments(
@@ -238,18 +244,26 @@ export async function sessionAdjustments(
     db
       .select({ exerciseId: sessionExercise.exerciseId, origin: sessionExercise.origin })
       .from(sessionExercise)
-      .where(eq(sessionExercise.sessionId, session.id)),
+      .where(eq(sessionExercise.sessionId, session.id))
+      .orderBy(asc(sessionExercise.position)),
     db
       .select({ id: exercise.id })
       .from(exercise)
-      .where(eq(exercise.workoutId, session.workoutId)),
+      .where(eq(exercise.workoutId, session.workoutId))
+      .orderBy(asc(exercise.position)),
   ]);
 
   const kept = new Set(rows.flatMap((r) => (r.exerciseId ? [r.exerciseId] : [])));
+  // Compara só os itens herdados do template, dos dois lados: exercício adicionado no dia
+  // (sem par no template) ou removido deslocaria a comparação sem ninguém ter reordenado.
+  const sessionOrder = rows.flatMap((r) => (r.exerciseId ? [r.exerciseId] : []));
+  const templateOrder = templateRows.flatMap((t) => (kept.has(t.id) ? [t.id] : []));
+
   return {
     added: rows.filter((r) => r.origin === "added").length,
     replaced: rows.filter((r) => r.origin === "replaced").length,
     removed: templateRows.filter((t) => !kept.has(t.id)).length,
+    reordered: sessionOrder.some((id, i) => id !== templateOrder[i]),
   };
 }
 

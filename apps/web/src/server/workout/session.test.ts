@@ -395,7 +395,12 @@ describe("salvar no treino", () => {
 
     const done = await completeSession(db, userId, sessionId);
     expect(done!.exerciseCount).toBe(2); // Supino inclinado + Crucifixo
-    expect(done!.adjustments).toEqual({ added: 1, replaced: 1, removed: 1 });
+    expect(done!.adjustments).toEqual({
+      added: 1,
+      replaced: 1,
+      removed: 1,
+      reordered: false,
+    });
   });
 
   test("sem ajuste, a contagem é zero", async () => {
@@ -412,7 +417,92 @@ describe("salvar no treino", () => {
     if (s === "already_active" || s === "not_found") throw new Error("unreachable");
 
     const done = await completeSession(db, userId, s.session.id);
-    expect(done!.adjustments).toEqual({ added: 0, replaced: 0, removed: 0 });
+    expect(done!.adjustments).toEqual({
+      added: 0,
+      replaced: 0,
+      removed: 0,
+      reordered: false,
+    });
+  });
+
+  test("só reordenar marca reordered, sem contar como add/replace/remove", async () => {
+    const db = await createTestDb();
+    const userId = await createTestUser(db);
+    const w = await createWorkout(db, userId, {
+      name: "Peito",
+      focus: "chest",
+      exercises: [
+        { name: "Supino", targetSets: 2, targetReps: 10, restSeconds: 60, position: 0 },
+        { name: "Voador", targetSets: 2, targetReps: 12, restSeconds: 45, position: 1 },
+        { name: "Crucifixo", targetSets: 3, targetReps: 12, restSeconds: 45, position: 2 },
+      ],
+    });
+    const s = await startSession(db, userId, w.id);
+    if (s === "already_active" || s === "not_found") throw new Error("unreachable");
+    const [supino, voador, crucifixo] = s.exercises;
+
+    await reorderSessionExercises(db, userId, s.session.id, [
+      crucifixo.id,
+      supino.id,
+      voador.id,
+    ]);
+
+    const done = await completeSession(db, userId, s.session.id);
+    // é o que faz o card "Salvar no treino" aparecer numa sessão em que só mudou a ordem
+    expect(done!.adjustments).toEqual({
+      added: 0,
+      replaced: 0,
+      removed: 0,
+      reordered: true,
+    });
+  });
+
+  test("adicionar exercício no fim não conta como reordenação", async () => {
+    const db = await createTestDb();
+    const userId = await createTestUser(db);
+    const w = await createWorkout(db, userId, {
+      name: "Costas",
+      focus: "back",
+      exercises: [
+        { name: "Remada", targetSets: 2, targetReps: 10, restSeconds: 60, position: 0 },
+        { name: "Puxada", targetSets: 2, targetReps: 12, restSeconds: 45, position: 1 },
+      ],
+    });
+    const s = await startSession(db, userId, w.id);
+    if (s === "already_active" || s === "not_found") throw new Error("unreachable");
+
+    await addSessionExercise(db, userId, s.session.id, {
+      name: "Pulldown",
+      targetSets: 3,
+      targetReps: 12,
+      restSeconds: 45,
+    });
+
+    const done = await completeSession(db, userId, s.session.id);
+    expect(done!.adjustments.added).toBe(1);
+    expect(done!.adjustments.reordered).toBe(false);
+  });
+
+  test("remover o exercício do meio não conta como reordenação", async () => {
+    const db = await createTestDb();
+    const userId = await createTestUser(db);
+    const w = await createWorkout(db, userId, {
+      name: "Pernas",
+      focus: "legs",
+      exercises: [
+        { name: "Agachamento", targetSets: 2, targetReps: 10, restSeconds: 60, position: 0 },
+        { name: "Leg press", targetSets: 2, targetReps: 12, restSeconds: 45, position: 1 },
+        { name: "Cadeira", targetSets: 2, targetReps: 12, restSeconds: 45, position: 2 },
+      ],
+    });
+    const s = await startSession(db, userId, w.id);
+    if (s === "already_active" || s === "not_found") throw new Error("unreachable");
+
+    await removeSessionExercise(db, userId, s.session.id, s.exercises[1].id);
+
+    const done = await completeSession(db, userId, s.session.id);
+    expect(done!.adjustments.removed).toBe(1);
+    expect(done!.adjustments.reordered).toBe(false);
   });
 
   test("applySessionToWorkout reflete troca, remoção e adição no template", async () => {
