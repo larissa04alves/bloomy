@@ -1,0 +1,1 @@
+CREATE INDEX `set_log_session_exercise_idx` ON `set_log` (`session_exercise_id`);

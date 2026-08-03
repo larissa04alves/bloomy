@@ -192,6 +192,10 @@ export const setLog = sqliteTable(
   },
   (table) => [
     index("set_log_session_idx").on(table.sessionId),
+    // o serviço filtra set_log por sessionExerciseId em 3 pontos (contagem de séries
+    // feitas e delete no swap, delete no remove); sem índice é full scan da tabela,
+    // que acumula o histórico inteiro
+    index("set_log_session_exercise_idx").on(table.sessionExerciseId),
     index("set_log_user_exercise_idx").on(table.userId, table.exerciseName),
   ],
 );

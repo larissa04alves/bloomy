@@ -13,7 +13,7 @@ import type {
 import { toastError } from "@/lib/toast";
 import { useResource } from "@/lib/use-resource";
 
-import { applySetPatch } from "./session";
+import { applySetPatch, NEW_EXERCISE_DEFAULTS } from "./session";
 
 type View = "lista" | "ex" | "fim";
 type SetPatch = { reps?: number | null; load?: number | null };
@@ -27,9 +27,6 @@ type FinishSummary = {
   adjustments: SessionAdjustments;
   summary: WorkoutSummary;
 };
-
-// Defaults de um exercício escolhido do catálogo — os mesmos do TreinoModal.
-const CATALOG_DEFAULTS = { targetSets: 3, targetReps: 12, restSeconds: 45 };
 
 // O back aceita reps/load como z.number().optional() (não .nullable()): enviar null → 400.
 // Só mandamos chaves com número de fato; done sempre que definido.
@@ -237,7 +234,7 @@ export function useSessao() {
         name: picked.namePt,
         catalogId: picked.id,
         muscleGroup: null,
-        ...CATALOG_DEFAULTS,
+        ...NEW_EXERCISE_DEFAULTS,
       };
       const sessionId = detail.session.id;
       try {

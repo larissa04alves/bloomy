@@ -1,5 +1,15 @@
 import type { SessionExercise, SetLog } from "@/lib/api-types";
 
+/**
+ * Defaults de um exercício novo, do catálogo ou avulso. Fonte única: o modal de treino
+ * e o ajuste da sessão precisam concordar, senão divergem silenciosamente numa mudança.
+ */
+export const NEW_EXERCISE_DEFAULTS = {
+  targetSets: 3,
+  targetReps: 12,
+  restSeconds: 45,
+} as const;
+
 /** Nº de séries concluídas de um exercício. */
 export function doneCount(ex: SessionExercise): number {
   return ex.sets.filter((s) => s.done).length;

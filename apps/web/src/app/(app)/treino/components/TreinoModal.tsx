@@ -15,6 +15,7 @@ import {
 } from "@/lib/api-types";
 
 import type { WorkoutInput } from "../hooks/useTreinos";
+import { NEW_EXERCISE_DEFAULTS } from "../hooks/session";
 import { useCatalogo } from "../hooks/useCatalogo";
 import { BuscaExercicio } from "./BuscaExercicio";
 import { GifThumb } from "./GifThumb";
@@ -33,9 +34,7 @@ type ExRow = {
 
 const NEW_ROW: ExRow = {
   name: "",
-  targetSets: 3,
-  targetReps: 12,
-  restSeconds: 45,
+  ...NEW_EXERCISE_DEFAULTS,
   catalogId: null,
   muscleGroup: null,
 };
@@ -186,9 +185,7 @@ export function TreinoModal({
         catalogId: ex.id,
         group: ex.group,
         muscleGroup: null,
-        targetSets: 3,
-        targetReps: 12,
-        restSeconds: 45,
+        ...NEW_EXERCISE_DEFAULTS,
       },
     ]);
     setView("form");

@@ -16,14 +16,13 @@ import {
 import { createWorkout, listWorkouts, updateWorkout } from "./service";
 
 describe("migration session_exercise", () => {
-  test("tabela existe e aceita insert após migrate", async () => {
+  test("tabela existe e vem vazia após o migrate", async () => {
     const db = await createTestDb();
-    const userId = await createTestUser(db);
 
-    // sem FK de sessão real: só verifica que a migration criou a estrutura
+    // só verifica que a migration criou a estrutura; cobertura de insert fica em
+    // "startSession com snapshot"
     const rows = await db.select().from(sessionExercise);
     expect(rows).toEqual([]);
-    expect(userId).toBe("user-test");
   });
 });
 
@@ -331,6 +330,26 @@ describe("ajustes na sessão ativa", () => {
 
     const rows = await db.select().from(sessionExercise);
     expect(rows).toHaveLength(1); // não foi removido
+  });
+
+  test("sessão de outro usuário não aceita adicionar", async () => {
+    const { db, s } = await setup();
+    const outro = await createTestUser(db, "user-2");
+    expect(await addSessionExercise(db, outro, s.session.id, CRUCIFIXO)).toBeNull();
+  });
+
+  test("sessão de outro usuário não aceita trocar", async () => {
+    const { db, s } = await setup();
+    const outro = await createTestUser(db, "user-2");
+    expect(
+      await swapSessionExercise(db, outro, s.session.id, s.exercises[0].id, CRUCIFIXO),
+    ).toBeNull();
+  });
+
+  test("sessão de outro usuário não aceita remover", async () => {
+    const { db, s } = await setup();
+    const outro = await createTestUser(db, "user-2");
+    expect(await removeSessionExercise(db, outro, s.session.id, s.exercises[0].id)).toBeNull();
   });
 });
 

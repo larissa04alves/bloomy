@@ -83,22 +83,29 @@ async function buildSessionDetail(
     .where(eq(setLog.sessionId, session.id))
     .orderBy(asc(setLog.setIndex));
 
-  const detail = await Promise.all(
-    rows.map(async (row) => ({
-      id: row.id,
-      exerciseId: row.exerciseId,
-      name: row.name,
-      targetSets: row.targetSets,
-      restSeconds: row.restSeconds,
-      position: row.position,
-      catalogId: row.catalogId,
-      origin: row.origin,
-      sets: sets.filter((s) => s.sessionExerciseId === row.id),
-      lastPerformance: perfByName?.has(row.name)
-        ? (perfByName.get(row.name) ?? null)
-        : await lastPerformance(db, userId, row.name),
-    })),
+  // cache por nome único: reaproveita o que já veio em perfByName e resolve só o que
+  // falta, uma vez por nome — sem isso, exercícios com o mesmo nome disparavam uma
+  // consulta lastPerformance cada, dentro do map assíncrono
+  const cache: PerfCache = new Map(perfByName);
+  const missingNames = [...new Set(rows.map((r) => r.name).filter((name) => !cache.has(name)))];
+  await Promise.all(
+    missingNames.map(async (name) => {
+      cache.set(name, await lastPerformance(db, userId, name));
+    }),
   );
+
+  const detail = rows.map((row) => ({
+    id: row.id,
+    exerciseId: row.exerciseId,
+    name: row.name,
+    targetSets: row.targetSets,
+    restSeconds: row.restSeconds,
+    position: row.position,
+    catalogId: row.catalogId,
+    origin: row.origin,
+    sets: sets.filter((s) => s.sessionExerciseId === row.id),
+    lastPerformance: cache.get(row.name) ?? null,
+  }));
   return { session, exercises: detail };
 }
 
@@ -137,7 +144,15 @@ export async function startSession(
     ),
   );
 
-  const { session, rows } = await db.transaction(async (tx) => {
+  const result = await db.transaction(async (tx) => {
+    // re-checagem atômica: duas requisições concorrentes podem ter passado no guard
+    // externo juntas, antes de qualquer uma inserir — sem isso, as duas criam sessão ativa
+    const [live] = await tx
+      .select({ id: workoutSession.id })
+      .from(workoutSession)
+      .where(and(eq(workoutSession.userId, userId), isNull(workoutSession.completedAt)));
+    if (live) return "already_active" as const;
+
     const [s] = await tx
       .insert(workoutSession)
       .values({ userId, workoutId, day: dayFor() })
@@ -183,8 +198,9 @@ export async function startSession(
     if (setRows.length) await tx.insert(setLog).values(setRows);
     return { session: s, rows };
   });
+  if (result === "already_active") return "already_active";
 
-  return buildSessionDetail(db, session, userId, perfByName, rows);
+  return buildSessionDetail(db, result.session, userId, perfByName, result.rows);
 }
 
 export async function getActiveSession(
@@ -348,13 +364,19 @@ function isSameExercise(
 function buildSetRows(
   sessionId: string,
   userId: string,
-  row: { id: string; name: string; targetSets: number; targetReps: number },
+  row: {
+    id: string;
+    name: string;
+    targetSets: number;
+    targetReps: number;
+    exerciseId: string | null;
+  },
   last: { reps: number | null; load: number | null } | null,
 ) {
   return Array.from({ length: row.targetSets }, (_, i) => ({
     sessionId,
     sessionExerciseId: row.id,
-    exerciseId: null,
+    exerciseId: row.exerciseId,
     userId,
     exerciseName: row.name,
     setIndex: i + 1,
@@ -373,13 +395,7 @@ export async function addSessionExercise(
   const session = await activeSessionById(db, userId, sessionId);
   if (!session) return null;
 
-  const [last, [{ maxPosition }]] = await Promise.all([
-    lastPerformance(db, userId, input.name),
-    db
-      .select({ maxPosition: max(sessionExercise.position) })
-      .from(sessionExercise)
-      .where(eq(sessionExercise.sessionId, sessionId)),
-  ]);
+  const last = await lastPerformance(db, userId, input.name);
 
   const result = await db.transaction(async (tx) => {
     // re-checagem atômica: completeSession pode ter concluído a sessão desde o guard externo
@@ -400,6 +416,13 @@ export async function addSessionExercise(
       .from(sessionExercise)
       .where(eq(sessionExercise.sessionId, sessionId));
     if (existing.some((row) => isSameExercise(row, input))) return "duplicate";
+
+    // lido dentro da tx, logo antes do insert: fora dela, duas adições concorrentes
+    // leriam o mesmo máximo e gravariam a mesma position (sem constraint única no par)
+    const [{ maxPosition }] = await tx
+      .select({ maxPosition: max(sessionExercise.position) })
+      .from(sessionExercise)
+      .where(eq(sessionExercise.sessionId, sessionId));
 
     const [row] = await tx
       .insert(sessionExercise)
@@ -482,7 +505,10 @@ export async function swapSessionExercise(
       return "duplicate";
     }
 
-    // delete explícito: o enforcement de FK não é garantido no libsql
+    // delete explícito: sets antigos não sobrevivem à troca de exercício (regra de
+    // negócio, não é sobre a linha de sessionExercise). O driver aplica FK de verdade
+    // (foreign_keys=1), mas a FK de set_log.session_exercise_id não tem ON DELETE
+    // CASCADE no banco — não dá pra contar com cascade pra limpar isso sozinho.
     await tx.delete(setLog).where(eq(setLog.sessionExerciseId, sessionExerciseId));
     // exerciseId permanece: é o slot do template, e é ele que o "salvar no treino" atualiza
     await tx
@@ -501,7 +527,7 @@ export async function swapSessionExercise(
       buildSetRows(
         sessionId,
         userId,
-        { ...input, id: sessionExerciseId },
+        { ...input, id: sessionExerciseId, exerciseId: current.exerciseId },
         last,
       ),
     );
@@ -627,18 +653,21 @@ export async function applySessionToWorkout(
     .where(and(eq(workoutSession.id, sessionId), eq(workoutSession.userId, userId)));
   if (!session) return null;
 
-  const rows = await db
-    .select()
-    .from(sessionExercise)
-    .where(eq(sessionExercise.sessionId, sessionId))
-    .orderBy(asc(sessionExercise.position));
-
   return db.transaction(async (tx) => {
     const [w] = await tx
       .select()
       .from(workout)
       .where(and(eq(workout.id, session.workoutId), eq(workout.userId, userId)));
     if (!w) return null;
+
+    // lido dentro da tx: a sessão pode ainda estar ativa e receber ajustes concorrentes
+    // (ex.: um exercício adicionado no meio) — ler fora faria o delete de "stale" abaixo
+    // apagar algo que deveria ter ficado
+    const rows = await tx
+      .select()
+      .from(sessionExercise)
+      .where(eq(sessionExercise.sessionId, sessionId))
+      .orderBy(asc(sessionExercise.position));
 
     // update pontual em vez de replace-all: replace-all zeraria set_log.exercise_id
     // das sessões antigas (onDelete: "set null")

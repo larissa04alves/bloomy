@@ -13,7 +13,8 @@ import {
 import { removeSessionExercise, swapSessionExercise } from "@/server/workout/session";
 
 const BODY_SCHEMA = z.object({
-  name: z.string().min(1).max(120),
+  // trim na borda: `min(1)` sozinho aceita " ", que seria gravado e exibido com os espaços
+  name: z.string().trim().min(1).max(120),
   targetSets: z.number().int().min(1).max(20),
   targetReps: z.number().int().min(1).max(50),
   restSeconds: z.number().int().min(0).max(600),
