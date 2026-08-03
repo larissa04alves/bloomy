@@ -1,7 +1,7 @@
 import { db } from "@bloomy/db";
 
 import { requireUserId, unauthorized } from "@/server/shared/api";
-import { getActiveSession } from "@/server/workout/service";
+import { getActiveSession } from "@/server/workout/session";
 
 export async function GET(request: Request) {
   const userId = await requireUserId(request);

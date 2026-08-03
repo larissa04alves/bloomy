@@ -14,10 +14,12 @@ export function BuscaExercicio({
   onPick,
   onCustom,
   onBack,
+  alreadyAdded,
 }: {
   onPick: (ex: CatalogExercise) => void;
-  onCustom: () => void;
+  onCustom?: () => void;
   onBack: () => void;
+  alreadyAdded?: string[]; // catalogIds já presentes na sessão
 }) {
   const { catalog, loading } = useCatalogo();
   const fuse = useMemo(() => buildFuse(catalog), [catalog]);
@@ -91,43 +93,52 @@ export function BuscaExercicio({
         {loading ? (
           <p className="py-6 text-center text-sm font-semibold text-ink-read">Carregando…</p>
         ) : null}
-        {results.map((ex) => (
-          <div key={ex.id} className="flex items-center gap-3 rounded-card p-2">
-            <button type="button" onClick={() => setPreview(ex)} aria-label={`Ver ${ex.namePt}`}>
-              <GifThumb id={ex.id} alt="" className="size-12 rounded-control" />
-            </button>
-            <button
-              type="button"
-              onClick={() => onPick(ex)}
-              className="flex flex-1 flex-col items-start text-left"
+        {results.map((ex) => {
+          const added = alreadyAdded?.includes(ex.id) ?? false;
+          return (
+            <div
+              key={ex.id}
+              className={`flex items-center gap-3 rounded-card p-2 ${added ? "opacity-50" : ""}`}
             >
-              <span className="text-sm font-bold text-ink">{ex.namePt}</span>
-              <span className="mt-0.5 rounded-full bg-pink-tint px-2 py-0.5 text-xs font-bold text-pink-deep">
-                {FOCUS_LABELS[ex.group]}
-              </span>
-            </button>
-            <button
-              type="button"
-              aria-label="Ver execução"
-              onClick={() => setPreview(ex)}
-              className="text-ink-faint"
-            >
-              ⤢
-            </button>
-          </div>
-        ))}
+              <button type="button" onClick={() => setPreview(ex)} aria-label={`Ver ${ex.namePt}`}>
+                <GifThumb id={ex.id} alt="" className="size-12 rounded-control" />
+              </button>
+              <button
+                type="button"
+                disabled={added}
+                onClick={() => onPick(ex)}
+                className="flex flex-1 flex-col items-start text-left"
+              >
+                <span className="text-sm font-bold text-ink">{ex.namePt}</span>
+                <span className="mt-0.5 rounded-full bg-pink-tint px-2 py-0.5 text-xs font-bold text-pink-deep">
+                  {added ? "já na lista" : FOCUS_LABELS[ex.group]}
+                </span>
+              </button>
+              <button
+                type="button"
+                aria-label="Ver execução"
+                onClick={() => setPreview(ex)}
+                className="text-ink-faint"
+              >
+                ⤢
+              </button>
+            </div>
+          );
+        })}
         {!loading && results.length === 0 ? (
           <p className="py-6 text-center text-sm font-semibold text-ink-read">
             Nada encontrado.
           </p>
         ) : null}
-        <button
-          type="button"
-          onClick={onCustom}
-          className="mt-1 flex items-center justify-center gap-1 rounded-control border border-dashed border-hairline py-3 text-sm font-bold text-pink-deep"
-        >
-          <PlusIcon size={16} weight="bold" /> Adicionar exercício personalizado
-        </button>
+        {onCustom ? (
+          <button
+            type="button"
+            onClick={onCustom}
+            className="mt-1 flex items-center justify-center gap-1 rounded-control border border-dashed border-hairline py-3 text-sm font-bold text-pink-deep"
+          >
+            <PlusIcon size={16} weight="bold" /> Adicionar exercício personalizado
+          </button>
+        ) : null}
       </div>
 
       {preview ? <GifViewer exercise={preview} onClose={() => setPreview(null)} /> : null}

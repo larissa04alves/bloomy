@@ -3,7 +3,13 @@
 import { useCallback, useState } from "react";
 
 import { api, ApiError } from "@/lib/api";
-import type { SessionDetail, WorkoutSummary } from "@/lib/api-types";
+import type {
+  CatalogExercise,
+  SessionAdjustments,
+  SessionDetail,
+  SessionExercise,
+  WorkoutSummary,
+} from "@/lib/api-types";
 import { toastError } from "@/lib/toast";
 import { useResource } from "@/lib/use-resource";
 
@@ -11,7 +17,19 @@ import { applySetPatch } from "./session";
 
 type View = "lista" | "ex" | "fim";
 type SetPatch = { reps?: number | null; load?: number | null };
-type FinishSummary = { durationSec: number; exerciseCount: number; summary: WorkoutSummary };
+type AdjustState =
+  | { mode: "add" }
+  | { mode: "swap"; id: string; name: string; doneSets: number }
+  | null;
+type FinishSummary = {
+  durationSec: number;
+  exerciseCount: number;
+  adjustments: SessionAdjustments;
+  summary: WorkoutSummary;
+};
+
+// Defaults de um exercício escolhido do catálogo — os mesmos do TreinoModal.
+const CATALOG_DEFAULTS = { targetSets: 3, targetReps: 12, restSeconds: 45 };
 
 // O back aceita reps/load como z.number().optional() (não .nullable()): enviar null → 400.
 // Só mandamos chaves com número de fato; done sempre que definido.
@@ -34,6 +52,12 @@ export function useSessao() {
   const [finishSummary, setFinishSummary] = useState<FinishSummary | null>(null);
   const [startingId, setStartingId] = useState<string | null>(null);
   const [completing, setCompleting] = useState(false);
+  const [adjust, setAdjust] = useState<AdjustState>(null);
+  const [applying, setApplying] = useState(false);
+  const [applied, setApplied] = useState(false);
+  const [pendingRemoval, setPendingRemoval] = useState<
+    { id: string; name: string; doneSets: number } | null
+  >(null);
 
   const patchLocal = useCallback(
     (setId: string, patch: SetPatch & { done?: boolean }) => {
@@ -129,11 +153,123 @@ export function useSessao() {
     }
   }, [detail]);
 
+  const openAdd = useCallback(() => setAdjust({ mode: "add" }), []);
+  const openSwap = useCallback(
+    (ex: SessionExercise) =>
+      setAdjust({
+        mode: "swap",
+        id: ex.id,
+        name: ex.name,
+        doneSets: ex.sets.filter((s) => s.done).length,
+      }),
+    [],
+  );
+  const closeAdjust = useCallback(() => setAdjust(null), []);
+
+  // Um único caminho para adicionar e trocar: o modo vem do estado `adjust`.
+  const pickExercise = useCallback(
+    async (picked: CatalogExercise) => {
+      if (!detail || !adjust) return;
+      const body = {
+        name: picked.namePt,
+        catalogId: picked.id,
+        muscleGroup: null,
+        ...CATALOG_DEFAULTS,
+      };
+      const sessionId = detail.session.id;
+      try {
+        if (adjust.mode === "add") {
+          const { session } = await api.post<{ session: SessionDetail }>(
+            `/api/sessions/${sessionId}/exercises`,
+            body,
+          );
+          setData({ session });
+        } else {
+          const { session } = await api.put<{
+            session: SessionDetail;
+            discardedDoneSets: number;
+          }>(`/api/sessions/${sessionId}/exercises/${adjust.id}`, body);
+          setData({ session });
+        }
+        setAdjust(null);
+      } catch (e) {
+        if (e instanceof ApiError && e.status === 409) {
+          // toastError mostra e.message quando `e` é ApiError — passar `undefined`
+          // força o fallback, porque o back devolve texto em EN ("exercise already in session").
+          toastError(undefined, "Esse exercício já está na sessão");
+          return; // mantém a busca aberta para escolher outro
+        }
+        toastError(
+          e,
+          adjust.mode === "add"
+            ? "Não foi possível adicionar o exercício"
+            : "Não foi possível trocar o exercício",
+        );
+      }
+    },
+    [detail, adjust, setData],
+  );
+
+  const removeExercise = useCallback(
+    async (sessionExerciseId: string) => {
+      if (!detail) return;
+      try {
+        // o client expõe `del`, não `delete` (ver apps/web/src/lib/api.ts)
+        const { session } = await api.del<{ session: SessionDetail }>(
+          `/api/sessions/${detail.session.id}/exercises/${sessionExerciseId}`,
+        );
+        setData({ session });
+      } catch (e) {
+        toastError(e, "Não foi possível remover o exercício");
+      }
+    },
+    [detail, setData],
+  );
+
+  // Mesma regra da troca: sem série feita remove direto, com série feita confirma antes.
+  const askRemove = useCallback(
+    (ex: SessionExercise) => {
+      const doneSets = ex.sets.filter((s) => s.done).length;
+      if (doneSets === 0) {
+        void removeExercise(ex.id);
+        return;
+      }
+      setPendingRemoval({ id: ex.id, name: ex.name, doneSets });
+    },
+    [removeExercise],
+  );
+
+  const confirmRemove = useCallback(async () => {
+    if (!pendingRemoval) return;
+    await removeExercise(pendingRemoval.id);
+    setPendingRemoval(null);
+  }, [pendingRemoval, removeExercise]);
+
+  const cancelRemove = useCallback(() => setPendingRemoval(null), []);
+
+  // Chamado da tela de fim: a sessão já está concluída, `detail` ainda tem o id.
+  const applyToWorkout = useCallback(async () => {
+    if (!detail) return;
+    setApplying(true);
+    try {
+      await api.post(`/api/sessions/${detail.session.id}/apply-to-workout`);
+      setApplied(true);
+    } catch (e) {
+      toastError(e, "Não foi possível salvar no treino");
+    } finally {
+      setApplying(false);
+    }
+  }, [detail]);
+
   const reset = useCallback(() => {
     setData({ session: null });
     setFinishSummary(null);
     setView("lista");
     setActiveEx(0);
+    setAdjust(null);
+    setApplied(false);
+    setApplying(false);
+    setPendingRemoval(null);
   }, [setData]);
 
   return {
@@ -144,6 +280,10 @@ export function useSessao() {
     finishSummary,
     startingId,
     completing,
+    adjust,
+    applying,
+    applied,
+    pendingRemoval,
     start,
     openExercise,
     backToList,
@@ -152,5 +292,13 @@ export function useSessao() {
     markDone,
     complete,
     reset,
+    openAdd,
+    openSwap,
+    closeAdjust,
+    pickExercise,
+    askRemove,
+    confirmRemove,
+    cancelRemove,
+    applyToWorkout,
   };
 }

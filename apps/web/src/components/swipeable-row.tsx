@@ -11,10 +11,14 @@ const openRows = new Map<string, () => void>();
 export function SwipeableRow({
   onEdit,
   onDelete,
+  editIcon,
+  editLabel = "Editar",
   children,
 }: {
   onEdit?: () => void;
   onDelete?: () => void;
+  editIcon?: ReactNode;
+  editLabel?: string;
   children: ReactNode;
 }) {
   const id = useId();
@@ -99,14 +103,14 @@ export function SwipeableRow({
       {onEdit ? (
         <button
           type="button"
-          aria-label="Editar"
+          aria-label={editLabel}
           onClick={() => {
             onEdit();
             close();
           }}
           className="absolute inset-y-1 left-1 flex w-17 items-center justify-center rounded-[16px] bg-lilac-tint text-lilac-deep"
         >
-          <PencilSimpleIcon size={22} weight="fill" />
+          {editIcon ?? <PencilSimpleIcon size={22} weight="fill" />}
         </button>
       ) : null}
       {onDelete ? (
