@@ -14,10 +14,12 @@ export function BuscaExercicio({
   onPick,
   onCustom,
   onBack,
+  alreadyAdded,
 }: {
   onPick: (ex: CatalogExercise) => void;
-  onCustom: () => void;
+  onCustom?: () => void;
   onBack: () => void;
+  alreadyAdded?: string[]; // catalogIds já na sessão — somem da lista
 }) {
   const { catalog, loading } = useCatalogo();
   const fuse = useMemo(() => buildFuse(catalog), [catalog]);
@@ -26,10 +28,17 @@ export function BuscaExercicio({
   const [filterOpen, setFilterOpen] = useState(false);
   const [preview, setPreview] = useState<CatalogExercise | null>(null);
 
-  const results = useMemo(
-    () => searchExercises(fuse, catalog, { q, group }).slice(0, 60),
+  const found = useMemo(
+    () => searchExercises(fuse, catalog, { q, group }),
     [fuse, catalog, q, group],
   );
+  // O que já está na sessão não aparece: a lista só mostra o que dá para escolher.
+  const results = useMemo(
+    () => found.filter((ex) => !alreadyAdded?.includes(ex.id)).slice(0, 60),
+    [found, alreadyAdded],
+  );
+  // Distingue "a busca não achou nada" de "achou, mas tudo já está na sessão".
+  const allHidden = found.length > 0 && results.length === 0;
 
   return (
     <div className="flex flex-col gap-3">
@@ -118,16 +127,18 @@ export function BuscaExercicio({
         ))}
         {!loading && results.length === 0 ? (
           <p className="py-6 text-center text-sm font-semibold text-ink-read">
-            Nada encontrado.
+            {allHidden ? "Todos os resultados já estão na sessão." : "Nada encontrado."}
           </p>
         ) : null}
-        <button
-          type="button"
-          onClick={onCustom}
-          className="mt-1 flex items-center justify-center gap-1 rounded-control border border-dashed border-hairline py-3 text-sm font-bold text-pink-deep"
-        >
-          <PlusIcon size={16} weight="bold" /> Adicionar exercício personalizado
-        </button>
+        {onCustom ? (
+          <button
+            type="button"
+            onClick={onCustom}
+            className="mt-1 flex items-center justify-center gap-1 rounded-control border border-dashed border-hairline py-3 text-sm font-bold text-pink-deep"
+          >
+            <PlusIcon size={16} weight="bold" /> Adicionar exercício personalizado
+          </button>
+        ) : null}
       </div>
 
       {preview ? <GifViewer exercise={preview} onClose={() => setPreview(null)} /> : null}

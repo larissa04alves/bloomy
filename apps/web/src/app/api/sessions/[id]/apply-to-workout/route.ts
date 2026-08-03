@@ -1,7 +1,7 @@
 import { db } from "@bloomy/db";
 
 import { notFound, requireUserId, unauthorized } from "@/server/shared/api";
-import { completeSession } from "@/server/workout/session";
+import { applySessionToWorkout } from "@/server/workout/session";
 
 export async function POST(
   request: Request,
@@ -11,8 +11,8 @@ export async function POST(
   if (!userId) return unauthorized();
 
   const { id } = await params;
-  const summary = await completeSession(db, userId, id);
-  if (!summary) return notFound();
+  const workout = await applySessionToWorkout(db, userId, id);
+  if (!workout) return notFound();
 
-  return Response.json(summary);
+  return Response.json({ workout });
 }

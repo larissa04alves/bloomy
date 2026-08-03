@@ -120,6 +120,49 @@ export const workoutSession = sqliteTable(
   ],
 );
 
+export const sessionExercise = sqliteTable(
+  "session_exercise",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    sessionId: text("session_id")
+      .notNull()
+      .references(() => workoutSession.id, { onDelete: "cascade" }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    // origem no template; null = exercício que só existe nesta sessão
+    exerciseId: text("exercise_id").references(() => exercise.id, {
+      onDelete: "set null",
+    }),
+    name: text("name").notNull(),
+    targetSets: integer("target_sets").notNull(),
+    targetReps: integer("target_reps").notNull().default(12),
+    restSeconds: integer("rest_seconds").notNull().default(45),
+    position: integer("position").notNull(),
+    catalogId: text("catalog_id").references(() => exerciseCatalog.id, {
+      onDelete: "set null",
+    }),
+    muscleGroup: text("muscle_group").$type<
+      | "chest"
+      | "back"
+      | "legs"
+      | "shoulders"
+      | "glutes"
+      | "arms"
+      | "abs"
+      | "cardio"
+    >(),
+    origin: text("origin")
+      .$type<"template" | "added" | "replaced">()
+      .default("template")
+      .notNull(),
+    createdAt: timestampMs("created_at"),
+  },
+  (table) => [index("session_exercise_session_idx").on(table.sessionId)],
+);
+
 export const setLog = sqliteTable(
   "set_log",
   {
@@ -132,6 +175,10 @@ export const setLog = sqliteTable(
     exerciseId: text("exercise_id").references(() => exercise.id, {
       onDelete: "set null",
     }),
+    sessionExerciseId: text("session_exercise_id").references(
+      () => sessionExercise.id,
+      { onDelete: "cascade" },
+    ),
     userId: text("user_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
@@ -145,6 +192,10 @@ export const setLog = sqliteTable(
   },
   (table) => [
     index("set_log_session_idx").on(table.sessionId),
+    // o serviço filtra set_log por sessionExerciseId em 3 pontos (contagem de séries
+    // feitas e delete no swap, delete no remove); sem índice é full scan da tabela,
+    // que acumula o histórico inteiro
+    index("set_log_session_exercise_idx").on(table.sessionExerciseId),
     index("set_log_user_exercise_idx").on(table.userId, table.exerciseName),
   ],
 );
@@ -153,4 +204,5 @@ export type Workout = typeof workout.$inferSelect;
 export type Exercise = typeof exercise.$inferSelect;
 export type ExerciseCatalog = typeof exerciseCatalog.$inferSelect;
 export type WorkoutSession = typeof workoutSession.$inferSelect;
+export type SessionExerciseRow = typeof sessionExercise.$inferSelect;
 export type SetLog = typeof setLog.$inferSelect;

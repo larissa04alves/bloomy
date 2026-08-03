@@ -2,7 +2,7 @@
 
 import { CheckCircleIcon, FireIcon } from "@phosphor-icons/react";
 
-import type { WorkoutSummary } from "@/lib/api-types";
+import type { SessionAdjustments, WorkoutSummary } from "@/lib/api-types";
 
 import { formatDuration } from "../hooks/format";
 import { useTodayIndex } from "../hooks/today";
@@ -13,13 +13,25 @@ export function SessaoFim({
   durationSec,
   exerciseCount,
   summary,
+  adjustments,
+  onApplyToWorkout,
+  applying,
+  applied,
   onRestart,
 }: {
   durationSec: number;
   exerciseCount: number;
   summary: WorkoutSummary;
+  adjustments: SessionAdjustments;
+  onApplyToWorkout: () => void;
+  applying: boolean;
+  applied: boolean;
   onRestart: () => void;
 }) {
+  const adjustCount = adjustments.added + adjustments.replaced + adjustments.removed;
+  // Reordenar sozinho também é mudança que vale salvar no treino — sem isso, uma sessão
+  // em que só mexeu na ordem não oferecia o botão e a ordem nova morria com a sessão.
+  const hasChanges = adjustCount > 0 || adjustments.reordered;
   const todayIndex = useTodayIndex(); // resolvido após o mount (evita mismatch SSR)
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-5 px-5.5 pb-8 text-center">
@@ -76,6 +88,42 @@ export function SessaoFim({
           </span>
         ))}
       </div>
+
+      {hasChanges ? (
+        <div className="flex w-full flex-col gap-3 rounded-card bg-white p-4 shadow-card-sm">
+          <p className="text-sm font-semibold text-ink-read">
+            {adjustCount > 0 ? (
+              <>
+                Você ajustou{" "}
+                <span className="font-bold text-ink">
+                  {adjustCount === 1 ? "1 exercício" : `${adjustCount} exercícios`}
+                </span>
+                {adjustments.reordered ? " e mudou a ordem" : ""} hoje. Salvar essas mudanças
+                no treino?
+              </>
+            ) : (
+              <>
+                Você mudou a <span className="font-bold text-ink">ordem dos exercícios</span>{" "}
+                hoje. Salvar essa ordem no treino?
+              </>
+            )}
+          </p>
+          {applied ? (
+            <span className="flex items-center justify-center gap-1.5 text-sm font-bold text-green-deep">
+              <CheckCircleIcon size={18} weight="fill" /> Salvo no treino
+            </span>
+          ) : (
+            <button
+              type="button"
+              onClick={onApplyToWorkout}
+              disabled={applying}
+              className="w-full rounded-full bg-pink-bright py-3 font-display font-bold text-white shadow-btn transition-opacity disabled:opacity-70"
+            >
+              {applying ? "Salvando…" : "Salvar no treino"}
+            </button>
+          )}
+        </div>
+      ) : null}
 
       <button
         type="button"

@@ -8,7 +8,7 @@ import {
   requireUserId,
   unauthorized,
 } from "@/server/shared/api";
-import { updateSet } from "@/server/workout/service";
+import { updateSet } from "@/server/workout/session";
 
 const BODY_SCHEMA = z
   .object({

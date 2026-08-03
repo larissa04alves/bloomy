@@ -124,6 +124,7 @@ export type WorkoutSummary = {
 export type SetLog = {
   id: string;
   exerciseId: string | null; // FK com onDelete:"set null" no back
+  sessionExerciseId: string | null;
   exerciseName: string;
   setIndex: number;
   reps: number | null;
@@ -132,12 +133,14 @@ export type SetLog = {
 };
 
 export type SessionExercise = {
-  exerciseId: string;
+  id: string; // linha de session_exercise — é o alvo dos ajustes do dia
+  exerciseId: string | null; // origem no template; null = só desta sessão
   name: string;
   targetSets: number;
   restSeconds: number;
   position: number;
   catalogId: string | null;
+  origin: "template" | "added" | "replaced";
   sets: SetLog[];
   lastPerformance: { reps: number | null; load: number | null } | null;
 };
@@ -151,6 +154,14 @@ export type SessionDetail = {
     completedAt: string | null;
   };
   exercises: SessionExercise[];
+};
+
+export type SessionAdjustments = {
+  added: number;
+  replaced: number;
+  removed: number;
+  /** true quando os exercícios herdados do template estão em ordem diferente da dele. */
+  reordered: boolean;
 };
 
 // ── Mente ─────────────────────────────────────────────────────────────────

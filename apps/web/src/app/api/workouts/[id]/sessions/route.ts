@@ -1,7 +1,7 @@
 import { db } from "@bloomy/db";
 
 import { conflict, notFound, requireUserId, unauthorized } from "@/server/shared/api";
-import { startSession } from "@/server/workout/service";
+import { startSession } from "@/server/workout/session";
 
 export async function POST(
   request: Request,

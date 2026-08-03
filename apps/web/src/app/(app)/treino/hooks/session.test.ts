@@ -6,16 +6,19 @@ import { applySetPatch, completedExercises, doneCount } from "./session";
 
 function ex(id: string, sets: { id: string; done: boolean }[]): SessionExercise {
   return {
+    id,
     exerciseId: id,
     name: id,
     targetSets: sets.length,
     restSeconds: 45,
     position: 0,
     catalogId: null,
+    origin: "template",
     lastPerformance: null,
     sets: sets.map((s, i) => ({
       id: s.id,
       exerciseId: id,
+      sessionExerciseId: id,
       exerciseName: id,
       setIndex: i + 1,
       reps: 10,

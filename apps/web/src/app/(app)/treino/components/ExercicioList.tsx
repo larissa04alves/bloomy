@@ -1,22 +1,20 @@
 "use client";
 
 import {
-  BarbellIcon,
-  CaretRightIcon,
-  CheckCircleIcon,
   CircleNotchIcon,
   FlagCheckeredIcon,
+  PlusIcon,
   TimerIcon,
 } from "@phosphor-icons/react";
+import { Reorder } from "motion/react";
 import { useEffect, useState } from "react";
 
-import { IconChip } from "@/components/icon-chip";
 import { ToggleSwitch } from "@/components/toggle-switch";
 import type { SessionExercise } from "@/lib/api-types";
 
 import { mmss } from "../hooks/format";
-import { doneCount, isExerciseDone } from "../hooks/session";
-import { GifThumb } from "./GifThumb";
+import { isExerciseDone } from "../hooks/session";
+import { ExercicioRow } from "./ExercicioRow";
 
 export function ExercicioList({
   name,
@@ -27,6 +25,11 @@ export function ExercicioList({
   onOpenExercise,
   onComplete,
   completing,
+  onSwapExercise,
+  onRemoveExercise,
+  onAddExercise,
+  onReorder,
+  onDropOrder,
 }: {
   name: string;
   exercises: SessionExercise[];
@@ -36,6 +39,11 @@ export function ExercicioList({
   onOpenExercise: (i: number) => void;
   onComplete: () => void;
   completing: boolean;
+  onSwapExercise: (ex: SessionExercise) => void;
+  onRemoveExercise: (ex: SessionExercise) => void;
+  onAddExercise: () => void;
+  onReorder: (ids: string[]) => void;
+  onDropOrder: () => void;
 }) {
   const [elapsed, setElapsed] = useState(0);
   useEffect(() => {
@@ -66,50 +74,36 @@ export function ExercicioList({
         Toque em um exercício para registrar as séries.
       </p>
 
-      <div className="flex flex-col gap-2">
-        {exercises.map((ex, i) => {
-          const done = isExerciseDone(ex);
-          return (
-            <button
-              key={ex.exerciseId}
-              type="button"
-              onClick={() => onOpenExercise(i)}
-              className="flex items-center gap-3 rounded-card bg-white p-3 text-left shadow-card-sm"
-            >
-              {ex.catalogId ? (
-                <GifThumb
-                  id={ex.catalogId}
-                  alt=""
-                  className="size-10.5 rounded-[14px]"
-                />
-              ) : (
-                <IconChip
-                  tone="pink"
-                  icon={<BarbellIcon size={22} weight="fill" />}
-                />
-              )}
-              <div className="flex flex-1 flex-col">
-                <span className="text-sm font-bold text-ink">{ex.name}</span>
-                <span className="text-xs font-semibold text-ink-read">
-                  {doneCount(ex)}/{ex.targetSets} séries
-                  {ex.lastPerformance?.load != null
-                    ? ` · ${ex.lastPerformance.load} kg`
-                    : ""}
-                </span>
-              </div>
-              {done ? (
-                <CheckCircleIcon
-                  size={24}
-                  weight="fill"
-                  className="text-green-deep"
-                />
-              ) : (
-                <CaretRightIcon size={20} className="text-ink-faint" />
-              )}
-            </button>
-          );
-        })}
-      </div>
+      <Reorder.Group
+        as="ul"
+        axis="y"
+        values={exercises.map((ex) => ex.id)}
+        onReorder={onReorder}
+        className="flex flex-col gap-2"
+      >
+        {exercises.map((ex, i) => (
+          <ExercicioRow
+            key={ex.id}
+            ex={ex}
+            index={i}
+            completing={completing}
+            draggable={exercises.length > 1}
+            onOpen={onOpenExercise}
+            onSwap={onSwapExercise}
+            onRemove={onRemoveExercise}
+            onDropOrder={onDropOrder}
+          />
+        ))}
+      </Reorder.Group>
+
+      <button
+        type="button"
+        onClick={onAddExercise}
+        disabled={completing}
+        className="flex items-center justify-center gap-1 rounded-control border border-dashed border-hairline py-3 text-sm font-bold text-pink-deep disabled:opacity-70"
+      >
+        <PlusIcon size={16} weight="bold" /> Adicionar exercício
+      </button>
 
       <label className="flex items-center justify-between rounded-card bg-white p-3 shadow-card-sm">
         <span className="text-sm font-bold text-ink">Descanso automático</span>
