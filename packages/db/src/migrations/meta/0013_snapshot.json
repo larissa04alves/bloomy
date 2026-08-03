@@ -1,8 +1,8 @@
 {
+  "id": "2aafc4a5-eb7b-4e57-b9f1-2790e6faf12d",
+  "prevId": "3fa474c9-aaad-40f8-875a-df1f537597c5",
   "version": "6",
   "dialect": "sqlite",
-  "id": "3fa474c9-aaad-40f8-875a-df1f537597c5",
-  "prevId": "4b8fec89-c3bb-409e-8569-4d066793285a",
   "tables": {
     "account": {
       "name": "account",
@@ -113,15 +113,15 @@
         "account_user_id_user_id_fk": {
           "name": "account_user_id_user_id_fk",
           "tableFrom": "account",
-          "tableTo": "user",
           "columnsFrom": [
             "user_id"
           ],
+          "tableTo": "user",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
@@ -209,15 +209,15 @@
         "session_user_id_user_id_fk": {
           "name": "session_user_id_user_id_fk",
           "tableFrom": "session",
-          "tableTo": "user",
           "columnsFrom": [
             "user_id"
           ],
+          "tableTo": "user",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
@@ -417,15 +417,15 @@
         "meal_user_id_user_id_fk": {
           "name": "meal_user_id_user_id_fk",
           "tableFrom": "meal",
-          "tableTo": "user",
           "columnsFrom": [
             "user_id"
           ],
+          "tableTo": "user",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
@@ -515,15 +515,15 @@
         "medication_user_id_user_id_fk": {
           "name": "medication_user_id_user_id_fk",
           "tableFrom": "medication",
-          "tableTo": "user",
           "columnsFrom": [
             "user_id"
           ],
+          "tableTo": "user",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
@@ -608,28 +608,28 @@
         "medication_intake_user_id_user_id_fk": {
           "name": "medication_intake_user_id_user_id_fk",
           "tableFrom": "medication_intake",
-          "tableTo": "user",
           "columnsFrom": [
             "user_id"
           ],
+          "tableTo": "user",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         },
         "medication_intake_medication_id_medication_id_fk": {
           "name": "medication_intake_medication_id_medication_id_fk",
           "tableFrom": "medication_intake",
-          "tableTo": "medication",
           "columnsFrom": [
             "medication_id"
           ],
+          "tableTo": "medication",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
@@ -690,15 +690,15 @@
         "water_log_user_id_user_id_fk": {
           "name": "water_log_user_id_user_id_fk",
           "tableFrom": "water_log",
-          "tableTo": "user",
           "columnsFrom": [
             "user_id"
           ],
+          "tableTo": "user",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
@@ -789,15 +789,15 @@
         "goal_user_id_user_id_fk": {
           "name": "goal_user_id_user_id_fk",
           "tableFrom": "goal",
-          "tableTo": "user",
           "columnsFrom": [
             "user_id"
           ],
+          "tableTo": "user",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
@@ -925,28 +925,28 @@
         "appointment_user_id_user_id_fk": {
           "name": "appointment_user_id_user_id_fk",
           "tableFrom": "appointment",
-          "tableTo": "user",
           "columnsFrom": [
             "user_id"
           ],
+          "tableTo": "user",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         },
         "appointment_parent_id_appointment_id_fk": {
           "name": "appointment_parent_id_appointment_id_fk",
           "tableFrom": "appointment",
-          "tableTo": "appointment",
           "columnsFrom": [
             "parent_id"
           ],
+          "tableTo": "appointment",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "set null",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "set null"
         }
       },
       "compositePrimaryKeys": {},
@@ -1071,28 +1071,28 @@
         "exam_user_id_user_id_fk": {
           "name": "exam_user_id_user_id_fk",
           "tableFrom": "exam",
-          "tableTo": "user",
           "columnsFrom": [
             "user_id"
           ],
+          "tableTo": "user",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         },
         "exam_parent_id_exam_id_fk": {
           "name": "exam_parent_id_exam_id_fk",
           "tableFrom": "exam",
-          "tableTo": "exam",
           "columnsFrom": [
             "parent_id"
           ],
+          "tableTo": "exam",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "set null",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "set null"
         }
       },
       "compositePrimaryKeys": {},
@@ -1168,15 +1168,15 @@
         "mind_note_user_id_user_id_fk": {
           "name": "mind_note_user_id_user_id_fk",
           "tableFrom": "mind_note",
-          "tableTo": "user",
           "columnsFrom": [
             "user_id"
           ],
+          "tableTo": "user",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
@@ -1259,15 +1259,15 @@
         "mood_checkin_user_id_user_id_fk": {
           "name": "mood_checkin_user_id_user_id_fk",
           "tableFrom": "mood_checkin",
-          "tableTo": "user",
           "columnsFrom": [
             "user_id"
           ],
+          "tableTo": "user",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
@@ -1329,15 +1329,15 @@
         "profile_user_id_user_id_fk": {
           "name": "profile_user_id_user_id_fk",
           "tableFrom": "profile",
-          "tableTo": "user",
           "columnsFrom": [
             "user_id"
           ],
+          "tableTo": "user",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
@@ -1413,15 +1413,15 @@
         "reminder_user_id_user_id_fk": {
           "name": "reminder_user_id_user_id_fk",
           "tableFrom": "reminder",
-          "tableTo": "user",
           "columnsFrom": [
             "user_id"
           ],
+          "tableTo": "user",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
@@ -1525,41 +1525,41 @@
         "exercise_workout_id_workout_id_fk": {
           "name": "exercise_workout_id_workout_id_fk",
           "tableFrom": "exercise",
-          "tableTo": "workout",
           "columnsFrom": [
             "workout_id"
           ],
+          "tableTo": "workout",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         },
         "exercise_user_id_user_id_fk": {
           "name": "exercise_user_id_user_id_fk",
           "tableFrom": "exercise",
-          "tableTo": "user",
           "columnsFrom": [
             "user_id"
           ],
+          "tableTo": "user",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         },
         "exercise_catalog_id_exercise_catalog_id_fk": {
           "name": "exercise_catalog_id_exercise_catalog_id_fk",
           "tableFrom": "exercise",
-          "tableTo": "exercise_catalog",
           "columnsFrom": [
             "catalog_id"
           ],
+          "tableTo": "exercise_catalog",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "set null",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "set null"
         }
       },
       "compositePrimaryKeys": {},
@@ -1744,41 +1744,41 @@
         "set_log_session_id_workout_session_id_fk": {
           "name": "set_log_session_id_workout_session_id_fk",
           "tableFrom": "set_log",
-          "tableTo": "workout_session",
           "columnsFrom": [
             "session_id"
           ],
+          "tableTo": "workout_session",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         },
         "set_log_exercise_id_exercise_id_fk": {
           "name": "set_log_exercise_id_exercise_id_fk",
           "tableFrom": "set_log",
-          "tableTo": "exercise",
           "columnsFrom": [
             "exercise_id"
           ],
+          "tableTo": "exercise",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "set null",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "set null"
         },
         "set_log_user_id_user_id_fk": {
           "name": "set_log_user_id_user_id_fk",
           "tableFrom": "set_log",
-          "tableTo": "user",
           "columnsFrom": [
             "user_id"
           ],
+          "tableTo": "user",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
@@ -1854,15 +1854,15 @@
         "workout_user_id_user_id_fk": {
           "name": "workout_user_id_user_id_fk",
           "tableFrom": "workout",
-          "tableTo": "user",
           "columnsFrom": [
             "user_id"
           ],
+          "tableTo": "user",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
@@ -1938,28 +1938,28 @@
         "workout_session_user_id_user_id_fk": {
           "name": "workout_session_user_id_user_id_fk",
           "tableFrom": "workout_session",
-          "tableTo": "user",
           "columnsFrom": [
             "user_id"
           ],
+          "tableTo": "user",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         },
         "workout_session_workout_id_workout_id_fk": {
           "name": "workout_session_workout_id_workout_id_fk",
           "tableFrom": "workout_session",
-          "tableTo": "workout",
           "columnsFrom": [
             "workout_id"
           ],
+          "tableTo": "workout",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
@@ -1970,9 +1970,9 @@
   "views": {},
   "enums": {},
   "_meta": {
+    "columns": {},
     "schemas": {},
-    "tables": {},
-    "columns": {}
+    "tables": {}
   },
   "internal": {
     "indexes": {}

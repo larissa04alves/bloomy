@@ -1,5 +1,7 @@
 import "server-only";
 
+import { randomUUID } from "node:crypto";
+
 import type { Db } from "@bloomy/db";
 import {
   appointment,
@@ -8,6 +10,8 @@ import {
   type Exam,
 } from "@bloomy/db/schema/health";
 import { and, asc, eq, gte, isNotNull, lte, ne, or } from "drizzle-orm";
+
+import type { ExamStorage } from "./r2";
 
 const NEXT_WINDOW_DAYS = 30;
 
@@ -36,7 +40,10 @@ export type AppointmentUpdate = {
   remindDayBefore?: boolean;
 };
 
-export async function listAppointments(db: Db, userId: string): Promise<Appointment[]> {
+export async function listAppointments(
+  db: Db,
+  userId: string,
+): Promise<Appointment[]> {
   return db
     .select()
     .from(appointment)
@@ -50,7 +57,9 @@ export async function nextAppointment(
   userId: string,
   now: Date = new Date(),
 ): Promise<Appointment | null> {
-  const windowEnd = new Date(now.getTime() + NEXT_WINDOW_DAYS * 24 * 60 * 60 * 1000);
+  const windowEnd = new Date(
+    now.getTime() + NEXT_WINDOW_DAYS * 24 * 60 * 60 * 1000,
+  );
   const rows = await db
     .select()
     .from(appointment)
@@ -58,7 +67,10 @@ export async function nextAppointment(
       and(
         eq(appointment.userId, userId),
         or(
-          and(eq(appointment.status, "scheduled"), gte(appointment.scheduledAt, now)),
+          and(
+            eq(appointment.status, "scheduled"),
+            gte(appointment.scheduledAt, now),
+          ),
           and(
             eq(appointment.status, "to_schedule"),
             isNotNull(appointment.suggestedAt),
@@ -105,14 +117,18 @@ export async function updateAppointment(
   const [updated] = await db
     .update(appointment)
     .set({
-      ...(input.professional !== undefined && { professional: input.professional }),
+      ...(input.professional !== undefined && {
+        professional: input.professional,
+      }),
       ...(input.specialty !== undefined && { specialty: input.specialty }),
       ...(input.scheduledAt !== undefined && {
         scheduledAt: input.scheduledAt,
         status: "scheduled" as const,
       }),
       ...(input.location !== undefined && { location: input.location }),
-      ...(input.remindDayBefore !== undefined && { remindDayBefore: input.remindDayBefore }),
+      ...(input.remindDayBefore !== undefined && {
+        remindDayBefore: input.remindDayBefore,
+      }),
       updatedAt: new Date(),
     })
     .where(and(eq(appointment.id, id), eq(appointment.userId, userId)))
@@ -180,13 +196,13 @@ export async function completeAppointment(
 export type ExamInput = {
   name: string;
   status?: Exam["status"];
-  scheduledAt?: Date;
+  scheduledAt?: Date | null;
 };
 
 export type ExamUpdate = {
   name?: string;
   status?: Exam["status"];
-  scheduledAt?: Date;
+  scheduledAt?: Date | null;
 };
 
 export async function listExams(db: Db, userId: string): Promise<Exam[]> {
@@ -197,67 +213,124 @@ export async function listExams(db: Db, userId: string): Promise<Exam[]> {
     .orderBy(asc(exam.scheduledAt));
 }
 
+export type ExamScheduleError = "missing_schedule";
+
 export async function createExam(
   db: Db,
   userId: string,
   input: ExamInput,
-): Promise<Exam> {
+): Promise<Exam | ExamScheduleError> {
+  const status = input.status ?? "to_schedule";
+  if (status === "scheduled" && !input.scheduledAt) return "missing_schedule";
+
   const [created] = await db
     .insert(exam)
     .values({
       userId,
       name: input.name,
-      status: input.status ?? "to_schedule",
+      status,
       scheduledAt: input.scheduledAt ?? null,
     })
     .returning();
   return created;
 }
 
+/** Parcial. Valida o invariante sobre o estado final (patch + linha atual), não só sobre o patch. */
 export async function updateExam(
   db: Db,
   userId: string,
   id: string,
   input: ExamUpdate,
-): Promise<Exam | null> {
-  const [updated] = await db
-    .update(exam)
-    .set({
-      ...(input.name !== undefined && { name: input.name }),
-      ...(input.status !== undefined && { status: input.status }),
-      ...(input.scheduledAt !== undefined && { scheduledAt: input.scheduledAt }),
-      updatedAt: new Date(),
-    })
-    .where(and(eq(exam.id, id), eq(exam.userId, userId)))
-    .returning();
-  return updated ?? null;
+): Promise<Exam | ExamScheduleError | null> {
+  return db.transaction(async (tx) => {
+    const [current] = await tx
+      .select()
+      .from(exam)
+      .where(and(eq(exam.id, id), eq(exam.userId, userId)));
+    if (!current) return null;
+
+    const status = input.status ?? current.status;
+    const scheduledAt =
+      input.scheduledAt !== undefined ? input.scheduledAt : current.scheduledAt;
+    if (status === "scheduled" && !scheduledAt) return "missing_schedule";
+
+    const now = new Date();
+    const [updated] = await tx
+      .update(exam)
+      .set({
+        ...(input.name !== undefined && { name: input.name }),
+        ...(input.status !== undefined && { status: input.status }),
+        ...(input.scheduledAt !== undefined && {
+          scheduledAt: input.scheduledAt,
+        }),
+
+        ...(input.status !== undefined &&
+          input.status === "completed" && { completedAt: now }),
+        ...(input.status !== undefined &&
+          input.status !== "completed" &&
+          current.status === "completed" && { completedAt: null }),
+        updatedAt: now,
+      })
+      .where(and(eq(exam.id, id), eq(exam.userId, userId)))
+      .returning();
+    return updated ?? null;
+  });
 }
 
-export async function deleteExam(db: Db, userId: string, id: string): Promise<boolean> {
-  const deleted = await db
-    .delete(exam)
-    .where(and(eq(exam.id, id), eq(exam.userId, userId)))
-    .returning();
-  return deleted.length > 0;
+export async function deleteExam(
+  db: Db,
+  storage: ExamStorage,
+  userId: string,
+  id: string,
+): Promise<boolean> {
+  const [row] = await db
+    .select({ key: exam.attachmentKey })
+    .from(exam)
+    .where(and(eq(exam.id, id), eq(exam.userId, userId)));
+  if (!row) return false;
+
+  await db.delete(exam).where(and(eq(exam.id, id), eq(exam.userId, userId)));
+
+  if (row.key) {
+    try {
+      await storage.delete(row.key);
+    } catch (err) {
+      console.error(`R2 delete falhou (key=${row.key}):`, err);
+    }
+  }
+  return true;
 }
 
-export async function completeExam(
+export type ExamTransitionError = "not_found" | "wrong_status";
+
+export async function markExamDone(
   db: Db,
   userId: string,
   id: string,
   input: { needsReturn: boolean; followUpMonths?: number },
-): Promise<{ completed: Exam; followUp: Exam | null } | null> {
+): Promise<{ done: Exam; followUp: Exam | null } | ExamTransitionError> {
   return db.transaction(async (tx) => {
+    const [current] = await tx
+      .select()
+      .from(exam)
+      .where(and(eq(exam.id, id), eq(exam.userId, userId)));
+    if (!current) return "not_found";
+    if (current.status !== "scheduled") return "wrong_status";
+
     const now = new Date();
-    const [completed] = await tx
+    const [done] = await tx
       .update(exam)
-      .set({ status: "completed", completedAt: now, updatedAt: now })
-      // guarda de idempotência: retry/double-tap num item já concluído não recria o retorno
+      .set({ status: "awaiting_result", updatedAt: now })
+      // guarda: só sai de `scheduled`, então double-tap não cria um segundo retorno
       .where(
-        and(eq(exam.id, id), eq(exam.userId, userId), ne(exam.status, "completed")),
+        and(
+          eq(exam.id, id),
+          eq(exam.userId, userId),
+          eq(exam.status, "scheduled"),
+        ),
       )
       .returning();
-    if (!completed) return null;
+    if (!done) return "wrong_status";
 
     let followUp: Exam | null = null;
     if (input.needsReturn) {
@@ -266,14 +339,163 @@ export async function completeExam(
         .insert(exam)
         .values({
           userId,
-          name: completed.name,
+          name: done.name,
           status: "to_schedule",
           suggestedAt: addMonths(now, months),
-          parentId: completed.id,
+          parentId: done.id,
         })
         .returning();
       followUp = created;
     }
-    return { completed, followUp };
+    return { done, followUp };
   });
+}
+
+/** Conclui o exame (vai pro histórico). Chamado ao dispensar o laudo ou ao anexá-lo. */
+export async function completeExam(
+  db: Db,
+  userId: string,
+  id: string,
+): Promise<Exam | ExamTransitionError> {
+  return db.transaction(async (tx) => {
+    const [current] = await tx
+      .select()
+      .from(exam)
+      .where(and(eq(exam.id, id), eq(exam.userId, userId)));
+    if (!current) return "not_found";
+    if (current.status !== "awaiting_result") return "wrong_status";
+
+    const now = new Date();
+    const [completed] = await tx
+      .update(exam)
+      .set({ status: "completed", completedAt: now, updatedAt: now })
+      // guarda de idempotência: double-tap num item já concluído não remexe no completedAt
+      .where(
+        and(
+          eq(exam.id, id),
+          eq(exam.userId, userId),
+          ne(exam.status, "completed"),
+        ),
+      )
+      .returning();
+    if (!completed) return "wrong_status";
+    return completed;
+  });
+}
+
+export type ExamStorageError = "not_found" | "wrong_status";
+const KEY_PREFIX = "exam-attachments";
+
+/**
+ * Anexa resultado a exame que já foi feito (`awaiting_result` ou `completed`); troca substitui e
+ * apaga a chave antiga do R2. `completed` aceita porque o resultado costuma chegar depois de
+ * finalizar (o retorno é respondido no Finalizar) — sem isso o laudo ficaria sem lugar.
+ */
+const CAN_ATTACH: ReadonlyArray<Exam["status"]> = [
+  "awaiting_result",
+  "completed",
+];
+
+export async function attachExam(
+  db: Db,
+  storage: ExamStorage,
+  userId: string,
+  examId: string,
+  file: { body: Uint8Array; mime: string; name: string; size: number },
+): Promise<Exam | ExamStorageError> {
+  const [current] = await db
+    .select()
+    .from(exam)
+    .where(and(eq(exam.id, examId), eq(exam.userId, userId)));
+  if (!current) return "not_found";
+  if (!CAN_ATTACH.includes(current.status)) return "wrong_status";
+
+  const oldKey = current.attachmentKey;
+  const safeName =
+    file.name.replace(/[^\w.\-]+/g, "_").slice(0, 100) || "arquivo";
+  const key = `${KEY_PREFIX}/${userId}/${examId}/${randomUUID()}-${safeName}`;
+
+  await storage.put(key, file.body, file.mime);
+
+  const now = new Date();
+  const [updated] = await db
+    .update(exam)
+    .set({
+      attachmentKey: key,
+      attachmentMime: file.mime,
+      attachmentName: file.name,
+      attachmentSize: file.size,
+      // anexar o laudo é o que fecha o exame: de `awaiting_result` ele já vai pro histórico.
+      ...(current.status === "awaiting_result" && {
+        status: "completed" as const,
+        completedAt: now,
+      }),
+      updatedAt: now,
+    })
+    .where(and(eq(exam.id, examId), eq(exam.userId, userId)))
+    .returning();
+
+  // troca: remove o objeto antigo só depois do update persistir.
+  if (oldKey) {
+    try {
+      await storage.delete(oldKey);
+    } catch (err) {
+      console.error(`R2 delete falhou (key=${oldKey}):`, err);
+    }
+  }
+  return updated;
+}
+
+/** Limpa colunas de anexo do exame e apaga o objeto correspondente no R2. */
+export async function removeExamAttachment(
+  db: Db,
+  storage: ExamStorage,
+  userId: string,
+  examId: string,
+): Promise<Exam | null> {
+  const [current] = await db
+    .select()
+    .from(exam)
+    .where(and(eq(exam.id, examId), eq(exam.userId, userId)));
+  if (!current) return null;
+  const oldKey = current.attachmentKey;
+
+  const [updated] = await db
+    .update(exam)
+    .set({
+      attachmentKey: null,
+      attachmentMime: null,
+      attachmentName: null,
+      attachmentSize: null,
+      updatedAt: new Date(),
+    })
+    .where(and(eq(exam.id, examId), eq(exam.userId, userId)))
+    .returning();
+
+  if (oldKey) {
+    try {
+      await storage.delete(oldKey);
+    } catch (err) {
+      console.error(`R2 delete falhou (key=${oldKey}):`, err);
+    }
+  }
+  return updated;
+}
+
+/** Metadados do anexo (p/ endpoint de download); só se todas as colunas estiverem preenchidas. */
+export async function getExamAttachmentMeta(
+  db: Db,
+  userId: string,
+  examId: string,
+): Promise<{ key: string; mime: string; name: string } | null> {
+  const [row] = await db
+    .select({
+      key: exam.attachmentKey,
+      mime: exam.attachmentMime,
+      name: exam.attachmentName,
+    })
+    .from(exam)
+    .where(and(eq(exam.id, examId), eq(exam.userId, userId)));
+  if (!row?.key || !row.mime || !row.name) return null;
+  return { key: row.key, mime: row.mime, name: row.name };
 }

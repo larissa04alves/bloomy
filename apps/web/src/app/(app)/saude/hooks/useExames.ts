@@ -1,0 +1,213 @@
+"use client";
+
+import { useCallback, useState } from "react";
+
+import { api } from "@/lib/api";
+import type { Exam, ExamInput } from "@/lib/api-types";
+import { toastError } from "@/lib/toast";
+import { useResource } from "@/lib/use-resource";
+
+import type { AttachmentIntent } from "../components/ExamModal";
+import { byCompletedDesc, sortByWhen, tempId } from "./format";
+
+type ListResponse = { exams: Exam[] };
+
+export function useExames() {
+  const list = useResource<ListResponse>(
+    useCallback(() => api.get<ListResponse>("/api/exams"), []),
+  );
+
+  const all = list.data?.exams ?? [];
+  const ativos = sortByWhen(all.filter((e) => e.status !== "completed"));
+  const historico = byCompletedDesc(
+    all.filter((e) => e.status === "completed"),
+  );
+  const [creating, setCreating] = useState(false);
+
+  // Aplica a intenção de anexo depois que o exame já existe (tem id).
+  const applyAttachment = useCallback(
+    async (examId: string, attachment?: AttachmentIntent) => {
+      if (!attachment) return;
+      if (attachment.file) {
+        const form = new FormData();
+        form.append("file", attachment.file);
+        await api.upload(`/api/exams/${examId}/attachment`, form);
+      } else if (attachment.remove) {
+        await api.del(`/api/exams/${examId}/attachment`);
+      }
+    },
+    [],
+  );
+
+  const create = useCallback(
+    async (input: ExamInput, attachment?: AttachmentIntent) => {
+      setCreating(true);
+      try {
+        const { exam } = await api.post<{ exam: Exam }>("/api/exams", input);
+        try {
+          await applyAttachment(exam.id, attachment);
+        } catch (e) {
+          toastError(e, "Exame salvo, mas o anexo não pôde ser enviado — reanexe editando");
+        }
+        try {
+          const data = await api.get<ListResponse>("/api/exams");
+          list.setData(data);
+        } catch (e) {
+          toastError(e, "Exame criado, mas a lista não atualizou — recarregue");
+        }
+      } catch (e) {
+        toastError(e, "Não foi possível adicionar o exame");
+      } finally {
+        setCreating(false);
+      }
+    },
+    [list, applyAttachment],
+  );
+
+  const update = useCallback(
+    async (id: string, input: ExamInput, attachment?: AttachmentIntent) => {
+      const prev = list.data;
+      if (list.data) {
+        list.setData({
+          exams: all.map((e) => (e.id === id ? { ...e, ...input } : e)),
+        });
+      }
+      try {
+        await api.put(`/api/exams/${id}`, input);
+      } catch (e) {
+        if (prev) list.setData(prev);
+        toastError(e, "Não foi possível editar o exame");
+        return;
+      }
+      try {
+        await applyAttachment(id, attachment);
+      } catch (e) {
+        toastError(e, "Exame salvo, mas o anexo não pôde ser enviado — reanexe editando");
+      }
+      list.reload();
+    },
+    [list, all, applyAttachment],
+  );
+
+  const remove = useCallback(
+    async (id: string) => {
+      const prev = list.data;
+      list.setData({ exams: all.filter((e) => e.id !== id) });
+      try {
+        await api.del(`/api/exams/${id}`);
+      } catch (e) {
+        if (prev) list.setData(prev);
+        toastError(e, "Não foi possível excluir o exame");
+      }
+    },
+    [list, all],
+  );
+
+  /** Exame feito: vai pra "aguardando resultado" e cria o retorno, se pedido. Não conclui. */
+  const markDone = useCallback(
+    async (id: string, opts: { needsReturn: boolean; followUpMonths?: number }) => {
+      const prev = list.data;
+      const done = all.find((e) => e.id === id);
+      const nowIso = new Date().toISOString();
+      const optimistic = all.map((e) =>
+        e.id === id ? { ...e, status: "awaiting_result" as const } : e,
+      );
+      // Retorno otimista: o item `to_schedule` é derivável do exame feito
+      // (id/timestamps reais chegam no reload e reconciliam o temporário).
+      if (opts.needsReturn && done) {
+        const suggested = new Date();
+        suggested.setMonth(suggested.getMonth() + (opts.followUpMonths ?? 1));
+        optimistic.push({
+          id: tempId(),
+          name: done.name,
+          status: "to_schedule",
+          scheduledAt: null,
+          suggestedAt: suggested.toISOString(),
+          completedAt: null,
+          parentId: done.id,
+          attachmentKey: null,
+          attachmentMime: null,
+          attachmentName: null,
+          attachmentSize: null,
+          createdAt: nowIso,
+          updatedAt: nowIso,
+        });
+      }
+      list.setData({ exams: optimistic });
+      try {
+        await api.post(`/api/exams/${id}/done`, opts);
+        list.reload();
+      } catch (e) {
+        if (prev) list.setData(prev);
+        toastError(e, "Não foi possível marcar o exame como feito");
+      }
+    },
+    [list, all],
+  );
+
+  /** Conclui sem laudo ("não vou anexar o resultado"): vai pro histórico. */
+  const complete = useCallback(
+    async (id: string) => {
+      const prev = list.data;
+      list.setData({
+        exams: all.map((e) =>
+          e.id === id
+            ? { ...e, status: "completed" as const, completedAt: new Date().toISOString() }
+            : e,
+        ),
+      });
+      try {
+        await api.post(`/api/exams/${id}/complete`, {});
+        list.reload();
+      } catch (e) {
+        if (prev) list.setData(prev);
+        toastError(e, "Não foi possível concluir o exame");
+      }
+    },
+    [list, all],
+  );
+
+  /** Anexa o laudo. Em "aguardando resultado" isso conclui o exame (sai dos ativos). */
+  const attach = useCallback(
+    async (id: string, file: File) => {
+      const prev = list.data;
+      list.setData({
+        exams: all.map((e) =>
+          e.id === id
+            ? {
+                ...e,
+                attachmentName: file.name,
+                attachmentMime: file.type,
+                attachmentSize: file.size,
+                ...(e.status === "awaiting_result" && {
+                  status: "completed" as const,
+                  completedAt: new Date().toISOString(),
+                }),
+              }
+            : e,
+        ),
+      });
+      try {
+        await applyAttachment(id, { file });
+        list.reload();
+      } catch (e) {
+        if (prev) list.setData(prev);
+        toastError(e, "Não foi possível anexar o resultado");
+      }
+    },
+    [list, all, applyAttachment],
+  );
+
+  return {
+    ativos,
+    historico,
+    loading: list.loading,
+    creating,
+    create,
+    update,
+    remove,
+    complete,
+    markDone,
+    attach,
+  };
+}

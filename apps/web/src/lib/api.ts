@@ -32,10 +32,18 @@ function request<T>(path: string, method: string, body?: unknown): Promise<T> {
   }).then((res) => handle<T>(res));
 }
 
+function upload<T>(path: string, form: FormData): Promise<T> {
+  // sem content-type manual: o browser define o boundary do multipart.
+  return fetch(path, { method: "POST", credentials: "same-origin", body: form }).then((res) =>
+    handle<T>(res),
+  );
+}
+
 export const api = {
   get: <T>(path: string) => request<T>(path, "GET"),
   post: <T>(path: string, body?: unknown) => request<T>(path, "POST", body),
   put: <T>(path: string, body?: unknown) => request<T>(path, "PUT", body),
   patch: <T>(path: string, body?: unknown) => request<T>(path, "PATCH", body),
   del: <T>(path: string) => request<T>(path, "DELETE"),
+  upload: <T>(path: string, form: FormData) => upload<T>(path, form),
 };

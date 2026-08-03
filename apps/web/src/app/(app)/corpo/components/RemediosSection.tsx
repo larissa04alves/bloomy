@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckCircleIcon, CircleIcon, PillIcon, PlusIcon } from "@phosphor-icons/react";
+import { CheckCircleIcon, CircleIcon, PillIcon } from "@phosphor-icons/react";
 
 import { IconChip } from "@/components/icon-chip";
 import type { IntakeSlot } from "@/lib/api-types";
@@ -8,24 +8,13 @@ import type { IntakeSlot } from "@/lib/api-types";
 export function RemediosSection({
   intakes,
   onToggle,
-  onOpenModal,
 }: {
   intakes: IntakeSlot[];
   onToggle: (slot: IntakeSlot) => void;
-  onOpenModal: () => void;
 }) {
   return (
     <section className="flex flex-col gap-3">
-      <div className="flex items-center justify-between">
-        <h2 className="font-display text-base font-bold text-ink">Remédios de hoje</h2>
-        <button
-          type="button"
-          onClick={onOpenModal}
-          className="flex items-center gap-1 text-sm font-bold text-coral"
-        >
-          <PlusIcon size={16} weight="bold" /> Cadastrar
-        </button>
-      </div>
+      <h2 className="font-display text-base font-bold text-ink">Remédios de hoje</h2>
 
       {intakes.length === 0 ? (
         <p className="rounded-card border border-dashed border-hairline p-4 text-center text-sm font-semibold text-ink-read">

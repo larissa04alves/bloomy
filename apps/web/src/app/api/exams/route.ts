@@ -1,13 +1,13 @@
 import { db } from "@bloomy/db";
 import { z } from "zod";
 
-import { invalidBody, parseJson, requireUserId, unauthorized } from "@/server/shared/api";
+import { badRequest, invalidBody, parseJson, requireUserId, unauthorized } from "@/server/shared/api";
 import { createExam, listExams } from "@/server/health/service";
 
 const BODY_SCHEMA = z.object({
   name: z.string().min(1).max(120),
-  status: z.enum(["to_schedule", "scheduled", "result_available", "completed"]).optional(),
-  scheduledAt: z.coerce.date().optional(),
+  status: z.enum(["to_schedule", "scheduled"]).optional(),
+  scheduledAt: z.coerce.date().nullable().optional(),
 });
 
 export async function GET(request: Request) {
@@ -25,5 +25,6 @@ export async function POST(request: Request) {
   if (!parsed.success) return invalidBody(parsed.error);
 
   const exam = await createExam(db, userId, parsed.data);
+  if (exam === "missing_schedule") return badRequest("exame agendado precisa de data");
   return Response.json({ exam }, { status: 201 });
 }
