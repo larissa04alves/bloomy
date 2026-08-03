@@ -10,7 +10,7 @@ import {
   requireUserId,
   unauthorized,
 } from "@/server/shared/api";
-import { addSessionExercise } from "@/server/workout/session";
+import { addSessionExercise, reorderSessionExercises } from "@/server/workout/session";
 
 const BODY_SCHEMA = z.object({
   name: z.string().min(1).max(120),
@@ -19,6 +19,10 @@ const BODY_SCHEMA = z.object({
   restSeconds: z.number().int().min(0).max(600),
   catalogId: z.string().nullable().optional(),
   muscleGroup: z.enum(FOCUS_VALUES).nullable().optional(),
+});
+
+const ORDER_SCHEMA = z.object({
+  ids: z.array(z.string().min(1)).min(1),
 });
 
 export async function POST(
@@ -37,4 +41,22 @@ export async function POST(
   if (!session) return notFound();
 
   return Response.json({ session }, { status: 201 });
+}
+
+export async function PATCH(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  const userId = await requireUserId(request);
+  if (!userId) return unauthorized();
+
+  const parsed = ORDER_SCHEMA.safeParse(await parseJson(request));
+  if (!parsed.success) return invalidBody(parsed.error);
+
+  const { id } = await params;
+  const session = await reorderSessionExercises(db, userId, id, parsed.data.ids);
+  if (session === "mismatch") return conflict("exercise set mismatch");
+  if (!session) return notFound();
+
+  return Response.json({ session });
 }

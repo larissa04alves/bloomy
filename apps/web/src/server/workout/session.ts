@@ -542,6 +542,65 @@ export async function removeSessionExercise(
   return buildSessionDetail(db, session, userId);
 }
 
+/**
+ * Reordena os exercícios da sessão. `ids` tem que ser permutação exata dos exercícios
+ * atuais — isso impede um cliente com estado velho de sumir com ou duplicar uma linha.
+ */
+export async function reorderSessionExercises(
+  db: Db,
+  userId: string,
+  sessionId: string,
+  ids: string[],
+): Promise<SessionDetail | "mismatch" | null> {
+  const session = await activeSessionById(db, userId, sessionId);
+  if (!session) return null;
+
+  const result = await db.transaction(async (tx) => {
+    // re-checagem atômica: completeSession pode ter concluído a sessão desde o guard externo
+    const [live] = await tx
+      .select({ id: workoutSession.id })
+      .from(workoutSession)
+      .where(
+        and(
+          eq(workoutSession.id, sessionId),
+          eq(workoutSession.userId, userId),
+          isNull(workoutSession.completedAt),
+        ),
+      );
+    if (!live) return null;
+
+    // busca DENTRO da tx: evita a race em que um id some entre o guard externo e o update
+    const rows = await tx
+      .select({ id: sessionExercise.id })
+      .from(sessionExercise)
+      .where(eq(sessionExercise.sessionId, sessionId));
+
+    const current = new Set(rows.map((r) => r.id));
+    const received = new Set(ids);
+    // Set descarta repetição: comparar os três tamanhos cobre faltando, extra e duplicado.
+    if (received.size !== ids.length || received.size !== current.size) return "mismatch";
+    if (ids.some((id) => !current.has(id))) return "mismatch";
+
+    for (const [i, id] of ids.entries()) {
+      await tx
+        .update(sessionExercise)
+        .set({ position: i })
+        .where(
+          and(
+            eq(sessionExercise.id, id),
+            eq(sessionExercise.sessionId, sessionId),
+            eq(sessionExercise.userId, userId),
+          ),
+        );
+    }
+    return true;
+  });
+  if (result === null) return null;
+  if (result === "mismatch") return "mismatch";
+
+  return buildSessionDetail(db, session, userId);
+}
+
 /** Aplica os ajustes da sessão (concluída ou não) de volta no template. */
 export async function applySessionToWorkout(
   db: Db,

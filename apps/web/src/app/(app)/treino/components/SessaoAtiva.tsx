@@ -181,6 +181,8 @@ export function SessaoAtiva({
       onSwapExercise={sessao.openSwap}
       onRemoveExercise={sessao.askRemove}
       onAddExercise={sessao.openAdd}
+      onReorder={sessao.reorderLocal}
+      onDropOrder={sessao.persistOrder}
     />
   );
 }

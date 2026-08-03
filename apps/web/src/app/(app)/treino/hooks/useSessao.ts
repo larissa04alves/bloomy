@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 
 import { api, ApiError } from "@/lib/api";
 import type {
@@ -42,32 +42,87 @@ function toSetBody(patch: SetPatch & { done?: boolean }) {
 }
 
 export function useSessao() {
-  const { data, loading, reload, setData } = useResource<{ session: SessionDetail | null }>(
-    useCallback(() => api.get<{ session: SessionDetail | null }>("/api/sessions/active"), []),
+  const { data, loading, reload, setData } = useResource<{
+    session: SessionDetail | null;
+  }>(
+    useCallback(
+      () => api.get<{ session: SessionDetail | null }>("/api/sessions/active"),
+      [],
+    ),
   );
   const detail = data?.session ?? null;
 
   const [view, setView] = useState<View>("lista");
   const [activeEx, setActiveEx] = useState(0);
-  const [finishSummary, setFinishSummary] = useState<FinishSummary | null>(null);
+  const [finishSummary, setFinishSummary] = useState<FinishSummary | null>(
+    null,
+  );
   const [startingId, setStartingId] = useState<string | null>(null);
   const [completing, setCompleting] = useState(false);
   const [adjust, setAdjust] = useState<AdjustState>(null);
   const [applying, setApplying] = useState(false);
   const [applied, setApplied] = useState(false);
-  const [pendingRemoval, setPendingRemoval] = useState<
-    { id: string; name: string; doneSets: number } | null
-  >(null);
+  const [pendingRemoval, setPendingRemoval] = useState<{
+    id: string;
+    name: string;
+    doneSets: number;
+  } | null>(null);
 
   const patchLocal = useCallback(
     (setId: string, patch: SetPatch & { done?: boolean }) => {
       if (!detail) return;
       setData({
-        session: { ...detail, exercises: applySetPatch(detail.exercises, setId, patch) },
+        session: {
+          ...detail,
+          exercises: applySetPatch(detail.exercises, setId, patch),
+        },
       });
     },
     [detail, setData],
   );
+  const orderRef = useRef<string[] | null>(null);
+
+  // Só estado: chamado a cada troca de posição durante o arraste.
+  const reorderLocal = useCallback(
+    (ids: string[]) => {
+      if (!detail) return;
+      const byId = new Map(detail.exercises.map((e) => [e.id, e]));
+      const next = ids.flatMap((id) => {
+        const ex = byId.get(id);
+        return ex ? [ex] : [];
+      });
+      if (next.length !== detail.exercises.length) return;
+      orderRef.current = next.map((e) => e.id);
+      setData({ session: { ...detail, exercises: next } });
+    },
+    [detail, setData],
+  );
+
+  // Uma vez por drag, no drop. Usa o ref (gravado sincronamente pelo último
+  // reorderLocal) quando existe; cai pro `detail` só se não houve drag nesta sessão do hook.
+  const persistOrder = useCallback(async () => {
+    if (!detail) return;
+    const snapshot = orderRef.current;
+    const ids = snapshot ?? detail.exercises.map((e) => e.id);
+    try {
+      const { session } = await api.patch<{ session: SessionDetail }>(
+        `/api/sessions/${detail.session.id}/exercises`,
+        { ids },
+      );
+      if (orderRef.current === snapshot) {
+        setData({ session });
+      }
+    } catch (e) {
+      if (orderRef.current === snapshot) {
+        reload();
+        toastError(e, "Não foi possível salvar a nova ordem");
+      }
+    } finally {
+      if (orderRef.current === snapshot) {
+        orderRef.current = null;
+      }
+    }
+  }, [detail, setData, reload]);
 
   const start = useCallback(
     async (workoutId: string) => {
@@ -99,14 +154,20 @@ export function useSessao() {
   const backToList = useCallback(() => setView("lista"), []);
 
   // Edição local (stepper) sem persistir.
-  const setSetValue = useCallback((setId: string, patch: SetPatch) => patchLocal(setId, patch), [patchLocal]);
+  const setSetValue = useCallback(
+    (setId: string, patch: SetPatch) => patchLocal(setId, patch),
+    [patchLocal],
+  );
 
   // Persiste reps/load ao sair do campo (sem marcar feito).
   const persistSet = useCallback(
     async (setId: string, patch: SetPatch) => {
       if (!detail) return;
       try {
-        await api.put(`/api/sessions/${detail.session.id}/sets/${setId}`, toSetBody(patch));
+        await api.put(
+          `/api/sessions/${detail.session.id}/sets/${setId}`,
+          toSetBody(patch),
+        );
       } catch (e) {
         // Recarrega o estado canônico em vez de restaurar um snapshot local —
         // um snapshot poderia sobrescrever escritas concorrentes já persistidas.
@@ -143,7 +204,9 @@ export function useSessao() {
     if (!detail) return;
     setCompleting(true);
     try {
-      const summary = await api.post<FinishSummary>(`/api/sessions/${detail.session.id}/complete`);
+      const summary = await api.post<FinishSummary>(
+        `/api/sessions/${detail.session.id}/complete`,
+      );
       setFinishSummary(summary);
       setView("fim");
     } catch (e) {
@@ -290,6 +353,8 @@ export function useSessao() {
     setSetValue,
     persistSet,
     markDone,
+    reorderLocal,
+    persistOrder,
     complete,
     reset,
     openAdd,

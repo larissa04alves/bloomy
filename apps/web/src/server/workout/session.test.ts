@@ -8,6 +8,7 @@ import {
   completeSession,
   getActiveSession,
   removeSessionExercise,
+  reorderSessionExercises,
   startSession,
   swapSessionExercise,
   updateSet,
@@ -448,5 +449,175 @@ describe("salvar no treino", () => {
 
     const [fresh] = (await listWorkouts(db, userId)).filter((x) => x.id === w.id);
     expect(fresh.exercises.map((e) => e.name)).toEqual(["Supino", "Voador"]);
+  });
+});
+
+describe("reorderSessionExercises", () => {
+  async function setup() {
+    const db = await createTestDb();
+    const userId = await createTestUser(db);
+    const w = await createWorkout(db, userId, {
+      name: "Peito",
+      focus: "chest",
+      exercises: [
+        { name: "Supino", targetSets: 2, targetReps: 10, restSeconds: 60, position: 0 },
+        { name: "Voador", targetSets: 2, targetReps: 12, restSeconds: 45, position: 1 },
+        { name: "Crucifixo", targetSets: 3, targetReps: 12, restSeconds: 45, position: 2 },
+      ],
+    });
+    const s = await startSession(db, userId, w.id);
+    if (s === "already_active" || s === "not_found") throw new Error("unreachable");
+    return { db, userId, w, s };
+  }
+
+  test("permutação válida renumera position como 0..n-1 na ordem recebida", async () => {
+    const { db, userId, s } = await setup();
+    const [supino, voador, crucifixo] = s.exercises;
+
+    const updated = await reorderSessionExercises(db, userId, s.session.id, [
+      crucifixo.id,
+      supino.id,
+      voador.id,
+    ]);
+
+    if (updated === null || updated === "mismatch") throw new Error("unreachable");
+    expect(updated.exercises.map((e) => e.name)).toEqual(["Crucifixo", "Supino", "Voador"]);
+    expect(updated.exercises.map((e) => e.position)).toEqual([0, 1, 2]);
+  });
+
+  test("reorder não mexe nas séries já registradas", async () => {
+    const { db, userId, s } = await setup();
+    const [supino, voador, crucifixo] = s.exercises;
+    await updateSet(db, userId, s.session.id, supino.sets[0].id, {
+      reps: 10,
+      load: 40,
+      done: true,
+    });
+
+    const updated = await reorderSessionExercises(db, userId, s.session.id, [
+      voador.id,
+      crucifixo.id,
+      supino.id,
+    ]);
+    if (updated === null || updated === "mismatch") throw new Error("unreachable");
+
+    const moved = updated.exercises.find((e) => e.id === supino.id)!;
+    expect(moved.position).toBe(2);
+    expect(moved.sets).toHaveLength(2);
+    expect(moved.sets.filter((set) => set.done)).toHaveLength(1);
+    expect(moved.sets[0].load).toBe(40);
+  });
+
+  test("id faltando → mismatch e nenhuma posição muda", async () => {
+    const { db, userId, s } = await setup();
+    const [supino, voador] = s.exercises;
+
+    expect(
+      await reorderSessionExercises(db, userId, s.session.id, [voador.id, supino.id]),
+    ).toBe("mismatch");
+
+    const rows = await db.select().from(sessionExercise);
+    expect(rows.map((r) => `${r.name}:${r.position}`).sort()).toEqual([
+      "Crucifixo:2",
+      "Supino:0",
+      "Voador:1",
+    ]);
+  });
+
+  test("id repetido → mismatch", async () => {
+    const { db, userId, s } = await setup();
+    const [supino, voador] = s.exercises;
+
+    expect(
+      await reorderSessionExercises(db, userId, s.session.id, [
+        supino.id,
+        supino.id,
+        voador.id,
+      ]),
+    ).toBe("mismatch");
+  });
+
+  test("id que não pertence à sessão → mismatch", async () => {
+    const { db, userId, s } = await setup();
+    const [supino, voador] = s.exercises;
+
+    expect(
+      await reorderSessionExercises(db, userId, s.session.id, [
+        supino.id,
+        voador.id,
+        "id-que-nao-existe",
+      ]),
+    ).toBe("mismatch");
+  });
+
+  test("id de outra sessão do mesmo usuário → mismatch", async () => {
+    const { db, userId, s } = await setup();
+    // só há 1 sessão ativa por vez: conclui a atual pra poder abrir a segunda
+    await completeSession(db, userId, s.session.id);
+    const foreignId = s.exercises[0].id; // pertence à sessão já concluída, não à nova
+
+    const w2 = await createWorkout(db, userId, {
+      name: "Costas",
+      focus: "back",
+      exercises: [
+        { name: "Remada", targetSets: 1, targetReps: 12, restSeconds: 45, position: 0 },
+        { name: "Puxada", targetSets: 1, targetReps: 10, restSeconds: 45, position: 1 },
+      ],
+    });
+    const s2 = await startSession(db, userId, w2.id);
+    if (s2 === "already_active" || s2 === "not_found") throw new Error("unreachable");
+    const [, puxada] = s2.exercises;
+
+    expect(
+      await reorderSessionExercises(db, userId, s2.session.id, [foreignId, puxada.id]),
+    ).toBe("mismatch");
+  });
+
+  test("sessão de outro usuário → null", async () => {
+    const { db, s } = await setup();
+    const outro = await createTestUser(db, "user-2");
+
+    expect(
+      await reorderSessionExercises(
+        db,
+        outro,
+        s.session.id,
+        s.exercises.map((e) => e.id),
+      ),
+    ).toBeNull();
+  });
+
+  test("sessão já concluída → null", async () => {
+    const { db, userId, s } = await setup();
+    await completeSession(db, userId, s.session.id);
+
+    expect(
+      await reorderSessionExercises(
+        db,
+        userId,
+        s.session.id,
+        s.exercises.map((e) => e.id).reverse(),
+      ),
+    ).toBeNull();
+  });
+
+  test("applySessionToWorkout depois do reorder leva a ordem nova pro template", async () => {
+    const { db, userId, w, s } = await setup();
+    const [supino, voador, crucifixo] = s.exercises;
+
+    await reorderSessionExercises(db, userId, s.session.id, [
+      crucifixo.id,
+      supino.id,
+      voador.id,
+    ]);
+    const updatedWorkout = await applySessionToWorkout(db, userId, s.session.id);
+
+    expect(updatedWorkout!.id).toBe(w.id);
+    expect(updatedWorkout!.exercises.map((e) => e.name)).toEqual([
+      "Crucifixo",
+      "Supino",
+      "Voador",
+    ]);
+    expect(updatedWorkout!.exercises.map((e) => e.position)).toEqual([0, 1, 2]);
   });
 });
