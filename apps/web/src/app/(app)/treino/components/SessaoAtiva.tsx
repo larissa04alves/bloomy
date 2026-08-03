@@ -114,9 +114,7 @@ export function SessaoAtiva({
         <BuscaExercicio
           onBack={sessao.closeAdjust}
           onPick={(picked) => sessao.pickExercise(picked)}
-          alreadyAdded={detail.exercises
-            .filter((e) => (adjust.mode === "swap" ? e.id !== adjust.id : true))
-            .flatMap((e) => (e.catalogId ? [e.catalogId] : []))}
+          alreadyAdded={detail.exercises.flatMap((e) => (e.catalogId ? [e.catalogId] : []))}
         />
       </div>
     );

@@ -19,7 +19,7 @@ export function BuscaExercicio({
   onPick: (ex: CatalogExercise) => void;
   onCustom?: () => void;
   onBack: () => void;
-  alreadyAdded?: string[]; // catalogIds já presentes na sessão
+  alreadyAdded?: string[]; // catalogIds já na sessão — somem da lista
 }) {
   const { catalog, loading } = useCatalogo();
   const fuse = useMemo(() => buildFuse(catalog), [catalog]);
@@ -28,10 +28,17 @@ export function BuscaExercicio({
   const [filterOpen, setFilterOpen] = useState(false);
   const [preview, setPreview] = useState<CatalogExercise | null>(null);
 
-  const results = useMemo(
-    () => searchExercises(fuse, catalog, { q, group }).slice(0, 60),
+  const found = useMemo(
+    () => searchExercises(fuse, catalog, { q, group }),
     [fuse, catalog, q, group],
   );
+  // O que já está na sessão não aparece: a lista só mostra o que dá para escolher.
+  const results = useMemo(
+    () => found.filter((ex) => !alreadyAdded?.includes(ex.id)).slice(0, 60),
+    [found, alreadyAdded],
+  );
+  // Distingue "a busca não achou nada" de "achou, mas tudo já está na sessão".
+  const allHidden = found.length > 0 && results.length === 0;
 
   return (
     <div className="flex flex-col gap-3">
@@ -93,41 +100,34 @@ export function BuscaExercicio({
         {loading ? (
           <p className="py-6 text-center text-sm font-semibold text-ink-read">Carregando…</p>
         ) : null}
-        {results.map((ex) => {
-          const added = alreadyAdded?.includes(ex.id) ?? false;
-          return (
-            <div
-              key={ex.id}
-              className={`flex items-center gap-3 rounded-card p-2 ${added ? "opacity-50" : ""}`}
+        {results.map((ex) => (
+          <div key={ex.id} className="flex items-center gap-3 rounded-card p-2">
+            <button type="button" onClick={() => setPreview(ex)} aria-label={`Ver ${ex.namePt}`}>
+              <GifThumb id={ex.id} alt="" className="size-12 rounded-control" />
+            </button>
+            <button
+              type="button"
+              onClick={() => onPick(ex)}
+              className="flex flex-1 flex-col items-start text-left"
             >
-              <button type="button" onClick={() => setPreview(ex)} aria-label={`Ver ${ex.namePt}`}>
-                <GifThumb id={ex.id} alt="" className="size-12 rounded-control" />
-              </button>
-              <button
-                type="button"
-                disabled={added}
-                onClick={() => onPick(ex)}
-                className="flex flex-1 flex-col items-start text-left"
-              >
-                <span className="text-sm font-bold text-ink">{ex.namePt}</span>
-                <span className="mt-0.5 rounded-full bg-pink-tint px-2 py-0.5 text-xs font-bold text-pink-deep">
-                  {added ? "já na lista" : FOCUS_LABELS[ex.group]}
-                </span>
-              </button>
-              <button
-                type="button"
-                aria-label="Ver execução"
-                onClick={() => setPreview(ex)}
-                className="text-ink-faint"
-              >
-                ⤢
-              </button>
-            </div>
-          );
-        })}
+              <span className="text-sm font-bold text-ink">{ex.namePt}</span>
+              <span className="mt-0.5 rounded-full bg-pink-tint px-2 py-0.5 text-xs font-bold text-pink-deep">
+                {FOCUS_LABELS[ex.group]}
+              </span>
+            </button>
+            <button
+              type="button"
+              aria-label="Ver execução"
+              onClick={() => setPreview(ex)}
+              className="text-ink-faint"
+            >
+              ⤢
+            </button>
+          </div>
+        ))}
         {!loading && results.length === 0 ? (
           <p className="py-6 text-center text-sm font-semibold text-ink-read">
-            Nada encontrado.
+            {allHidden ? "Todos os resultados já estão na sessão." : "Nada encontrado."}
           </p>
         ) : null}
         {onCustom ? (
