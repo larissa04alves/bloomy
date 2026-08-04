@@ -1,7 +1,40 @@
 import { describe, expect, test } from "bun:test";
 
+import { weightLog } from "@bloomy/db/schema/health";
+
 import { createTestDb, createTestUser } from "@/server/shared/test-db";
-import { deleteWeight, listWeights, updateWeight, upsertWeight } from "./weight";
+import {
+  deleteWeight,
+  isDayTakenError,
+  listWeights,
+  updateWeight,
+  upsertWeight,
+} from "./weight";
+
+describe("isDayTakenError", () => {
+  test("reconhece a violação de weight_log_user_day_idx vinda do banco", async () => {
+    const db = await createTestDb();
+    const userId = await createTestUser(db);
+    await upsertWeight(db, userId, { day: "2026-08-03", grams: 64200 });
+
+    // Erro de verdade, não fabricado: o drizzle embrulha o do libsql e a mensagem
+    // do SQLite fica no `cause` — é justamente essa cadeia que precisa ser andada.
+    const error = await db
+      .insert(weightLog)
+      .values({ userId, day: "2026-08-03", grams: 65000 })
+      .then(() => null)
+      .catch((e: unknown) => e);
+
+    expect(error).not.toBeNull();
+    expect((error as Error).message).not.toMatch(/UNIQUE constraint/i); // está no cause
+    expect(isDayTakenError(error)).toBe(true);
+  });
+
+  test("não confunde outro erro com conflito de dia", () => {
+    expect(isDayTakenError(new Error("SQLITE_BUSY: database is locked"))).toBe(false);
+    expect(isDayTakenError(null)).toBe(false);
+  });
+});
 
 describe("upsertWeight", () => {
   test("cria o primeiro registro do dia", async () => {
@@ -110,15 +143,21 @@ describe("updateWeight", () => {
     const a = await upsertWeight(db, userId, { day: "2026-08-01", grams: 64000 });
     const b = await upsertWeight(db, userId, { day: "2026-08-02", grams: 65000 });
 
-    // Ambas checam o dia livre antes de qualquer UPDATE acontecer, então quem
-    // perde só descobre o conflito pelo índice único — é esse caminho que o
-    // `catch` de `updateWeight` traduz.
+    // Qual das duas perde e por qual caminho (pré-checagem ou índice único) depende
+    // do escalonamento — o que este teste fixa é o invariante: exatamente uma passa,
+    // a outra recebe conflito e nada é sobrescrito. A tradução do erro do índice tem
+    // teste próprio, determinístico, em `isDayTakenError`.
     const results = await Promise.all([
       updateWeight(db, userId, a.id, { day: "2026-08-03" }),
       updateWeight(db, userId, b.id, { day: "2026-08-03" }),
     ]);
 
-    expect(results.filter((r) => r === "day_taken")).toHaveLength(1);
+    const conflicts = results.filter((r) => r === "day_taken");
+    const winners = results.filter((r) => r !== null && r !== "day_taken");
+    expect(conflicts).toHaveLength(1);
+    expect(winners).toHaveLength(1);
+    expect(winners[0]).toMatchObject({ day: "2026-08-03" });
+
     const all = await listWeights(db, userId);
     expect(all).toHaveLength(2);
     expect(all.filter((r) => r.day === "2026-08-03")).toHaveLength(1);

@@ -36,8 +36,11 @@ export async function upsertWeight(
  * `weight_log_user_day_idx` violado: outro registro já ocupa esse (usuário, dia).
  * O drizzle embrulha o erro do libsql num `DrizzleQueryError` cuja mensagem é só
  * o SQL — a do SQLite fica no `cause`, daí percorrer a cadeia.
+ *
+ * Exportado só para o teste: reconhecer essa forma de erro é o que separa 409 de 500,
+ * e chegar nela por corrida real não é determinístico.
  */
-function isDayTakenError(error: unknown): boolean {
+export function isDayTakenError(error: unknown): boolean {
   for (let e: unknown = error; e instanceof Error; e = e.cause) {
     if (/UNIQUE constraint failed: weight_log\./i.test(e.message)) return true;
   }
