@@ -104,6 +104,26 @@ describe("updateWeight", () => {
     expect(all.find((r) => r.day === "2026-08-02")?.grams).toBe(65000);
   });
 
+  test("duas edições simultâneas para o mesmo dia: uma passa, a outra é 'day_taken'", async () => {
+    const db = await createTestDb();
+    const userId = await createTestUser(db);
+    const a = await upsertWeight(db, userId, { day: "2026-08-01", grams: 64000 });
+    const b = await upsertWeight(db, userId, { day: "2026-08-02", grams: 65000 });
+
+    // Ambas checam o dia livre antes de qualquer UPDATE acontecer, então quem
+    // perde só descobre o conflito pelo índice único — é esse caminho que o
+    // `catch` de `updateWeight` traduz.
+    const results = await Promise.all([
+      updateWeight(db, userId, a.id, { day: "2026-08-03" }),
+      updateWeight(db, userId, b.id, { day: "2026-08-03" }),
+    ]);
+
+    expect(results.filter((r) => r === "day_taken")).toHaveLength(1);
+    const all = await listWeights(db, userId);
+    expect(all).toHaveLength(2);
+    expect(all.filter((r) => r.day === "2026-08-03")).toHaveLength(1);
+  });
+
   test("id inexistente → null", async () => {
     const db = await createTestDb();
     const userId = await createTestUser(db);

@@ -9,7 +9,7 @@ import {
   type ChartConfig,
 } from "@bloomy/ui/components/chart";
 
-import { dayLabel, type ChartPoint } from "../hooks/peso-helpers";
+import { dayLabel, formatKg, type ChartPoint } from "../hooks/peso-helpers";
 
 const CONFIG = {
   kg: { label: "Peso", color: "var(--color-chart-1)" },
@@ -44,7 +44,10 @@ export function PesoChart({ points }: { points: ChartPoint[] }) {
               labelFormatter={(_, payload) =>
                 dayLabel(String(payload?.[0]?.payload?.day ?? ""))
               }
-              formatter={(value) => `${String(value).replace(".", ",")} kg`}
+              // `value` vem em kg (é o que o gráfico plota); volta pra gramas
+              // para reusar o `formatKg` — assim tooltip, resumo e histórico
+              // mostram sempre uma casa decimal ("65,0 kg", não "65 kg").
+              formatter={(value) => `${formatKg(Math.round(Number(value) * 1000))} kg`}
             />
           }
         />

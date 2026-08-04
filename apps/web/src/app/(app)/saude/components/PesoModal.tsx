@@ -63,8 +63,11 @@ export function PesoModal({
     setDate(initial ? fromDayString(initial.day) : fromDayString(dayFor()));
     setEnteringWeight(false);
     setWeightDraft("");
+    // `lastGrams` é lido, mas de propósito não é dependência: se o sheet abrir
+    // enquanto o `GET` do histórico ainda carrega, a chegada do último peso
+    // reexecutaria este reset e apagaria o número já digitado.
     // eslint-disable-next-line react-hooks/exhaustive-deps -- dependência deliberada em `initial?.id`, ver comentário acima
-  }, [open, initial?.id, lastGrams]);
+  }, [open, initial?.id]);
 
   const canSubmit = grams !== null && date !== undefined;
 

@@ -39,7 +39,10 @@ export function Stepper({
     }
     if (draft === null || !parse) return;
     const next = parse(draft);
-    if (next !== null && Number.isFinite(next)) onChange(clamp(next));
+    // Fora da faixa não vira `clamp`: quem digitou "10" kg num mínimo de 20
+    // salvaria 20 sem perceber. Entrada inválida mantém a edição aberta.
+    if (next === null || !Number.isFinite(next) || next < min || next > max) return;
+    onChange(next);
     setDraft(null);
   };
 
