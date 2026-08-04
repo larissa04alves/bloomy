@@ -158,6 +158,7 @@ export default function SaudePage() {
         onOpenChange={(open) => setPesoModal((s) => ({ ...s, open }))}
         initial={pesoModal.initial}
         lastGrams={peso.lastGrams}
+        saving={peso.saving}
         onSubmit={(input) =>
           pesoModal.initial ? peso.update(pesoModal.initial.id, input) : peso.create(input)
         }

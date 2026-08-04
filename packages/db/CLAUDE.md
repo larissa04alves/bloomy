@@ -7,6 +7,9 @@
   índice composto `(user_id, day)` (ADR-0002).
 - **Migrations sempre**: `bun db:generate` + `bun db:migrate` (da raiz).
   NUNCA `drizzle-kit push`. Migrations ficam em `src/migrations/`.
+- **`db:generate` sem `db:migrate` não dá erro na subida** — o app sobe normalmente e
+  só estoura 500 (`no such table: X`) quando a feature nova é usada. Depois de gerar
+  migration, rodar `bun db:migrate` antes de testar na tela.
 - Dev local: `bun db:local` (turso dev em `local.db`), `.env` fica em
   `apps/web/.env`.
 - Serviços recebem `Db` (`import type { Db } from "@bloomy/db"`); o singleton

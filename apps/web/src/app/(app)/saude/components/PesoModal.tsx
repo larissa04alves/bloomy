@@ -1,6 +1,6 @@
 "use client";
 
-import { ScalesIcon } from "@phosphor-icons/react";
+import { CircleNotchIcon, ScalesIcon } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
 
 import { BottomSheet } from "@/components/bottom-sheet";
@@ -8,7 +8,12 @@ import { Stepper } from "@/components/stepper";
 import type { WeightLog } from "@/lib/api-types";
 import { dayFor } from "@/server/shared/day";
 
-import { formatKg, fromDayString, parseKgToGrams, toDayString } from "../hooks/peso-helpers";
+import {
+  formatKg,
+  fromDayString,
+  parseKgToGrams,
+  toDayString,
+} from "../hooks/peso-helpers";
 import { DatePickerField } from "./DatePickerField";
 
 const MIN_GRAMS = 20_000;
@@ -20,13 +25,17 @@ export function PesoModal({
   onOpenChange,
   initial,
   lastGrams,
+  saving,
   onSubmit,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   initial?: WeightLog;
   lastGrams?: number;
-  onSubmit: (input: { grams: number; day: string }) => void;
+  /** Gravação em curso: trava o botão e o mantém em "Salvando…". */
+  saving: boolean;
+  /** `false` = falhou: o sheet fica aberto com os valores, pra poder tentar de novo. */
+  onSubmit: (input: { grams: number; day: string }) => Promise<boolean>;
 }) {
   // Sem histórico e sem edição, não há de onde partir: o campo nasce vazio
   // pedindo o número em vez de chutar um peso qualquer.
@@ -77,15 +86,29 @@ export function PesoModal({
       footer={
         <button
           type="button"
-          disabled={!canSubmit}
-          onClick={() => {
+          disabled={!canSubmit || saving}
+          onClick={async () => {
             if (grams === null || !date) return;
-            onSubmit({ grams, day: toDayString(date) });
-            onOpenChange(false);
+
+            const ok = await onSubmit({ grams, day: toDayString(date) });
+            if (ok) onOpenChange(false);
           }}
-          className="w-full rounded-full bg-lilac py-3.5 font-display font-bold text-white shadow-btn disabled:opacity-60"
+          className="flex w-full items-center justify-center gap-2 rounded-full bg-lilac py-3.5 font-display font-bold text-white shadow-btn transition-opacity disabled:opacity-60"
         >
-          {initial ? "Salvar" : "Registrar"}
+          {saving ? (
+            <>
+              <CircleNotchIcon
+                size={18}
+                weight="bold"
+                className="animate-spin"
+              />
+              Salvando…
+            </>
+          ) : initial ? (
+            "Salvar"
+          ) : (
+            "Registrar"
+          )}
         </button>
       }
     >
@@ -145,7 +168,11 @@ export function PesoModal({
 
       <div className="flex flex-col gap-2">
         <span className="text-xs font-bold text-ink-soft">Data</span>
-        <DatePickerField value={date} onChange={setDate} placeholder="Escolha a data" />
+        <DatePickerField
+          value={date}
+          onChange={setDate}
+          placeholder="Escolha a data"
+        />
       </div>
     </BottomSheet>
   );
