@@ -251,6 +251,8 @@ export type ExamInput = {
   scheduledAt?: string | null; // ISO
 };
 
+export type WeightLog = { id: string; grams: number; day: string; createdAt: string };
+
 /** Cadastro de remédio (input dos modais/hook de agenda). */
 export type MedicationInput = {
   name: string;

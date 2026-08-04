@@ -4,6 +4,7 @@ import {
   integer,
   sqliteTable,
   text,
+  uniqueIndex,
 } from "drizzle-orm/sqlite-core";
 
 import { user } from "./auth";
@@ -73,5 +74,25 @@ export const exam = sqliteTable(
   (table) => [index("exam_user_idx").on(table.userId)],
 );
 
+/** Pesagem: um registro por (usuário, dia). Peso em gramas inteiros — nunca float. */
+export const weightLog = sqliteTable(
+  "weight_log",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    day: text("day").notNull(),
+    grams: integer("grams").notNull(),
+    createdAt: timestampMs("created_at"),
+    updatedAt: timestampMs("updated_at"),
+  },
+  // O unique também serve de índice para as consultas por intervalo de dia.
+  (table) => [uniqueIndex("weight_log_user_day_idx").on(table.userId, table.day)],
+);
+
 export type Appointment = typeof appointment.$inferSelect;
 export type Exam = typeof exam.$inferSelect;
+export type WeightLog = typeof weightLog.$inferSelect;
