@@ -25,6 +25,13 @@
   --input: #eae2f4;
   --ring: #a78bd0; /* lilac */
   --radius: 1rem; /* 16px = control */
+
+  /* Cores de série do shadcn/chart — paleta Bloomy, lilás como primária. */
+  --chart-1: #a78bd0; /* lilac */
+  --chart-2: #f3b6d0; /* pink */
+  --chart-3: #a8d5ba; /* green */
+  --chart-4: #c77e93; /* coral */
+  --chart-5: #8768bc; /* lilac-deep */
 }
 
 /* ---- Tokens Bloomy (utilitários bg-/text-/border-<nome>) ---- */
@@ -111,6 +118,11 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);

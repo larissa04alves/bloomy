@@ -56,6 +56,18 @@ _Avoid_: dose (dose é a quantidade no cadastro, ex.: "1 comprimido")
 **Estoque**:
 Quantidade restante de um remédio. Diminui a cada toma confirmada; desmarcar devolve.
 
+### Peso
+
+**Pesagem**:
+O registro de peso de um dia, em gramas. Uma por dia — registrar de novo no mesmo dia substitui
+o valor. Vive na aba Saúde; não é ritual do dia e nunca gera pendência.
+_Avoid_: medição, peso corporal
+
+**Variação**:
+A diferença entre uma pesagem e a anterior. Sempre exibida em tinta neutra — a seta dá a direção,
+a cor nunca julga. Subir não é falha, descer não é conquista.
+_Avoid_: ganho, perda, progresso
+
 ### Treino e Mente (termos nomeados, modelagem pendente)
 
 **Check-in**:

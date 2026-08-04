@@ -32,6 +32,7 @@
     "next-themes": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
+    "recharts": "catalog:",
     "server-only": "^0.0.1",
     "sonner": "catalog:",
     "vaul": "catalog:",

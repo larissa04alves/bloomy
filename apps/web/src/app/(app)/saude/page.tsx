@@ -5,7 +5,7 @@ import { useState } from "react";
 import { HeartPulseIcon } from "@/components/icons/heart-pulse";
 import { LoadingOverlay } from "@/components/loading-overlay";
 import { Screen } from "@/components/screen";
-import type { Appointment, Exam, Medication } from "@/lib/api-types";
+import type { Appointment, Exam, Medication, WeightLog } from "@/lib/api-types";
 
 import { AgendaRemediosSection } from "./components/AgendaRemediosSection";
 import { AppointmentModal } from "./components/AppointmentModal";
@@ -14,6 +14,9 @@ import { ExamModal } from "./components/ExamModal";
 import { ExamesSection } from "./components/ExamesSection";
 import { HistorySheet } from "./components/HistorySheet";
 import { MedicationModal } from "./components/MedicationModal";
+import { PesoHistorySheet } from "./components/PesoHistorySheet";
+import { PesoModal } from "./components/PesoModal";
+import { PesoSection } from "./components/PesoSection";
 import { ProximaConsultaCard } from "./components/ProximaConsultaCard";
 import { ResultadoSheet } from "./components/ResultadoSheet";
 import { RetornoSheet } from "./components/RetornoSheet";
@@ -21,6 +24,7 @@ import { useAgendaRemedios } from "./hooks/useAgendaRemedios";
 import { useConsultas } from "./hooks/useConsultas";
 import { useExames } from "./hooks/useExames";
 import { useHistorySheet } from "./hooks/useHistorySheet";
+import { usePeso } from "./hooks/usePeso";
 
 type RetornoTarget = { kind: "consulta" | "exame"; id: string };
 
@@ -28,11 +32,17 @@ export default function SaudePage() {
   const consultas = useConsultas();
   const exames = useExames();
   const agenda = useAgendaRemedios();
+  const peso = usePeso();
 
   // Modais de consulta / exame / remédio (undefined = criar; objeto = editar).
   const [apptModal, setApptModal] = useState<{ open: boolean; initial?: Appointment }>({ open: false });
   const [examModal, setExamModal] = useState<{ open: boolean; initial?: Exam }>({ open: false });
   const [medModal, setMedModal] = useState<{ open: boolean; initial?: Medication }>({ open: false });
+  // Modal de peso (undefined = registrar; objeto = editar) e sheet de histórico.
+  const [pesoModal, setPesoModal] = useState<{ open: boolean; initial?: WeightLog }>({
+    open: false,
+  });
+  const [pesoHistory, setPesoHistory] = useState(false);
 
   // Sheet de retorno (após concluir) e sheet de histórico.
   const [retorno, setRetorno] = useState<{ open: boolean; target?: RetornoTarget }>({ open: false });
@@ -69,6 +79,14 @@ export default function SaudePage() {
         onAdd={() => setMedModal({ open: true })}
         onEdit={(m) => setMedModal({ open: true, initial: m })}
         onDelete={agenda.remove}
+      />
+
+      <PesoSection
+        weights={peso.weights}
+        period={peso.period}
+        onPeriodChange={peso.setPeriod}
+        onAdd={() => setPesoModal({ open: true })}
+        onHistory={() => setPesoHistory(true)}
       />
 
       <AppointmentModal
@@ -133,6 +151,27 @@ export default function SaudePage() {
         onOpenChange={history.onOpenChange}
         title={history.title}
         items={history.items}
+      />
+
+      <PesoModal
+        open={pesoModal.open}
+        onOpenChange={(open) => setPesoModal((s) => ({ ...s, open }))}
+        initial={pesoModal.initial}
+        lastGrams={peso.lastGrams}
+        onSubmit={(input) =>
+          pesoModal.initial ? peso.update(pesoModal.initial.id, input) : peso.create(input)
+        }
+      />
+
+      <PesoHistorySheet
+        open={pesoHistory}
+        onOpenChange={setPesoHistory}
+        weights={peso.weights}
+        onEdit={(w) => {
+          setPesoHistory(false);
+          setPesoModal({ open: true, initial: w });
+        }}
+        onDelete={peso.remove}
       />
 
       {consultas.creating || exames.creating || agenda.creating ? (
