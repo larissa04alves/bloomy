@@ -1,10 +1,9 @@
 "use client";
 
-import type { Mood } from "@/lib/api-types";
+import { MOOD_ORDER, type Mood } from "@/lib/api-types";
 import { cn } from "@bloomy/ui/lib/utils";
 
 import { MoodFaceIcon } from "./MoodFaceIcon";
-import { MOOD_ORDER } from "../hooks/mente-helpers";
 
 const MOOD_LABEL: Record<Mood, string> = {
   sad: "Muito pra baixo",

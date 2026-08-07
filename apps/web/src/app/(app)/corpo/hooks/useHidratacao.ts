@@ -6,8 +6,7 @@ import { api } from "@/lib/api";
 import type { WaterDay } from "@/lib/api-types";
 import { toastError } from "@/lib/toast";
 import { useResource } from "@/lib/use-resource";
-
-import { garrafas } from "./garrafas";
+import { garrafas } from "@/server/shared/units";
 
 export function useHidratacao(goalMl: number) {
   const { data, loading, reload, setData } = useResource<WaterDay>(

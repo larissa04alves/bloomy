@@ -1,7 +1,4 @@
-import type { Mood, WeekMood } from "@/lib/api-types";
-
-/** Humor do pior ao melhor — casa com a posição dos tiles na tela. */
-export const MOOD_ORDER: readonly Mood[] = ["sad", "meh", "neutral", "good", "great"];
+import { MOOD_ORDER, type Mood, type WeekMood } from "@/lib/api-types";
 
 /** Cor do ícone de humor na lista de registros (valência; do protótipo). */
 export const MOOD_RECORD_COLOR: Record<Mood, string> = {

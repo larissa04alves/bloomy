@@ -1,4 +1,17 @@
-export function ProgressBar({ value }: { value: number }) {
+import { cn } from "@bloomy/ui/lib/utils";
+
+import { TONE, type Tone } from "@/lib/tone";
+
+export function ProgressBar({
+  value,
+  tone = "lilac",
+  track = "muted",
+}: {
+  value: number;
+  tone?: Tone;
+  /** Dentro de card tint o trilho é branco (protótipo); solto na tela, é o muted. */
+  track?: "muted" | "white";
+}) {
   const pct = Math.round(Math.min(1, Math.max(0, value)) * 100);
   return (
     <div
@@ -6,10 +19,16 @@ export function ProgressBar({ value }: { value: number }) {
       aria-valuenow={pct}
       aria-valuemin={0}
       aria-valuemax={100}
-      className="h-2 w-full overflow-hidden rounded-full bg-ring-track"
+      className={cn(
+        "h-1.75 w-full overflow-hidden rounded-full",
+        track === "white" ? "bg-white" : "bg-ring-track",
+      )}
     >
       <div
-        className="h-full rounded-full bg-lilac transition-[width] duration-200 ease-out motion-reduce:transition-none"
+        className={cn(
+          "h-full rounded-full transition-[width] duration-200 ease-out motion-reduce:transition-none",
+          TONE[tone].solid,
+        )}
         style={{ width: `${pct}%` }}
       />
     </div>

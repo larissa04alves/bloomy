@@ -9,6 +9,14 @@ export async function requireUserId(request: Request): Promise<string | null> {
   return session?.user.id ?? null;
 }
 
+/** Como `requireUserId`, mas também traz o nome — a Hoje saúda pelo primeiro nome. */
+export async function requireUser(
+  request: Request,
+): Promise<{ id: string; name: string } | null> {
+  const session = await auth.api.getSession({ headers: request.headers });
+  return session ? { id: session.user.id, name: session.user.name } : null;
+}
+
 /** Lê o corpo JSON com segurança; body malformado vira `undefined` (→ zod 400, não 500). */
 export async function parseJson(request: Request): Promise<unknown> {
   try {
