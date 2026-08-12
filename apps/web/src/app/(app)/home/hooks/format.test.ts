@@ -1,6 +1,86 @@
 import { afterAll, beforeAll, describe, expect, it } from "bun:test";
 
-import { consultaLabel, dateLabel, greetingLabel, monthShort, workoutLabel } from "./format";
+import type { TodayPayload } from "@/lib/api-types";
+
+import {
+  consultaLabel,
+  dateLabel,
+  dayProgress,
+  greetingLabel,
+  monthShort,
+  progressLabel,
+  workoutLabel,
+} from "./format";
+
+function todayWith(over: Partial<TodayPayload> = {}): TodayPayload {
+  return {
+    name: "Dev",
+    day: "2026-08-12",
+    period: "evening",
+    checkin: { mood: null },
+    water: { done: 0, target: 4 },
+    meals: { done: 0, target: 3 },
+    meds: { taken: 0, total: 4 },
+    workout: { state: "suggested", id: "w1", name: "Quads" },
+    nextAppointment: null,
+    ...over,
+  } as TodayPayload;
+}
+
+describe("dayProgress", () => {
+  it("soma garrafas, refeições, remédios e o treino do dia", () => {
+    const p = dayProgress(
+      todayWith({ water: { done: 2, target: 4 }, meals: { done: 1, target: 3 }, meds: { taken: 3, total: 4 } }),
+    );
+    // 2+1+3 feitos de 4+3+4 possíveis, +1 do treino ainda não concluído
+    expect(p.done).toBe(6);
+    expect(p.total).toBe(12);
+    expect(p.ratio).toBeCloseTo(0.5);
+  });
+
+  it("conta o treino concluído como 1 feito", () => {
+    const p = dayProgress(todayWith({ workout: { state: "done", name: "Quads" } }));
+    expect(p.done).toBe(1);
+    expect(p.total).toBe(12);
+  });
+
+  it("deixa fora do total o que não está cadastrado", () => {
+    const p = dayProgress(todayWith({ meds: { taken: 0, total: 0 }, workout: { state: "none" } }));
+    expect(p.total).toBe(7); // 4 garrafas + 3 refeições
+  });
+
+  it("não passa de 1 nem divide por zero", () => {
+    const vazio = dayProgress(
+      todayWith({
+        water: { done: 0, target: 0 },
+        meals: { done: 0, target: 0 },
+        meds: { taken: 0, total: 0 },
+        workout: { state: "none" },
+      }),
+    );
+    expect(vazio.ratio).toBe(0);
+
+    const excedido = dayProgress(
+      todayWith({
+        water: { done: 9, target: 4 },
+        meals: { done: 0, target: 0 },
+        meds: { taken: 0, total: 0 },
+        workout: { state: "none" },
+      }),
+    );
+    expect(excedido.ratio).toBe(1);
+  });
+});
+
+describe("progressLabel", () => {
+  it("muda o tom conforme o dia anda", () => {
+    expect(progressLabel(0, 0)).toBe("Cadastre seus rituais pra acompanhar o dia");
+    expect(progressLabel(0, 12)).toBe("Seu dia está começando");
+    expect(progressLabel(2, 12)).toBe("Seu dia começou");
+    expect(progressLabel(6, 12)).toBe("Você já passou da metade");
+    expect(progressLabel(12, 12)).toBe("Dia completo, parabéns");
+  });
+});
 
 describe("greetingLabel", () => {
   it("saúda pelo primeiro nome", () => {

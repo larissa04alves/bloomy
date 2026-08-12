@@ -1,4 +1,4 @@
-import type { DayPeriod, WorkoutCard } from "@/lib/api-types";
+import type { DayPeriod, TodayPayload, WorkoutCard } from "@/lib/api-types";
 
 const GREETING: Record<DayPeriod, string> = {
   morning: "Bom dia",
@@ -53,6 +53,28 @@ const MONTH_SHORT_FMT = new Intl.DateTimeFormat("pt-BR", { month: "short", timeZ
 /** Instante ISO → "ago" (mês abreviado, minúsculo, sem ponto), no fuso BR. */
 export function monthShort(at: string): string {
   return MONTH_SHORT_FMT.format(new Date(at)).replace(".", "");
+}
+
+/**
+ * Progresso do dia somando os rituais em unidades comparáveis: cada garrafa,
+ * refeição e remédio vale 1, e o treino do dia vale 1. O que não está cadastrado
+ * (sem remédio, sem treino) fica fora do total — senão o dia nasceria devendo.
+ */
+export function dayProgress(today: TodayPayload): { done: number; total: number; ratio: number } {
+  const hasWorkout = today.workout.state !== "none";
+  const done =
+    today.water.done + today.meals.done + today.meds.taken + (today.workout.state === "done" ? 1 : 0);
+  const total = today.water.target + today.meals.target + today.meds.total + (hasWorkout ? 1 : 0);
+  return { done, total, ratio: total > 0 ? Math.min(1, done / total) : 0 };
+}
+
+/** Frase do bloco de progresso — muda de tom conforme o dia anda. */
+export function progressLabel(done: number, total: number): string {
+  if (total === 0) return "Cadastre seus rituais pra acompanhar o dia";
+  if (done === 0) return "Seu dia está começando";
+  if (done >= total) return "Dia completo, parabéns";
+  if (done / total >= 0.5) return "Você já passou da metade";
+  return "Seu dia começou";
 }
 
 export type RitualAction = { label: string; kind: "play" | "check" | "plus" };

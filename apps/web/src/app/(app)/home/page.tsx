@@ -4,6 +4,7 @@ import { ConsultaCard } from "./components/ConsultaCard";
 import { HomeErro } from "./components/HomeErro";
 import { HomeSkeleton } from "./components/HomeSkeleton";
 import { HumorCard } from "./components/HumorCard";
+import { ProgressoDia } from "./components/ProgressoDia";
 import { RituaisGrid } from "./components/RituaisGrid";
 import { SaudacaoHeader } from "./components/SaudacaoHeader";
 import { useHome } from "./hooks/useHome";
@@ -18,8 +19,9 @@ export default function HomePage() {
   }
 
   return (
-    <div className="flex flex-col gap-6 px-5.5 pt-6 pb-4">
+    <div className="flex flex-1 flex-col gap-4 px-5.5 pt-5">
       <SaudacaoHeader period={today.period} name={today.name} day={today.day} />
+      <ProgressoDia today={today} />
       <HumorCard
         value={moodIndex}
         registered={today.checkin.mood !== null}

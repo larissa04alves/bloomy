@@ -1,4 +1,9 @@
-import { CheckCircleIcon, type Icon, PlayCircleIcon, PlusCircleIcon } from "@phosphor-icons/react";
+import {
+  CheckCircleIcon,
+  type Icon,
+  PlayCircleIcon,
+  PlusCircleIcon,
+} from "@phosphor-icons/react";
 import type { Route } from "next";
 import Link from "next/link";
 import type { ReactNode } from "react";
@@ -41,21 +46,38 @@ export function RitualCard({
   const ActionIcon = action ? ACTION_ICON[action.kind] : null;
 
   return (
-    <Link href={href} className={cn("flex flex-col rounded-card-lg p-4", t.tint)}>
-      <IconChip tone={tone} variant="white" icon={icon} className="mb-3" />
-      <span className="font-display text-base font-bold text-ink">{title}</span>
-      <span className="mt-0.5 line-clamp-2 text-xs font-semibold text-ink-soft">{subtitle}</span>
-      {progress !== undefined ? (
-        <div className="mt-3">
-          <ProgressBar value={progress} tone={tone} track="white" />
-        </div>
-      ) : null}
-      {action && ActionIcon ? (
-        <span className={cn("mt-3 inline-flex items-center gap-1 text-xs font-bold", t.deep)}>
-          <ActionIcon size={16} weight="fill" />
-          {action.label}
+    // h-full + justify-between: o card acompanha a altura da linha do grid e empurra
+    // a ação pro rodapé, então os quatro terminam alinhados por baixo.
+    <Link
+      href={href}
+      className={cn(
+        "flex h-full flex-col justify-between rounded-card-lg p-4",
+        t.tint,
+      )}
+    >
+      <IconChip tone={tone} variant="white" icon={icon} size="lg" />
+      <div className="mt-2 flex flex-col">
+        <span className="font-display text-lg font-bold text-ink">{title}</span>
+        <span className="mt-0.5 line-clamp-2 text-xs font-semibold text-ink-soft">
+          {subtitle}
         </span>
-      ) : null}
+        {progress !== undefined ? (
+          <div className="mt-2">
+            <ProgressBar value={progress} tone={tone} track="white" />
+          </div>
+        ) : null}
+        {action && ActionIcon ? (
+          <span
+            className={cn(
+              "mt-2 inline-flex items-center gap-1 text-xs font-bold",
+              t.deep,
+            )}
+          >
+            <ActionIcon size={16} weight="fill" />
+            {action.label}
+          </span>
+        ) : null}
+      </div>
     </Link>
   );
 }
