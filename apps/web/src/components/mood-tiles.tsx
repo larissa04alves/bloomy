@@ -1,24 +1,12 @@
 "use client";
 
-import {
-  HeartIcon,
-  type Icon,
-  SmileyIcon,
-  SmileyMehIcon,
-  SmileySadIcon,
-  SmileyWinkIcon,
-} from "@phosphor-icons/react";
-
 import { cn } from "@bloomy/ui/lib/utils";
 
-const FACES: { Icon: Icon; label: string }[] = [
-  { Icon: SmileySadIcon, label: "Triste" },
-  { Icon: SmileyMehIcon, label: "Neutro" },
-  { Icon: SmileyIcon, label: "Bem" },
-  { Icon: SmileyWinkIcon, label: "Ótimo" },
-  { Icon: HeartIcon, label: "Radiante" },
-];
+import { MOOD_LABEL, MoodFaceIcon } from "@/components/mood-face-icon";
+import { MOOD_ORDER } from "@/lib/api-types";
 
+/** Fileira de humores da Hoje. Mesmas faces e rótulos do card da Mente — as duas
+ *  telas gravam o mesmo check-in do dia, então precisam falar a mesma língua. */
 export function MoodTiles({
   value,
   onChange,
@@ -28,13 +16,13 @@ export function MoodTiles({
 }) {
   return (
     <div className="flex justify-between">
-      {FACES.map(({ Icon, label }, i) => {
+      {MOOD_ORDER.map((mood, i) => {
         const selected = value === i;
         return (
           <button
-            key={label}
+            key={mood}
             type="button"
-            aria-label={label}
+            aria-label={MOOD_LABEL[mood]}
             aria-pressed={selected}
             onClick={() => onChange(i)}
             className={cn(
@@ -42,11 +30,7 @@ export function MoodTiles({
               selected ? "bg-lilac shadow-btn" : "bg-lilac-tint-soft",
             )}
           >
-            <Icon
-              size={28}
-              weight="fill"
-              className={selected ? "text-white" : "text-[#c7beda]"}
-            />
+            <MoodFaceIcon mood={mood} size={28} color={selected ? "#ffffff" : "#c7beda"} />
           </button>
         );
       })}
