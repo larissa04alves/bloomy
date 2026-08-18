@@ -34,10 +34,11 @@ async function devUser(): Promise<SessionUser | null> {
   }
   if (!devUserWarned) {
     devUserWarned = true;
+    // Sem interpolar o e-mail: é dado pessoal e o log pode acabar num coletor central.
     console.warn(
       devUserCache
-        ? `[auth] DEV_USER_EMAIL ativo: requests sem sessão respondem como ${email}`
-        : `[auth] DEV_USER_EMAIL=${email} não existe no banco — rotas seguem em 401`,
+        ? "[auth] DEV_USER_EMAIL ativo: requests sem sessão respondem como esse usuário"
+        : "[auth] DEV_USER_EMAIL não existe no banco — rotas seguem em 401",
     );
   }
   return devUserCache;
