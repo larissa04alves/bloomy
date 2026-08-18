@@ -23,7 +23,7 @@ import {
   max,
 } from "drizzle-orm";
 
-import { dayFor } from "@/server/shared/day";
+import { dayFor, previousDay } from "@/server/shared/day";
 
 import { workoutSummary, type WorkoutWithExercises } from "./service";
 
@@ -258,25 +258,34 @@ export async function getActiveSession(
   return buildSessionDetail(db, active, userId);
 }
 
+/** Sessão concluída *em* `day` — quem manda é o dia da conclusão, não o do início.
+ *  `workoutSession.day` é gravado quando a sessão começa: um treino que atravessa a
+ *  meia-noite ficaria marcado na véspera e sumiria da Hoje do dia seguinte. Por isso
+ *  a janela inclui o dia anterior e o `completedAt` é conferido no fuso BR (ADR-0002). */
 export async function completedSessionOn(
   db: Db,
   userId: string,
   day: string,
 ): Promise<{ workoutId: string; name: string } | null> {
-  const [row] = await db
-    .select({ workoutId: workoutSession.workoutId, name: workout.name })
+  const rows = await db
+    .select({
+      workoutId: workoutSession.workoutId,
+      name: workout.name,
+      completedAt: workoutSession.completedAt,
+    })
     .from(workoutSession)
     .innerJoin(workout, eq(workout.id, workoutSession.workoutId))
     .where(
       and(
         eq(workoutSession.userId, userId),
-        eq(workoutSession.day, day),
+        inArray(workoutSession.day, [previousDay(day), day]),
         isNotNull(workoutSession.completedAt),
       ),
     )
-    .orderBy(desc(workoutSession.completedAt))
-    .limit(1);
-  return row ?? null;
+    .orderBy(desc(workoutSession.completedAt));
+
+  const row = rows.find((r) => r.completedAt && dayFor(r.completedAt) === day);
+  return row ? { workoutId: row.workoutId, name: row.name } : null;
 }
 
 export async function updateSet(

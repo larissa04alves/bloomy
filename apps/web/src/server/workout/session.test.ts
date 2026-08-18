@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test";
 
 import { exerciseCatalog, sessionExercise, setLog, workoutSession } from "@bloomy/db/schema/workout";
 import { eq } from "drizzle-orm";
-import { dayFor } from "@/server/shared/day";
+import { dayFor, previousDay } from "@/server/shared/day";
 import { createTestDb, createTestUser } from "@/server/shared/test-db";
 import {
   addSessionExercise,
@@ -775,6 +775,35 @@ describe("completedSessionOn", () => {
     await completeSession(db, userId, started.session.id);
 
     expect(await completedSessionOn(db, userId, "2020-01-01")).toBeNull();
+  });
+
+  test("sessão que atravessa a meia-noite conta no dia da conclusão", async () => {
+    const db = await createTestDb();
+    const userId = await createTestUser(db);
+    const w = await createWorkout(db, userId, {
+      name: "Costas",
+      focus: "back",
+      exercises: [
+        { name: "Remada", targetSets: 3, targetReps: 10, restSeconds: 45, position: 0 },
+      ],
+    });
+    const started = await startSession(db, userId, w.id);
+    if (typeof started === "string") throw new Error(`startSession falhou: ${started}`);
+    await completeSession(db, userId, started.session.id);
+
+    // começou ontem 23h, terminou hoje: o `day` da linha é o do início
+    const ontem = previousDay(dayFor());
+    await db
+      .update(workoutSession)
+      .set({ day: ontem })
+      .where(eq(workoutSession.id, started.session.id));
+
+    expect(await completedSessionOn(db, userId, dayFor())).toEqual({
+      workoutId: w.id,
+      name: "Costas",
+    });
+    // e não conta no dia em que começou — lá o treino não foi concluído
+    expect(await completedSessionOn(db, userId, ontem)).toBeNull();
   });
 
   test("com duas sessões concluídas no mesmo dia, devolve a mais recente", async () => {
