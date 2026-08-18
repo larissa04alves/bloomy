@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
 import { api } from "@/lib/api";
 import { MOOD_ORDER, type TodayPayload } from "@/lib/api-types";
@@ -24,23 +24,35 @@ export function useHome() {
 
   const moodIndex = data?.checkin.mood ? MOOD_ORDER.indexOf(data.checkin.mood) : null;
 
+  // Fila de gravação do humor: dois toques rápidos viram dois PUTs em ordem, e
+  // nunca dois em voo — fora de ordem, o servidor gravaria o humor antigo.
+  const queue = useRef<Promise<unknown>>(Promise.resolve());
+  const pending = useRef(0);
+
   /** Grava o humor do dia — mesmo check-in da Mente (upsert por dia). */
   const setMood = useCallback(
-    async (index: number) => {
+    (index: number) => {
       const mood = MOOD_ORDER[index];
       if (!mood || !data) return;
 
-      const prev = data;
       // Otimista: a carinha acende na hora; o PUT confirma.
-      setData({ ...data, checkin: { mood } });
-      try {
-        await api.put("/api/checkins", { mood });
-      } catch (e) {
-        setData(prev);
-        toastError(e, "Não foi possível registrar o humor");
-      }
+      setData((cur) => (cur ? { ...cur, checkin: { mood } } : cur));
+
+      pending.current += 1;
+      queue.current = queue.current
+        .then(() => api.put("/api/checkins", { mood }))
+        .catch((e: unknown) => {
+          toastError(e, "Não foi possível registrar o humor");
+          // Só recarrega se este era o último toque da fila: com outro pendente,
+          // quem decide o que fica na tela é a intenção mais recente. Um snapshot
+          // local aqui apagaria a seleção que a pessoa acabou de fazer.
+          if (pending.current === 1) reload();
+        })
+        .finally(() => {
+          pending.current -= 1;
+        });
     },
-    [data, setData],
+    [data, setData, reload],
   );
 
   return { today: data, moodIndex, loading, error, reload, setMood };
