@@ -1,7 +1,7 @@
 "use client";
 
 import { ConsultaCard } from "./components/ConsultaCard";
-import { HomeErro } from "./components/HomeErro";
+import { HomeError } from "./components/HomeError";
 import { HomeSkeleton } from "./components/HomeSkeleton";
 import { HumorCard } from "./components/HumorCard";
 import { ProgressoDia } from "./components/ProgressoDia";
@@ -14,7 +14,7 @@ export default function HomePage() {
 
   if (!today) {
     if (loading) return <HomeSkeleton />;
-    if (error) return <HomeErro onRetry={reload} />;
+    if (error) return <HomeError onRetry={reload} />;
     return <HomeSkeleton />;
   }
 

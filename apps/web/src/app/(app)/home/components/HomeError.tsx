@@ -1,6 +1,6 @@
 "use client";
 
-export function HomeErro({ onRetry }: { onRetry: () => void }) {
+export function HomeError({ onRetry }: { onRetry: () => void }) {
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-3 px-5.5 text-center">
       <p className="font-display text-lg font-bold text-ink">Não conseguimos carregar seu dia</p>
