@@ -24,7 +24,7 @@ export function PerfilMenu({ name }: { name: string | null }) {
     <DropdownMenu>
       <DropdownMenuTrigger
         aria-label="Abrir menu do perfil"
-        className="grid size-11.5 shrink-0 place-items-center rounded-full bg-lilac font-display text-lg font-bold text-white outline-none"
+        className="grid size-11.5 shrink-0 place-items-center rounded-full bg-lilac font-display text-lg font-bold text-white outline-none focus-visible:ring-2 focus-visible:ring-lilac-deep focus-visible:ring-offset-2"
       >
         {initial || <UserIcon size={22} weight="fill" />}
       </DropdownMenuTrigger>
@@ -43,7 +43,15 @@ export function PerfilMenu({ name }: { name: string | null }) {
           onClick={async () => {
             setSigningOut(true);
             try {
-              await authClient.signOut();
+              // O better-auth devolve `{ error }` em falha HTTP em vez de lançar —
+              // só o erro de rede cai no catch. Sem checar, um 500 mandaria a pessoa
+              // pro /login achando que saiu, com a sessão ainda válida.
+              const { error } = await authClient.signOut();
+              if (error) {
+                setSigningOut(false);
+                toastError(error, "Não foi possível sair. Tente de novo.");
+                return;
+              }
               router.replace("/login");
               // sem reset no sucesso: a navegação desmonta o menu antes que o
               // rótulo tenha chance de piscar de volta pra "Sair".
