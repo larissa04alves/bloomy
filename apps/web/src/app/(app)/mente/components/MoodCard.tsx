@@ -1,18 +1,9 @@
 "use client";
 
-import type { Mood } from "@/lib/api-types";
+import { MOOD_ORDER, type Mood } from "@/lib/api-types";
 import { cn } from "@bloomy/ui/lib/utils";
 
-import { MoodFaceIcon } from "./MoodFaceIcon";
-import { MOOD_ORDER } from "../hooks/mente-helpers";
-
-const MOOD_LABEL: Record<Mood, string> = {
-  sad: "Muito pra baixo",
-  meh: "Pra baixo",
-  neutral: "Neutro",
-  good: "Bem",
-  great: "Ótimo",
-};
+import { MOOD_LABEL, MoodFaceIcon } from "@/components/mood-face-icon";
 
 export function MoodCard({
   value,
@@ -23,9 +14,16 @@ export function MoodCard({
 }) {
   return (
     <section className="rounded-card-lg bg-lilac-tint p-4.5">
-      <h2 className="mb-3.5 font-display text-base font-bold text-ink">
-        Como você está se sentindo agora?
-      </h2>
+      <div className="mb-3.5 flex items-center justify-between gap-3">
+        <h2 className="font-display text-base font-bold text-ink">
+          Como você está se sentindo hoje?
+        </h2>
+        {value ? (
+          <span className="shrink-0 text-xs font-bold whitespace-nowrap text-lilac-deep">
+            registrado ✓
+          </span>
+        ) : null}
+      </div>
       <div className="flex justify-between">
         {MOOD_ORDER.map((mood) => {
           const selected = value === mood;

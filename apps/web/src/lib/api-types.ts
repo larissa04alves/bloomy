@@ -168,6 +168,9 @@ export type SessionAdjustments = {
 
 export type Mood = "sad" | "meh" | "neutral" | "good" | "great";
 
+/** Humor do pior ao melhor — casa com a posição dos tiles em `MoodTiles`. */
+export const MOOD_ORDER: readonly Mood[] = ["sad", "meh", "neutral", "good", "great"];
+
 /** Check-in do dia (1 por dia, upsert). Datas ISO string. */
 export type Checkin = {
   id: string;
@@ -259,4 +262,29 @@ export type MedicationInput = {
   dose?: string;
   stock?: number | null;
   times: string[];
+};
+
+// ── Hoje ──────────────────────────────────────────────────────────────────
+
+/** Período do dia, resolvido no fuso BR pelo servidor. */
+export type DayPeriod = "morning" | "afternoon" | "evening";
+
+/** Estado do card de Treino na Hoje. `done` não tem id: não há nada pra iniciar. */
+export type WorkoutCard =
+  | { state: "none" }
+  | { state: "suggested"; id: string; name: string }
+  | { state: "active"; id: string; name: string }
+  | { state: "done"; name: string };
+
+/** Payload da tela Hoje. `nextAppointment` vem serializado (datas em ISO string). */
+export type TodayPayload = {
+  name: string | null;
+  day: string; // YYYY-MM-DD, fuso BR
+  period: DayPeriod;
+  checkin: { mood: Mood | null };
+  water: { done: number; target: number }; // garrafas de 500 ml
+  meals: { done: number; target: number };
+  meds: { taken: number; total: number }; // total 0 = nenhum remédio cadastrado
+  workout: WorkoutCard;
+  nextAppointment: Appointment | null;
 };

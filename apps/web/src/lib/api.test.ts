@@ -3,9 +3,17 @@ import { afterEach, describe, expect, it, mock } from "bun:test";
 import { ApiError, api } from "./api";
 
 const originalFetch = globalThis.fetch;
+const originalWindow = globalThis.window;
 afterEach(() => {
   globalThis.fetch = originalFetch;
+  globalThis.window = originalWindow;
 });
+
+/** `window` mínimo: o client só lê pathname/search e chama location.replace. */
+function stubWindow(pathname: string, search: string, replace: (url: string) => void) {
+  globalThis.window = { location: { pathname, search, replace } } as unknown as Window &
+    typeof globalThis;
+}
 
 function mockFetch(status: number, body: unknown) {
   globalThis.fetch = mock(async () =>
@@ -34,6 +42,38 @@ describe("api client", () => {
     expect(caught).toBeInstanceOf(ApiError);
     expect((caught as ApiError).status).toBe(409);
     expect((caught as ApiError).message).toBe("já marcada");
+  });
+
+  it("em 401 lança ApiError e manda pro login guardando a rota atual", async () => {
+    mockFetch(401, { error: "unauthorized" });
+    const replace = mock((_url: string) => {});
+    stubWindow("/corpo", "?aba=peso", replace);
+
+    let caught: unknown;
+    try {
+      await api.get("/api/weights");
+    } catch (e) {
+      caught = e;
+    }
+
+    expect((caught as ApiError).status).toBe(401);
+    expect(replace).toHaveBeenCalledWith("/login?next=%2Fcorpo%3Faba%3Dpeso");
+  });
+
+  it("não redireciona se já está no login (evita loop)", async () => {
+    mockFetch(401, { error: "unauthorized" });
+    const replace = mock((_url: string) => {});
+    stubWindow("/login", "", replace);
+
+    let caught: unknown;
+    try {
+      await api.get("/api/today");
+    } catch (e) {
+      caught = e;
+    }
+
+    expect(caught).toBeInstanceOf(ApiError);
+    expect(replace).not.toHaveBeenCalled();
   });
 
   it("retorna undefined em 204", async () => {

@@ -3,7 +3,7 @@
 import type { MindNote } from "@/lib/api-types";
 import { dayFor } from "@/server/shared/day";
 
-import { MoodFaceIcon } from "./MoodFaceIcon";
+import { MoodFaceIcon } from "@/components/mood-face-icon";
 import { MOOD_RECORD_COLOR, relativeDay, timeOf } from "../hooks/mente-helpers";
 
 export function RegistrosList({ records }: { records: MindNote[] }) {

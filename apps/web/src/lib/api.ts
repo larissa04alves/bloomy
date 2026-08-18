@@ -8,7 +8,26 @@ export class ApiError extends Error {
   }
 }
 
+const LOGIN_PATH = "/login";
+
+/**
+ * 401 significa sessão ausente ou expirada: o cookie pode continuar no browser,
+ * então sem isso a tela fica logada por fora e todas as chamadas falham. Manda
+ * pro login guardando a rota atual em `?next=`.
+ */
+function redirectToLogin(): void {
+  if (typeof window === "undefined") return;
+  if (window.location.pathname === LOGIN_PATH) return;
+  const next = window.location.pathname + window.location.search;
+  window.location.replace(`${LOGIN_PATH}?next=${encodeURIComponent(next)}`);
+}
+
 async function handle<T>(res: Response): Promise<T> {
+  if (res.status === 401) {
+    redirectToLogin();
+    // A navegação não interrompe este tick: rejeitar evita a tela seguir com dados vazios.
+    throw new ApiError(401, "sessão expirada");
+  }
   if (!res.ok) {
     let message = res.statusText;
     try {

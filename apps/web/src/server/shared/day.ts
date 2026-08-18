@@ -25,6 +25,14 @@ export function weekDays(reference: string = dayFor()): string[] {
   });
 }
 
+/** A véspera de `day` (YYYY-MM-DD). Aritmética de calendário — sem fuso envolvido. */
+export function previousDay(day: string): string {
+  const [y, m, d] = day.split("-").map(Number);
+  const dt = new Date(Date.UTC(y, m - 1, d));
+  dt.setUTCDate(dt.getUTCDate() - 1);
+  return dt.toISOString().slice(0, 10);
+}
+
 export const DAY_SCHEMA = z.iso.date();
 
 /** Resolve o `day` da query (default hoje); inválido → `{ ok: false }`. */

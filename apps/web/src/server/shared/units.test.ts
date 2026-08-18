@@ -1,6 +1,6 @@
 import { describe, expect, it } from "bun:test";
 
-import { garrafas } from "./garrafas";
+import { garrafas } from "./units";
 
 describe("garrafas", () => {
   it("deriva garrafas feitas e alvo a partir de ml (500 ml/garrafa)", () => {

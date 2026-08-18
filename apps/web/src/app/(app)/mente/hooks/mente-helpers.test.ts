@@ -1,6 +1,7 @@
 import { describe, expect, it } from "bun:test";
 
-import { MOOD_ORDER, dayMoodLabel, relativeDay, timeOf, weekSentence } from "./mente-helpers";
+import { MOOD_ORDER } from "@/lib/api-types";
+import { dayMoodLabel, relativeDay, timeOf, weekSentence } from "./mente-helpers";
 
 describe("MOOD_ORDER", () => {
   it("vai do pior ao melhor humor, 5 valores", () => {

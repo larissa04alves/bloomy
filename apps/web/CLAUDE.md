@@ -25,7 +25,12 @@ Glossário canônico em `CONTEXT.md` (nesta pasta). Decisões em `/docs/adr/`.
 
 - Registro diário grava `day` (`YYYY-MM-DD`) via `dayFor()` de
   `server/shared/day.ts` — nunca recalcular fuso em outro lugar (ADR-0002).
-- Erros de API: `{ "error": string }` + status (400/401/404/409).
+- Erros de API: `{ "error": string }` + status (400/401/404/409). No client, 401 é
+  tratado no `lib/api.ts`: redireciona pra `/login?next=<rota>` e rejeita.
+- **Auth em dev (até a Fase 10):** `DEV_USER_EMAIL` no `.env` faz `requireUser`
+  assumir esse usuário quando não há sessão válida — sem isso, sessão expirada
+  = 401 em tudo. Nunca ativa com `NODE_ENV=production`. Remover junto com o
+  login real.
 - Tomas de remédio derivam do cadastro na leitura; só confirmação vira linha;
   estoque muda na mesma transação do mark/unmark.
 - Testes: `bun test` (rodar de apps/web) roda com `--conditions react-server`

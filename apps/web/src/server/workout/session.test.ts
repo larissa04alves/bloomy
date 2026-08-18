@@ -1,10 +1,13 @@
 import { describe, expect, test } from "bun:test";
 
-import { exerciseCatalog, sessionExercise, setLog } from "@bloomy/db/schema/workout";
+import { exerciseCatalog, sessionExercise, setLog, workoutSession } from "@bloomy/db/schema/workout";
+import { eq } from "drizzle-orm";
+import { dayFor, previousDay } from "@/server/shared/day";
 import { createTestDb, createTestUser } from "@/server/shared/test-db";
 import {
   addSessionExercise,
   applySessionToWorkout,
+  completedSessionOn,
   completeSession,
   getActiveSession,
   removeSessionExercise,
@@ -728,5 +731,113 @@ describe("reorderSessionExercises", () => {
       "Voador",
     ]);
     expect(updatedWorkout!.exercises.map((e) => e.position)).toEqual([0, 1, 2]);
+  });
+});
+
+describe("completedSessionOn", () => {
+  test("só conta sessão concluída, e devolve o nome do treino", async () => {
+    const db = await createTestDb();
+    const userId = await createTestUser(db);
+    const w = await createWorkout(db, userId, {
+      name: "Pernas",
+      focus: "legs",
+      exercises: [
+        { name: "Agachamento", targetSets: 3, targetReps: 10, restSeconds: 45, position: 0 },
+      ],
+    });
+
+    expect(await completedSessionOn(db, userId, dayFor())).toBeNull();
+
+    const started = await startSession(db, userId, w.id);
+    if (typeof started === "string") throw new Error(`startSession falhou: ${started}`);
+    // sessão aberta não conta como concluída
+    expect(await completedSessionOn(db, userId, dayFor())).toBeNull();
+
+    await completeSession(db, userId, started.session.id);
+    expect(await completedSessionOn(db, userId, dayFor())).toEqual({
+      workoutId: w.id,
+      name: "Pernas",
+    });
+  });
+
+  test("não vaza sessão de outro dia", async () => {
+    const db = await createTestDb();
+    const userId = await createTestUser(db);
+    const w = await createWorkout(db, userId, {
+      name: "Cardio leve",
+      focus: "cardio",
+      exercises: [
+        { name: "Corrida", targetSets: 1, targetReps: 1, restSeconds: 30, position: 0 },
+      ],
+    });
+    const started = await startSession(db, userId, w.id);
+    if (typeof started === "string") throw new Error(`startSession falhou: ${started}`);
+    await completeSession(db, userId, started.session.id);
+
+    expect(await completedSessionOn(db, userId, "2020-01-01")).toBeNull();
+  });
+
+  test("sessão que atravessa a meia-noite conta no dia da conclusão", async () => {
+    const db = await createTestDb();
+    const userId = await createTestUser(db);
+    const w = await createWorkout(db, userId, {
+      name: "Costas",
+      focus: "back",
+      exercises: [
+        { name: "Remada", targetSets: 3, targetReps: 10, restSeconds: 45, position: 0 },
+      ],
+    });
+    const started = await startSession(db, userId, w.id);
+    if (typeof started === "string") throw new Error(`startSession falhou: ${started}`);
+    await completeSession(db, userId, started.session.id);
+
+    // começou ontem 23h, terminou hoje: o `day` da linha é o do início
+    const ontem = previousDay(dayFor());
+    await db
+      .update(workoutSession)
+      .set({ day: ontem })
+      .where(eq(workoutSession.id, started.session.id));
+
+    expect(await completedSessionOn(db, userId, dayFor())).toEqual({
+      workoutId: w.id,
+      name: "Costas",
+    });
+    // e não conta no dia em que começou — lá o treino não foi concluído
+    expect(await completedSessionOn(db, userId, ontem)).toBeNull();
+  });
+
+  test("com duas sessões concluídas no mesmo dia, devolve a mais recente", async () => {
+    const db = await createTestDb();
+    const userId = await createTestUser(db);
+    const w1 = await createWorkout(db, userId, {
+      name: "Pernas",
+      focus: "legs",
+      exercises: [
+        { name: "Agachamento", targetSets: 3, targetReps: 10, restSeconds: 45, position: 0 },
+      ],
+    });
+    const w2 = await createWorkout(db, userId, {
+      name: "Peito",
+      focus: "chest",
+      exercises: [{ name: "Supino", targetSets: 3, targetReps: 10, restSeconds: 45, position: 0 }],
+    });
+
+    const started1 = await startSession(db, userId, w1.id);
+    if (typeof started1 === "string") throw new Error(`startSession falhou: ${started1}`);
+    await completeSession(db, userId, started1.session.id);
+    // força um completedAt claramente anterior, pra não empatar (mesmo ms) com a segunda sessão
+    await db
+      .update(workoutSession)
+      .set({ completedAt: new Date(Date.now() - 60_000) })
+      .where(eq(workoutSession.id, started1.session.id));
+
+    const started2 = await startSession(db, userId, w2.id);
+    if (typeof started2 === "string") throw new Error(`startSession falhou: ${started2}`);
+    await completeSession(db, userId, started2.session.id);
+
+    expect(await completedSessionOn(db, userId, dayFor())).toEqual({
+      workoutId: w2.id,
+      name: "Peito",
+    });
   });
 });

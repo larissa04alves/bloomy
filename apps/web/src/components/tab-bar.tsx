@@ -13,7 +13,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const TABS: { href: Route; label: string; Icon: Icon }[] = [
-  { href: "/home", label: "Home", Icon: HouseIcon },
+  { href: "/home", label: "Hoje", Icon: HouseIcon },
   { href: "/corpo", label: "Corpo", Icon: HeartbeatIcon },
   { href: "/treino", label: "Treino", Icon: BarbellIcon },
   { href: "/mente", label: "Mente", Icon: SmileyIcon },

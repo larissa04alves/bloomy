@@ -11,9 +11,19 @@ import {
   type SetLog,
   type WorkoutSession,
 } from "@bloomy/db/schema/workout";
-import { and, asc, count, desc, eq, inArray, isNotNull, isNull, max } from "drizzle-orm";
+import {
+  and,
+  asc,
+  count,
+  desc,
+  eq,
+  inArray,
+  isNotNull,
+  isNull,
+  max,
+} from "drizzle-orm";
 
-import { dayFor } from "@/server/shared/day";
+import { dayFor, previousDay } from "@/server/shared/day";
 
 import { workoutSummary, type WorkoutWithExercises } from "./service";
 
@@ -59,7 +69,10 @@ export async function lastPerformance(
   return row ?? null;
 }
 
-type PerfCache = Map<string, { reps: number | null; load: number | null } | null>;
+type PerfCache = Map<
+  string,
+  { reps: number | null; load: number | null } | null
+>;
 
 async function buildSessionDetail(
   db: Db,
@@ -87,7 +100,9 @@ async function buildSessionDetail(
   // falta, uma vez por nome — sem isso, exercícios com o mesmo nome disparavam uma
   // consulta lastPerformance cada, dentro do map assíncrono
   const cache: PerfCache = new Map(perfByName);
-  const missingNames = [...new Set(rows.map((r) => r.name).filter((name) => !cache.has(name)))];
+  const missingNames = [
+    ...new Set(rows.map((r) => r.name).filter((name) => !cache.has(name))),
+  ];
   await Promise.all(
     missingNames.map(async (name) => {
       cache.set(name, await lastPerformance(db, userId, name));
@@ -118,14 +133,23 @@ export async function startSession(
   const [active] = await db
     .select()
     .from(workoutSession)
-    .where(and(eq(workoutSession.userId, userId), isNull(workoutSession.completedAt)));
+    .where(
+      and(
+        eq(workoutSession.userId, userId),
+        isNull(workoutSession.completedAt),
+      ),
+    );
   if (active) return "already_active";
 
   const [w] = await db
     .select()
     .from(workout)
     .where(
-      and(eq(workout.id, workoutId), eq(workout.userId, userId), eq(workout.active, true)),
+      and(
+        eq(workout.id, workoutId),
+        eq(workout.userId, userId),
+        eq(workout.active, true),
+      ),
     );
   if (!w) return "not_found";
 
@@ -140,7 +164,10 @@ export async function startSession(
   const uniqueNames = [...new Set(exercises.map((e) => e.name))];
   const perfByName: PerfCache = new Map(
     await Promise.all(
-      uniqueNames.map(async (name) => [name, await lastPerformance(db, userId, name)] as const),
+      uniqueNames.map(
+        async (name) =>
+          [name, await lastPerformance(db, userId, name)] as const,
+      ),
     ),
   );
 
@@ -150,7 +177,12 @@ export async function startSession(
     const [live] = await tx
       .select({ id: workoutSession.id })
       .from(workoutSession)
-      .where(and(eq(workoutSession.userId, userId), isNull(workoutSession.completedAt)));
+      .where(
+        and(
+          eq(workoutSession.userId, userId),
+          isNull(workoutSession.completedAt),
+        ),
+      );
     if (live) return "already_active" as const;
 
     const [s] = await tx
@@ -200,7 +232,13 @@ export async function startSession(
   });
   if (result === "already_active") return "already_active";
 
-  return buildSessionDetail(db, result.session, userId, perfByName, result.rows);
+  return buildSessionDetail(
+    db,
+    result.session,
+    userId,
+    perfByName,
+    result.rows,
+  );
 }
 
 export async function getActiveSession(
@@ -210,9 +248,44 @@ export async function getActiveSession(
   const [active] = await db
     .select()
     .from(workoutSession)
-    .where(and(eq(workoutSession.userId, userId), isNull(workoutSession.completedAt)));
+    .where(
+      and(
+        eq(workoutSession.userId, userId),
+        isNull(workoutSession.completedAt),
+      ),
+    );
   if (!active) return null;
   return buildSessionDetail(db, active, userId);
+}
+
+/** Sessão concluída *em* `day` — quem manda é o dia da conclusão, não o do início.
+ *  `workoutSession.day` é gravado quando a sessão começa: um treino que atravessa a
+ *  meia-noite ficaria marcado na véspera e sumiria da Hoje do dia seguinte. Por isso
+ *  a janela inclui o dia anterior e o `completedAt` é conferido no fuso BR (ADR-0002). */
+export async function completedSessionOn(
+  db: Db,
+  userId: string,
+  day: string,
+): Promise<{ workoutId: string; name: string } | null> {
+  const rows = await db
+    .select({
+      workoutId: workoutSession.workoutId,
+      name: workout.name,
+      completedAt: workoutSession.completedAt,
+    })
+    .from(workoutSession)
+    .innerJoin(workout, eq(workout.id, workoutSession.workoutId))
+    .where(
+      and(
+        eq(workoutSession.userId, userId),
+        inArray(workoutSession.day, [previousDay(day), day]),
+        isNotNull(workoutSession.completedAt),
+      ),
+    )
+    .orderBy(desc(workoutSession.completedAt));
+
+  const row = rows.find((r) => r.completedAt && dayFor(r.completedAt) === day);
+  return row ? { workoutId: row.workoutId, name: row.name } : null;
 }
 
 export async function updateSet(
@@ -258,7 +331,10 @@ export async function sessionAdjustments(
 ): Promise<SessionAdjustments> {
   const [rows, templateRows] = await Promise.all([
     db
-      .select({ exerciseId: sessionExercise.exerciseId, origin: sessionExercise.origin })
+      .select({
+        exerciseId: sessionExercise.exerciseId,
+        origin: sessionExercise.origin,
+      })
       .from(sessionExercise)
       .where(eq(sessionExercise.sessionId, session.id))
       .orderBy(asc(sessionExercise.position)),
@@ -269,11 +345,17 @@ export async function sessionAdjustments(
       .orderBy(asc(exercise.position)),
   ]);
 
-  const kept = new Set(rows.flatMap((r) => (r.exerciseId ? [r.exerciseId] : [])));
+  const kept = new Set(
+    rows.flatMap((r) => (r.exerciseId ? [r.exerciseId] : [])),
+  );
   // Compara só os itens herdados do template, dos dois lados: exercício adicionado no dia
   // (sem par no template) ou removido deslocaria a comparação sem ninguém ter reordenado.
-  const sessionOrder = rows.flatMap((r) => (r.exerciseId ? [r.exerciseId] : []));
-  const templateOrder = templateRows.flatMap((t) => (kept.has(t.id) ? [t.id] : []));
+  const sessionOrder = rows.flatMap((r) =>
+    r.exerciseId ? [r.exerciseId] : [],
+  );
+  const templateOrder = templateRows.flatMap((t) =>
+    kept.has(t.id) ? [t.id] : [],
+  );
 
   return {
     added: rows.filter((r) => r.origin === "added").length,
@@ -319,8 +401,16 @@ export async function completeSession(
     sessionAdjustments(db, session),
   ]);
 
-  const durationSec = Math.round((completedAt.getTime() - session.startedAt.getTime()) / 1000);
-  return { completedAt, durationSec, exerciseCount: exCount[0].n, adjustments, summary };
+  const durationSec = Math.round(
+    (completedAt.getTime() - session.startedAt.getTime()) / 1000,
+  );
+  return {
+    completedAt,
+    durationSec,
+    exerciseCount: exCount[0].n,
+    adjustments,
+    summary,
+  };
 }
 
 export type SessionExerciseInput = {
@@ -412,7 +502,10 @@ export async function addSessionExercise(
     if (!live) return null;
 
     const existing = await tx
-      .select({ catalogId: sessionExercise.catalogId, name: sessionExercise.name })
+      .select({
+        catalogId: sessionExercise.catalogId,
+        name: sessionExercise.name,
+      })
       .from(sessionExercise)
       .where(eq(sessionExercise.sessionId, sessionId));
     if (existing.some((row) => isSameExercise(row, input))) return "duplicate";
@@ -455,7 +548,9 @@ export async function swapSessionExercise(
   sessionId: string,
   sessionExerciseId: string,
   input: SessionExerciseInput,
-): Promise<{ session: SessionDetail; discardedDoneSets: number } | "duplicate" | null> {
+): Promise<
+  { session: SessionDetail; discardedDoneSets: number } | "duplicate" | null
+> {
   const session = await activeSessionById(db, userId, sessionId);
   if (!session) return null;
 
@@ -476,7 +571,12 @@ export async function swapSessionExercise(
     db
       .select({ n: count() })
       .from(setLog)
-      .where(and(eq(setLog.sessionExerciseId, sessionExerciseId), eq(setLog.done, true))),
+      .where(
+        and(
+          eq(setLog.sessionExerciseId, sessionExerciseId),
+          eq(setLog.done, true),
+        ),
+      ),
   ]);
 
   const result = await db.transaction(async (tx) => {
@@ -501,7 +601,11 @@ export async function swapSessionExercise(
       })
       .from(sessionExercise)
       .where(eq(sessionExercise.sessionId, sessionId));
-    if (existing.some((row) => row.id !== sessionExerciseId && isSameExercise(row, input))) {
+    if (
+      existing.some(
+        (row) => row.id !== sessionExerciseId && isSameExercise(row, input),
+      )
+    ) {
       return "duplicate";
     }
 
@@ -509,7 +613,9 @@ export async function swapSessionExercise(
     // negócio, não é sobre a linha de sessionExercise). O driver aplica FK de verdade
     // (foreign_keys=1), mas a FK de set_log.session_exercise_id não tem ON DELETE
     // CASCADE no banco — não dá pra contar com cascade pra limpar isso sozinho.
-    await tx.delete(setLog).where(eq(setLog.sessionExerciseId, sessionExerciseId));
+    await tx
+      .delete(setLog)
+      .where(eq(setLog.sessionExerciseId, sessionExerciseId));
     // exerciseId permanece: é o slot do template, e é ele que o "salvar no treino" atualiza
     await tx
       .update(sessionExercise)
@@ -523,20 +629,25 @@ export async function swapSessionExercise(
         origin: "replaced",
       })
       .where(eq(sessionExercise.id, sessionExerciseId));
-    await tx.insert(setLog).values(
-      buildSetRows(
-        sessionId,
-        userId,
-        { ...input, id: sessionExerciseId, exerciseId: current.exerciseId },
-        last,
-      ),
-    );
+    await tx
+      .insert(setLog)
+      .values(
+        buildSetRows(
+          sessionId,
+          userId,
+          { ...input, id: sessionExerciseId, exerciseId: current.exerciseId },
+          last,
+        ),
+      );
     return true;
   });
   if (result === null) return null;
   if (result === "duplicate") return "duplicate";
 
-  return { session: await buildSessionDetail(db, session, userId), discardedDoneSets };
+  return {
+    session: await buildSessionDetail(db, session, userId),
+    discardedDoneSets,
+  };
 }
 
 export async function removeSessionExercise(
@@ -564,7 +675,9 @@ export async function removeSessionExercise(
 
     // delete explícito e ANTES do pai: sem cascade real, e o FK entre set_log e
     // session_exercise é enforçado neste driver — apagar o pai primeiro quebraria a constraint
-    await tx.delete(setLog).where(eq(setLog.sessionExerciseId, sessionExerciseId));
+    await tx
+      .delete(setLog)
+      .where(eq(setLog.sessionExerciseId, sessionExerciseId));
     const deleted = await tx
       .delete(sessionExercise)
       .where(
@@ -618,7 +731,8 @@ export async function reorderSessionExercises(
     const current = new Set(rows.map((r) => r.id));
     const received = new Set(ids);
     // Set descarta repetição: comparar os três tamanhos cobre faltando, extra e duplicado.
-    if (received.size !== ids.length || received.size !== current.size) return "mismatch";
+    if (received.size !== ids.length || received.size !== current.size)
+      return "mismatch";
     if (ids.some((id) => !current.has(id))) return "mismatch";
 
     for (const [i, id] of ids.entries()) {
@@ -650,14 +764,18 @@ export async function applySessionToWorkout(
   const [session] = await db
     .select()
     .from(workoutSession)
-    .where(and(eq(workoutSession.id, sessionId), eq(workoutSession.userId, userId)));
+    .where(
+      and(eq(workoutSession.id, sessionId), eq(workoutSession.userId, userId)),
+    );
   if (!session) return null;
 
   return db.transaction(async (tx) => {
     const [w] = await tx
       .select()
       .from(workout)
-      .where(and(eq(workout.id, session.workoutId), eq(workout.userId, userId)));
+      .where(
+        and(eq(workout.id, session.workoutId), eq(workout.userId, userId)),
+      );
     if (!w) return null;
 
     // lido dentro da tx: a sessão pode ainda estar ativa e receber ajustes concorrentes
@@ -683,7 +801,10 @@ export async function applySessionToWorkout(
         muscleGroup: row.muscleGroup,
       };
       if (row.exerciseId) {
-        await tx.update(exercise).set(values).where(eq(exercise.id, row.exerciseId));
+        await tx
+          .update(exercise)
+          .set(values)
+          .where(eq(exercise.id, row.exerciseId));
         kept.add(row.exerciseId);
       } else {
         const [created] = await tx
@@ -704,7 +825,8 @@ export async function applySessionToWorkout(
       .from(exercise)
       .where(eq(exercise.workoutId, w.id));
     const stale = current.filter((e) => !kept.has(e.id)).map((e) => e.id);
-    if (stale.length) await tx.delete(exercise).where(inArray(exercise.id, stale));
+    if (stale.length)
+      await tx.delete(exercise).where(inArray(exercise.id, stale));
 
     const [updatedWorkout] = await tx
       .update(workout)
