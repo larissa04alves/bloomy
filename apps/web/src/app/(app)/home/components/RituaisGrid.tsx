@@ -73,6 +73,9 @@ export function RituaisGrid({ today }: { today: TodayPayload }) {
               ? "Nenhum cadastrado"
               : `${today.meds.taken} de ${today.meds.total} tomados`
           }
+          progress={
+            semRemedio ? undefined : ratio(today.meds.taken, today.meds.total)
+          }
           action={
             semRemedio
               ? { label: "Cadastrar", kind: "plus" }
