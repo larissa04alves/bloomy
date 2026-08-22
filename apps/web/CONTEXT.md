@@ -1,4 +1,4 @@
-# Bloomy (Diário)
+# Bloomy
 
 App de acompanhamento diário de bem-estar: água, refeições, remédios, treino e humor, com tom acolhedor. Este contexto cobre o produto inteiro (apps/web).
 

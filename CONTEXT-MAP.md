@@ -4,7 +4,7 @@ Este repo é multi-context. Cada contexto tem seu próprio `CONTEXT.md` (glossá
 
 | Contexto | Caminho    | CONTEXT.md              | Descrição                                    |
 | -------- | ---------- | ----------------------- | -------------------------------------------- |
-| Diário   | `apps/web` | `apps/web/CONTEXT.md`   | App de diário pessoal (produto principal)    |
+| Bloomy   | `apps/web` | `apps/web/CONTEXT.md`   | App de bem-estar diário (produto principal)  |
 
 Os `CONTEXT.md` por contexto são criados lazily pelo `/domain-modeling` quando termos ou decisões forem de fato resolvidos — a ausência de um arquivo não é erro.
 

@@ -1,6 +1,6 @@
 # bloomy
 
-Diário pessoal (app "Diário") — monorepo Turborepo + Bun.
+Bloomy — app de acompanhamento diário de bem-estar. Monorepo Turborepo + Bun.
 
 ## Git
 
@@ -31,7 +31,7 @@ Dependências de catálogo ficam em `package.json` raiz (`workspaces.catalog`) �
 
 ## Docs de produto
 
-`PRODUCT.md` (visão), `DESIGN.md` (design system), `docs/README.md` (spec do Diário).
+`PRODUCT.md` (visão), `DESIGN.md` (design system), `docs/README.md` (spec do produto).
 
 ## Convenções de código
 

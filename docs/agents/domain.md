@@ -19,7 +19,7 @@ Multi-context monorepo — contexts live under `apps/*` (and under `packages/*` 
 ├── docs/adr/                          ← system-wide decisions
 ├── apps/
 │   └── web/
-│       ├── CONTEXT.md                 ← context "Diário"
+│       ├── CONTEXT.md                 ← context "Bloomy"
 │       └── docs/adr/                  ← context-specific decisions
 └── packages/                          ← shared infra (auth, db, ui, env, config)
 ```

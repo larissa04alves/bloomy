@@ -1,7 +1,7 @@
-# Handoff: Diário — App de acompanhamento diário
+# Handoff: Bloomy — App de acompanhamento diário
 
 ## Overview
-"Diário" é um app **mobile** de acompanhamento do dia a dia, com tom acolhedor (nada clínico, sem julgamento). O princípio central é **separar o que se faz todo dia** (registrar, marcar, checar) **do que se gerencia de vez em quando** (cadastrar remédio, agendar consulta).
+"Bloomy" é um app **mobile** de acompanhamento do dia a dia, com tom acolhedor (nada clínico, sem julgamento). O princípio central é **separar o que se faz todo dia** (registrar, marcar, checar) **do que se gerencia de vez em quando** (cadastrar remédio, agendar consulta).
 
 Navegação principal (bottom tab, 5 abas):
 - **Hoje** — resumo do dia (a tela aberta ~90% das vezes)
@@ -107,7 +107,12 @@ Fluxo com estados (ver "Interactions"):
 - **Layout:** título; card-resumo "Próxima consulta em 3 dias"; seção Consultas (Dra. Marina, Dr. Paulo); seção Exames (Hemograma "resultado disponível", Vitamina D "a agendar"); seção "Agenda de remédios" com "+ Cadastrar" (Vitamina D, Magnésio).
 
 ### 7. Login / cadastro
-- Fundo `radial-gradient(120% 55% at 50% 0%, #EFE6FA, #FBFAFE 62%)`. Logo (quadrado 78px raio 24 `#A78BD0` com `heart` branco), wordmark "Diário" 32/700, tagline, 3 dots (lilás/rosa/verde). Rodapé: botão **Continuar com Google** (branco, borda `#E6DEF2`, ícone `google-logo`), botão **Entrar com e-mail** (tint), texto de termos.
+**Implementada — divergiu do protótipo de propósito.** O que vale é o que está em `apps/web/src/app/login/`:
+- Fundo `radial-gradient(120% 55% at 50% 0%, #EFE6FA, #FBFAFE 62%)`, conteúdo num container de largura máxima `sm` centralizado.
+- Sem o quadrado lilás com `heart` — o wordmark **é** o logo da tela: "Bloomy" em `text-6xl`/700, `tracking-tight`. Tagline e 3 dots (lilás/rosa/verde) abaixo.
+- Rodapé: só o botão **Continuar com Google** (branco, borda `#E6DEF2`, ícone oficial multicor do Google) + texto de termos. O botão **Entrar com e-mail** foi deliberadamente omitido: o login é só Google (issue #4).
+- Faixa inferior com um jardim que brota: 9 caules se desenham de baixo pra cima, folhas e flores abrem em sequência, fechando em ~2,5s. SVG + CSS, sem lib. O rodapé tem folga reservada para nunca ficar por cima das flores. Respeita `prefers-reduced-motion`.
+- O quadrado lilás com `heart` sobreviveu como **ícone do app** (favicon, apple-touch-icon e ícones do manifest).
 
 ### 8. Onboarding (3 passos separados)
 Cada passo é uma tela: barra de progresso de 3 segmentos + "Passo N de 3" + "Pular"; hero (círculo 112px com ícone), pergunta (Quicksand 24/700), subtítulo, controle, botão de avançar (+ "Voltar" nos passos 2–3).
