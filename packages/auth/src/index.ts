@@ -21,6 +21,18 @@ export function createAuth() {
     emailAndPassword: {
       enabled: true,
     },
+    // Só ativa o provider quando as credenciais existirem (issue #4: depende
+    // do Google Cloud Console). Sem `redirectURI` explícito — deriva de
+    // `baseURL` + a rota catch-all `/api/auth/[...all]` que já existe.
+    socialProviders:
+      env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET
+        ? {
+            google: {
+              clientId: env.GOOGLE_CLIENT_ID,
+              clientSecret: env.GOOGLE_CLIENT_SECRET,
+            },
+          }
+        : undefined,
     secret: env.BETTER_AUTH_SECRET,
     baseURL: env.BETTER_AUTH_URL,
     plugins: [nextCookies()],
