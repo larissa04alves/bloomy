@@ -5,20 +5,16 @@ import { useCallback, useState } from "react";
 import { authClient } from "@/lib/auth-client";
 import { toastError } from "@/lib/toast";
 
-const DEFAULT_CALLBACK = "/home";
+import { DEFAULT_NEXT, safeNextPath } from "./next-path";
 
-/**
- * `?next=` vem do redirect de 401 em `lib/api.ts`. Só aceita caminho relativo:
- * um `next` absoluto (ex.: `//evil.com`) abriria um redirect aberto depois do
- * login com o Google.
- */
+/** Para onde voltar depois de autenticar: a rota que o 401 guardou, se for segura. */
 function getCallbackURL(): string {
-  if (typeof window === "undefined") return DEFAULT_CALLBACK;
+  if (typeof window === "undefined") return DEFAULT_NEXT;
   const next = new URLSearchParams(window.location.search).get("next");
-  return next && next.startsWith("/") ? next : DEFAULT_CALLBACK;
+  return safeNextPath(next, window.location.origin);
 }
 
-/** Tela de login: só Google por agora (issue #4) — e-mail/senha fica pra depois. */
+/** Tela de login: só Google — e-mail/senha está desligado no `@bloomy/auth`. */
 export function useLogin() {
   const [pending, setPending] = useState(false);
 

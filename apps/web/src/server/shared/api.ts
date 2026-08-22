@@ -17,8 +17,8 @@ let devUserWarned = false;
 /**
  * Fallback de desenvolvimento: com `DEV_USER_EMAIL` no `.env` e nenhuma sessão
  * válida, as rotas respondem como esse usuário — útil pra testar rotas de API
- * direto (curl/Postman) sem passar pelo login. O login de página (Google, F10)
- * já existe; este fallback é um mecanismo separado, só das rotas de API.
+ * direto (curl/Postman) sem passar pelo login com Google. Este fallback é um
+ * mecanismo separado do login de página, e vale só das rotas de API.
  * Nunca ativa em produção, mesmo se a variável escapar pro ambiente.
  */
 async function devUser(): Promise<SessionUser | null> {
