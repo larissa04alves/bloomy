@@ -20,6 +20,13 @@ const nunito = Nunito({
 export const metadata: Metadata = {
   title: "Bloomy",
   description: "Seu jardim de bolso — cuidar de você, todo dia.",
+  icons: {
+    icon: [
+      { url: "/favicon/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon/favicon-96x96.png", sizes: "96x96", type: "image/png" },
+    ],
+    apple: "/favicon/apple-touch-icon.png",
+  },
 };
 
 export default function RootLayout({

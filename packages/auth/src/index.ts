@@ -18,9 +18,24 @@ export function createAuth() {
       schema: schema,
     }),
     trustedOrigins: [env.CORS_ORIGIN],
+    // Desligado: o login é só Google e nada no app chama `signUp`/`signIn.email`.
+    // Ligado, `/api/auth/sign-up/email` fica aberto e permite criar conta sem
+    // passar por nenhuma tela — superfície sem uso.
     emailAndPassword: {
-      enabled: true,
+      enabled: false,
     },
+    // Só ativa o provider quando as credenciais existirem (issue #4: depende
+    // do Google Cloud Console). Sem `redirectURI` explícito — deriva de
+    // `baseURL` + a rota catch-all `/api/auth/[...all]` que já existe.
+    socialProviders:
+      env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET
+        ? {
+            google: {
+              clientId: env.GOOGLE_CLIENT_ID,
+              clientSecret: env.GOOGLE_CLIENT_SECRET,
+            },
+          }
+        : undefined,
     secret: env.BETTER_AUTH_SECRET,
     baseURL: env.BETTER_AUTH_URL,
     plugins: [nextCookies()],

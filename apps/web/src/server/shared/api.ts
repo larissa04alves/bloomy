@@ -16,8 +16,9 @@ let devUserWarned = false;
 
 /**
  * Fallback de desenvolvimento: com `DEV_USER_EMAIL` no `.env` e nenhuma sessão
- * válida, as rotas respondem como esse usuário. A tela de login só chega na
- * Fase 10 — até lá, uma sessão expirada travaria a app inteira em 401.
+ * válida, as rotas respondem como esse usuário — útil pra testar rotas de API
+ * direto (curl/Postman) sem passar pelo login com Google. Este fallback é um
+ * mecanismo separado do login de página, e vale só das rotas de API.
  * Nunca ativa em produção, mesmo se a variável escapar pro ambiente.
  */
 async function devUser(): Promise<SessionUser | null> {

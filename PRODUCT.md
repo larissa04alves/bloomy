@@ -14,7 +14,7 @@ Bloomy é uma PWA mobile-first de acompanhamento diário de bem-estar: hidrataç
 
 No desktop, o app permanece uma coluna mobile (~420px) centrada sobre o fundo lilás claro — não há layout desktop alternativo. Tema light apenas, por ora; dark mode é extensão futura da paleta, não requisito.
 
-O nome do produto e wordmark é **Bloomy** (o protótipo em `docs/` usa "Diário" como placeholder de wordmark; substituir por "Bloomy" mantendo o visual).
+O nome do produto e wordmark é **Bloomy**. O protótipo em `docs/` usa "Diário" como placeholder de wordmark — o app já usa "Bloomy" em todas as telas.
 
 ## Brand Personality
 
