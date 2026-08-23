@@ -1,6 +1,6 @@
 // DTOs como chegam pela API (JSON). createdAt/updatedAt são strings ISO, não Date.
 
-export type GoalDomain = "water" | "meals" | "workout" | "mind";
+export type GoalDomain = "water" | "meals" | "workout";
 
 export type Goal = {
   id: string;

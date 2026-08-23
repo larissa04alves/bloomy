@@ -7,6 +7,7 @@ import {
   parseJson,
   requireUserId,
   unauthorized,
+  unprocessable,
 } from "@/server/shared/api";
 import { updateGoal } from "@/server/goals/service";
 
@@ -23,8 +24,12 @@ export async function PUT(
   if (!parsed.success) return invalidBody(parsed.error);
 
   const { id } = await params;
-  const updated = await updateGoal(db, userId, id, parsed.data.target);
-  if (!updated) return notFound();
+  const result = await updateGoal(db, userId, id, parsed.data.target);
+  if (!result.ok) {
+    return result.reason === "not_found"
+      ? notFound()
+      : unprocessable("meta fora da faixa permitida");
+  }
 
-  return Response.json({ goal: updated });
+  return Response.json({ goal: result.goal });
 }

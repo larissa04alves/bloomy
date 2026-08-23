@@ -6,6 +6,7 @@ import {
   TargetIcon,
   UserIcon,
 } from "@phosphor-icons/react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -48,12 +49,11 @@ export function PerfilMenu({ name }: { name: string | null }) {
         ) : null}
 
         <DropdownMenuItem
-          disabled
+          render={<Link href="/metas" />}
           className="gap-2.5 rounded-control px-2.5 py-2.5 text-sm font-semibold focus:bg-lilac-tint-soft"
         >
           <TargetIcon size={18} weight="fill" />
           Metas
-          <span className="ml-auto text-xs text-ink-faint">em breve</span>
         </DropdownMenuItem>
 
         <DropdownMenuItem

@@ -85,3 +85,8 @@ export function notFound(): Response {
 export function conflict(message: string): Response {
   return Response.json({ error: message }, { status: 409 });
 }
+
+/** 422: o corpo é sintaticamente válido, mas o valor não cabe na regra do recurso. */
+export function unprocessable(message: string): Response {
+  return Response.json({ error: message }, { status: 422 });
+}

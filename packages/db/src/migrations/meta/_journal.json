@@ -127,6 +127,13 @@
       "when": 1787446688843,
       "tag": "0017_melodic_hulk",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "6",
+      "when": 1787447900330,
+      "tag": "0018_remove_mind_goal",
+      "breakpoints": true
     }
   ]
 }
