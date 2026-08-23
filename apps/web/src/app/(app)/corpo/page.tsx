@@ -62,7 +62,12 @@ export default function CorpoPage() {
 
       <RemediosSection intakes={rem.intakes} onToggle={rem.toggle} />
 
-      <WaterModal open={waterOpen} onOpenChange={setWaterOpen} onConfirm={hidr.addWater} />
+      <WaterModal
+        open={waterOpen}
+        onOpenChange={setWaterOpen}
+        onConfirm={hidr.addWater}
+        portionMl={waterPortionMl}
+      />
       <MealModal
         open={mealOpen}
         onOpenChange={setMealOpen}
