@@ -7,18 +7,16 @@ import {
   ForkKnifeIcon,
 } from "@phosphor-icons/react";
 import Link from "next/link";
-import { useState } from "react";
 
 import { MetaCard } from "./components/MetaCard";
 import { MetaSheet } from "./components/MetaSheet";
 import { MetasError } from "./components/MetasError";
 import { MetasSkeleton } from "./components/MetasSkeleton";
-import { metaLabel, portionHint, type MetaDomain } from "./hooks/format";
+import { metaLabel } from "./hooks/format";
 import { useMetas } from "./hooks/useMetas";
 
 export default function MetasPage() {
   const metas = useMetas();
-  const [sheet, setSheet] = useState<MetaDomain | null>(null);
 
   if (!metas.ready) {
     if (metas.error) return <MetasError onRetry={metas.reload} />;
@@ -48,7 +46,7 @@ export default function MetasPage() {
           title="Hidratação"
           meta={metaLabel("water", metas.waterGoalMl)}
           pill={`${metas.waterGoalMl} ml`}
-          onEdit={() => setSheet("water")}
+          onEdit={() => metas.openSheet("water")}
         />
         <MetaCard
           tone="green"
@@ -56,7 +54,7 @@ export default function MetasPage() {
           title="Alimentação"
           meta={metaLabel("meals", metas.mealsTarget)}
           pill={String(metas.mealsTarget)}
-          onEdit={() => setSheet("meals")}
+          onEdit={() => metas.openSheet("meals")}
         />
         <MetaCard
           tone="pink"
@@ -64,81 +62,35 @@ export default function MetasPage() {
           title="Treino"
           meta={metaLabel("workout", metas.workoutTarget)}
           pill={String(metas.workoutTarget)}
-          onEdit={() => setSheet("workout")}
+          onEdit={() => metas.openSheet("workout")}
         />
       </div>
 
       <MetaSheet
-        open={sheet === "water"}
-        onOpenChange={(open) => setSheet(open ? "water" : null)}
+        open={metas.isOpen("water")}
+        onOpenChange={(open) => metas.setSheetOpen("water", open)}
         title="Hidratação"
         tone="lilac"
         icon={<DropIcon size={22} weight="fill" />}
-        fields={[
-          {
-            key: "goalMl",
-            label: "Meta do dia",
-            value: metas.waterGoalMl,
-            min: 500,
-            max: 5000,
-            step: 100,
-            unit: "ml",
-          },
-          {
-            key: "portionMl",
-            label: "Cada porção",
-            value: metas.waterPortionMl,
-            min: 100,
-            // 2000 ml acompanha o stepper do modal de água: garrafa de 1,5 L e
-            // garrafão de 2 L são porções reais de quem enche uma vez e bebe o dia.
-            max: 2000,
-            step: 50,
-            unit: "ml",
-          },
-        ]}
-        hint={(v) => portionHint(v.goalMl!, v.portionMl!)}
-        onSave={(v) => {
-          metas.saveTarget("water", v.goalMl!);
-          metas.savePortion(v.portionMl!);
-        }}
+        {...metas.sheets.water}
       />
 
       <MetaSheet
-        open={sheet === "meals"}
-        onOpenChange={(open) => setSheet(open ? "meals" : null)}
+        open={metas.isOpen("meals")}
+        onOpenChange={(open) => metas.setSheetOpen("meals", open)}
         title="Alimentação"
         tone="green"
         icon={<ForkKnifeIcon size={22} weight="fill" />}
-        fields={[
-          {
-            key: "target",
-            label: "Refeições por dia",
-            value: metas.mealsTarget,
-            min: 1,
-            max: 8,
-            step: 1,
-          },
-        ]}
-        onSave={(v) => metas.saveTarget("meals", v.target!)}
+        {...metas.sheets.meals}
       />
 
       <MetaSheet
-        open={sheet === "workout"}
-        onOpenChange={(open) => setSheet(open ? "workout" : null)}
+        open={metas.isOpen("workout")}
+        onOpenChange={(open) => metas.setSheetOpen("workout", open)}
         title="Treino"
         tone="pink"
         icon={<BarbellIcon size={22} weight="fill" />}
-        fields={[
-          {
-            key: "target",
-            label: "Dias por semana",
-            value: metas.workoutTarget,
-            min: 1,
-            max: 7,
-            step: 1,
-          },
-        ]}
-        onSave={(v) => metas.saveTarget("workout", v.target!)}
+        {...metas.sheets.workout}
       />
     </div>
   );

@@ -69,5 +69,9 @@ export async function updateGoal(
     .where(and(eq(goal.id, goalId), eq(goal.userId, userId)))
     .returning();
 
+  // O drizzle tipa `returning()` como não-vazio, mas a linha pode ter sumido
+  // entre o SELECT e o UPDATE. Sem a guarda, `goal` iria `undefined` na resposta.
+  if (!updated) return { ok: false, reason: "not_found" };
+
   return { ok: true, goal: updated };
 }

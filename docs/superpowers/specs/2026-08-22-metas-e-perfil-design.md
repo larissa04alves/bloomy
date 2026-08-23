@@ -86,7 +86,7 @@ mente (nenhuma tela a lê).
     `(app)/layout.tsx`, URL linkável, back → `/home`. Mesmo padrão das cinco telas existentes.
 
 11. **Limites são contrato, passos são UI.** O range é validado no zod da rota; o passo do
-    stepper existe só para o toque. Água 500–5000 ml (passo 100), porção 100–1000 ml (passo 50),
+    stepper existe só para o toque. Água 500–5000 ml (passo 100), porção 100–2000 ml (passo 50),
     refeições 1–8 por dia, treino 1–7 dias por semana.
 
 12. **Dropdown vestido, não reescrito.** O `DropdownMenu` do shadcn fica: foco, teclado e o
@@ -135,7 +135,7 @@ Gerada por `bun db:generate` a partir de `packages/db/src/schema/profile.ts`.
 |---|---|
 | `schema/profile.ts` | `waterPortionMl: integer("water_portion_ml").default(500).notNull()` |
 | `server/profile/service.ts` | `ProfileUpdate` ganha `waterPortionMl?: number`; `updateProfile` propaga |
-| `api/profile/route.ts` | `PATCH_SCHEMA` ganha `waterPortionMl: z.number().int().min(100).max(1000).optional()` |
+| `api/profile/route.ts` | `PATCH_SCHEMA` ganha `waterPortionMl: z.number().int().min(100).max(PORTION_LIMITS.max).optional()` (100–2000) |
 | `server/shared/units.ts` | `garrafas(totalMl, goalMl)` → `portions(totalMl, goalMl, portionMl)` |
 | `lib/api-types.ts` | `GARRAFA_ML` → `DEFAULT_PORTION_ML = 500` (agora só fallback de `waterPortionMl`) |
 | `server/today/service.ts` | lê `ensureProfile` no `Promise.all` e passa `waterPortionMl` para `portions()` |
@@ -255,7 +255,7 @@ Os cards, por domínio:
 
 | Card | Ícone / tone | Linha "Meta:" | Sheet |
 |---|---|---|---|
-| Hidratação | `Drop` / lilás | "2000 ml por dia" | *Meta do dia* 500–5000 (100) · *Cada porção* 100–1000 (50) |
+| Hidratação | `Drop` / lilás | "2000 ml por dia" | *Meta do dia* 500–5000 (100) · *Cada porção* 100–2000 (50) |
 | Alimentação | `ForkKnife` / verde | "3 refeições por dia" | *Refeições por dia* 1–8 |
 | Treino | `Barbell` / rosa | "4 dias por semana" | *Dias por semana* 1–7 |
 

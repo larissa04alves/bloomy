@@ -26,16 +26,16 @@ describe("dropSize", () => {
 
 describe("waterShortcuts", () => {
   it("oferece os tamanhos comuns até 1 L, em ordem", () => {
-    expect(waterShortcuts(500)).toEqual([200, 250, 500, 750]);
+    expect(waterShortcuts(500)).toEqual([200, 250, 500, 750, 1000]);
   });
   it("não repete o chip quando a porção da meta já é um preset", () => {
-    expect(waterShortcuts(750)).toEqual([200, 250, 500, 750]);
+    expect(waterShortcuts(750)).toEqual([200, 250, 500, 750, 1000]);
   });
   it("insere a porção da meta fora dos presets, na ordem", () => {
-    expect(waterShortcuts(1200)).toEqual([200, 250, 500, 750, 1200]);
-    expect(waterShortcuts(300)).toEqual([200, 250, 300, 500, 750]);
+    expect(waterShortcuts(1200)).toEqual([200, 250, 500, 750, 1000, 1200]);
+    expect(waterShortcuts(300)).toEqual([200, 250, 300, 500, 750, 1000]);
   });
   it("ignora porção zerada", () => {
-    expect(waterShortcuts(0)).toEqual([200, 250, 500, 750]);
+    expect(waterShortcuts(0)).toEqual([200, 250, 500, 750, 1000]);
   });
 });

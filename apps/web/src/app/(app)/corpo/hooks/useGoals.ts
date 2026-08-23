@@ -20,7 +20,10 @@ export function useGoals() {
   return {
     waterGoalMl: target("water", 2000),
     mealsTarget: target("meals", 3),
-    // fallback enquanto o profile não chegou: a Corpo renderiza antes do fetch
+    // Fallback só para o render: a Corpo desenha antes do fetch. Registrar com ele
+    // gravaria 500 ml em quem configurou outra porção — daí o `portionReady`, que
+    // bloqueia a ação até o valor real chegar.
     waterPortionMl: profile?.profile.waterPortionMl ?? DEFAULT_PORTION_ML,
+    portionReady: profile !== null,
   };
 }

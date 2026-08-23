@@ -4,6 +4,8 @@ import { DropIcon, PlusIcon } from "@phosphor-icons/react";
 
 import { ProgressBar } from "@/components/progress-bar";
 
+import { dropSize } from "../hooks/format";
+
 const MAX_DROPS = 12;
 
 export function HidratacaoSection({
@@ -12,6 +14,7 @@ export function HidratacaoSection({
   done,
   target,
   portionMl,
+  portionReady,
   onAddPortion,
   onOpenModal,
 }: {
@@ -20,6 +23,8 @@ export function HidratacaoSection({
   done: number;
   target: number;
   portionMl: number;
+  /** Porção já carregada do profile. Falso = o `portionMl` ainda é o fallback. */
+  portionReady: boolean;
   onAddPortion: () => void;
   onOpenModal: () => void;
 }) {
@@ -35,11 +40,11 @@ export function HidratacaoSection({
       </div>
 
       {target <= MAX_DROPS ? (
-        <div className="flex flex-wrap gap-2" aria-hidden="true">
+        <div className="flex flex-wrap items-center gap-2" aria-hidden="true">
           {Array.from({ length: target }, (_, i) => (
             <DropIcon
               key={i}
-              size={30}
+              size={dropSize(target)}
               weight="fill"
               className={i < done ? "text-lilac" : "text-control-off"}
             />
@@ -53,9 +58,11 @@ export function HidratacaoSection({
         <button
           type="button"
           onClick={onAddPortion}
-          className="flex flex-1 items-center justify-center gap-1 rounded-full bg-lilac font-bold text-white shadow-btn"
+          disabled={!portionReady}
+          className="flex flex-1 items-center justify-center gap-1 rounded-full bg-lilac font-bold text-white shadow-btn disabled:opacity-60 disabled:shadow-none"
         >
-          <PlusIcon size={18} weight="bold" /> Adicionar {portionMl} ml
+          <PlusIcon size={18} weight="bold" />
+          {portionReady ? `Adicionar ${portionMl} ml` : "Adicionar porção"}
         </button>
         <button
           type="button"

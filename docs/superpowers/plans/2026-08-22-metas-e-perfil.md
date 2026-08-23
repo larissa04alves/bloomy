@@ -206,7 +206,7 @@ Esperado: só `PerfilMenu.tsx` modificado. Deixe sem commitar — a Larissa revi
 - Produces:
   - `profile.waterPortionMl: number` (coluna `water_portion_ml`, default 500, NOT NULL)
   - `ProfileUpdate = { restSeconds?: number; autoRest?: boolean; completeOnboarding?: boolean; waterPortionMl?: number }`
-  - `PATCH /api/profile` aceita `{ waterPortionMl: number }` (int, 100–1000)
+  - `PATCH /api/profile` aceita `{ waterPortionMl: number }` (int, 100–2000)
   - `GET /api/profile` → `{ profile: Profile }` com o campo novo
 
 - [ ] **Step 1: Escrever o teste que falha**
@@ -307,7 +307,7 @@ const PATCH_SCHEMA = z.object({
   restSeconds: z.number().int().min(15).max(600).optional(),
   autoRest: z.boolean().optional(),
   completeOnboarding: z.boolean().optional(),
-  waterPortionMl: z.number().int().min(100).max(1000).optional(),
+  waterPortionMl: z.number().int().min(100).max(2000).optional(),
 });
 ```
 
@@ -1656,7 +1656,7 @@ export default function MetasPage() {
             label: "Cada porção",
             value: metas.waterPortionMl,
             min: 100,
-            max: 1000,
+            max: 2000,
             step: 50,
             unit: "ml",
           },

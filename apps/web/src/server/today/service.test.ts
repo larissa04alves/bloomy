@@ -6,6 +6,7 @@ import {
 } from "@/server/health/service";
 import { addMeal } from "@/server/meals/service";
 import { createMedication, markIntake } from "@/server/medications/service";
+import { updateProfile } from "@/server/profile/service";
 import { upsertCheckin } from "@/server/mind/service";
 import { dayFor } from "@/server/shared/day";
 import { createTestDb, createTestUser } from "@/server/shared/test-db";
@@ -167,4 +168,23 @@ describe("getToday", () => {
 
     expect(today.name).toBeNull();
   });
+
+  test("porção configurada muda done/target sem mexer nos ml", async () => {
+    const db = await createTestDb();
+    await createTestUser(db);
+    await getToday(db, USER, dayFor()); // cria profile e metas default
+    await updateProfile(db, USER.id, { waterPortionMl: 750 });
+    await addWater(db, USER.id, 1500);
+
+    const today = await getToday(db, USER, dayFor());
+
+    // 2000 ml de meta em porções de 750 → 3 porções (arredondado), 2 feitas.
+    expect(today.water).toEqual({
+      totalMl: 1500,
+      goalMl: 2000,
+      done: 2,
+      target: 3,
+    });
+  });
+
 });

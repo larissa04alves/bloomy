@@ -32,5 +32,8 @@ export function useHidratacao(goalMl: number, portionMl: number) {
     [data, totalMl, setData, reload],
   );
 
-  return { totalMl, done, target, loading, addWater, reload };
+  // Handler da porção mora aqui, não na page: a tela só renderiza.
+  const addPortion = useCallback(() => addWater(portionMl), [addWater, portionMl]);
+
+  return { totalMl, done, target, loading, addWater, addPortion, reload };
 }

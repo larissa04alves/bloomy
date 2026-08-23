@@ -17,7 +17,7 @@ export function dropSize(target: number): number {
 }
 
 /** Quantidades oferecidas como atalho no modal de água. */
-const WATER_PRESETS = [200, 250, 500, 750];
+const WATER_PRESETS = [200, 250, 500, 750, 1000];
 
 /** Atalhos do modal: os presets mais a porção configurada na meta, quando ela não
  *  é um deles. Quem bebe de 1200 em 1200 ml precisa do próprio tamanho a um toque;

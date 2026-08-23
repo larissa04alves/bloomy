@@ -17,7 +17,7 @@ import { useRefeicoes } from "./hooks/useRefeicoes";
 import { useRemedios } from "./hooks/useRemedios";
 
 export default function CorpoPage() {
-  const { waterGoalMl, mealsTarget, waterPortionMl } = useGoals();
+  const { waterGoalMl, mealsTarget, waterPortionMl, portionReady } = useGoals();
   const hidr = useHidratacao(waterGoalMl, waterPortionMl);
   const ref = useRefeicoes();
   const rem = useRemedios();
@@ -41,7 +41,8 @@ export default function CorpoPage() {
         done={hidr.done}
         target={hidr.target}
         portionMl={waterPortionMl}
-        onAddPortion={() => hidr.addWater(waterPortionMl)}
+        portionReady={portionReady}
+        onAddPortion={hidr.addPortion}
         onOpenModal={() => setWaterOpen(true)}
       />
 

@@ -39,8 +39,11 @@ export function MetaSheet({
 }) {
   const [draft, setDraft] = useState<Record<string, number>>({});
 
+  // Semeia o rascunho só na abertura: `fields` é criado inline pelo caller, então
+  // entrar na dep list re-semearia a cada render e travaria a edição.
   useEffect(() => {
     if (open) setDraft(Object.fromEntries(fields.map((f) => [f.key, f.value])));
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- dependência deliberada só em `open`, ver comentário acima
   }, [open]);
 
   const values: Record<string, number> = {
