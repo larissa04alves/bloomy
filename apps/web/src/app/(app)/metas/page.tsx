@@ -89,7 +89,9 @@ export default function MetasPage() {
             label: "Cada porção",
             value: metas.waterPortionMl,
             min: 100,
-            max: 1000,
+            // 2000 ml acompanha o stepper do modal de água: garrafa de 1,5 L e
+            // garrafão de 2 L são porções reais de quem enche uma vez e bebe o dia.
+            max: 2000,
             step: 50,
             unit: "ml",
           },
