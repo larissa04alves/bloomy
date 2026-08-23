@@ -7,9 +7,12 @@ export const profile = sqliteTable("profile", {
   userId: text("user_id")
     .primaryKey()
     .references(() => user.id, { onDelete: "cascade" }),
-  onboardingCompletedAt: integer("onboarding_completed_at", { mode: "timestamp_ms" }),
+  onboardingCompletedAt: integer("onboarding_completed_at", {
+    mode: "timestamp_ms",
+  }),
   restSeconds: integer("rest_seconds").default(45).notNull(),
   autoRest: integer("auto_rest", { mode: "boolean" }).default(true).notNull(),
+  waterPortionMl: integer("water_portion_ml").default(500).notNull(),
   createdAt: timestampMs("created_at"),
   updatedAt: timestampMs("updated_at"),
 });

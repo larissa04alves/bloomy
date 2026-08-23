@@ -2,12 +2,22 @@ import { db } from "@bloomy/db";
 import { z } from "zod";
 
 import { invalidBody, parseJson, requireUserId, unauthorized } from "@/server/shared/api";
-import { ensureProfile, updateProfile } from "@/server/profile/service";
+import {
+  ensureProfile,
+  PORTION_LIMITS,
+  updateProfile,
+} from "@/server/profile/service";
 
 const PATCH_SCHEMA = z.object({
   restSeconds: z.number().int().min(15).max(600).optional(),
   autoRest: z.boolean().optional(),
   completeOnboarding: z.boolean().optional(),
+  waterPortionMl: z
+    .number()
+    .int()
+    .min(PORTION_LIMITS.min)
+    .max(PORTION_LIMITS.max)
+    .optional(),
 });
 
 export async function GET(request: Request) {

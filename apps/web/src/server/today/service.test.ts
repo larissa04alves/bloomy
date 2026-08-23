@@ -1,8 +1,12 @@
 import { describe, expect, test } from "bun:test";
 
-import { completeAppointment, createAppointment } from "@/server/health/service";
+import {
+  completeAppointment,
+  createAppointment,
+} from "@/server/health/service";
 import { addMeal } from "@/server/meals/service";
 import { createMedication, markIntake } from "@/server/medications/service";
+import { updateProfile } from "@/server/profile/service";
 import { upsertCheckin } from "@/server/mind/service";
 import { dayFor } from "@/server/shared/day";
 import { createTestDb, createTestUser } from "@/server/shared/test-db";
@@ -24,7 +28,12 @@ describe("getToday", () => {
     expect(today.name).toBe("Larissa");
     expect(today.day).toBe(dayFor());
     expect(today.checkin.mood).toBeNull();
-    expect(today.water).toEqual({ done: 0, target: 4 }); // meta default 2000 ml
+    expect(today.water).toEqual({
+      totalMl: 0,
+      goalMl: 2000,
+      done: 0,
+      target: 4,
+    });
     expect(today.meals).toEqual({ done: 0, target: 3 });
     expect(today.meds).toEqual({ taken: 0, total: 0 });
     expect(today.workout).toEqual({ state: "none" });
@@ -38,17 +47,29 @@ describe("getToday", () => {
     // 500 + 1500 ml (dois registros, mas 2000 ml ≠ 2 registros — cobre soma de ml, não contagem)
     await addWater(db, USER.id, 500);
     await addWater(db, USER.id, 1500);
-    await addMeal(db, USER.id, { type: "breakfast", description: "café com pão" });
+    await addMeal(db, USER.id, {
+      type: "breakfast",
+      description: "café com pão",
+    });
     await upsertCheckin(db, USER.id, { mood: "good" });
     const med = await createMedication(db, USER.id, {
       name: "Vitamina D",
       times: ["09:00", "21:00"],
     });
-    await markIntake(db, USER.id, { medicationId: med.id, time: "09:00", day: dayFor() });
+    await markIntake(db, USER.id, {
+      medicationId: med.id,
+      time: "09:00",
+      day: dayFor(),
+    });
 
     const today = await getToday(db, USER, dayFor());
 
-    expect(today.water).toEqual({ done: 4, target: 4 });
+    expect(today.water).toEqual({
+      totalMl: 2000,
+      goalMl: 2000,
+      done: 4,
+      target: 4,
+    });
     expect(today.meals).toEqual({ done: 1, target: 3 });
     expect(today.meds).toEqual({ taken: 1, total: 2 });
     expect(today.checkin.mood).toBe("good");
@@ -61,17 +82,32 @@ describe("getToday", () => {
       name: "Pernas",
       focus: "legs",
       exercises: [
-        { name: "Agachamento", targetSets: 3, targetReps: 10, restSeconds: 45, position: 0 },
+        {
+          name: "Agachamento",
+          targetSets: 3,
+          targetReps: 10,
+          restSeconds: 45,
+          position: 0,
+        },
       ],
     });
 
     const suggested = await getToday(db, USER, dayFor());
-    expect(suggested.workout).toEqual({ state: "suggested", id: w.id, name: "Pernas" });
+    expect(suggested.workout).toEqual({
+      state: "suggested",
+      id: w.id,
+      name: "Pernas",
+    });
 
     const started = await startSession(db, USER.id, w.id);
-    if (typeof started === "string") throw new Error(`startSession falhou: ${started}`);
+    if (typeof started === "string")
+      throw new Error(`startSession falhou: ${started}`);
     const active = await getToday(db, USER, dayFor());
-    expect(active.workout).toEqual({ state: "active", id: w.id, name: "Pernas" });
+    expect(active.workout).toEqual({
+      state: "active",
+      id: w.id,
+      name: "Pernas",
+    });
 
     await completeSession(db, USER.id, started.session.id);
     const done = await getToday(db, USER, dayFor());
@@ -115,7 +151,8 @@ describe("getToday", () => {
       needsReturn: true,
       followUpMonths: 0,
     });
-    if (!result?.followUp) throw new Error("completeAppointment não criou o retorno");
+    if (!result?.followUp)
+      throw new Error("completeAppointment não criou o retorno");
 
     const today = await getToday(db, USER, dayFor());
 
@@ -131,4 +168,23 @@ describe("getToday", () => {
 
     expect(today.name).toBeNull();
   });
+
+  test("porção configurada muda done/target sem mexer nos ml", async () => {
+    const db = await createTestDb();
+    await createTestUser(db);
+    await getToday(db, USER, dayFor()); // cria profile e metas default
+    await updateProfile(db, USER.id, { waterPortionMl: 750 });
+    await addWater(db, USER.id, 1500);
+
+    const today = await getToday(db, USER, dayFor());
+
+    // 2000 ml de meta em porções de 750 → 3 porções (arredondado), 2 feitas.
+    expect(today.water).toEqual({
+      totalMl: 1500,
+      goalMl: 2000,
+      done: 2,
+      target: 3,
+    });
+  });
+
 });

@@ -25,7 +25,9 @@ Glossário canônico em `CONTEXT.md` (nesta pasta). Decisões em `/docs/adr/`.
 
 - Registro diário grava `day` (`YYYY-MM-DD`) via `dayFor()` de
   `server/shared/day.ts` — nunca recalcular fuso em outro lugar (ADR-0002).
-- Erros de API: `{ "error": string }` + status (400/401/404/409). No client, 401 é
+- Erros de API: `{ "error": string }` + status (400/401/404/409/422). 422 é para
+  valor sintaticamente válido fora da regra do recurso (ex.: alvo de meta fora de
+  `GOAL_LIMITS`); 400 fica para corpo inválido. No client, 401 é
   tratado no `lib/api.ts`: redireciona pra `/login?next=<rota>` e rejeita.
 - **Auth:** login de página é via Google (`better-auth` `socialProviders.google`,
   `(app)/layout.tsx` exige sessão sempre). `DEV_USER_EMAIL` no `.env` é um

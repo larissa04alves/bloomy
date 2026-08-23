@@ -12,7 +12,7 @@ export const goal = sqliteTable(
     userId: text("user_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
-    domain: text("domain").$type<"water" | "meals" | "workout" | "mind">().notNull(),
+    domain: text("domain").$type<"water" | "meals" | "workout">().notNull(),
     target: integer("target").notNull(),
     unit: text("unit").$type<"ml" | "count" | "days">().notNull(),
     period: text("period").$type<"day" | "week">().notNull(),

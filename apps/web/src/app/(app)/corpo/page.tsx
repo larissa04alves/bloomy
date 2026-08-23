@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 import { Screen } from "@/components/screen";
-import { GARRAFA_ML, type Meal, type MealType } from "@/lib/api-types";
+import { type Meal, type MealType } from "@/lib/api-types";
 
 import { HidratacaoSection } from "./components/HidratacaoSection";
 import { MealModal } from "./components/MealModal";
@@ -17,8 +17,8 @@ import { useRefeicoes } from "./hooks/useRefeicoes";
 import { useRemedios } from "./hooks/useRemedios";
 
 export default function CorpoPage() {
-  const { waterGoalMl, mealsTarget } = useGoals();
-  const hidr = useHidratacao(waterGoalMl);
+  const { waterGoalMl, mealsTarget, waterPortionMl, portionReady } = useGoals();
+  const hidr = useHidratacao(waterGoalMl, waterPortionMl);
   const ref = useRefeicoes();
   const rem = useRemedios();
 
@@ -30,16 +30,19 @@ export default function CorpoPage() {
   return (
     <Screen title="Corpo" subtitle="Seu físico de hoje">
       <ResumoCard
-        agua={{ done: hidr.done, target: hidr.target }}
+        agua={{ done: hidr.totalMl, target: waterGoalMl }}
         refeicoes={{ done: ref.count, target: mealsTarget }}
         remedios={{ done: rem.taken, target: rem.total }}
       />
 
       <HidratacaoSection
         totalMl={hidr.totalMl}
+        goalMl={waterGoalMl}
         done={hidr.done}
         target={hidr.target}
-        onAddGarrafa={() => hidr.addWater(GARRAFA_ML)}
+        portionMl={waterPortionMl}
+        portionReady={portionReady}
+        onAddPortion={hidr.addPortion}
         onOpenModal={() => setWaterOpen(true)}
       />
 
@@ -60,7 +63,12 @@ export default function CorpoPage() {
 
       <RemediosSection intakes={rem.intakes} onToggle={rem.toggle} />
 
-      <WaterModal open={waterOpen} onOpenChange={setWaterOpen} onConfirm={hidr.addWater} />
+      <WaterModal
+        open={waterOpen}
+        onOpenChange={setWaterOpen}
+        onConfirm={hidr.addWater}
+        portionMl={waterPortionMl}
+      />
       <MealModal
         open={mealOpen}
         onOpenChange={setMealOpen}

@@ -1,0 +1,1 @@
+ALTER TABLE `profile` ADD `water_portion_ml` integer DEFAULT 500 NOT NULL;

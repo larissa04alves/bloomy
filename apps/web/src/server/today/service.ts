@@ -9,7 +9,8 @@ import { nextAppointment } from "@/server/health/service";
 import { getMealsDay } from "@/server/meals/service";
 import { getIntakesDay } from "@/server/medications/service";
 import { getCheckin } from "@/server/mind/service";
-import { garrafas } from "@/server/shared/units";
+import { ensureProfile } from "@/server/profile/service";
+import { portions } from "@/server/shared/units";
 import { getWaterDay } from "@/server/water/service";
 import { completedSessionOn, getActiveSession } from "@/server/workout/session";
 import { listWorkouts } from "@/server/workout/service";
@@ -31,7 +32,7 @@ export async function getToday(
   day: string,
   now: Date = new Date(),
 ): Promise<TodayData> {
-  const [water, meals, intakes, checkin, appointment, workouts, active, completed, goals] =
+  const [water, meals, intakes, checkin, appointment, workouts, active, completed, goals, profile] =
     await Promise.all([
       getWaterDay(db, user.id, day),
       getMealsDay(db, user.id, day),
@@ -42,6 +43,7 @@ export async function getToday(
       getActiveSession(db, user.id),
       completedSessionOn(db, user.id, day),
       ensureGoals(db, user.id),
+      ensureProfile(db, user.id),
     ]);
 
   const waterGoalMl = goals.find((g) => g.domain === "water")?.target ?? 2000;
@@ -52,7 +54,11 @@ export async function getToday(
     day,
     period: periodFor(now),
     checkin: { mood: checkin?.mood ?? null },
-    water: garrafas(water.totalMl, waterGoalMl),
+    water: {
+      totalMl: water.totalMl,
+      goalMl: waterGoalMl,
+      ...portions(water.totalMl, waterGoalMl, profile.waterPortionMl),
+    },
     meals: { done: meals.meals.length, target: mealsTarget },
     meds: {
       taken: intakes.filter((i) => i.taken).length,

@@ -1,6 +1,6 @@
 // DTOs como chegam pela API (JSON). createdAt/updatedAt são strings ISO, não Date.
 
-export type GoalDomain = "water" | "meals" | "workout" | "mind";
+export type GoalDomain = "water" | "meals" | "workout";
 
 export type Goal = {
   id: string;
@@ -52,8 +52,16 @@ export type IntakeSlot = {
   taken: boolean;
 };
 
-/** ml por garrafa — unidade de contagem da hidratação. */
-export const GARRAFA_ML = 500;
+/** ml por porção — fallback de `profile.waterPortionMl` quando não há profile carregado. */
+export const DEFAULT_PORTION_ML = 500;
+
+/** Preferências do usuário (`GET`/`PATCH /api/profile`). */
+export type Profile = {
+  restSeconds: number;
+  autoRest: boolean;
+  waterPortionMl: number;
+  onboardingCompletedAt: string | null;
+};
 
 // ── Treino ────────────────────────────────────────────────────────────────
 
@@ -282,7 +290,7 @@ export type TodayPayload = {
   day: string; // YYYY-MM-DD, fuso BR
   period: DayPeriod;
   checkin: { mood: Mood | null };
-  water: { done: number; target: number }; // garrafas de 500 ml
+  water: { totalMl: number; goalMl: number; done: number; target: number };
   meals: { done: number; target: number };
   meds: { taken: number; total: number }; // total 0 = nenhum remédio cadastrado
   workout: WorkoutCard;
