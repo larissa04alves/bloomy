@@ -8,6 +8,7 @@ const PATCH_SCHEMA = z.object({
   restSeconds: z.number().int().min(15).max(600).optional(),
   autoRest: z.boolean().optional(),
   completeOnboarding: z.boolean().optional(),
+  waterPortionMl: z.number().int().min(100).max(1000).optional(),
 });
 
 export async function GET(request: Request) {

@@ -12,7 +12,10 @@ export function greetingLabel(period: DayPeriod, name: string | null): string {
 }
 
 const WEEKDAY_FMT = new Intl.DateTimeFormat("pt-BR", { weekday: "long" });
-const DAY_MONTH_FMT = new Intl.DateTimeFormat("pt-BR", { day: "numeric", month: "long" });
+const DAY_MONTH_FMT = new Intl.DateTimeFormat("pt-BR", {
+  day: "numeric",
+  month: "long",
+});
 
 /** Parse "YYYY-MM-DD" como data local (evita o shift de UTC). */
 function parseDay(day: string): Date {
@@ -28,8 +31,14 @@ export function dateLabel(day: string): string {
 }
 
 const BR = "America/Sao_Paulo";
-const SHORT_WEEKDAY_FMT = new Intl.DateTimeFormat("pt-BR", { weekday: "short", timeZone: BR });
-const DAY_FMT = new Intl.DateTimeFormat("pt-BR", { day: "numeric", timeZone: BR });
+const SHORT_WEEKDAY_FMT = new Intl.DateTimeFormat("pt-BR", {
+  weekday: "short",
+  timeZone: BR,
+});
+const DAY_FMT = new Intl.DateTimeFormat("pt-BR", {
+  day: "numeric",
+  timeZone: BR,
+});
 const TIME_FMT = new Intl.DateTimeFormat("pt-BR", {
   hour: "2-digit",
   minute: "2-digit",
@@ -48,7 +57,10 @@ export function consultaLabel(at: string): { date: string; time: string } {
   };
 }
 
-const MONTH_SHORT_FMT = new Intl.DateTimeFormat("pt-BR", { month: "short", timeZone: BR });
+const MONTH_SHORT_FMT = new Intl.DateTimeFormat("pt-BR", {
+  month: "short",
+  timeZone: BR,
+});
 
 /** Instante ISO → "ago" (mês abreviado, minúsculo, sem ponto), no fuso BR. */
 export function monthShort(at: string): string {
@@ -56,15 +68,28 @@ export function monthShort(at: string): string {
 }
 
 /**
- * Progresso do dia somando os rituais em unidades comparáveis: cada garrafa,
- * refeição e remédio vale 1, e o treino do dia vale 1. O que não está cadastrado
- * (sem remédio, sem treino) fica fora do total — senão o dia nasceria devendo.
+ * Progresso do dia somando os rituais em unidades comparáveis: cada porção de
+ * água, refeição e remédio vale 1, e o treino do dia vale 1. A conversão de ml
+ * para porções já veio pronta do servidor (`water.done`/`water.target`) — aqui
+ * ela é só um número. O que não está cadastrado (sem remédio, sem treino) fica
+ * fora do total — senão o dia nasceria devendo.
  */
-export function dayProgress(today: TodayPayload): { done: number; total: number; ratio: number } {
+export function dayProgress(today: TodayPayload): {
+  done: number;
+  total: number;
+  ratio: number;
+} {
   const hasWorkout = today.workout.state !== "none";
   const done =
-    today.water.done + today.meals.done + today.meds.taken + (today.workout.state === "done" ? 1 : 0);
-  const total = today.water.target + today.meals.target + today.meds.total + (hasWorkout ? 1 : 0);
+    today.water.done +
+    today.meals.done +
+    today.meds.taken +
+    (today.workout.state === "done" ? 1 : 0);
+  const total =
+    today.water.target +
+    today.meals.target +
+    today.meds.total +
+    (hasWorkout ? 1 : 0);
   return { done, total, ratio: total > 0 ? Math.min(1, done / total) : 0 };
 }
 
@@ -86,15 +111,24 @@ export function workoutLabel(card: WorkoutCard): {
 } {
   switch (card.state) {
     case "none":
-      return { subtitle: "Crie seu primeiro treino", action: { label: "Cadastrar", kind: "plus" } };
+      return {
+        subtitle: "Crie seu primeiro treino",
+        action: { label: "Cadastrar", kind: "plus" },
+      };
     case "active":
       return {
         subtitle: `${card.name} · em andamento`,
         action: { label: "Continuar", kind: "play" },
       };
     case "done":
-      return { subtitle: card.name, action: { label: "Treino concluído", kind: "check" } };
+      return {
+        subtitle: card.name,
+        action: { label: "Treino concluído", kind: "check" },
+      };
     case "suggested":
-      return { subtitle: card.name, action: { label: "Iniciar", kind: "play" } };
+      return {
+        subtitle: card.name,
+        action: { label: "Iniciar", kind: "play" },
+      };
   }
 }

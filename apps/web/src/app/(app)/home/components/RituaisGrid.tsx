@@ -20,7 +20,7 @@ export function RituaisGrid({ today }: { today: TodayPayload }) {
   const semRemedio = today.meds.total === 0;
 
   const aguaCompleta =
-    today.water.done >= today.water.target && today.water.target > 0;
+    today.water.totalMl >= today.water.goalMl && today.water.goalMl > 0;
   const refeicoesCompletas =
     today.meals.done >= today.meals.target && today.meals.target > 0;
 
@@ -34,8 +34,8 @@ export function RituaisGrid({ today }: { today: TodayPayload }) {
           tone="lilac"
           icon={<DropIcon size={26} weight="fill" />}
           title="Hidratação"
-          subtitle={`${today.water.done} de ${today.water.target} garrafas`}
-          progress={ratio(today.water.done, today.water.target)}
+          subtitle={`${today.water.totalMl} de ${today.water.goalMl} ml`}
+          progress={ratio(today.water.totalMl, today.water.goalMl)}
           action={
             aguaCompleta
               ? { label: "Meta batida", kind: "check" }

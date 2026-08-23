@@ -8,6 +8,7 @@ export type ProfileUpdate = {
   restSeconds?: number;
   autoRest?: boolean;
   completeOnboarding?: boolean;
+  waterPortionMl?: number;
 };
 
 /** Cria o profile on-demand (1:1 com user) e retorna. */
@@ -28,6 +29,7 @@ export async function updateProfile(
     .set({
       ...(input.restSeconds !== undefined && { restSeconds: input.restSeconds }),
       ...(input.autoRest !== undefined && { autoRest: input.autoRest }),
+      ...(input.waterPortionMl !== undefined && { waterPortionMl: input.waterPortionMl }),
       ...(input.completeOnboarding && { onboardingCompletedAt: new Date() }),
       updatedAt: new Date(),
     })

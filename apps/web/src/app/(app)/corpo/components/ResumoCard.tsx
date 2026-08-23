@@ -9,8 +9,14 @@ export function ResumoCard({
   refeicoes: { done: number; target: number };
   remedios: { done: number; target: number };
 }) {
-  const cols: { label: string; tone: Tone; done: number; target: number }[] = [
-    { label: "garrafas", tone: "lilac", ...agua },
+  const cols: {
+    label: string;
+    tone: Tone;
+    done: number;
+    target: number;
+    size?: "text-xl" | "text-2xl";
+  }[] = [
+    { label: "ml", tone: "lilac", size: "text-xl", ...agua },
     { label: "refeições", tone: "green", ...refeicoes },
     { label: "remédios", tone: "coral", ...remedios },
   ];
@@ -18,11 +24,15 @@ export function ResumoCard({
     <div className="grid grid-cols-3 gap-2 rounded-card-lg bg-lilac-tint p-4">
       {cols.map((c) => (
         <div key={c.label} className="flex flex-col items-center gap-0.5">
-          <span className={`font-display text-2xl font-bold ${TONE[c.tone].deep}`}>
+          <span
+            className={`font-display ${c.size ?? "text-2xl"} font-bold ${TONE[c.tone].deep}`}
+          >
             {c.done}
             <span className="text-base opacity-60">/{c.target}</span>
           </span>
-          <span className={`text-xs font-bold ${TONE[c.tone].deep}`}>{c.label}</span>
+          <span className={`text-xs font-bold ${TONE[c.tone].deep}`}>
+            {c.label}
+          </span>
         </div>
       ))}
     </div>

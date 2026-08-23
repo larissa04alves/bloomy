@@ -8,7 +8,6 @@ import { ChoiceChip } from "@/components/choice-chip";
 import { Stepper } from "@/components/stepper";
 
 const SHORTCUTS = [200, 250, 500, 750];
-const SHORTCUT_LABELS: Record<number, string> = { 200: "200", 250: "250", 500: "500", 750: "Garrafa" };
 
 export function WaterModal({
   open,
@@ -45,7 +44,7 @@ export function WaterModal({
       <div className="flex gap-2">
         {SHORTCUTS.map((s) => (
           <ChoiceChip key={s} selected={ml === s} onClick={() => setMl(s)}>
-            {SHORTCUT_LABELS[s]}
+            {s}
           </ChoiceChip>
         ))}
       </div>

@@ -18,7 +18,7 @@ function todayWith(over: Partial<TodayPayload> = {}): TodayPayload {
     day: "2026-08-12",
     period: "evening",
     checkin: { mood: null },
-    water: { done: 0, target: 4 },
+    water: { totalMl: 0, goalMl: 2000, done: 0, target: 4 },
     meals: { done: 0, target: 3 },
     meds: { taken: 0, total: 4 },
     workout: { state: "suggested", id: "w1", name: "Quads" },
@@ -30,7 +30,11 @@ function todayWith(over: Partial<TodayPayload> = {}): TodayPayload {
 describe("dayProgress", () => {
   it("soma garrafas, refeições, remédios e o treino do dia", () => {
     const p = dayProgress(
-      todayWith({ water: { done: 2, target: 4 }, meals: { done: 1, target: 3 }, meds: { taken: 3, total: 4 } }),
+      todayWith({
+        water: { totalMl: 1000, goalMl: 2000, done: 2, target: 4 },
+        meals: { done: 1, target: 3 },
+        meds: { taken: 3, total: 4 },
+      }),
     );
     // 2+1+3 feitos de 4+3+4 possíveis, +1 do treino ainda não concluído
     expect(p.done).toBe(6);
@@ -52,7 +56,7 @@ describe("dayProgress", () => {
   it("não passa de 1 nem divide por zero", () => {
     const vazio = dayProgress(
       todayWith({
-        water: { done: 0, target: 0 },
+        water: { totalMl: 0, goalMl: 0, done: 0, target: 0 },
         meals: { done: 0, target: 0 },
         meds: { taken: 0, total: 0 },
         workout: { state: "none" },
@@ -62,7 +66,7 @@ describe("dayProgress", () => {
 
     const excedido = dayProgress(
       todayWith({
-        water: { done: 9, target: 4 },
+        water: { totalMl: 4500, goalMl: 2000, done: 9, target: 4 },
         meals: { done: 0, target: 0 },
         meds: { taken: 0, total: 0 },
         workout: { state: "none" },

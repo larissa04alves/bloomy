@@ -6,15 +6,15 @@ import { api } from "@/lib/api";
 import type { WaterDay } from "@/lib/api-types";
 import { toastError } from "@/lib/toast";
 import { useResource } from "@/lib/use-resource";
-import { garrafas } from "@/server/shared/units";
+import { portions } from "@/server/shared/units";
 
-export function useHidratacao(goalMl: number) {
+export function useHidratacao(goalMl: number, portionMl: number) {
   const { data, loading, reload, setData } = useResource<WaterDay>(
     useCallback(() => api.get<WaterDay>("/api/water"), []),
   );
 
   const totalMl = data?.totalMl ?? 0;
-  const { done, target } = garrafas(totalMl, goalMl);
+  const { done, target } = portions(totalMl, goalMl, portionMl);
 
   const addWater = useCallback(
     async (ml: number) => {
