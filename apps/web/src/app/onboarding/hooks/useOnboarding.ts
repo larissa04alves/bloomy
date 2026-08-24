@@ -40,8 +40,12 @@ export function useOnboarding() {
         return;
       }
 
-      router.replace("/home");
-      // Sem `setPending(false)` no sucesso: a navegação desmonta a tela.
+      try {
+        router.replace("/home");
+        // Sem `setPending(false)` no sucesso: a navegação desmonta a tela.
+      } catch {
+        setPending(false);
+      }
     },
     [router],
   );

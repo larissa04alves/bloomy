@@ -90,9 +90,11 @@ evento, essa pessoa nunca mais veria o fluxo.
 10. **`DEFAULT_GOAL_TARGETS` passa a morar em `lib/api-types.ts`.** O client precisa de 2000/3/4
     para pré-popular, e `DEFAULT_GOALS` é `"server-only"`. `api-types.ts` já é a casa desse tipo
     de constante compartilhada — `server/shared/units.ts` importa `DEFAULT_PORTION_ML` de lá. Com
-    isso o literal `2000` deixa de existir em quatro lugares: `DEFAULT_GOALS` deriva da constante
-    e os três fallbacks de tela (`corpo/useGoals.ts:21`, `metas/useMetas.ts:85`,
-    `today/service.ts:49`) passam a lê-la.
+    isso os alvos default deixam de existir soltos: `DEFAULT_GOALS` deriva da constante e os
+    **quatro** fallbacks passam a lê-la — três de tela (`corpo/useGoals.ts`, `metas/useMetas.ts`,
+    `today/service.ts`) e um de servidor, `workout/service.ts` (`weekTargetFor`), que alimenta o
+    card "Meta semanal" da Treino. O quarto não estava no plano: escapou da varredura e só
+    apareceu na review final, sem nenhum teste cobrindo a linha.
 
 11. **Os defaults seguem 2000 ml / 3 refeições / 4 dias / porção 500 ml.** A conversa levantou
     1 L e 3 dias como alternativa; ficou decidido manter os números atuais, que são os do
