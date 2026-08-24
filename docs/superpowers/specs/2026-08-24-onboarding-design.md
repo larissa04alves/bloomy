@@ -193,9 +193,14 @@ ausente ou coluna nula → `false`.
    bloco passa por helper externo.
 3. Devolve as metas e o profile resultantes, para o client não precisar de um GET depois.
 
-As faixas não são revalidadas aqui: o zod da rota já barra com os mesmos `GOAL_LIMITS`/
-`PORTION_LIMITS`, e diferente do `PUT /api/goals/[id]` o handler **sabe** qual domínio é cada
-número — não há o problema que obrigou `updateGoal` a validar por dentro.
+**As faixas são validadas aqui, antes de abrir a transação**, e `completeOnboarding` devolve
+`{ ok: false, reason: "out_of_range" }` em vez de persistir. A primeira versão desta spec deixava
+a checagem só no zod da rota, argumentando que o handler sabe qual domínio é cada número —
+verdade, mas irrelevante: pelo ADR-0001 o serviço é o dono da regra, e `updateGoal` já valida por
+dentro pelo mesmo motivo. Com a faixa só na borda, qualquer chamador server-side futuro
+persistiria meta inválida. Revisto depois do review do PR #23. A rota fica só com a forma (zod) e
+traduz `out_of_range` em **422** — valor bem-formado fora da regra do recurso, conforme
+`apps/web/CLAUDE.md`.
 
 ### Contrato
 
@@ -227,7 +232,7 @@ if (!(await isOnboarded(db, session.user.id))) redirect("/onboarding");
 
 ## Front
 
-```
+```text
 app/onboarding/
   page.tsx                        # server: gate (sem sessão → /login; concluído → /home)
   components/FluxoOnboarding.tsx  # client: renderiza o passo atual + transição

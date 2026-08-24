@@ -6,7 +6,7 @@
 
 **Architecture:** Sete tasks em ordem de dependência, cada uma deixando o app funcionando. As três primeiras são servidor (constante compartilhada → serviço → rota) e não mudam nada visível. As três seguintes constroem a rota `/onboarding` de baixo pra cima (helpers puros → hook + layout do passo → telas), acessível manualmente ao fim da task 6. **O gate no `(app)/layout.tsx` é a última task de propósito:** ligá-lo antes de a rota existir jogaria todo usuário num 404.
 
-**Tech Stack:** Next.js 16 (App Router) · React 19 · Drizzle + libsql/Turso · zod · Tailwind 4 · Phosphor Icons · `bun test`
+**Tech Stack:** Next.js 16 (App Router) · React 19 · Drizzle + libsql/Turso · zod · Tailwind 4 · Phosphor Icons · `bun test` (via `bun run test`)
 
 **Spec:** `docs/superpowers/specs/2026-08-24-onboarding-design.md`
 
@@ -20,7 +20,7 @@
 - **Defaults: água 2000 ml · porção 500 ml · refeições 3 · treino 4 dias.** Nenhum outro valor.
 - **Tamanho de fonte: só a escala nomeada do Tailwind** (`text-xs`, `text-sm`, `text-base`, `text-lg`…). **Nunca** `text-[13px]`. Não existe `text-md`.
 - **Erros de API:** `{ "error": string }` + status. 401 já é tratado no `lib/api.ts`.
-- **Rodar testes de dentro de `apps/web`** — o script injeta `--conditions react-server`, que neutraliza `server-only` nos imports. `bun test` na raiz não faz isso.
+- **Testes precisam de `--conditions react-server`** (neutraliza `server-only` nos imports). Duas formas válidas: a suíte inteira com `bun run test` da raiz (o turbo chama o script de `apps/web`, que injeta a flag), ou um arquivo só com `bun test --conditions react-server <arquivo>` de dentro de `apps/web`. **`bun test` puro na raiz não serve** — `test` é builtin do bun, então ele ignora o script e a flag.
 - **Ler cada arquivo antes de editar** (`cat`/`sed`/`head` NÃO contam para o harness). Se um `Edit` falhar com `string not found`, re-`Read` antes de tentar de novo — nunca editar de memória.
 - **Sem teste de componente.** A convenção do repo é testar helpers e hooks puros. Tasks de UI terminam em `check-types` + verificação visual na rota.
 - **Vocabulário: "copo" e "garrafa" não aparecem em texto de tela.** A hidratação fala em **ml** (decisão 4 da spec de Metas, mantida na decisão 6 desta).
@@ -190,13 +190,13 @@ Esperado: PASSA — todos os testes do arquivo, inclusive os que já existiam.
 - [ ] **Step 7: Checkpoint**
 
 ```bash
-cd /home/larissa/Projects/bloomy && bun check-types && bun test
+cd /home/larissa/Projects/bloomy && bun check-types && bun run test
 ```
 
 Esperado: ambos limpos. Confirme que o literal `2000` como alvo de meta não sobrou:
 
 ```bash
-cd /home/larissa/Projects/bloomy && grep -rn '"water", 2000\|?? 2000\|water: 2000' apps/web/src
+cd /home/larissa/Projects/bloomy && grep -rn '"water", 2000\|?? 2000' apps/web/src
 ```
 
 Esperado: nenhuma linha (o `2000` que sobra em `api-types.ts`, `WaterModal.tsx`, `DiarioCard.tsx` e nas rotas de check-in é outra coisa — `max`, `maxLength` — e deve ficar).
@@ -401,7 +401,7 @@ export async function completeOnboarding(
 }
 ```
 
-As faixas **não** são revalidadas aqui: o zod da rota (Task 3) barra com os mesmos `GOAL_LIMITS`/`PORTION_LIMITS`, e diferente do `PUT /api/goals/[id]` o handler sabe qual domínio é cada número — não existe o problema que obrigou `updateGoal` a validar por dentro.
+> **Revisto após o review do PR #23.** O plano original dizia para **não** revalidar as faixas aqui, deixando a checagem só no zod da rota. Pelo ADR-0001 o serviço é o dono da regra — e `updateGoal` já valida por dentro —, então `completeOnboarding` valida `GOAL_LIMITS`/`PORTION_LIMITS` antes de abrir a transação e devolve `{ ok: false, reason: "out_of_range" }`; a rota (Task 3) traduz isso em 422. Ver a seção "Servidor" da spec.
 
 - [ ] **Step 4: Rodar o teste e ver passar**
 
@@ -409,14 +409,14 @@ As faixas **não** são revalidadas aqui: o zod da rota (Task 3) barra com os me
 cd /home/larissa/Projects/bloomy/apps/web && bun test --conditions react-server src/server/onboarding/service.test.ts
 ```
 
-Esperado: PASSA — 8 testes.
+Esperado: PASSA — 7 testes.
 
 Se o teste de idempotência falhar com `UNIQUE constraint failed`, o `onConflictDoUpdate` está com o `target` errado: precisa ser `[goal.userId, goal.domain]`, as duas colunas do índice `goal_user_domain_idx`.
 
 - [ ] **Step 5: Checkpoint**
 
 ```bash
-cd /home/larissa/Projects/bloomy && bun check-types && bun test
+cd /home/larissa/Projects/bloomy && bun check-types && bun run test
 ```
 
 Esperado: ambos limpos. Nada mudou de comportamento visível — o serviço existe mas ninguém o chama ainda.
@@ -656,7 +656,7 @@ Esperado: PASSA — 7 testes.
 - [ ] **Step 5: Checkpoint**
 
 ```bash
-cd /home/larissa/Projects/bloomy && bun check-types && bun test
+cd /home/larissa/Projects/bloomy && bun check-types && bun run test
 ```
 
 Esperado: ambos limpos.
@@ -903,7 +903,7 @@ export function useOnboarding() {
 - [ ] **Step 4: Checkpoint**
 
 ```bash
-cd /home/larissa/Projects/bloomy && bun check-types && bun test
+cd /home/larissa/Projects/bloomy && bun check-types && bun run test
 ```
 
 Esperado: ambos limpos. Nada renderiza ainda — as telas vêm na Task 6.
@@ -1279,7 +1279,7 @@ Se a Home rebater de volta para o onboarding, é cache do router do Next: acresc
 - [ ] **Step 8: Checkpoint**
 
 ```bash
-cd /home/larissa/Projects/bloomy && bun check-types && bun test
+cd /home/larissa/Projects/bloomy && bun check-types && bun run test
 ```
 
 Esperado: ambos limpos.
@@ -1337,7 +1337,7 @@ Esperado: nenhum arquivo novo em `migrations/` (o schema não mudou). Se aparece
 - [ ] **Step 4: Checkpoint final**
 
 ```bash
-cd /home/larissa/Projects/bloomy && bun check-types && bun test && git status --short
+cd /home/larissa/Projects/bloomy && bun check-types && bun run test && git status --short
 ```
 
 Esperado: typecheck e testes limpos; `git status` listando apenas os arquivos deste plano, **não commitados** — a Larissa revisa e commita.
