@@ -3,7 +3,7 @@ import "server-only";
 import type { Db } from "@bloomy/db";
 import type { Appointment } from "@bloomy/db/schema/health";
 
-import type { TodayPayload } from "@/lib/api-types";
+import { DEFAULT_GOAL_TARGETS, type TodayPayload } from "@/lib/api-types";
 import { ensureGoals } from "@/server/goals/service";
 import { nextAppointment } from "@/server/health/service";
 import { getMealsDay } from "@/server/meals/service";
@@ -46,8 +46,8 @@ export async function getToday(
       ensureProfile(db, user.id),
     ]);
 
-  const waterGoalMl = goals.find((g) => g.domain === "water")?.target ?? 2000;
-  const mealsTarget = goals.find((g) => g.domain === "meals")?.target ?? 3;
+  const waterGoalMl = goals.find((g) => g.domain === "water")?.target ?? DEFAULT_GOAL_TARGETS.water;
+  const mealsTarget = goals.find((g) => g.domain === "meals")?.target ?? DEFAULT_GOAL_TARGETS.meals;
 
   return {
     name: firstName(user.name),

@@ -4,10 +4,12 @@ import type { Db } from "@bloomy/db";
 import { goal, type Goal } from "@bloomy/db/schema/goals";
 import { and, eq } from "drizzle-orm";
 
+import { DEFAULT_GOAL_TARGETS } from "@/lib/api-types";
+
 export const DEFAULT_GOALS = [
-  { domain: "water", target: 2000, unit: "ml", period: "day" },
-  { domain: "meals", target: 3, unit: "count", period: "day" },
-  { domain: "workout", target: 4, unit: "days", period: "week" },
+  { domain: "water", target: DEFAULT_GOAL_TARGETS.water, unit: "ml", period: "day" },
+  { domain: "meals", target: DEFAULT_GOAL_TARGETS.meals, unit: "count", period: "day" },
+  { domain: "workout", target: DEFAULT_GOAL_TARGETS.workout, unit: "days", period: "week" },
 ] as const;
 
 export const GOAL_LIMITS = {

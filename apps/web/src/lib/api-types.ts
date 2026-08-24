@@ -10,6 +10,16 @@ export type Goal = {
   period: "day" | "week";
 };
 
+/** Corpo do `POST /api/onboarding`. Os quatro valores são obrigatórios: o client sempre
+ *  tem todos em mãos (default ou escolhido), então campo opcional só criaria um segundo
+ *  lugar onde o default é decidido. */
+export type OnboardingBody = {
+  waterMl: number;
+  portionMl: number;
+  meals: number;
+  workoutDays: number;
+};
+
 export type WaterLog = { id: string; ml: number; day: string; createdAt: string };
 export type WaterDay = { logs: WaterLog[]; totalMl: number };
 
@@ -51,6 +61,15 @@ export type IntakeSlot = {
   time: string;
   taken: boolean;
 };
+
+/** Alvos iniciais de cada meta. Compartilhado de propósito: `DEFAULT_GOALS` (servidor)
+ *  deriva daqui, e as telas usam como fallback de render antes do fetch — o número não
+ *  pode existir em dois lugares. */
+export const DEFAULT_GOAL_TARGETS = {
+  water: 2000,
+  meals: 3,
+  workout: 4,
+} as const satisfies Record<GoalDomain, number>;
 
 /** ml por porção — fallback de `profile.waterPortionMl` quando não há profile carregado. */
 export const DEFAULT_PORTION_ML = 500;

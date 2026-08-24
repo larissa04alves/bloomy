@@ -4,8 +4,6 @@ import { DropIcon, PlusIcon } from "@phosphor-icons/react";
 
 import { ProgressBar } from "@/components/progress-bar";
 
-import { dropSize } from "../hooks/format";
-
 const MAX_DROPS = 12;
 
 export function HidratacaoSection({
@@ -44,7 +42,7 @@ export function HidratacaoSection({
           {Array.from({ length: target }, (_, i) => (
             <DropIcon
               key={i}
-              size={dropSize(target)}
+              size={32}
               weight="fill"
               className={i < done ? "text-lilac" : "text-control-off"}
             />

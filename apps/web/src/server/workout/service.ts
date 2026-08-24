@@ -11,6 +11,7 @@ import {
 import { goal } from "@bloomy/db/schema/goals";
 import { and, asc, eq, inArray, isNotNull } from "drizzle-orm";
 
+import { DEFAULT_GOAL_TARGETS } from "@/lib/api-types";
 import { dayFor } from "@/server/shared/day";
 
 export type Focus = Workout["focus"];
@@ -185,7 +186,7 @@ async function weekTargetFor(db: Db, userId: string): Promise<number> {
     .select({ target: goal.target })
     .from(goal)
     .where(and(eq(goal.userId, userId), eq(goal.domain, "workout")));
-  return g?.target ?? 4;
+  return g?.target ?? DEFAULT_GOAL_TARGETS.workout;
 }
 
 export async function workoutSummary(

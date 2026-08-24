@@ -3,7 +3,12 @@
 import { useCallback, useState } from "react";
 
 import { api } from "@/lib/api";
-import { DEFAULT_PORTION_ML, type Goal, type Profile } from "@/lib/api-types";
+import {
+  DEFAULT_GOAL_TARGETS,
+  DEFAULT_PORTION_ML,
+  type Goal,
+  type Profile,
+} from "@/lib/api-types";
 import { toastError } from "@/lib/toast";
 import { useResource } from "@/lib/use-resource";
 
@@ -11,8 +16,6 @@ import type { SheetField } from "../components/MetaSheet";
 
 import { portionHint, type MetaDomain } from "./format";
 
-/** Configuração de uma sheet de meta: os números e o que salvar. Ícone, título e
- *  tom ficam na tela — aqui mora só a lógica. */
 export type MetaSheetSpec = {
   domain: MetaDomain;
   fields: SheetField[];
@@ -51,7 +54,9 @@ export function useMetas() {
 
       // Otimista: a pill já mostra o novo valor quando a sheet fecha.
       setGoals({
-        goals: current.goals.map((g) => (g.id === found.id ? { ...g, target } : g)),
+        goals: current.goals.map((g) =>
+          g.id === found.id ? { ...g, target } : g,
+        ),
       });
       try {
         await api.put(`/api/goals/${found.id}`, { target });
@@ -82,10 +87,11 @@ export function useMetas() {
 
   const [sheet, setSheet] = useState<MetaDomain | null>(null);
 
-  const waterGoalMl = targetOf("water", 2000);
-  const mealsTarget = targetOf("meals", 3);
-  const workoutTarget = targetOf("workout", 4);
-  const waterPortionMl = profileData?.profile.waterPortionMl ?? DEFAULT_PORTION_ML;
+  const waterGoalMl = targetOf("water", DEFAULT_GOAL_TARGETS.water);
+  const mealsTarget = targetOf("meals", DEFAULT_GOAL_TARGETS.meals);
+  const workoutTarget = targetOf("workout", DEFAULT_GOAL_TARGETS.workout);
+  const waterPortionMl =
+    profileData?.profile.waterPortionMl ?? DEFAULT_PORTION_ML;
 
   /** As faixas repetem os números de `GOAL_LIMITS`/`PORTION_LIMITS`: aqueles moram
    *  em serviço `server-only` e não podem ser importados no client. O servidor
@@ -93,8 +99,24 @@ export function useMetas() {
   const sheets: Record<MetaDomain, Omit<MetaSheetSpec, "domain">> = {
     water: {
       fields: [
-        { key: "goalMl", label: "Meta do dia", value: waterGoalMl, min: 500, max: 5000, step: 100, unit: "ml" },
-        { key: "portionMl", label: "Cada porção", value: waterPortionMl, min: 100, max: 2000, step: 50, unit: "ml" },
+        {
+          key: "goalMl",
+          label: "Meta do dia",
+          value: waterGoalMl,
+          min: 500,
+          max: 5000,
+          step: 100,
+          unit: "ml",
+        },
+        {
+          key: "portionMl",
+          label: "Cada porção",
+          value: waterPortionMl,
+          min: 100,
+          max: 2000,
+          step: 50,
+          unit: "ml",
+        },
       ],
       hint: (v) => portionHint(v.goalMl!, v.portionMl!),
       onSave: (v) => {
@@ -104,13 +126,27 @@ export function useMetas() {
     },
     meals: {
       fields: [
-        { key: "target", label: "Refeições por dia", value: mealsTarget, min: 1, max: 8, step: 1 },
+        {
+          key: "target",
+          label: "Refeições por dia",
+          value: mealsTarget,
+          min: 1,
+          max: 8,
+          step: 1,
+        },
       ],
       onSave: (v) => saveTarget("meals", v.target!),
     },
     workout: {
       fields: [
-        { key: "target", label: "Dias por semana", value: workoutTarget, min: 1, max: 7, step: 1 },
+        {
+          key: "target",
+          label: "Dias por semana",
+          value: workoutTarget,
+          min: 1,
+          max: 7,
+          step: 1,
+        },
       ],
       onSave: (v) => saveTarget("workout", v.target!),
     },
