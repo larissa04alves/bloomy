@@ -44,7 +44,7 @@ export function HidratacaoSection({
           {Array.from({ length: target }, (_, i) => (
             <DropIcon
               key={i}
-              size={dropSize(target)}
+              size={32}
               weight="fill"
               className={i < done ? "text-lilac" : "text-control-off"}
             />
