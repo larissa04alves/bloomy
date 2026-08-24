@@ -115,10 +115,11 @@ Fluxo com estados (ver "Interactions"):
 - O quadrado lilás com `heart` sobreviveu como **ícone do app** (favicon, apple-touch-icon e ícones do manifest).
 
 ### 8. Onboarding (3 passos separados)
-Cada passo é uma tela: barra de progresso de 3 segmentos + "Passo N de 3" + "Pular"; hero (círculo 112px com ícone), pergunta (Quicksand 24/700), subtítulo, controle, botão de avançar (+ "Voltar" nos passos 2–3).
-1. **Água** — círculo lilás `drop`; stepper (– 8 copos +, "≈ 2 litros"); fileira de 8 gotas.
-2. **Refeições** — círculo verde `fork-knife`; stepper (– 3 +); chips Café/Almoço/Jantar.
-3. **Dias de treino** — círculo rosa `barbell`; seletor de 7 dias (4 selecionados rosa `#E08AB0`); "4 dias por semana"; botão "Começar a usar".
+**Implementada — divergiu do protótipo de propósito.** O que vale é o que está em `apps/web/src/app/onboarding/`:
+- Cada passo é uma tela: barra de progresso de 3 segmentos + "Passo N de 3" + "Pular"; hero (círculo 112px com ícone), pergunta (Quicksand 24/700), subtítulo, controle, botão de avançar (+ "Voltar" nos passos 2–3).
+- **1. Água** — círculo lilás `drop`; dois steppers em **ml** (meta do dia 500–5000 e cada porção 100–2000), não "copos"/"litros": a hidratação fala só em ml na Corpo e nas Metas, e o onboarding segue o mesmo vocabulário; hint "≈ N porções por dia" (mesmo cálculo de `portions()` usado na Corpo e na Metas); fileira de gotas até o número de porções.
+- **2. Refeições** — círculo verde `fork-knife`; stepper (– 3 +); chips Café/Almoço/Jantar (decorativos).
+- **3. Dias de treino** — círculo rosa `barbell`; seletor de 7 dias que **abre vazio** — nenhum dia vem pré-marcado; com zero dias escolhidos, o hint anuncia o default no lugar de aplicá-lo em silêncio ("Sem dias escolhidos — vamos usar 4 dias por semana"); botão "Começar a usar".
 
 ### 9. Modais de adicionar (bottom sheet sobre a tela escurecida)
 Padrão: overlay `rgba(43,38,64,.42)` + sheet branco (raio topo 28) com "grabber" (40×5 `#E2D8F0`), header (chip de ícone + título) e botão primário na cor do domínio.

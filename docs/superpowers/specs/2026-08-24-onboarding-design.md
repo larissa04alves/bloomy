@@ -158,7 +158,7 @@ também pelo zod da rota nova.
 ### `server/onboarding/service.ts`
 
 ```ts
-export type OnboardingInput = {
+export type OnboardingBody = {
   waterMl: number;
   portionMl: number;
   meals: number;
@@ -172,7 +172,7 @@ export async function isOnboarded(db: Db, userId: string): Promise<boolean>;
 export async function completeOnboarding(
   db: Db,
   userId: string,
-  input: OnboardingInput,
+  input: OnboardingBody,
 ): Promise<{ goals: Goal[]; profile: Profile }>;
 ```
 
@@ -263,16 +263,16 @@ pessoa fica onde está.
 
 ```ts
 /** "≈ 4 porções por dia" — reusa portions() para arredondar igual à Corpo e à Metas. */
-export function porcoesHint(goalMl: number, portionMl: number): string;
+export function portionHint(goalMl: number, portionMl: number): string;
 
 /** 0 → "Sem dias escolhidos — vamos usar 4 dias por semana"; 1 → "1 dia por semana"; … */
-export function diasHint(count: number): string;
+export function workoutDaysHint(count: number): string;
 
 /** State → body do POST. Zero dias cai em DEFAULT_GOAL_TARGETS.workout. */
-export function onboardingPayload(state: OnboardingState): OnboardingInput;
+export function onboardingPayload(state: OnboardingState): OnboardingBody;
 ```
 
-`porcoesHint` chama a mesma `portions()` de `server/shared/units.ts` que a tela de Metas usa —
+`portionHint` chama a mesma `portions()` de `server/shared/units.ts` que a tela de Metas usa —
 Corpo, Metas e onboarding nunca podem discordar sobre quantas porções cabem na meta. É um wrapper
 de duas linhas quase idêntico ao `portionHint` de `metas/hooks/format.ts`, duplicado de propósito:
 importar helper de uma pasta de rota para outra acopla duas telas que não têm relação, e o
@@ -282,9 +282,9 @@ arredondamento — a parte que precisa ser única — mora em `portions()`.
 
 | Passo | Hero | Pergunta | Controle | Rodapé |
 |---|---|---|---|---|
-| 1 · Água | círculo lilás, `Drop` | "Quanto de água por dia?" | `Stepper` 500–5000 (100) `ml` + `Stepper` 100–2000 (50) `ml` + `porcoesHint` + fileira de gotas | "Continuar" |
+| 1 · Água | círculo lilás, `Drop` | "Quanto de água por dia?" | `Stepper` 500–5000 (100) `ml` + `Stepper` 100–2000 (50) `ml` + `portionHint` + fileira de gotas | "Continuar" |
 | 2 · Refeições | círculo verde, `ForkKnife` | "Quantas refeições por dia?" | `Stepper` 1–8 + chips Café/Almoço/Jantar (decorativos) | "Continuar" · "Voltar" |
-| 3 · Treino | círculo rosa, `Barbell` | "Quantos dias de treino?" | `SeletorDias` + `diasHint` | "Começar a usar" · "Voltar" |
+| 3 · Treino | círculo rosa, `Barbell` | "Quantos dias de treino?" | `SeletorDias` + `workoutDaysHint` | "Começar a usar" · "Voltar" |
 
 Componentes reusados: `Stepper` (já suporta `unit`, `min`, `max`, `step` e digitação por
 `parse`), `TONE` de `lib/tone.ts` para os três tons, e os tokens do `DESIGN.md`. Nada de
@@ -314,7 +314,7 @@ no canto direito em todos os passos, e "Voltar" só aparece com `step > 1`.
 | Arquivo | Cobre |
 |---|---|
 | `server/onboarding/service.test.ts` *(novo)* | `isOnboarded`: sem linha de profile → false; com `onboardingCompletedAt` nulo → false; preenchido → true. `completeOnboarding`: cria as 3 metas + porção + timestamp para usuário zerado; **sobrescreve** metas já criadas pelo `ensureGoals` (idempotência, sem violar o `UNIQUE`); segunda chamada é no-op de valor; não vaza para outro usuário |
-| `onboarding/hooks/format.test.ts` *(novo)* | `porcoesHint` com porção 250/500; `diasHint` em 0, 1 e N; `onboardingPayload` convertendo `Set` vazio no default e `Set` de 5 em `5` |
+| `onboarding/hooks/format.test.ts` *(novo)* | `portionHint` com porção 250/500; `workoutDaysHint` em 0, 1 e N; `onboardingPayload` convertendo `Set` vazio no default e `Set` de 5 em `5` |
 | `server/goals/service.test.ts` | segue passando com `DEFAULT_GOALS` derivado de `DEFAULT_GOAL_TARGETS` |
 
 Sem teste de componente — a convenção do repo é testar helpers e hooks puros.

@@ -3,6 +3,7 @@ import { eq } from "drizzle-orm";
 
 import { goal } from "@bloomy/db/schema/goals";
 
+import { DEFAULT_GOAL_TARGETS, type GoalDomain } from "@/lib/api-types";
 import { cleanupTestDbs, createTestDb, createTestUser } from "@/server/shared/test-db";
 import { ensureGoals, updateGoal } from "./service";
 
@@ -16,6 +17,18 @@ describe("ensureGoals", () => {
     const goals = await ensureGoals(db, userId);
 
     expect(goals.map((g) => g.domain).sort()).toEqual(["meals", "water", "workout"]);
+  });
+
+  test("os alvos iniciais saem de DEFAULT_GOAL_TARGETS", async () => {
+    const db = await createTestDb();
+    const userId = await createTestUser(db);
+
+    const goals = await ensureGoals(db, userId);
+    const target = (domain: GoalDomain) => goals.find((g) => g.domain === domain)!.target;
+
+    expect(target("water")).toBe(DEFAULT_GOAL_TARGETS.water);
+    expect(target("meals")).toBe(DEFAULT_GOAL_TARGETS.meals);
+    expect(target("workout")).toBe(DEFAULT_GOAL_TARGETS.workout);
   });
 });
 

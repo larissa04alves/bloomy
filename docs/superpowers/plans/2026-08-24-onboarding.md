@@ -55,7 +55,7 @@
 | `apps/web/src/app/onboarding/components/PassoTreino.tsx` | *(criar)* `SeletorDias` + hint |
 | `apps/web/src/app/onboarding/components/SeletorDias.tsx` | *(criar)* 7 círculos, devolve só a contagem |
 | `apps/web/src/app/onboarding/hooks/useOnboarding.ts` | *(criar)* state, navegação, submit, skip |
-| `apps/web/src/app/onboarding/hooks/format.ts` | *(criar)* `porcoesHint`, `diasHint`, `onboardingPayload` (puros) |
+| `apps/web/src/app/onboarding/hooks/format.ts` | *(criar)* `portionHint`, `workoutDaysHint`, `onboardingPayload` (puros) |
 | `apps/web/src/app/onboarding/hooks/format.test.ts` | *(criar)* testes dos três helpers |
 | `packages/ui/src/styles/globals.css` | *(modificar)* token `--animate-fade-in` + entrada no bloco `prefers-reduced-motion` |
 
@@ -531,8 +531,8 @@ Esperado: limpo.
 - Consumes: `DEFAULT_GOAL_TARGETS` e `OnboardingBody` de `@/lib/api-types` (Task 1); `portions` de `@/server/shared/units`
 - Produces:
   - `OnboardingState = { step: 1 | 2 | 3; waterMl: number; portionMl: number; meals: number; workoutDays: Set<number> }`
-  - `porcoesHint(goalMl: number, portionMl: number): string`
-  - `diasHint(count: number): string`
+  - `portionHint(goalMl: number, portionMl: number): string`
+  - `workoutDaysHint(count: number): string`
   - `onboardingPayload(state: OnboardingState): OnboardingBody`
 
 - [ ] **Step 1: Escrever o teste que falha**
@@ -542,7 +542,7 @@ Crie `apps/web/src/app/onboarding/hooks/format.test.ts`:
 ```ts
 import { describe, expect, it } from "bun:test";
 
-import { diasHint, onboardingPayload, porcoesHint, type OnboardingState } from "./format";
+import { workoutDaysHint, onboardingPayload, portionHint, type OnboardingState } from "./format";
 
 const state = (over: Partial<OnboardingState> = {}): OnboardingState => ({
   step: 1,
@@ -553,23 +553,23 @@ const state = (over: Partial<OnboardingState> = {}): OnboardingState => ({
   ...over,
 });
 
-describe("porcoesHint", () => {
+describe("portionHint", () => {
   it("divide a meta pela porção", () => {
-    expect(porcoesHint(2000, 500)).toBe("≈ 4 porções por dia");
-    expect(porcoesHint(2000, 250)).toBe("≈ 8 porções por dia");
+    expect(portionHint(2000, 500)).toBe("≈ 4 porções por dia");
+    expect(portionHint(2000, 250)).toBe("≈ 8 porções por dia");
   });
   it("usa o singular quando a meta cabe numa porção", () => {
-    expect(porcoesHint(500, 500)).toBe("≈ 1 porção por dia");
+    expect(portionHint(500, 500)).toBe("≈ 1 porção por dia");
   });
 });
 
-describe("diasHint", () => {
+describe("workoutDaysHint", () => {
   it("anuncia o default quando nada foi escolhido", () => {
-    expect(diasHint(0)).toBe("Sem dias escolhidos — vamos usar 4 dias por semana");
+    expect(workoutDaysHint(0)).toBe("Sem dias escolhidos — vamos usar 4 dias por semana");
   });
   it("concorda em número", () => {
-    expect(diasHint(1)).toBe("1 dia por semana");
-    expect(diasHint(5)).toBe("5 dias por semana");
+    expect(workoutDaysHint(1)).toBe("1 dia por semana");
+    expect(workoutDaysHint(5)).toBe("5 dias por semana");
   });
 });
 
@@ -620,13 +620,13 @@ export type OnboardingState = {
  * importar helper de uma pasta de rota para outra acoparia duas telas sem relação, e o
  * arredondamento — a parte que precisa ser única — mora em `portions()`.
  */
-export function porcoesHint(goalMl: number, portionMl: number): string {
+export function portionHint(goalMl: number, portionMl: number): string {
   const { target } = portions(0, goalMl, portionMl);
   return target === 1 ? "≈ 1 porção por dia" : `≈ ${target} porções por dia`;
 }
 
 /** Hint do passo 3. Zero anuncia o default em vez de aplicá-lo em silêncio. */
-export function diasHint(count: number): string {
+export function workoutDaysHint(count: number): string {
   if (count === 0) {
     return `Sem dias escolhidos — vamos usar ${DEFAULT_GOAL_TARGETS.workout} dias por semana`;
   }
@@ -921,7 +921,7 @@ Esperado: ambos limpos. Nada renderiza ainda — as telas vêm na Task 6.
 - Create: `apps/web/src/app/onboarding/page.tsx`
 
 **Interfaces:**
-- Consumes: `PassoLayout`, `useOnboarding` (Task 5); `porcoesHint`, `diasHint` (Task 4); `isOnboarded` (Task 2); `Stepper` de `@/components/stepper`; `portions` de `@/server/shared/units`
+- Consumes: `PassoLayout`, `useOnboarding` (Task 5); `portionHint`, `workoutDaysHint` (Task 4); `isOnboarded` (Task 2); `Stepper` de `@/components/stepper`; `portions` de `@/server/shared/units`
 - Produces: rota `/onboarding` renderizável, com gate próprio
 
 - [ ] **Step 1: Escrever o `SeletorDias`**
@@ -987,7 +987,7 @@ import { DropIcon } from "@phosphor-icons/react";
 import { Stepper } from "@/components/stepper";
 import { portions } from "@/server/shared/units";
 
-import { porcoesHint } from "../hooks/format";
+import { portionHint } from "../hooks/format";
 import { PassoLayout } from "./PassoLayout";
 
 /** Acima disso a fileira de gotas vira ruído numa coluna de 342 px — mesmo teto da Corpo. */
@@ -1047,7 +1047,7 @@ export function PassoAgua({
             onChange={onPortionMl}
           />
         </div>
-        <p className="text-sm font-semibold text-ink-faint">{porcoesHint(waterMl, portionMl)}</p>
+        <p className="text-sm font-semibold text-ink-faint">{portionHint(waterMl, portionMl)}</p>
         <div className="flex flex-wrap justify-center gap-1.5" aria-hidden>
           {Array.from({ length: Math.min(target, MAX_GOTAS) }, (_, i) => (
             <DropIcon key={i} size={20} weight="fill" className="text-lilac" />
@@ -1130,7 +1130,7 @@ Crie `apps/web/src/app/onboarding/components/PassoTreino.tsx`:
 
 import { BarbellIcon } from "@phosphor-icons/react";
 
-import { diasHint } from "../hooks/format";
+import { workoutDaysHint } from "../hooks/format";
 import { PassoLayout } from "./PassoLayout";
 import { SeletorDias } from "./SeletorDias";
 
@@ -1164,7 +1164,7 @@ export function PassoTreino({
     >
       <div className="flex w-full flex-col items-center gap-4">
         <SeletorDias selected={selected} onToggle={onToggle} />
-        <p className="max-w-64 text-sm font-bold text-pink-deep">{diasHint(selected.size)}</p>
+        <p className="max-w-64 text-sm font-bold text-pink-deep">{workoutDaysHint(selected.size)}</p>
       </div>
     </PassoLayout>
   );
@@ -1348,7 +1348,7 @@ Esperado: typecheck e testes limpos; `git status` listando apenas os arquivos de
 
 - **Cobertura da spec:** decisões 1–2 → Task 2 + Task 7 · decisão 3 → Task 6 Step 6 · decisão 4 → Task 5/6 · decisões 5–6 → Task 6 Step 2 · decisões 7–8 → Task 6 Steps 1 e 4 + Task 4 · decisão 9 → Task 5 Step 3 (state inicial) · decisões 10–11 → Task 1 · decisão 12 (sem backfill) → nenhuma task, por definição · decisões 13–14 → Task 2 + Task 3 · decisão 15 → `skip` no Task 5 Step 3 · decisão 16 → `finish` no Task 5 Step 3 · decisão 17 → Task 5 Step 1.
 - **Ordem não é estética:** o gate (Task 7) depende da rota existir (Task 6); ligá-lo antes deixaria todo usuário em 404. O curl da Task 3 suja o banco de dev, por isso o Step 4 daquela task restaura o estado pendente — sem isso, as verificações visuais das Tasks 6 e 7 não têm como rodar.
-- **Nomes conferidos entre tasks:** `DEFAULT_GOAL_TARGETS`, `OnboardingBody`, `isOnboarded`, `completeOnboarding`, `porcoesHint`, `diasHint`, `onboardingPayload`, `OnboardingState`, `PassoLayout`, `SeletorDias`, `useOnboarding` — usados com a mesma grafia em toda parte.
+- **Nomes conferidos entre tasks:** `DEFAULT_GOAL_TARGETS`, `OnboardingBody`, `isOnboarded`, `completeOnboarding`, `portionHint`, `workoutDaysHint`, `onboardingPayload`, `OnboardingState`, `PassoLayout`, `SeletorDias`, `useOnboarding` — usados com a mesma grafia em toda parte.
 - **Sem teste de rota:** o repo não tem nenhum; a Task 3 verifica por `curl` usando o fallback `DEV_USER_EMAIL`, e a regra de faixa já está coberta pelos testes de serviço.
 - **Uma divergência de texto em relação ao protótipo:** o subtítulo do passo 1 é *"A gente conta as porções ao longo do dia."*, não *"A gente te lembra de beber ao longo do dia."* — lembretes não existem no app ainda, e prometer notificação que não chega é pior que texto neutro. Os subtítulos dos passos 2 e 3 seguem o protótipo palavra por palavra.
 - **Tokens conferidos no `globals.css`:** `--color-control-off`, `--color-pink-bright`, `--radius-control`, `--shadow-btn` existem; `bg-control-off` e `rounded-control` são usos válidos.
