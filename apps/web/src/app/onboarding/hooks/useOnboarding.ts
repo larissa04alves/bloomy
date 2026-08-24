@@ -55,7 +55,9 @@ export function useOnboarding() {
       void finish(state);
       return;
     }
-    setState((s) => ({ ...s, step: (s.step + 1) as 2 | 3 }));
+    setState((s) =>
+      s.step === state.step ? { ...s, step: (s.step + 1) as 2 | 3 } : s,
+    );
   }, [state, finish]);
 
   const back = useCallback(() => {

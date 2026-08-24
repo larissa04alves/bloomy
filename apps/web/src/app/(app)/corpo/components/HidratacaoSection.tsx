@@ -4,8 +4,6 @@ import { DropIcon, PlusIcon } from "@phosphor-icons/react";
 
 import { ProgressBar } from "@/components/progress-bar";
 
-import { dropSize } from "../hooks/format";
-
 const MAX_DROPS = 12;
 
 export function HidratacaoSection({
