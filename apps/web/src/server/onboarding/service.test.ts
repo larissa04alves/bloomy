@@ -17,6 +17,17 @@ const INPUT: OnboardingBody = { waterMl: 2500, portionMl: 250, meals: 4, workout
 const targetOf = (goals: { domain: string; target: number }[], domain: string) =>
   goals.find((g) => g.domain === domain)!.target;
 
+/** Desembrulha o resultado nos testes do caminho feliz — falha alto se vier recusa. */
+async function complete(
+  db: Awaited<ReturnType<typeof createTestDb>>,
+  userId: string,
+  input: OnboardingBody = INPUT,
+) {
+  const result = await completeOnboarding(db, userId, input);
+  if (!result.ok) throw new Error(`esperava sucesso, veio ${result.reason}`);
+  return result;
+}
+
 describe("isOnboarded", () => {
   test("sem linha de profile conta como pendente", async () => {
     const db = await createTestDb();
@@ -47,7 +58,7 @@ describe("completeOnboarding", () => {
     const db = await createTestDb();
     const userId = await createTestUser(db);
 
-    const { goals, profile } = await completeOnboarding(db, userId, INPUT);
+    const { goals, profile } = await complete(db, userId);
 
     expect(goals.map((g) => g.domain).sort()).toEqual(["meals", "water", "workout"]);
     expect(targetOf(goals, "water")).toBe(2500);
@@ -62,7 +73,7 @@ describe("completeOnboarding", () => {
     const userId = await createTestUser(db);
     await ensureGoals(db, userId); // já existem 2000/3/4
 
-    const { goals } = await completeOnboarding(db, userId, INPUT);
+    const { goals } = await complete(db, userId);
 
     expect(goals).toHaveLength(3);
     expect(targetOf(goals, "water")).toBe(2500);
@@ -74,7 +85,7 @@ describe("completeOnboarding", () => {
     const userId = await createTestUser(db);
     await completeOnboarding(db, userId, INPUT);
 
-    const { goals } = await completeOnboarding(db, userId, INPUT);
+    const { goals } = await complete(db, userId);
 
     expect(goals).toHaveLength(3);
     expect(targetOf(goals, "water")).toBe(2500);
@@ -86,10 +97,40 @@ describe("completeOnboarding", () => {
     const other = await createTestUser(db, "other");
     await ensureGoals(db, other);
 
-    await completeOnboarding(db, owner, INPUT);
+    await complete(db, owner);
 
     const rows = await db.select().from(goal).where(eq(goal.userId, other));
     expect(targetOf(rows, "water")).toBe(DEFAULT_GOAL_TARGETS.water);
     expect(await isOnboarded(db, other)).toBe(false);
+  });
+
+  test("recusa alvo fora da faixa sem persistir nada", async () => {
+    const db = await createTestDb();
+    const userId = await createTestUser(db);
+
+    const result = await completeOnboarding(db, userId, { ...INPUT, waterMl: 90000 });
+
+    expect(result).toEqual({ ok: false, reason: "out_of_range" });
+    const rows = await db.select().from(goal).where(eq(goal.userId, userId));
+    expect(rows).toHaveLength(0);
+    expect(await isOnboarded(db, userId)).toBe(false);
+  });
+
+  test("recusa porção fora da faixa", async () => {
+    const db = await createTestDb();
+    const userId = await createTestUser(db);
+
+    const result = await completeOnboarding(db, userId, { ...INPUT, portionMl: 1 });
+
+    expect(result).toEqual({ ok: false, reason: "out_of_range" });
+  });
+
+  test("recusa valor quebrado (o serviço não depende do zod da rota)", async () => {
+    const db = await createTestDb();
+    const userId = await createTestUser(db);
+
+    const result = await completeOnboarding(db, userId, { ...INPUT, meals: 3.5 });
+
+    expect(result).toEqual({ ok: false, reason: "out_of_range" });
   });
 });
