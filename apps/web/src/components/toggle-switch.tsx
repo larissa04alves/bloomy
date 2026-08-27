@@ -6,10 +6,12 @@ export function ToggleSwitch({
   checked,
   onCheckedChange,
   label,
+  disabled = false,
 }: {
   checked: boolean;
   onCheckedChange: (next: boolean) => void;
   label: string;
+  disabled?: boolean;
 }) {
   return (
     <button
@@ -17,10 +19,12 @@ export function ToggleSwitch({
       role="switch"
       aria-checked={checked}
       aria-label={label}
+      disabled={disabled}
       onClick={() => onCheckedChange(!checked)}
       className={cn(
         "relative h-6.75 w-11.5 shrink-0 rounded-full transition-colors duration-200 motion-reduce:transition-none",
         checked ? "bg-lilac" : "bg-control-off",
+        disabled && "cursor-not-allowed",
       )}
     >
       <span

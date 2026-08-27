@@ -81,4 +81,36 @@ describe("api client", () => {
     const data = await api.del("/api/meals/1");
     expect(data).toBeUndefined();
   });
+
+  it("manda corpo em DELETE quando recebe um", async () => {
+    const calls: RequestInit[] = [];
+    globalThis.fetch = mock(async (_url: string, init: RequestInit) => {
+      calls.push(init);
+      return new Response(JSON.stringify({ ok: true }), {
+        status: 200,
+        headers: { "content-type": "application/json" },
+      });
+    }) as unknown as typeof fetch;
+
+    await api.del("/api/push/subscriptions", { endpoint: "https://push.example/abc" });
+
+    expect(calls[0]!.method).toBe("DELETE");
+    expect(calls[0]!.body).toBe(JSON.stringify({ endpoint: "https://push.example/abc" }));
+    expect((calls[0]!.headers as Record<string, string>)["content-type"]).toBe(
+      "application/json",
+    );
+  });
+
+  it("segue mandando DELETE sem corpo quando não recebe um", async () => {
+    const calls: RequestInit[] = [];
+    globalThis.fetch = mock(async (_url: string, init: RequestInit) => {
+      calls.push(init);
+      return new Response(null, { status: 204 });
+    }) as unknown as typeof fetch;
+
+    await api.del("/api/meals/abc");
+
+    expect(calls[0]!.body).toBeUndefined();
+    expect(calls[0]!.headers).toBeUndefined();
+  });
 });

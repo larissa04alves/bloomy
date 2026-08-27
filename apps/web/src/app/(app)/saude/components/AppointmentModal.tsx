@@ -11,7 +11,7 @@ import type { Appointment, AppointmentInput } from "@/lib/api-types";
 
 import { combineDateTime, splitDateTime } from "../hooks/format";
 import { DatePickerField } from "./DatePickerField";
-import { TimeSelect } from "./TimeSelect";
+import { TimeSelect } from "@/components/time-select";
 
 const schema = z.object({
   professional: z.string().trim().min(1, "Quem é o profissional?"),

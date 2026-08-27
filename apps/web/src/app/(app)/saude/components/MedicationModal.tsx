@@ -9,7 +9,7 @@ import { BottomSheet } from "@/components/bottom-sheet";
 import { ChoiceChip } from "@/components/choice-chip";
 import type { Medication, MedicationInput } from "@/lib/api-types";
 
-import { TimeSelect } from "./TimeSelect";
+import { TimeSelect } from "@/components/time-select";
 
 const schema = z.object({
   name: z.string().trim().min(1, "Dê um nome ao remédio"),

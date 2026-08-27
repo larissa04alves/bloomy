@@ -387,6 +387,11 @@ Registradas de propósito, não esquecidas:
 5. **Sem retry no despertador.** cron-job.org não reenvia falhas. A varredura seguinte
    cobre, desde que dentro dos 30 min de tolerância.
 
+6. **Rotação de subscription não é tratada.** Sem handler de
+   `pushsubscriptionchange`, um aparelho cuja subscription for rotacionada pelo
+   navegador para de receber até a pessoa reabrir `/notificacoes` e mexer num
+   toggle.
+
 ## Ajustes feitos durante a implementação da Fase 1
 
 Coisas que só apareceram ao escrever o código, registradas para o spec não mentir:
@@ -410,6 +415,71 @@ Coisas que só apareceram ao escrever o código, registradas para o spec não me
    **Isso vale para qualquer migration futura com `ALTER COLUMN` em SQLite.** A
    verificação é mecânica: todo índice dropado tem de existir em alguma migration
    anterior, e todo índice criado no arquivo não pode aparecer num `DROP` dele.
+
+## Ajustes feitos durante a implementação da Fase 2
+
+Coisas que só apareceram ao escrever o código, registradas para o spec não mentir:
+
+1. **O manifest já existia como rota de metadata.** O spec pedia
+   `public/manifest.json` e ícones novos; o repo já tinha `src/app/manifest.ts`
+   (`display: standalone`, tema `#A78BD0`) e os PNGs 192/512 em
+   `public/favicon/` (`web-app-manifest-192x192.png`,
+   `web-app-manifest-512x512.png`). Criar o JSON teria posto dois manifests
+   concorrentes na mesma página. Nada foi criado.
+
+2. **`TimeSelect` virou componente global.** A sheet de horário (`HorarioSheet`)
+   precisava do mesmo seletor HH:MM dos três modais da Saúde. Ele saiu de
+   `app/(app)/saude/components/TimeSelect.tsx` para
+   `src/components/time-select.tsx`. A regra de `apps/web/CLAUDE.md` fala em
+   ">2 telas" e aqui são 2 — a alternativa era duplicar o componente, o que
+   deixaria dois seletores livres para divergir.
+
+3. **`pad2` virou export público de `time-select.tsx`.** `HorarioSheet` precisa
+   normalizar `""` → `"00"` ao salvar o horário, do mesmo jeito que o
+   `TimeSelect` já faz no próprio `onBlur`. O plano original mandava duplicar a
+   função; a duplicação foi eliminada exportando a original
+   (`apps/web/src/components/time-select.tsx:16`).
+
+4. **`urlBase64ToUint8Array` devolve `Uint8Array<ArrayBuffer>`, não
+   `Uint8Array`.** O código não compilava com a assinatura simples: sob TS 6 o
+   parâmetro genérico default de `Uint8Array` é `ArrayBufferLike`, que inclui
+   `SharedArrayBuffer` e não satisfaz o `BufferSource` que o DOM exige em
+   `applicationServerKey`. Fixar o tipo do buffer na própria função evita um
+   cast na chamada (`apps/web/src/lib/push.ts:42`).
+
+5. **`api.del` passou a aceitar corpo.** `DELETE /api/push/subscriptions` exige
+   `{ endpoint }` no corpo, e o atalho do client não repassava — `request()` já
+   sabia mandar (`apps/web/src/lib/api.ts`).
+
+6. **A subscription é devolvida quando o último toggle é desligado, servidor
+   primeiro.** Sem lembrete ligado não há motivo para o servidor guardar o
+   endpoint deste aparelho. O DELETE vem antes do `unsubscribe()` do
+   navegador: na ordem inversa, uma falha de rede deixaria a linha órfã e cada
+   varredura tentaria um endpoint morto até tomar 410.
+
+7. **`disablePush` tolera 404 do DELETE.** `DELETE /api/push/subscriptions`
+   responde 404 quando a linha já não existe — e o `dispatch.ts` do back apaga
+   a linha sozinho quando o push service devolve 404/410 numa varredura. Sem
+   tolerar isso, o `unsubscribe()` do navegador nunca rodaria depois de uma
+   limpeza automática. A decisão foi extraída em `isMissingSubscriptionError`,
+   a única parte de `disablePush` testável sem navegador
+   (`apps/web/src/lib/push.ts:90`).
+
+8. **`ToggleSwitch` ganhou `disabled?: boolean`.** A linha de remédios sem
+   cadastro mostra o valor real guardado e não aceita toque — um `<button>`
+   sem `disabled` continuaria focável e seria anunciado como acionável pelo
+   leitor de tela (`apps/web/src/components/toggle-switch.tsx`).
+
+9. **`pushsubscriptionchange` ficou fora.** O navegador pode rotacionar a
+   subscription por conta própria (troca de chave do push service, limpeza de
+   dados); tratar isso no `sw.js` exigiria a chave VAPID dentro do worker. Sem
+   isso, o aparelho para de receber até a pessoa reabrir a tela e mexer num
+   toggle. Entra na lista de limitações conhecidas.
+
+10. **Sem cache offline no service worker.** O `sw.js` trata só `push` e
+    `notificationclick`. O app é online e um cache mal invalidado serviria
+    tela velha depois de um deploy — o worker existe pela notificação, não
+    pelo offline.
 
 ## Decisões de referência
 
