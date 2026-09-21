@@ -1,7 +1,34 @@
 import { describe, expect, it } from "bun:test";
 
 import { ApiError } from "./api";
-import { isMissingSubscriptionError, urlBase64ToUint8Array } from "./push";
+import {
+  isMissingSubscriptionError,
+  sameApplicationServerKey,
+  urlBase64ToUint8Array,
+} from "./push";
+
+describe("sameApplicationServerKey", () => {
+  const key = urlBase64ToUint8Array("Qmxvb215");
+
+  it("aceita a mesma chave em outro buffer", () => {
+    expect(sameApplicationServerKey(Uint8Array.from(key).buffer, key)).toBe(true);
+  });
+
+  it("rejeita chave diferente do mesmo tamanho", () => {
+    const other = Uint8Array.from(key);
+    other[0] ^= 1;
+    expect(sameApplicationServerKey(other.buffer, key)).toBe(false);
+  });
+
+  it("rejeita chave de tamanho diferente", () => {
+    expect(sameApplicationServerKey(new Uint8Array(3).buffer, key)).toBe(false);
+  });
+
+  it("trata ausência da chave como diferente — recriar é o caminho seguro", () => {
+    expect(sameApplicationServerKey(null, key)).toBe(false);
+    expect(sameApplicationServerKey(undefined, key)).toBe(false);
+  });
+});
 
 describe("urlBase64ToUint8Array", () => {
   it("decodifica base64url para os bytes originais", () => {

@@ -8,18 +8,22 @@ import {
   requireUserId,
   unauthorized,
 } from "@/server/shared/api";
+import { isSafePushEndpoint } from "@/server/push/endpoint";
 import { removeSubscription, saveSubscription } from "@/server/push/service";
+
+/** A varredura faz POST neste endereço — só https em host público (`endpoint.ts`). */
+const ENDPOINT = z.url().refine(isSafePushEndpoint, "endpoint must be a public https URL");
 
 /** Formato de `PushSubscription.toJSON()` do navegador. */
 const BODY_SCHEMA = z.object({
-  endpoint: z.url(),
+  endpoint: ENDPOINT,
   keys: z.object({
     p256dh: z.string().min(1),
     auth: z.string().min(1),
   }),
 });
 
-const DELETE_SCHEMA = z.object({ endpoint: z.url() });
+const DELETE_SCHEMA = z.object({ endpoint: ENDPOINT });
 
 export async function POST(request: Request) {
   const userId = await requireUserId(request);

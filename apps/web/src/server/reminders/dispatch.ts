@@ -28,6 +28,10 @@ import {
   type UserState,
 } from "./slots";
 
+/** Teto por envio. Bem abaixo do limite da função serverless, para que um
+ *  aparelho lento não roube o tempo dos seguintes. */
+const SEND_TIMEOUT_MS = 10_000;
+
 /** Por quantos dias guardar o histórico de entregas. Curto de propósito: serve
  *  para investigar "por que não recebi ontem", não para virar arquivo. */
 export const DELIVERY_RETENTION_DAYS = 3;
@@ -134,6 +138,9 @@ async function sendToDevices(db: Db, userId: string, slot: DueSlot): Promise<boo
           keys: { p256dh: device.p256dh, auth: device.auth },
         },
         payload,
+        // Sem timeout a lib espera para sempre; um push service lento travaria o
+        // loop sequencial e a varredura inteira estouraria o tempo do serverless.
+        { timeout: SEND_TIMEOUT_MS },
       );
       anyDelivered = true;
     } catch (error) {

@@ -64,7 +64,9 @@ export function LembreteCard({
       <ToggleSwitch
         checked={enabled}
         onCheckedChange={onToggle}
-        disabled={blocked}
+        // Bloqueado só barra LIGAR: quem apagou o último remédio ainda precisa
+        // conseguir desligar o lembrete que ficou ativo.
+        disabled={blocked && !enabled}
         label={`Lembrete de ${title}`}
       />
     </div>

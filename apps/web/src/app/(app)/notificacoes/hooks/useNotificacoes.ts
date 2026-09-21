@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { api } from "@/lib/api";
 import type { Medication, Reminder } from "@/lib/api-types";
@@ -35,6 +35,13 @@ export function useNotificacoes() {
   useEffect(() => {
     setPermission(pushStatus());
   }, []);
+
+  // Espelho do estado otimista mais recente, para quem acorda depois de um `await`
+  // e precisa decidir com o que a tela mostra agora, não com o que via ao começar.
+  const latestReminders = useRef<Reminder[] | null>(null);
+  useEffect(() => {
+    latestReminders.current = remindersData?.reminders ?? null;
+  }, [remindersData]);
 
   /** A permissão é pedida ao ligar o primeiro toggle — depois da intenção declarada,
    *  que é quando as pessoas aceitam. Desligar o último devolve a subscription: sem
@@ -73,7 +80,11 @@ export function useNotificacoes() {
         return;
       }
 
-      await syncPush(next.some((r) => r.enabled));
+      // Decide pelo estado MAIS RECENTE, não pelo snapshot deste toggle: dois
+      // toggles em sequência rápida terminam fora de ordem, e o snapshot do
+      // primeiro ainda veria o segundo ligado — reativaria o push com tudo desligado.
+      const latest = latestReminders.current ?? next;
+      await syncPush(latest.some((r) => r.enabled));
     },
     [remindersData, setReminders, syncPush],
   );

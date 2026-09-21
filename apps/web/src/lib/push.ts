@@ -48,6 +48,19 @@ export function urlBase64ToUint8Array(base64: string): Uint8Array<ArrayBuffer> {
   return bytes;
 }
 
+/** A subscription guarda a chave com que nasceu (`options.applicationServerKey`,
+ *  um `ArrayBuffer` ou `null` em navegadores antigos). Compara byte a byte com a
+ *  chave atual; `null` conta como "não sei", e aí é mais seguro recriar. */
+export function sameApplicationServerKey(
+  current: ArrayBuffer | null | undefined,
+  expected: Uint8Array,
+): boolean {
+  if (!current) return false;
+  const bytes = new Uint8Array(current);
+  if (bytes.length !== expected.length) return false;
+  return bytes.every((b, i) => b === expected[i]);
+}
+
 /**
  * Pede permissão (se ainda não foi pedida), registra o service worker, garante a
  * subscription e a registra no servidor. Devolve o estado final da permissão.
@@ -68,16 +81,20 @@ export async function enablePush(): Promise<PushStatus> {
   const registration = await navigator.serviceWorker.register(SW_PATH);
   await navigator.serviceWorker.ready;
 
-  // Reaproveita a subscription existente: chamar `subscribe()` de novo com a mesma
-  // chave devolve a mesma, mas com chave diferente lança — e o upsert do servidor
-  // já cuida do endpoint repetido.
-  const existing = await registration.pushManager.getSubscription();
-  const subscription =
-    existing ??
-    (await registration.pushManager.subscribe({
-      userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
-    }));
+  // Reaproveita a subscription existente só se ela foi criada com a chave VAPID
+  // atual: as opções de uma subscription não mudam, e o push service recusa
+  // mensagens assinadas com outra chave. Chave diferente (rotação, ambiente
+  // trocado) → desinscreve e cria de novo; o upsert do servidor cuida do resto.
+  const key = urlBase64ToUint8Array(VAPID_PUBLIC_KEY);
+  let subscription = await registration.pushManager.getSubscription();
+  if (subscription && !sameApplicationServerKey(subscription.options.applicationServerKey, key)) {
+    await subscription.unsubscribe();
+    subscription = null;
+  }
+  subscription ??= await registration.pushManager.subscribe({
+    userVisibleOnly: true,
+    applicationServerKey: key,
+  });
 
   await api.post("/api/push/subscriptions", subscription.toJSON());
   return "granted";
