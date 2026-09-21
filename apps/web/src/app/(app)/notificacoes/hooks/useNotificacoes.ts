@@ -44,7 +44,12 @@ export function useNotificacoes() {
       else await disablePush();
     } catch (e) {
       // A preferência já foi salva; o que falhou foi só o registro do aparelho.
-      toastError(e, "Não foi possível ativar as notificações neste aparelho");
+      toastError(
+        e,
+        anyEnabled
+          ? "Não foi possível ativar as notificações neste aparelho"
+          : "Não foi possível desativar as notificações neste aparelho",
+      );
       setPermission(pushStatus());
     }
   }, []);

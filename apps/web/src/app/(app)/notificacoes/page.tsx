@@ -13,6 +13,7 @@ import type { ReactNode } from "react";
 
 import type { ReminderType } from "@/lib/api-types";
 import type { Tone } from "@/lib/tone";
+import { DEFAULT_TIME } from "@/server/reminders/slots";
 
 import { HorarioSheet } from "./components/HorarioSheet";
 import { LembreteCard } from "./components/LembreteCard";
@@ -25,11 +26,30 @@ import { useNotificacoes } from "./hooks/useNotificacoes";
 /** Cor e ícone de cada domínio, iguais aos da Hoje (`RituaisGrid`, `ConsultaCard`):
  *  uma cor por domínio, em todas as telas, sem exceção. Fica no `page.tsx` porque é
  *  JSX — mesmo lugar onde a Metas guarda os dela. */
-const META: Record<ReminderType, { tone: Tone; icon: ReactNode; title: string }> = {
-  water: { tone: "lilac", icon: <DropIcon size={22} weight="fill" />, title: "Água" },
-  meds: { tone: "coral", icon: <PillIcon size={22} weight="fill" />, title: "Remédios" },
-  workout: { tone: "pink", icon: <BarbellIcon size={22} weight="fill" />, title: "Treino" },
-  mind: { tone: "lilac", icon: <SmileyIcon size={22} weight="fill" />, title: "Mente" },
+const META: Record<
+  ReminderType,
+  { tone: Tone; icon: ReactNode; title: string }
+> = {
+  water: {
+    tone: "lilac",
+    icon: <DropIcon size={22} weight="fill" />,
+    title: "Água",
+  },
+  meds: {
+    tone: "coral",
+    icon: <PillIcon size={22} weight="fill" />,
+    title: "Remédios",
+  },
+  workout: {
+    tone: "pink",
+    icon: <BarbellIcon size={22} weight="fill" />,
+    title: "Treino",
+  },
+  mind: {
+    tone: "lilac",
+    icon: <SmileyIcon size={22} weight="fill" />,
+    title: "Mente",
+  },
   appointments: {
     tone: "lilac",
     icon: <CalendarHeartIcon size={22} weight="fill" />,
@@ -60,7 +80,9 @@ export default function NotificacoesPage() {
         >
           <ArrowLeftIcon size={18} weight="bold" />
         </Link>
-        <h1 className="font-display text-lg font-bold text-ink">Notificações</h1>
+        <h1 className="font-display text-lg font-bold text-ink">
+          Notificações
+        </h1>
         <span className="size-9.5" aria-hidden="true" />
       </header>
 
@@ -107,7 +129,10 @@ export default function NotificacoesPage() {
           title={META[aberto.type].title}
           tone={META[aberto.type].tone}
           icon={META[aberto.type].icon}
-          time={aberto.time ?? "18:00"}
+          time={
+            aberto.time ??
+            (aberto.type === "mind" ? DEFAULT_TIME.mind : DEFAULT_TIME.workout)
+          }
           onSave={(time) => n.setTime(aberto.id, time)}
         />
       ) : null}
