@@ -1,6 +1,27 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "ui": "tui",
+  "globalEnv": [
+    "DATABASE_URL",
+    "DATABASE_AUTH_TOKEN",
+    "BETTER_AUTH_SECRET",
+    "BETTER_AUTH_URL",
+    "CORS_ORIGIN",
+    "GOOGLE_CLIENT_ID",
+    "GOOGLE_CLIENT_SECRET",
+    "DEV_USER_EMAIL",
+    "R2_ACCOUNT_ID",
+    "R2_ACCESS_KEY_ID",
+    "R2_SECRET_ACCESS_KEY",
+    "R2_EXAM_BUCKET",
+    "VAPID_PUBLIC_KEY",
+    "VAPID_PRIVATE_KEY",
+    "VAPID_SUBJECT",
+    "CRON_SECRET",
+    "VERCEL_ENV",
+    "VERCEL_URL",
+    "VERCEL_PROJECT_PRODUCTION_URL"
+  ],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
