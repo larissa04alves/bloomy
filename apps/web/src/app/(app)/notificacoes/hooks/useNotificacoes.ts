@@ -7,6 +7,7 @@ import type { Medication, Reminder } from "@/lib/api-types";
 import { disablePush, enablePush, pushStatus, type PushStatus } from "@/lib/push";
 import { toastError } from "@/lib/toast";
 import { useResource } from "@/lib/use-resource";
+import { DEFAULT_TIME, hasOwnTime } from "@/server/reminders/slots";
 
 export function useNotificacoes() {
   const {
@@ -100,9 +101,20 @@ export function useNotificacoes() {
   );
 
   const [sheetId, setSheetId] = useState<string | null>(null);
+  const reminders = remindersData?.reminders ?? [];
+
+  // A sheet só existe para tipos com horário próprio; o horário exibido cai no
+  // default do próprio tipo quando o banco ainda não tem um (mente 21:00, treino 18:00).
+  const sheetReminder = reminders.find((r) => r.id === sheetId);
+  const sheet =
+    sheetReminder && hasOwnTime(sheetReminder.type)
+      ? { reminder: sheetReminder, time: sheetReminder.time ?? DEFAULT_TIME[sheetReminder.type] }
+      : null;
 
   return {
-    reminders: remindersData?.reminders ?? [],
+    reminders,
+    hasOwnTime,
+    sheet,
     hasMedication: (medsData?.medications ?? []).some((m) => m.active),
     permission,
 
@@ -117,7 +129,6 @@ export function useNotificacoes() {
 
     setEnabled,
     setTime,
-    sheetId,
     openSheet: useCallback((id: string) => setSheetId(id), []),
     setSheetOpen: useCallback(
       (id: string, open: boolean) => setSheetId(open ? id : null),

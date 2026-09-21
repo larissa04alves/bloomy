@@ -4,17 +4,9 @@ import type { Db } from "@bloomy/db";
 import { reminder, type Reminder } from "@bloomy/db/schema/reminder";
 import { and, eq } from "drizzle-orm";
 
-import { DEFAULT_TIME, type ReminderType } from "./slots";
+import { DEFAULT_TIME, hasOwnTime, type ReminderType } from "./slots";
 
 export type ReminderUpdate = { time?: string; enabled?: boolean };
-
-/** Tipos cujo horário é escolhido pela pessoa. Os demais têm horário derivado
- *  (remédios, consultas) ou constante (água) — ver `slots.ts`. */
-export const TIMED_TYPES = ["workout", "mind"] as const;
-
-export function hasOwnTime(type: ReminderType): boolean {
-  return (TIMED_TYPES as readonly string[]).includes(type);
-}
 
 /** Estado inicial: o app lembra por padrão. Consultas nasce ligado — diferente do
  *  protótipo, que não previa aviso de exame nem o de 1h antes; nascer desligado

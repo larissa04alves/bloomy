@@ -13,7 +13,6 @@ import type { ReactNode } from "react";
 
 import type { ReminderType } from "@/lib/api-types";
 import type { Tone } from "@/lib/tone";
-import { DEFAULT_TIME } from "@/server/reminders/slots";
 
 import { HorarioSheet } from "./components/HorarioSheet";
 import { LembreteCard } from "./components/LembreteCard";
@@ -57,9 +56,6 @@ const META: Record<
   },
 };
 
-/** Só estes dois têm horário escolhido pela pessoa — os outros derivam ou são constantes. */
-const TIMED: ReminderType[] = ["workout", "mind"];
-
 export default function NotificacoesPage() {
   const n = useNotificacoes();
 
@@ -68,7 +64,7 @@ export default function NotificacoesPage() {
     return <NotificacoesSkeleton />;
   }
 
-  const aberto = n.reminders.find((r) => r.id === n.sheetId);
+  const { sheet } = n;
 
   return (
     <div className="flex flex-col gap-4 px-5.5 pt-6 pb-4">
@@ -109,7 +105,7 @@ export default function NotificacoesPage() {
               blocked={blocked}
               onToggle={(next) => n.setEnabled(reminder.id, next)}
               onEditTime={
-                TIMED.includes(reminder.type)
+                n.hasOwnTime(reminder.type)
                   ? () => n.openSheet(reminder.id)
                   : undefined
               }
@@ -122,18 +118,15 @@ export default function NotificacoesPage() {
         Lembretes chegam como notificação, mesmo com o app fechado.
       </p>
 
-      {aberto ? (
+      {sheet ? (
         <HorarioSheet
           open
-          onOpenChange={(open) => n.setSheetOpen(aberto.id, open)}
-          title={META[aberto.type].title}
-          tone={META[aberto.type].tone}
-          icon={META[aberto.type].icon}
-          time={
-            aberto.time ??
-            (aberto.type === "mind" ? DEFAULT_TIME.mind : DEFAULT_TIME.workout)
-          }
-          onSave={(time) => n.setTime(aberto.id, time)}
+          onOpenChange={(open) => n.setSheetOpen(sheet.reminder.id, open)}
+          title={META[sheet.reminder.type].title}
+          tone={META[sheet.reminder.type].tone}
+          icon={META[sheet.reminder.type].icon}
+          time={sheet.time}
+          onSave={(time) => n.setTime(sheet.reminder.id, time)}
         />
       ) : null}
     </div>

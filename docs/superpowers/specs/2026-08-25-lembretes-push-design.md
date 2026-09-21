@@ -416,6 +416,13 @@ Coisas que só apareceram ao escrever o código, registradas para o spec não me
    verificação é mecânica: todo índice dropado tem de existir em alguma migration
    anterior, e todo índice criado no arquivo não pode aparecer num `DROP` dele.
 
+4. **`missed` só é gravado até 120 min de atraso (`MISS_WINDOW_MINUTES`).** A
+   seção "Tolerância a atraso" diz que slot mais velho que 30 min "é gravado como
+   `missed`"; na prática isso vale até 2h. Acima disso a varredura ignora o slot,
+   sem linha nenhuma: sem esse teto, cada varredura reprocessaria o dia inteiro só
+   para gravar diagnóstico. A tolerância de envio (30 min) não mudou
+   (`apps/web/src/server/reminders/slots.ts`).
+
 ## Ajustes feitos durante a implementação da Fase 2
 
 Coisas que só apareceram ao escrever o código, registradas para o spec não mentir:
@@ -480,6 +487,22 @@ Coisas que só apareceram ao escrever o código, registradas para o spec não me
     `notificationclick`. O app é online e um cache mal invalidado serviria
     tela velha depois de um deploy — o worker existe pela notificação, não
     pelo offline.
+
+11. **O redirect de sessão expirada passou a preservar o destino.** Achado ao
+    validar o clique da notificação: `(app)/layout.tsx` fazia `redirect("/login")`
+    sem `?next=`, e quem clicava em "mente" com a sessão vencida terminava em
+    `/home` depois de logar. Layouts não recebem a URL, então entrou um
+    `apps/web/src/proxy.ts` que injeta `pathname + search` no header `x-pathname`,
+    e o layout redireciona com `loginPathFor()` para `/login?next=<rota>` — o mesmo
+    contrato que o 401 da `lib/api.ts` já usava; o login segue validando com
+    `safeNextPath`. O proxy não checa sessão: o layout continua a única fonte de
+    verdade.
+
+12. **A regra "quem tem horário próprio" mora em `slots.ts`.** `hasOwnTime` e
+    `TIMED_TYPES` saíram de `service.ts` (server-only) para `slots.ts`
+    (client-safe): a tela precisa da mesma regra para decidir quem abre a sheet de
+    horário, e mantê-la duplicada num array solto do `page.tsx` deixava duas fontes
+    de verdade para uma decisão de domínio.
 
 ## Decisões de referência
 

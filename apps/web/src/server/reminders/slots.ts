@@ -7,7 +7,12 @@
 
 import { dayFor, previousDay } from "@/server/shared/day";
 
-export type ReminderType = "water" | "meds" | "workout" | "mind" | "appointments";
+export type ReminderType =
+  | "water"
+  | "meds"
+  | "workout"
+  | "mind"
+  | "appointments";
 
 /** Água não tem horário escolhido: o intervalo e a janela são constantes de produto.
  *  Tornar isso editável exigiria coluna própria — decisão registrada no spec. */
@@ -15,6 +20,16 @@ export const WATER_INTERVAL_HOURS = 3;
 export const WATER_WINDOW = { start: "06:00", end: "21:00" } as const;
 
 export const DEFAULT_TIME = { workout: "18:00", mind: "21:00" } as const;
+
+export type TimedType = keyof typeof DEFAULT_TIME;
+export const TIMED_TYPES = [
+  "workout",
+  "mind",
+] as const satisfies readonly TimedType[];
+
+export function hasOwnTime(type: ReminderType): type is TimedType {
+  return (TIMED_TYPES as readonly string[]).includes(type);
+}
 
 /** Slot pendente há menos que isso ainda é enviado. Acima, vira `missed`.
  *  Depois de uma queda longa, disparar tudo o que acumulou é pior que não
@@ -66,7 +81,12 @@ export type DueSlot = {
   label?: string;
 };
 
-export function deliveryKey(reminderId: string, day: string, slot: string, refId: string): string {
+export function deliveryKey(
+  reminderId: string,
+  day: string,
+  slot: string,
+  refId: string,
+): string {
   return `${reminderId}|${day}|${slot}|${refId}`;
 }
 
@@ -98,13 +118,17 @@ export function waterSlots(): string[] {
   const step = WATER_INTERVAL_HOURS * 60;
   const end = toMinutes(WATER_WINDOW.end);
   const slots: string[] = [];
-  for (let m = toMinutes(WATER_WINDOW.start); m <= end; m += step) slots.push(toTime(m));
+  for (let m = toMinutes(WATER_WINDOW.start); m <= end; m += step)
+    slots.push(toTime(m));
   return slots;
 }
 
 /** `send` se o slot passou há pouco, `miss` se passou há muito, `null` se ainda não
  *  chegou a hora (ou se já é história velha demais para valer registro). */
-function actionFor(slotMinutes: number, nowMinutes: number): DueSlot["action"] | null {
+function actionFor(
+  slotMinutes: number,
+  nowMinutes: number,
+): DueSlot["action"] | null {
   const late = nowMinutes - slotMinutes;
   if (late < 0) return null;
   if (late <= TOLERANCE_MINUTES) return "send";
@@ -133,7 +157,8 @@ export function dueSlotsAt(now: Date, state: UserState): DueSlot[] {
     // via evento de saúde, e nesse caso o horário já foi normalizado para hoje.
     const action = actionFor(toMinutes(slot), nowMinutes);
     if (!action) return;
-    if (state.delivered.has(deliveryKey(reminder.id, slotDay, slot, refId))) return;
+    if (state.delivered.has(deliveryKey(reminder.id, slotDay, slot, refId)))
+      return;
     found.push({
       reminderId: reminder.id,
       type: reminder.type,
@@ -180,14 +205,18 @@ export function dueSlotsAt(now: Date, state: UserState): DueSlot[] {
       // flag marcada no modal de Saúde; exame sempre avisa, porque não tem flag.
       const wantsDayBefore = event.kind === "exam" || event.remindDayBefore;
       if (wantsDayBefore && previousDay(eventDay) === day) {
-        push(appointments, eventTime, `${event.kind}:${event.id}:1d`, { label: event.label });
+        push(appointments, eventTime, `${event.kind}:${event.id}:1d`, {
+          label: event.label,
+        });
       }
 
       // Uma hora antes. Se o compromisso é antes das 01:00, a hora anterior cai no dia
       // anterior — aí o aviso perderia a referência de dia e é melhor não existir.
       if (eventDay === day && toMinutes(eventTime) >= 60) {
         const slot = toTime(toMinutes(eventTime) - 60);
-        push(appointments, slot, `${event.kind}:${event.id}:1h`, { label: event.label });
+        push(appointments, slot, `${event.kind}:${event.id}:1h`, {
+          label: event.label,
+        });
       }
     }
   }
