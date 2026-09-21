@@ -288,7 +288,7 @@ Derrube o dev server depois.
 - [ ] **Step 3: Conferir a sintaxe**
 
 ```bash
-bun build public/sw.js --target=browser --outfile=/dev/null
+bun build apps/web/public/sw.js --target=browser --outfile=/dev/null
 ```
 
 Esperado: build sem erro (só valida a sintaxe — o arquivo continua sendo servido cru).
@@ -1117,7 +1117,12 @@ export function useNotificacoes() {
       else await disablePush();
     } catch (e) {
       // A preferência já foi salva; o que falhou foi só o registro do aparelho.
-      toastError(e, "Não foi possível ativar as notificações neste aparelho");
+      toastError(
+        e,
+        anyEnabled
+          ? "Não foi possível ativar as notificações neste aparelho"
+          : "Não foi possível desativar as notificações neste aparelho",
+      );
       setPermission(pushStatus());
     }
   }, []);
@@ -1140,7 +1145,10 @@ export function useNotificacoes() {
         return;
       }
 
-      await syncPush(next.some((r) => r.enabled));
+      // Decide pelo estado mais recente (ref espelhando `remindersData`), não pelo
+      // snapshot deste toggle: dois toggles rápidos terminam fora de ordem.
+      const latest = latestReminders.current ?? next;
+      await syncPush(latest.some((r) => r.enabled));
     },
     [remindersData, setReminders, syncPush],
   );
@@ -1260,8 +1268,8 @@ const META: Record<ReminderType, { tone: Tone; icon: ReactNode; title: string }>
   },
 };
 
-/** Só estes dois têm horário escolhido pela pessoa — os outros derivam ou são constantes. */
-const TIMED: ReminderType[] = ["workout", "mind"];
+// Quem tem horário próprio vem de `hasOwnTime` (slots.ts), exposto pelo hook — a
+// page não redeclara a regra.
 
 export default function NotificacoesPage() {
   const n = useNotificacoes();
@@ -1271,7 +1279,8 @@ export default function NotificacoesPage() {
     return <NotificacoesSkeleton />;
   }
 
-  const aberto = n.reminders.find((r) => r.id === n.sheetId);
+  // Sheet aberta já com o horário resolvido pelo hook (default do tipo quando `time` é null).
+  const { sheet } = n;
 
   return (
     <div className="flex flex-col gap-4 px-5.5 pt-6 pb-4">
@@ -1310,7 +1319,7 @@ export default function NotificacoesPage() {
               blocked={blocked}
               onToggle={(next) => n.setEnabled(reminder.id, next)}
               onEditTime={
-                TIMED.includes(reminder.type)
+                n.hasOwnTime(reminder.type)
                   ? () => n.openSheet(reminder.id)
                   : undefined
               }
@@ -1323,15 +1332,15 @@ export default function NotificacoesPage() {
         Lembretes chegam como notificação, mesmo com o app fechado.
       </p>
 
-      {aberto ? (
+      {sheet ? (
         <HorarioSheet
           open
-          onOpenChange={(open) => n.setSheetOpen(aberto.id, open)}
-          title={META[aberto.type].title}
-          tone={META[aberto.type].tone}
-          icon={META[aberto.type].icon}
-          time={aberto.time ?? "18:00"}
-          onSave={(time) => n.setTime(aberto.id, time)}
+          onOpenChange={(open) => n.setSheetOpen(sheet.reminder.id, open)}
+          title={META[sheet.reminder.type].title}
+          tone={META[sheet.reminder.type].tone}
+          icon={META[sheet.reminder.type].icon}
+          time={sheet.time}
+          onSave={(time) => n.setTime(sheet.reminder.id, time)}
         />
       ) : null}
     </div>

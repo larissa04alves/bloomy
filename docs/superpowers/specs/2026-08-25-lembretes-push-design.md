@@ -104,6 +104,17 @@ Uma linha por navegador/aparelho. N por usuário — celular e desktop convivem.
 | `auth` | text | segredo do cliente |
 | `createdAt` | timestamp_ms | |
 
+**Endpoint repetido muda de dono.** O `POST` faz upsert por `endpoint`: se ele já existe
+(reinstalação, ou outra conta no mesmo navegador), a linha é reatribuída ao usuário
+autenticado e `p256dh`/`auth` são atualizados, numa operação só. Quem loga por último no
+aparelho é quem recebe os lembretes — e o logout devolve a subscription
+(`PerfilMenu` chama `disablePush()` antes do `signOut`).
+
+**Endpoint só em `https` e host público.** A varredura faz POST nesse endereço; a rota
+recusa `http:`, loopback, sufixos locais e IP literal (`server/push/endpoint.ts`) para
+uma conta autenticada não usar o servidor como proxy (SSRF). Sem resolução DNS: o
+serverless não tem rede interna a proteger e o filtro barato cobre o caso real.
+
 Índice: `push_subscription_user_idx (user_id)`.
 
 **Limpeza:** quando `web-push` devolve **404 ou 410**, a subscription morreu (app
@@ -200,8 +211,10 @@ acontece **num único lugar** — `slots.ts` — e `day` é sempre gravado via `
 
 ### Tolerância a atraso
 
-Slot pendente há **menos de 30 min** ainda é enviado. Mais velho que isso é gravado como
-`missed` e não toca.
+Slot pendente há **até 30 min** ainda é enviado. Entre 31 e 120 min é gravado como
+`missed` e não toca. Mais velho que 120 min não gera linha nenhuma: a varredura ignora
+(`MISS_WINDOW_MINUTES` — ver ajuste 4 da Fase 1). Os três limites têm teste em
+`slots.test.ts`.
 
 Motivo: depois de uma queda longa, disparar todos os slots acumulados de uma vez é pior que
 não disparar — "hora do remédio" às 23h por causa de um slot das 08h destrói a confiança na
