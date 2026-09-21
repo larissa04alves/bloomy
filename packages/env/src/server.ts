@@ -38,6 +38,16 @@ export const env = createEnv({
     R2_ACCESS_KEY_ID: z.string().min(1),
     R2_SECRET_ACCESS_KEY: z.string().min(1),
     R2_EXAM_BUCKET: z.string().min(1),
+
+    // Web Push (issue #5). Opcionais para não quebrar quem roda o app sem
+    // lembretes configurados: o dispatch checa e sai em silêncio se faltarem.
+    // Par gerado uma vez com `bunx web-push generate-vapid-keys`.
+    VAPID_PUBLIC_KEY: z.string().min(1).optional(),
+    VAPID_PRIVATE_KEY: z.string().min(1).optional(),
+    /** Identificação do responsável exigida pelo protocolo VAPID. */
+    VAPID_SUBJECT: z.string().startsWith("mailto:").optional(),
+    /** Autentica o agendador externo (cron-job.org) na rota de varredura. */
+    CRON_SECRET: z.string().min(16).optional(),
   },
   runtimeEnv: runtimeEnv,
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,

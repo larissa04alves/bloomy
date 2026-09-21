@@ -17,7 +17,7 @@ import {
 import { combineDateTime, splitDateTime } from "../hooks/format";
 import { AttachmentPreview } from "./AttachmentPreview";
 import { DatePickerField } from "./DatePickerField";
-import { TimeSelect } from "./TimeSelect";
+import { TimeSelect } from "@/components/time-select";
 
 const schema = z.object({
   name: z.string().trim().min(1, "Dê um nome ao exame"),

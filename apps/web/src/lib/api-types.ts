@@ -315,3 +315,18 @@ export type TodayPayload = {
   workout: WorkoutCard;
   nextAppointment: Appointment | null;
 };
+
+export type ReminderType = "water" | "meds" | "workout" | "mind" | "appointments";
+
+/** Preferência de lembrete (`GET /api/reminders`, `PUT /api/reminders/[id]`).
+ *  `time` é `null` nos tipos sem horário próprio: água segue intervalo constante,
+ *  remédios derivam de `medication.times` e consultas de `scheduledAt`. Só
+ *  `workout` e `mind` aceitam `time` no PUT — os outros respondem 422. */
+export type Reminder = {
+  id: string;
+  type: ReminderType;
+  time: string | null;
+  enabled: boolean;
+  createdAt: string;
+  updatedAt: string;
+};

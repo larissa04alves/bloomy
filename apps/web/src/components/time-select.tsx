@@ -11,7 +11,9 @@ function clampField(raw: string, max: number): string {
   return Number(digits) > max ? String(max) : digits;
 }
 
-const pad2 = (v: string) => (v === "" ? "00" : v.padStart(2, "0"));
+/** Público: `HorarioSheet` precisa normalizar `""` → `"00"` do mesmo jeito ao
+ *  formatar o horário salvo — duas cópias podiam divergir. */
+export const pad2 = (v: string) => (v === "" ? "00" : v.padStart(2, "0"));
 
 /** Hora em 24h: dois campos digitáveis (HH : MM), no mesmo visual dos outros inputs. */
 export function TimeSelect({

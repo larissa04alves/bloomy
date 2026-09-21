@@ -19,6 +19,7 @@ import {
 } from "@bloomy/ui/components/dropdown-menu";
 
 import { authClient } from "@/lib/auth-client";
+import { disablePush } from "@/lib/push";
 import { toastError } from "@/lib/toast";
 
 /** Chip de ícone de cada item: quadrado tint com o ícone na variante profunda
@@ -77,14 +78,11 @@ export function PerfilMenu({ name }: { name: string | null }) {
             Metas
           </DropdownMenuItem>
 
-          <DropdownMenuItem disabled className={ITEM}>
+          <DropdownMenuItem render={<Link href="/notificacoes" />} className={ITEM}>
             <span className={`${CHIP} bg-lilac-tint-soft text-lilac-deep`}>
               <BellIcon size={16} weight="fill" />
             </span>
             Notificações
-            <span className="ml-auto text-xs font-bold text-ink-faint">
-              em breve
-            </span>
           </DropdownMenuItem>
 
           <DropdownMenuSeparator className="mx-2 my-1.5 bg-hairline-soft" />
@@ -99,6 +97,11 @@ export function PerfilMenu({ name }: { name: string | null }) {
             onClick={async () => {
               setSigningOut(true);
               try {
+                // Devolve a subscription deste aparelho antes de sair: num celular
+                // compartilhado, a próxima conta não pode receber os lembretes desta.
+                // Falha aqui (rede) não pode barrar o logout — escolha consciente: o
+                // pior caso é a linha sobrar até o próximo toggle neste aparelho.
+                await disablePush().catch(() => {});
                 // O better-auth devolve `{ error }` em falha HTTP em vez de lançar —
                 // só o erro de rede cai no catch. Sem checar, um 500 mandaria a pessoa
                 // pro /login achando que saiu, com a sessão ainda válida.

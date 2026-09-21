@@ -6,14 +6,16 @@ import { db } from "@bloomy/db";
 
 import { TabBar } from "@/components/tab-bar";
 import { isOnboarded } from "@/server/onboarding/service";
+import { PATHNAME_HEADER, loginPathFor } from "@/server/shared/login-redirect";
 
 export default async function AppLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const session = await auth.api.getSession({ headers: await headers() });
-  if (!session) redirect("/login");
+  const h = await headers();
+  const session = await auth.api.getSession({ headers: h });
+  if (!session) redirect(loginPathFor(h.get(PATHNAME_HEADER)));
   // Segundo gate: quem nunca escolheu as metas passa pelo onboarding antes das abas.
   // `isOnboarded` só lê — `ensureProfile` viraria uma escrita a cada navegação.
   if (!(await isOnboarded(db, session.user.id))) redirect("/onboarding");
