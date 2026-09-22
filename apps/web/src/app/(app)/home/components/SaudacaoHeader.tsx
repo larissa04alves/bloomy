@@ -6,10 +6,12 @@ import { PerfilMenu } from "./PerfilMenu";
 export function SaudacaoHeader({
   period,
   name,
+  image,
   day,
 }: {
   period: DayPeriod;
   name: string | null;
+  image: string | null;
   day: string;
 }) {
   return (
@@ -20,7 +22,7 @@ export function SaudacaoHeader({
         </h1>
         <p className="mt-0.5 text-sm font-semibold text-ink-soft">{dateLabel(day)}</p>
       </div>
-      <PerfilMenu name={name} />
+      <PerfilMenu name={name} image={image} />
     </header>
   );
 }

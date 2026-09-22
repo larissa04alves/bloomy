@@ -89,6 +89,8 @@ If you want to add app-specific blocks instead of shared primitives, run the sha
 - Production deploy: bun run deploy:prod
   Vercel Services share project environment variables, but deploys do not upload local `.env` files automatically. Link the project with `vercel link`, then run the env sync command before your first deploy (otherwise the deployment starts with no env vars), or pass one-off envs with `vercel deploy -e KEY=value`.
   Pass Vercel CLI flags to the env sync command directly, for example: `bun run env:production --scope your-team`.
+  `BETTER_AUTH_URL` e `CORS_ORIGIN` ficam fora do sync (`SKIP_KEYS`) e são definidos à mão por ambiente: em Production, `https://bloomy.laridev.com` (sempre `https://`; o build falha com `http://`). Em Preview, deixe os dois sem valor — o schema deriva a origem de `VERCEL_URL`.
+  O redirect URI do OAuth no Google Cloud Console tem que ser exatamente `<BETTER_AUTH_URL>/api/auth/callback/google`.
 
 For more details, see the guide on [Deploying to Vercel](https://www.better-t-stack.dev/docs/guides/vercel).
 

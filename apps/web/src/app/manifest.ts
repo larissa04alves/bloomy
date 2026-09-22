@@ -11,7 +11,8 @@ export default function manifest(): MetadataRoute.Manifest {
     start_url: "/",
     display: "standalone",
     background_color: "#FBFAFE",
-    theme_color: "#A78BD0",
+    // Mesma cor do fundo (--background): a barra de status do PWA funde com a tela.
+    theme_color: "#FBFAFE",
     icons: ICON_SIZES.flatMap((sizes) =>
       (["any", "maskable"] as const).map((purpose) => ({
         src: `/favicon/web-app-manifest-${sizes}.png`,

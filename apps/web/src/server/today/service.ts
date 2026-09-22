@@ -28,7 +28,7 @@ export type TodayData = Omit<TodayPayload, "nextAppointment"> & {
  *  regra nova mora aqui além do estado do card de treino (`rotation.ts`). */
 export async function getToday(
   db: Db,
-  user: { id: string; name: string | null },
+  user: { id: string; name: string | null; image?: string | null },
   day: string,
   now: Date = new Date(),
 ): Promise<TodayData> {
@@ -51,6 +51,7 @@ export async function getToday(
 
   return {
     name: firstName(user.name),
+    image: user.image ?? null,
     day,
     period: periodFor(now),
     checkin: { mood: checkin?.mood ?? null },
