@@ -30,7 +30,8 @@ const ITEM = "gap-2.5 rounded-control px-2 py-2.5 text-sm font-semibold";
 /** Foto do Google quando existe e carrega; senão a inicial do nome; sem nome, ícone.
  *  `<img>` cru em vez de `next/image`: o host da foto varia (lh3, lh4…) e o avatar
  *  é decorativo — não compensa manter `remotePatterns`. `referrerPolicy` porque o
- *  CDN do Google devolve 403 quando o Referer é uma origem que ele não conhece. */
+ *  CDN do Google devolve 403 quando o Referer é uma origem que ele não conhece.
+ *  Quem renderiza passa `key={image}`: URL nova remonta e zera `broken` sem efeito. */
 function Avatar({
   name,
   image,
@@ -74,7 +75,7 @@ export function PerfilMenu({ name, image }: { name: string | null; image: string
         aria-label="Abrir menu do perfil"
         className="shrink-0 rounded-full outline-none focus-visible:ring-2 focus-visible:ring-lilac-deep focus-visible:ring-offset-2"
       >
-        <Avatar name={name} image={image} size="lg" />
+        <Avatar key={image ?? "none"} name={name} image={image} size="lg" />
       </DropdownMenuTrigger>
       {/* w-56 sobrescreve o w-(--anchor-width) do shadcn: o âncora é um avatar de 46px.
           O resto desfaz o vestido shadcn — sombra cinza, ring, canto reto — e devolve
@@ -87,7 +88,7 @@ export function PerfilMenu({ name, image }: { name: string | null; image: string
       >
         <div className="flex items-center gap-2.5 bg-lilac-tint px-3.5 py-3">
           <span aria-hidden="true" className="contents">
-            <Avatar name={name} image={image} size="sm" />
+            <Avatar key={image ?? "none"} name={name} image={image} size="sm" />
           </span>
           <span className="min-w-0">
             <span className="block truncate font-display text-sm font-bold text-ink">
