@@ -20,7 +20,12 @@ export default function HomePage() {
 
   return (
     <div className="flex flex-1 flex-col gap-4 px-5.5 pt-5">
-      <SaudacaoHeader period={today.period} name={today.name} day={today.day} />
+      <SaudacaoHeader
+        period={today.period}
+        name={today.name}
+        image={today.image}
+        day={today.day}
+      />
       <ProgressoDia today={today} />
       <HumorCard
         value={moodIndex}

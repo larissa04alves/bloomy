@@ -9,7 +9,8 @@ import { db } from "@bloomy/db";
 import { user as userTable } from "@bloomy/db/schema/auth";
 import { env } from "@bloomy/env/server";
 
-type SessionUser = { id: string; name: string };
+/** `image` é a foto do provedor (Google) — `null` sem foto ou no fallback de dev. */
+type SessionUser = { id: string; name: string; image: string | null };
 
 let devUserCache: SessionUser | null | undefined;
 let devUserWarned = false;
@@ -27,7 +28,7 @@ async function devUser(): Promise<SessionUser | null> {
 
   if (devUserCache === undefined) {
     const rows = await db
-      .select({ id: userTable.id, name: userTable.name })
+      .select({ id: userTable.id, name: userTable.name, image: userTable.image })
       .from(userTable)
       .where(eq(userTable.email, email))
       .limit(1);
@@ -52,7 +53,9 @@ export async function requireUserId(request: Request): Promise<string | null> {
 /** Como `requireUserId`, mas também traz o nome — a Hoje saúda pelo primeiro nome. */
 export async function requireUser(request: Request): Promise<SessionUser | null> {
   const session = await auth.api.getSession({ headers: request.headers });
-  if (session) return { id: session.user.id, name: session.user.name };
+  if (session) {
+    return { id: session.user.id, name: session.user.name, image: session.user.image ?? null };
+  }
   return devUser();
 }
 

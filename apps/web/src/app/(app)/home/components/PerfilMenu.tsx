@@ -27,18 +27,54 @@ import { toastError } from "@/lib/toast";
 const CHIP = "grid size-7 shrink-0 place-items-center rounded-xl";
 const ITEM = "gap-2.5 rounded-control px-2 py-2.5 text-sm font-semibold";
 
-export function PerfilMenu({ name }: { name: string | null }) {
+/** Foto do Google quando existe e carrega; senão a inicial do nome; sem nome, ícone.
+ *  `<img>` cru em vez de `next/image`: o host da foto varia (lh3, lh4…) e o avatar
+ *  é decorativo — não compensa manter `remotePatterns`. `referrerPolicy` porque o
+ *  CDN do Google devolve 403 quando o Referer é uma origem que ele não conhece. */
+function Avatar({
+  name,
+  image,
+  size,
+}: {
+  name: string | null;
+  image: string | null;
+  size: "lg" | "sm";
+}) {
+  const [broken, setBroken] = useState(false);
+  const initial = name?.trim().charAt(0).toUpperCase() ?? "";
+  const dims = size === "lg" ? "size-11.5 text-lg" : "size-8 text-sm";
+
+  if (image && !broken) {
+    return (
+      <img
+        src={image}
+        alt=""
+        referrerPolicy="no-referrer"
+        onError={() => setBroken(true)}
+        className={`${dims} shrink-0 rounded-full object-cover`}
+      />
+    );
+  }
+  return (
+    <span
+      className={`grid ${dims} shrink-0 place-items-center rounded-full bg-lilac font-display font-bold text-white`}
+    >
+      {initial || <UserIcon size={size === "lg" ? 22 : 16} weight="fill" />}
+    </span>
+  );
+}
+
+export function PerfilMenu({ name, image }: { name: string | null; image: string | null }) {
   const router = useRouter();
   const [signingOut, setSigningOut] = useState(false);
-  const initial = name?.trim().charAt(0).toUpperCase() ?? "";
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
         aria-label="Abrir menu do perfil"
-        className="grid size-11.5 shrink-0 place-items-center rounded-full bg-lilac font-display text-lg font-bold text-white outline-none focus-visible:ring-2 focus-visible:ring-lilac-deep focus-visible:ring-offset-2"
+        className="shrink-0 rounded-full outline-none focus-visible:ring-2 focus-visible:ring-lilac-deep focus-visible:ring-offset-2"
       >
-        {initial || <UserIcon size={22} weight="fill" />}
+        <Avatar name={name} image={image} size="lg" />
       </DropdownMenuTrigger>
       {/* w-56 sobrescreve o w-(--anchor-width) do shadcn: o âncora é um avatar de 46px.
           O resto desfaz o vestido shadcn — sombra cinza, ring, canto reto — e devolve
@@ -50,11 +86,8 @@ export function PerfilMenu({ name }: { name: string | null }) {
         className="w-56 overflow-hidden rounded-card-lg bg-white p-0 shadow-[0_16px_34px_rgba(120,86,164,0.24)] ring-0"
       >
         <div className="flex items-center gap-2.5 bg-lilac-tint px-3.5 py-3">
-          <span
-            aria-hidden="true"
-            className="grid size-8 shrink-0 place-items-center rounded-full bg-lilac font-display text-sm font-bold text-white"
-          >
-            {initial || <UserIcon size={16} weight="fill" />}
+          <span aria-hidden="true" className="contents">
+            <Avatar name={name} image={image} size="sm" />
           </span>
           <span className="min-w-0">
             <span className="block truncate font-display text-sm font-bold text-ink">

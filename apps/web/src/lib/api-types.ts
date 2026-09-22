@@ -306,6 +306,8 @@ export type WorkoutCard =
 /** Payload da tela Hoje. `nextAppointment` vem serializado (datas em ISO string). */
 export type TodayPayload = {
   name: string | null;
+  /** Foto do perfil (Google); `null` sem foto → avatar cai na inicial do nome. */
+  image: string | null;
   day: string; // YYYY-MM-DD, fuso BR
   period: DayPeriod;
   checkin: { mood: Mood | null };
