@@ -1,5 +1,7 @@
 // DTOs como chegam pela API (JSON). createdAt/updatedAt são strings ISO, não Date.
 
+import type { DoseUnit } from "@bloomy/db/schema/body";
+
 export type GoalDomain = "water" | "meals" | "workout";
 
 export type Goal = {
@@ -45,8 +47,7 @@ export type Meal = {
 };
 export type MealsDay = { meals: Meal[]; pendingTypes: MealType[] };
 
-export type { DoseUnit } from "@bloomy/db/schema/body";
-import type { DoseUnit } from "@bloomy/db/schema/body";
+export type { DoseUnit };
 
 export type Medication = {
   id: string;

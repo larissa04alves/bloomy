@@ -16,6 +16,7 @@ export function HidratacaoSection({
   target,
   portionMl,
   portionReady,
+  canRemove,
   onAddPortion,
   onRemoveLast,
   onOpenModal,
@@ -26,6 +27,8 @@ export function HidratacaoSection({
   portionMl: number;
   /** Porção já carregada do profile. Falso = o `portionMl` ainda é o fallback. */
   portionReady: boolean;
+  /** Falso com o dia zerado ou com um add ainda em voo. */
+  canRemove: boolean;
   onAddPortion: () => void;
   onRemoveLast: () => void;
   onOpenModal: () => void;
@@ -76,7 +79,7 @@ export function HidratacaoSection({
           type="button"
           aria-label="Tirar último registro"
           onClick={onRemoveLast}
-          disabled={totalMl === 0}
+          disabled={!canRemove}
           className="grid size-12 shrink-0 place-items-center rounded-full bg-lilac-tint text-lilac-deep disabled:opacity-50"
         >
           <MinusIcon size={20} weight="bold" />

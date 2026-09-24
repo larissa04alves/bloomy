@@ -13,7 +13,11 @@ export const DOSE_UNIT_LABELS: Record<DoseUnit, { one: string; many: string }> =
 
 export const DOSE_UNIT_OPTIONS = Object.keys(DOSE_UNIT_LABELS) as DoseUnit[];
 
-const NUMBER = new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 2 });
+/** Casas decimais aceitas no input e mostradas na tela; iguais para editar não arredondar
+ *  (125 mcg = 0,125 mg). */
+const DECIMALS = 3;
+
+const NUMBER = new Intl.NumberFormat("pt-BR", { maximumFractionDigits: DECIMALS });
 
 export function formatQuantity(amount: number): string {
   return NUMBER.format(amount);
@@ -39,5 +43,5 @@ export function parseQuantity(text: string): number | null {
 /** Mantém só dígitos e uma vírgula decimal enquanto a pessoa digita. */
 export function sanitizeQuantity(text: string): string {
   const [int, ...rest] = text.replace(".", ",").replace(/[^\d,]/g, "").split(",");
-  return rest.length ? `${int},${rest.join("")}` : int;
+  return rest.length ? `${int},${rest.join("").slice(0, DECIMALS)}` : int;
 }

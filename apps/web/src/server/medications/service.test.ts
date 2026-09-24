@@ -145,6 +145,23 @@ describe("markIntake / unmarkIntake (db em memória)", () => {
     expect(row.stock).toBe(3);
   });
 
+  test("doses decimais repetidas não acumulam resíduo de float", async () => {
+    const db = await createTestDb();
+    const userId = await createTestUser(db);
+    const med = await createMedication(db, userId, {
+      name: "Gotas",
+      doseAmount: 0.1,
+      doseUnit: "ml",
+      stock: 1,
+      times: ["08:00", "09:00", "10:00", "11:00", "12:00", "13:00"],
+    });
+    for (const time of med.times) {
+      await markIntake(db, userId, { medicationId: med.id, time, day: "2026-07-06" });
+    }
+    const [row] = await db.select().from(medication).where(eq(medication.id, med.id));
+    expect(row.stock).toBe(0.4);
+  });
+
   test("remédio inexistente: mark retorna not_found e unmark false", async () => {
     const db = await createTestDb();
     const userId = await createTestUser(db);

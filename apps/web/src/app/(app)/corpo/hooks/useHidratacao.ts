@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 
 import { api } from "@/lib/api";
 import type { WaterDay } from "@/lib/api-types";
@@ -13,20 +13,27 @@ export function useHidratacao(goalMl: number, portionMl: number) {
     useCallback(() => api.get<WaterDay>("/api/water"), []),
   );
 
+  // Adds ainda sem resposta: o `−` espera, senão o DELETE pode chegar antes do
+  // insert e apagar o registro anterior.
+  const [pendingAdds, setPendingAdds] = useState(0);
+
   const totalMl = data?.totalMl ?? 0;
-  const { done, target } = portions(totalMl, goalMl, portionMl);
+  const { target } = portions(totalMl, goalMl, portionMl);
 
   const addWater = useCallback(
     async (ml: number) => {
       const prev = data;
       // Otimista: soma o total na hora (as gotas reagem ao totalMl)
       setData({ logs: data?.logs ?? [], totalMl: totalMl + ml });
+      setPendingAdds((n) => n + 1);
       try {
         await api.post("/api/water", { ml });
         reload();
       } catch (e) {
         if (prev) setData(prev);
         toastError(e, "Não foi possível registrar a água");
+      } finally {
+        setPendingAdds((n) => n - 1);
       }
     },
     [data, totalMl, setData, reload],
@@ -52,5 +59,14 @@ export function useHidratacao(goalMl: number, portionMl: number) {
   // Handler da porção mora aqui, não na page: a tela só renderiza.
   const addPortion = useCallback(() => addWater(portionMl), [addWater, portionMl]);
 
-  return { totalMl, done, target, loading, addWater, addPortion, removeLast, reload };
+  return {
+    totalMl,
+    target,
+    loading,
+    canRemove: totalMl > 0 && pendingAdds === 0,
+    addWater,
+    addPortion,
+    removeLast,
+    reload,
+  };
 }

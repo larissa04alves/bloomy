@@ -28,6 +28,9 @@ describe("formatQuantity", () => {
     expect(formatQuantity(30)).toBe("30");
     expect(formatQuantity(0.25)).toBe("0,25");
   });
+  it("ida e volta pelo input não perde precisão (125 mcg = 0,125 mg)", () => {
+    expect(parseQuantity(formatQuantity(0.125))).toBe(0.125);
+  });
 });
 
 describe("parseQuantity / sanitizeQuantity", () => {
@@ -40,5 +43,6 @@ describe("parseQuantity / sanitizeQuantity", () => {
     expect(sanitizeQuantity("2.5")).toBe("2,5");
     expect(sanitizeQuantity("1,2,3")).toBe("1,23");
     expect(sanitizeQuantity("3 comp")).toBe("3");
+    expect(sanitizeQuantity("0,1256")).toBe("0,125");
   });
 });

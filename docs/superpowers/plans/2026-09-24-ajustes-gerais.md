@@ -20,4 +20,5 @@ Desvio: o grid de gotas substituiu `dropSize()` (calibrado para tamanho fixo, n�
 - [x] 4b. Service: desconto/devolução pela dose + testes (dose 2, dose 0,5, clamp no zero, devolução exata)
 - [x] 4c. Rotas zod, `api-types`, `formatDose` + teste, modal com unidade, rótulos na Saúde e na Corpo
 - [x] 4d. Migration de remoção (`dose`, `stock_decremented`) — 0021, SQL conferido sem rebuild
-- [ ] 5. `bun check-types` ok, 395 testes ok; falta verificação visual em `/corpo`, `/saude` e onboarding
+- [x] 5. `bun check-types` ok, 395 testes ok; verificação visual feita por ela em `/corpo`, `/saude` e onboarding
+- [x] 6. Fixes da revisão: precisão de 3 casas na dose (ida e volta), `round(…, 4)` no estoque, `−` bloqueado com add em voo, limpezas

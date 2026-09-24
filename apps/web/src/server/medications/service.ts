@@ -153,12 +153,13 @@ export async function markIntake(
       .from(medication)
       .where(eq(medication.id, med.id));
 
-    // Desconta a dose, sem passar de zero; a toma guarda quanto saiu p/ o unmark devolver exato
+    // Desconta a dose, sem passar de zero; a toma guarda quanto saiu p/ o unmark devolver exato.
+    // round(…, 4): doses decimais (0,1 ml) acumulariam resíduo de float no estoque
     const delta = current.stock === null ? 0 : Math.min(current.stock, current.doseAmount);
     if (delta > 0) {
       await tx
         .update(medication)
-        .set({ stock: sql`${medication.stock} - ${delta}` })
+        .set({ stock: sql`round(${medication.stock} - ${delta}, 4)` })
         .where(eq(medication.id, med.id));
       await tx
         .update(medicationIntake)
@@ -195,7 +196,7 @@ export async function unmarkIntake(
     if (delta) {
       await tx
         .update(medication)
-        .set({ stock: sql`${medication.stock} + ${delta}` })
+        .set({ stock: sql`round(${medication.stock} + ${delta}, 4)` })
         .where(
           and(
             eq(medication.id, input.medicationId),

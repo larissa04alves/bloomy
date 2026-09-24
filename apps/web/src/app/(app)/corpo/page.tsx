@@ -42,6 +42,7 @@ export default function CorpoPage() {
         portionMl={waterPortionMl}
         portionReady={portionReady}
         onAddPortion={hidr.addPortion}
+        canRemove={hidr.canRemove}
         onRemoveLast={hidr.removeLast}
         onOpenModal={() => setWaterOpen(true)}
       />
