@@ -4,6 +4,7 @@ import { CheckCircleIcon, CircleIcon, PillIcon } from "@phosphor-icons/react";
 
 import { IconChip } from "@/components/icon-chip";
 import type { IntakeSlot } from "@/lib/api-types";
+import { formatDose } from "@/lib/dose";
 
 export function RemediosSection({
   intakes,
@@ -33,7 +34,7 @@ export function RemediosSection({
               <span className="text-sm font-bold text-ink">{s.name}</span>
               <span className="text-xs font-semibold text-ink-read">
                 {s.time}
-                {s.dose ? ` · ${s.dose}` : ""}
+                {` · ${formatDose(s.doseAmount, s.doseUnit)}`}
               </span>
             </div>
             {s.taken ? (

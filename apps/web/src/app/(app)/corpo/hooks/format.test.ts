@@ -1,26 +1,23 @@
 import { describe, expect, it } from "bun:test";
 
-import { dropSize, waterShortcuts } from "./format";
+import { dropFill, waterShortcuts } from "./format";
 
-describe("dropSize", () => {
-  it("gota grande quando a porção é grande (poucas gotas)", () => {
-    expect(dropSize(1)).toBe(44);
-    expect(dropSize(4)).toBe(44);
+describe("dropFill", () => {
+  it("enche a gota em fração da porção", () => {
+    // porção de 1 L, 200 ml registrados: 1/5 da primeira gota
+    expect(dropFill(200, 1000, 0)).toBeCloseTo(0.2);
+    expect(dropFill(200, 1000, 1)).toBe(0);
   });
-  it("encolhe por faixa conforme a fileira cresce", () => {
-    expect(dropSize(5)).toBe(40);
-    expect(dropSize(6)).toBe(40);
-    expect(dropSize(7)).toBe(34);
-    expect(dropSize(8)).toBe(34);
+  it("gotas anteriores ficam cheias e a seguinte recebe o resto", () => {
+    expect(dropFill(1500, 1000, 0)).toBe(1);
+    expect(dropFill(1500, 1000, 1)).toBeCloseTo(0.5);
+    expect(dropFill(1500, 1000, 2)).toBe(0);
   });
-  it("para de encolher no piso de legibilidade", () => {
-    expect(dropSize(9)).toBe(30);
-    expect(dropSize(12)).toBe(30);
-    expect(dropSize(40)).toBe(30);
+  it("não passa de cheia quando o total estoura a meta", () => {
+    expect(dropFill(9000, 1000, 3)).toBe(1);
   });
-  it("nunca desce do maior tamanho com meta degenerada", () => {
-    // `portions()` já garante alvo mínimo 1, mas a gota não deve depender disso.
-    expect(dropSize(0)).toBe(44);
+  it("porção inválida não vira NaN", () => {
+    expect(dropFill(500, 0, 0)).toBe(1);
   });
 });
 

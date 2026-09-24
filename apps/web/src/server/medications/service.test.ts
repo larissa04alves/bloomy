@@ -4,14 +4,21 @@ import { eq } from "drizzle-orm";
 import { medication } from "@bloomy/db/schema/body";
 
 import { cleanupTestDbs, createTestDb, createTestUser } from "@/server/shared/test-db";
-import { createMedication, deriveIntakes, getIntakesDay, markIntake, unmarkIntake } from "./service";
+import {
+  createMedication,
+  deriveIntakes,
+  getIntakesDay,
+  markIntake,
+  unmarkIntake,
+  updateMedication,
+} from "./service";
 
 afterAll(cleanupTestDbs);
 
 describe("deriveIntakes (pura)", () => {
   const meds = [
-    { id: "m1", name: "Vitamina D", dose: "1 cápsula", times: ["09:00"] },
-    { id: "m2", name: "Magnésio", dose: null, times: ["09:00", "21:00"] },
+    { id: "m1", name: "Vitamina D", doseAmount: 1, doseUnit: "capsula" as const, times: ["09:00"] },
+    { id: "m2", name: "Magnésio", doseAmount: 1, doseUnit: "comp" as const, times: ["09:00", "21:00"] },
   ];
 
   test("expande cadastro × horários, ordenado por hora", () => {
@@ -76,6 +83,66 @@ describe("markIntake / unmarkIntake (db em memória)", () => {
     expect(await unmarkIntake(db, userId, { medicationId: med.id, time: "09:00", day: "2026-07-06" })).toBe(true);
     [row] = await db.select().from(medication).where(eq(medication.id, med.id));
     expect(row.stock).toBe(0);
+  });
+
+  test("toma desconta a quantidade da dose e desmarcar devolve", async () => {
+    const db = await createTestDb();
+    const userId = await createTestUser(db);
+    const med = await createMedication(db, userId, {
+      name: "Creatina",
+      doseAmount: 2,
+      doseUnit: "scoop",
+      stock: 30,
+      times: ["09:00"],
+    });
+    const input = { medicationId: med.id, time: "09:00", day: "2026-07-06" };
+
+    expect(await markIntake(db, userId, input)).toBe("ok");
+    let [row] = await db.select().from(medication).where(eq(medication.id, med.id));
+    expect(row.stock).toBe(28);
+
+    expect(await unmarkIntake(db, userId, input)).toBe(true);
+    [row] = await db.select().from(medication).where(eq(medication.id, med.id));
+    expect(row.stock).toBe(30);
+  });
+
+  test("dose fracionada desconta decimal", async () => {
+    const db = await createTestDb();
+    const userId = await createTestUser(db);
+    const med = await createMedication(db, userId, {
+      name: "Rivotril",
+      doseAmount: 0.5,
+      doseUnit: "comp",
+      stock: 10,
+      times: ["21:00"],
+    });
+
+    expect(await markIntake(db, userId, { medicationId: med.id, time: "21:00", day: "2026-07-06" })).toBe("ok");
+    const [row] = await db.select().from(medication).where(eq(medication.id, med.id));
+    expect(row.stock).toBe(9.5);
+  });
+
+  test("estoque menor que a dose zera e o desmarcar devolve só o que saiu", async () => {
+    const db = await createTestDb();
+    const userId = await createTestUser(db);
+    const med = await createMedication(db, userId, {
+      name: "Xarope",
+      doseAmount: 5,
+      doseUnit: "ml",
+      stock: 3,
+      times: ["09:00"],
+    });
+    const input = { medicationId: med.id, time: "09:00", day: "2026-07-06" };
+
+    expect(await markIntake(db, userId, input)).toBe("ok");
+    let [row] = await db.select().from(medication).where(eq(medication.id, med.id));
+    expect(row.stock).toBe(0);
+
+    // mesmo com a dose editada depois, devolve o que a toma tirou
+    await updateMedication(db, userId, med.id, { doseAmount: 10 });
+    expect(await unmarkIntake(db, userId, input)).toBe(true);
+    [row] = await db.select().from(medication).where(eq(medication.id, med.id));
+    expect(row.stock).toBe(3);
   });
 
   test("remédio inexistente: mark retorna not_found e unmark false", async () => {

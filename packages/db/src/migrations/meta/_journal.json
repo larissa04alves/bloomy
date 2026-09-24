@@ -141,6 +141,20 @@
       "when": 1787697531755,
       "tag": "0019_brown_spirit",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "6",
+      "when": 1790271475621,
+      "tag": "0020_same_george_stacy",
+      "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "6",
+      "when": 1790271487218,
+      "tag": "0021_brainy_wasp",
+      "breakpoints": true
     }
   ]
 }

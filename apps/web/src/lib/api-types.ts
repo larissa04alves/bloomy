@@ -45,10 +45,15 @@ export type Meal = {
 };
 export type MealsDay = { meals: Meal[]; pendingTypes: MealType[] };
 
+export type { DoseUnit } from "@bloomy/db/schema/body";
+import type { DoseUnit } from "@bloomy/db/schema/body";
+
 export type Medication = {
   id: string;
   name: string;
-  dose: string | null;
+  doseAmount: number;
+  doseUnit: DoseUnit;
+  /** Na mesma unidade da dose. */
   stock: number | null;
   times: string[];
   active: boolean;
@@ -57,7 +62,8 @@ export type Medication = {
 export type IntakeSlot = {
   medicationId: string;
   name: string;
-  dose: string | null;
+  doseAmount: number;
+  doseUnit: DoseUnit;
   time: string;
   taken: boolean;
 };
@@ -286,7 +292,8 @@ export type WeightLog = { id: string; grams: number; day: string; createdAt: str
 /** Cadastro de remédio (input dos modais/hook de agenda). */
 export type MedicationInput = {
   name: string;
-  dose?: string;
+  doseAmount: number;
+  doseUnit: DoseUnit;
   stock?: number | null;
   times: string[];
 };

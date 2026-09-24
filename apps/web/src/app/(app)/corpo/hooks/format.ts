@@ -1,19 +1,10 @@
-/** Faixas de tamanho da gota, da meta curta para a longa. A gota cresce quando
- *  são poucas porções (porção grande) e encolhe quando são muitas, para a fileira
- *  caber na coluna de ~342px sem virar três linhas. */
-const DROP_SIZES = [
-  { upTo: 4, size: 44 },
-  { upTo: 6, size: 40 },
-  { upTo: 8, size: 34 },
-] as const;
+import { DEFAULT_PORTION_ML } from "@/lib/api-types";
 
-/** Menor gota: acima de 8 porções o tamanho para de cair (abaixo disso a gota
- *  deixa de ser legível). */
-const SMALLEST_DROP = 30;
-
-/** Lado da gota (px) para uma meta de `target` porções. */
-export function dropSize(target: number): number {
-  return DROP_SIZES.find((s) => target <= s.upTo)?.size ?? SMALLEST_DROP;
+/** Quanto da gota `index` está cheia (0–1): cada gota é uma porção, e o total
+ *  enche as gotas em ordem, com a última parcial (200 ml numa porção de 1 L = 1/5). */
+export function dropFill(totalMl: number, portionMl: number, index: number): number {
+  const size = portionMl > 0 ? portionMl : DEFAULT_PORTION_ML;
+  return Math.min(1, Math.max(0, totalMl / size - index));
 }
 
 /** Quantidades oferecidas como atalho no modal de água. */

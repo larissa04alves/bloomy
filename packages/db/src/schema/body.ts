@@ -1,4 +1,4 @@
-import { index, integer, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
+import { index, integer, real, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
 
 import { user } from "./auth";
 import { timestampMs } from "./_columns";
@@ -36,6 +36,9 @@ export const meal = sqliteTable(
   (table) => [index("meal_user_day_idx").on(table.userId, table.day)],
 );
 
+export const DOSE_UNITS = ["comp", "capsula", "gotas", "ml", "g", "mg", "scoop"] as const;
+export type DoseUnit = (typeof DOSE_UNITS)[number];
+
 export const medication = sqliteTable(
   "medication",
   {
@@ -46,8 +49,10 @@ export const medication = sqliteTable(
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
     name: text("name").notNull(),
-    dose: text("dose"),
-    stock: integer("stock"),
+    doseAmount: real("dose_amount").default(1).notNull(),
+    doseUnit: text("dose_unit").$type<DoseUnit>().default("comp").notNull(),
+    /** Na mesma unidade da dose. */
+    stock: real("stock"),
     times: text("times", { mode: "json" }).$type<string[]>().notNull(),
     active: integer("active", { mode: "boolean" }).default(true).notNull(),
     createdAt: timestampMs("created_at"),
@@ -70,7 +75,8 @@ export const medicationIntake = sqliteTable(
       .references(() => medication.id, { onDelete: "cascade" }),
     day: text("day").notNull(),
     time: text("time").notNull(),
-    stockDecremented: integer("stock_decremented", { mode: "boolean" }).default(false).notNull(),
+    /** Quanto esta toma tirou do estoque; é o que o desmarcar devolve. */
+    stockDelta: real("stock_delta"),
     createdAt: timestampMs("created_at"),
   },
   (table) => [

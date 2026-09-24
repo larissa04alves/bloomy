@@ -1,4 +1,5 @@
 import { db } from "@bloomy/db";
+import { DOSE_UNITS } from "@bloomy/db/schema/body";
 import { z } from "zod";
 
 import {
@@ -13,8 +14,9 @@ import { deactivateMedication, updateMedication } from "@/server/medications/ser
 
 const BODY_SCHEMA = z.object({
   name: z.string().min(1).max(120).optional(),
-  dose: z.string().max(120).optional(),
-  stock: z.number().int().nonnegative().nullable().optional(),
+  doseAmount: z.number().positive().max(10000).optional(),
+  doseUnit: z.enum(DOSE_UNITS).optional(),
+  stock: z.number().nonnegative().max(1_000_000).nullable().optional(),
   times: z.array(TIME_SCHEMA).min(1).max(6).optional(),
 });
 

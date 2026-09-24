@@ -32,8 +32,25 @@ export function useHidratacao(goalMl: number, portionMl: number) {
     [data, totalMl, setData, reload],
   );
 
+  const removeLast = useCallback(async () => {
+    const prev = data;
+    // Otimista só quando o último registro é conhecido; logo após um add otimista
+    // os logs ainda não têm a linha nova, então espera o servidor.
+    const last = data?.logs[0];
+    if (data && last && data.logs.reduce((s, l) => s + l.ml, 0) === totalMl) {
+      setData({ logs: data.logs.slice(1), totalMl: totalMl - last.ml });
+    }
+    try {
+      await api.del("/api/water/last");
+      reload();
+    } catch (e) {
+      if (prev) setData(prev);
+      toastError(e, "Não foi possível tirar a água");
+    }
+  }, [data, totalMl, setData, reload]);
+
   // Handler da porção mora aqui, não na page: a tela só renderiza.
   const addPortion = useCallback(() => addWater(portionMl), [addWater, portionMl]);
 
-  return { totalMl, done, target, loading, addWater, addPortion, reload };
+  return { totalMl, done, target, loading, addWater, addPortion, removeLast, reload };
 }
