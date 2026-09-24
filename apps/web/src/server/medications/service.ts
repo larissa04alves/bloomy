@@ -1,20 +1,29 @@
 import "server-only";
 
 import type { Db } from "@bloomy/db";
-import { medication, medicationIntake, type Medication } from "@bloomy/db/schema/body";
-import { and, asc, eq, gt, sql } from "drizzle-orm";
+import {
+  medication,
+  medicationIntake,
+  type DoseUnit,
+  type Medication,
+} from "@bloomy/db/schema/body";
+import { and, asc, eq, sql } from "drizzle-orm";
+
+/** Mesma precisão que o `round(…, 4)` do estoque, para o delta devolvido bater com o descontado. */
+const round4 = (n: number) => Math.round(n * 1e4) / 1e4;
 
 export type IntakeSlot = {
   medicationId: string;
   name: string;
-  dose: string | null;
+  doseAmount: number;
+  doseUnit: DoseUnit;
   time: string;
   taken: boolean;
 };
 
 /** Tomas do dia derivam do cadastro; só a confirmação é fato (CONTEXT.md). */
 export function deriveIntakes(
-  meds: Pick<Medication, "id" | "name" | "dose" | "times">[],
+  meds: Pick<Medication, "id" | "name" | "doseAmount" | "doseUnit" | "times">[],
   taken: { medicationId: string; time: string }[],
 ): IntakeSlot[] {
   const takenSet = new Set(taken.map((t) => `${t.medicationId}|${t.time}`));
@@ -24,7 +33,8 @@ export function deriveIntakes(
       med.times.map((time) => ({
         medicationId: med.id,
         name: med.name,
-        dose: med.dose,
+        doseAmount: med.doseAmount,
+        doseUnit: med.doseUnit,
         time,
         taken: takenSet.has(`${med.id}|${time}`),
       })),
@@ -34,7 +44,8 @@ export function deriveIntakes(
 
 export type MedicationInput = {
   name: string;
-  dose?: string;
+  doseAmount?: number;
+  doseUnit?: DoseUnit;
   stock?: number | null;
   times: string[];
 };
@@ -49,7 +60,8 @@ export async function createMedication(
     .values({
       userId,
       name: input.name,
-      dose: input.dose ?? null,
+      ...(input.doseAmount !== undefined && { doseAmount: input.doseAmount }),
+      ...(input.doseUnit !== undefined && { doseUnit: input.doseUnit }),
       stock: input.stock ?? null,
       times: [...new Set(input.times)].sort(),
     })
@@ -64,19 +76,38 @@ export async function updateMedication(
   medicationId: string,
   input: Partial<MedicationInput>,
 ): Promise<Medication | null> {
-  const [updated] = await db
-    .update(medication)
-    .set({
-      ...(input.name !== undefined && { name: input.name }),
-      ...(input.dose !== undefined && { dose: input.dose }),
-      ...(input.stock !== undefined && { stock: input.stock }),
-      ...(input.times !== undefined && { times: [...new Set(input.times)].sort() }),
-      updatedAt: new Date(),
-    })
-    .where(and(eq(medication.id, medicationId), eq(medication.userId, userId)))
-    .returning();
+  return db.transaction(async (tx) => {
+    const [before] = await tx
+      .select({ doseUnit: medication.doseUnit })
+      .from(medication)
+      .where(and(eq(medication.id, medicationId), eq(medication.userId, userId)));
 
-  return updated ?? null;
+    if (!before) return null;
+
+    const [updated] = await tx
+      .update(medication)
+      .set({
+        ...(input.name !== undefined && { name: input.name }),
+        ...(input.doseAmount !== undefined && { doseAmount: input.doseAmount }),
+        ...(input.doseUnit !== undefined && { doseUnit: input.doseUnit }),
+        ...(input.stock !== undefined && { stock: input.stock }),
+        ...(input.times !== undefined && { times: [...new Set(input.times)].sort() }),
+        updatedAt: new Date(),
+      })
+      .where(eq(medication.id, medicationId))
+      .returning();
+
+    // O delta das tomas já feitas está na unidade antiga: devolvê-lo no estoque novo
+    // misturaria unidades, então desmarcar essas tomas deixa de devolver.
+    if (input.doseUnit !== undefined && input.doseUnit !== before.doseUnit) {
+      await tx
+        .update(medicationIntake)
+        .set({ stockDelta: null })
+        .where(eq(medicationIntake.medicationId, medicationId));
+    }
+
+    return updated;
+  });
 }
 
 export async function deactivateMedication(
@@ -137,20 +168,25 @@ export async function markIntake(
 
     if (inserted.length === 0) return "duplicate";
 
-    if (med.stock !== null) {
-      // Decrementa só se havia estoque; registra na toma se descontou, p/ o unmark devolver com precisão
-      const decremented = await tx
-        .update(medication)
-        .set({ stock: sql`${medication.stock} - 1` })
-        .where(and(eq(medication.id, med.id), gt(medication.stock, 0)))
-        .returning({ stock: medication.stock });
+    // Relido depois do insert: a transação já segura o lock de escrita, então o valor é o atual
+    const [current] = await tx
+      .select({ stock: medication.stock, doseAmount: medication.doseAmount })
+      .from(medication)
+      .where(eq(medication.id, med.id));
 
-      if (decremented.length > 0) {
-        await tx
-          .update(medicationIntake)
-          .set({ stockDecremented: true })
-          .where(eq(medicationIntake.id, inserted[0].id));
-      }
+    // Desconta a dose, sem passar de zero; a toma guarda quanto saiu p/ o unmark devolver exato.
+    // round(…, 4): doses decimais (0,1 ml) acumulariam resíduo de float no estoque
+    const delta =
+      current.stock === null ? 0 : round4(Math.min(current.stock, current.doseAmount));
+    if (delta > 0) {
+      await tx
+        .update(medication)
+        .set({ stock: sql`round(${medication.stock} - ${delta}, 4)` })
+        .where(eq(medication.id, med.id));
+      await tx
+        .update(medicationIntake)
+        .set({ stockDelta: delta })
+        .where(eq(medicationIntake.id, inserted[0].id));
     }
 
     return "ok";
@@ -177,11 +213,12 @@ export async function unmarkIntake(
 
     if (deleted.length === 0) return false;
 
-    // Devolve estoque só se esta toma realmente descontou (evita unidade fantasma no clamp de 0)
-    if (deleted[0].stockDecremented) {
+    // Devolve só o que esta toma descontou (evita unidade fantasma no clamp de 0)
+    const delta = deleted[0].stockDelta;
+    if (delta) {
       await tx
         .update(medication)
-        .set({ stock: sql`${medication.stock} + 1` })
+        .set({ stock: sql`round(${medication.stock} + ${delta}, 4)` })
         .where(
           and(
             eq(medication.id, input.medicationId),

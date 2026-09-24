@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 
 import { api } from "@/lib/api";
 import type { WaterDay } from "@/lib/api-types";
@@ -13,27 +13,65 @@ export function useHidratacao(goalMl: number, portionMl: number) {
     useCallback(() => api.get<WaterDay>("/api/water"), []),
   );
 
+  // Add e remoção em voo se excluem: o servidor apaga "o último", então um POST e um
+  // DELETE simultâneos podem tirar o registro errado.
+  const [pendingAdds, setPendingAdds] = useState(0);
+  const [removing, setRemoving] = useState(false);
+
   const totalMl = data?.totalMl ?? 0;
-  const { done, target } = portions(totalMl, goalMl, portionMl);
+  const { target } = portions(totalMl, goalMl, portionMl);
 
   const addWater = useCallback(
     async (ml: number) => {
       const prev = data;
       // Otimista: soma o total na hora (as gotas reagem ao totalMl)
       setData({ logs: data?.logs ?? [], totalMl: totalMl + ml });
+      setPendingAdds((n) => n + 1);
       try {
         await api.post("/api/water", { ml });
         reload();
       } catch (e) {
         if (prev) setData(prev);
         toastError(e, "Não foi possível registrar a água");
+      } finally {
+        setPendingAdds((n) => n - 1);
       }
     },
     [data, totalMl, setData, reload],
   );
 
+  const removeLast = useCallback(async () => {
+    const prev = data;
+    // Otimista só quando o último registro é conhecido; logo após um add otimista
+    // os logs ainda não têm a linha nova, então espera o servidor.
+    const last = data?.logs[0];
+    if (data && last && data.logs.reduce((s, l) => s + l.ml, 0) === totalMl) {
+      setData({ logs: data.logs.slice(1), totalMl: totalMl - last.ml });
+    }
+    setRemoving(true);
+    try {
+      await api.del("/api/water/last");
+      reload();
+    } catch (e) {
+      if (prev) setData(prev);
+      toastError(e, "Não foi possível tirar a água");
+    } finally {
+      setRemoving(false);
+    }
+  }, [data, totalMl, setData, reload]);
+
   // Handler da porção mora aqui, não na page: a tela só renderiza.
   const addPortion = useCallback(() => addWater(portionMl), [addWater, portionMl]);
 
-  return { totalMl, done, target, loading, addWater, addPortion, reload };
+  return {
+    totalMl,
+    target,
+    loading,
+    canAdd: !removing,
+    canRemove: totalMl > 0 && pendingAdds === 0 && !removing,
+    addWater,
+    addPortion,
+    removeLast,
+    reload,
+  };
 }

@@ -5,6 +5,7 @@ import { PillIcon, PlusIcon } from "@phosphor-icons/react";
 import { IconChip } from "@/components/icon-chip";
 import { SwipeableRow } from "@/components/swipeable-row";
 import type { Medication } from "@/lib/api-types";
+import { formatDose } from "@/lib/dose";
 
 import { frequencyLabel } from "../hooks/format";
 
@@ -45,7 +46,7 @@ export function AgendaRemediosSection({
                 <span className="text-sm font-bold text-ink">{m.name}</span>
                 <span className="text-xs font-semibold text-ink-read">
                   {frequencyLabel(m.times)}
-                  {m.dose ? ` · ${m.dose}` : ""}
+                  {` · ${formatDose(m.doseAmount, m.doseUnit)}`}
                 </span>
               </div>
             </div>

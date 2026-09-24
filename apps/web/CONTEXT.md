@@ -54,7 +54,7 @@ A confirmação de um remédio em um horário previsto de um dia. As tomas esper
 _Avoid_: dose (dose é a quantidade no cadastro, ex.: "1 comprimido")
 
 **Estoque**:
-Quantidade restante de um remédio. Diminui a cada toma confirmada; desmarcar devolve.
+Quantidade restante de um remédio, na mesma unidade da dose (comp., ml, g, scoop…). Cada toma confirmada desconta a quantidade da dose, sem passar de zero; desmarcar devolve o que aquela toma descontou.
 
 ### Peso
 

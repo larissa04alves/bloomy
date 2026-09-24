@@ -7,13 +7,22 @@ import { z } from "zod";
 
 import { BottomSheet } from "@/components/bottom-sheet";
 import { ChoiceChip } from "@/components/choice-chip";
-import type { Medication, MedicationInput } from "@/lib/api-types";
+import type { DoseUnit, Medication, MedicationInput } from "@/lib/api-types";
+import {
+  DOSE_UNIT_OPTIONS,
+  formatQuantity,
+  parseQuantity,
+  sanitizeQuantity,
+  unitLabel,
+} from "@/lib/dose";
 
 import { TimeSelect } from "@/components/time-select";
 
 const schema = z.object({
   name: z.string().trim().min(1, "Dê um nome ao remédio"),
-  dose: z.string(),
+  doseAmount: z
+    .string()
+    .refine((v) => (parseQuantity(v) ?? 0) > 0, "Informe a quantidade da dose"),
   stock: z.string(),
 });
 
@@ -35,17 +44,19 @@ export function MedicationModal({
   onSubmit: (input: MedicationInput) => void;
 }) {
   const [times, setTimes] = useState<string[]>(["09:00"]);
+  const [doseUnit, setDoseUnit] = useState<DoseUnit>("comp");
   const [newHour, setNewHour] = useState("12");
   const [newMinute, setNewMinute] = useState("00");
 
   const form = useForm({
-    defaultValues: { name: "", dose: "", stock: "" },
+    defaultValues: { name: "", doseAmount: "1", stock: "" },
     validators: { onChange: schema },
     onSubmit: ({ value }) => {
       onSubmit({
         name: value.name.trim(),
-        dose: value.dose.trim(),
-        stock: value.stock ? Number(value.stock) : null,
+        doseAmount: parseQuantity(value.doseAmount) ?? 1,
+        doseUnit,
+        stock: parseQuantity(value.stock),
         times,
       });
       onOpenChange(false);
@@ -55,10 +66,11 @@ export function MedicationModal({
   useEffect(() => {
     if (!open) return;
     form.setFieldValue("name", initial?.name ?? "");
-    form.setFieldValue("dose", initial?.dose ?? "");
+    form.setFieldValue("doseAmount", formatQuantity(initial?.doseAmount ?? 1));
+    setDoseUnit(initial?.doseUnit ?? "comp");
     form.setFieldValue(
       "stock",
-      initial?.stock != null ? String(initial.stock) : "",
+      initial?.stock != null ? formatQuantity(initial.stock) : "",
     );
     setTimes(initial?.times?.length ? initial.times : ["09:00"]);
   }, [open, initial, form]);
@@ -107,32 +119,60 @@ export function MedicationModal({
         )}
       </form.Field>
 
-      <div className="flex gap-2">
-        <form.Field name="dose">
-          {(field) => (
-            <input
-              value={field.state.value}
-              aria-label="Dose"
-              onChange={(e) => field.handleChange(e.target.value)}
-              placeholder="Dose (ex.: 1 comp.)"
-              className="flex-1 rounded-control border border-hairline bg-white px-4 py-3 text-sm font-semibold text-ink placeholder:text-ink-faint focus:border-lilac focus:outline-none"
-            />
-          )}
-        </form.Field>
-        <form.Field name="stock">
-          {(field) => (
-            <input
-              value={field.state.value}
-              aria-label="Estoque"
-              inputMode="numeric"
-              onChange={(e) =>
-                field.handleChange(e.target.value.replace(/\D/g, ""))
-              }
-              placeholder="Estoque"
-              className="w-28 rounded-control border border-hairline bg-white px-4 py-3 text-sm font-semibold text-ink placeholder:text-ink-faint focus:border-lilac focus:outline-none"
-            />
-          )}
-        </form.Field>
+      <div className="flex flex-col gap-2">
+        <span className="text-sm font-bold text-ink">Dose</span>
+        <div className="flex flex-wrap gap-2">
+          {DOSE_UNIT_OPTIONS.map((u) => (
+            <ChoiceChip
+              key={u}
+              tone="coral"
+              selected={doseUnit === u}
+              onClick={() => setDoseUnit(u)}
+            >
+              {unitLabel(2, u)}
+            </ChoiceChip>
+          ))}
+        </div>
+        <div className="flex gap-2">
+          <form.Field name="doseAmount">
+            {(field) => (
+              <label className="flex flex-1 items-center gap-2 rounded-control border border-hairline bg-white px-4 py-3 focus-within:border-lilac">
+                <input
+                  value={field.state.value}
+                  aria-label="Quantidade dose"
+                  inputMode="decimal"
+                  onChange={(e) =>
+                    field.handleChange(sanitizeQuantity(e.target.value))
+                  }
+                  placeholder="1"
+                  className="w-full min-w-0 bg-transparent text-sm font-semibold text-ink placeholder:text-ink-faint focus:outline-none"
+                />
+                <span className="shrink-0 text-sm font-semibold text-ink-read">
+                  dose
+                </span>
+              </label>
+            )}
+          </form.Field>
+          <form.Field name="stock">
+            {(field) => (
+              <label className="flex flex-1 items-center gap-2 rounded-control border border-hairline bg-white px-4 py-3 focus-within:border-lilac">
+                <input
+                  value={field.state.value}
+                  aria-label="Estoque"
+                  inputMode="decimal"
+                  onChange={(e) =>
+                    field.handleChange(sanitizeQuantity(e.target.value))
+                  }
+                  placeholder="Estoque"
+                  className="w-full min-w-0 bg-transparent text-sm font-semibold text-ink placeholder:text-ink-faint focus:outline-none"
+                />
+                <span className="shrink-0 text-sm font-semibold text-ink-read">
+                  {unitLabel(2, doseUnit)}
+                </span>
+              </label>
+            )}
+          </form.Field>
+        </div>
       </div>
 
       <div className="flex flex-col gap-2">

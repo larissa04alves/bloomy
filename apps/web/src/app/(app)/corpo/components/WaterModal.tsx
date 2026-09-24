@@ -14,12 +14,15 @@ export function WaterModal({
   onOpenChange,
   onConfirm,
   portionMl,
+  disabled = false,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onConfirm: (ml: number) => void;
   /** Porção configurada na meta — vira atalho e valor inicial do stepper. */
   portionMl: number;
+  /** Bloqueia o registro enquanto uma remoção está em voo. */
+  disabled?: boolean;
 }) {
   const [ml, setMl] = useState(portionMl);
 
@@ -40,11 +43,12 @@ export function WaterModal({
       footer={
         <button
           type="button"
+          disabled={disabled}
           onClick={() => {
             onConfirm(ml);
             onOpenChange(false);
           }}
-          className="w-full rounded-full bg-lilac py-3.5 font-display font-bold text-white shadow-btn"
+          className="w-full rounded-full bg-lilac py-3.5 font-display font-bold text-white shadow-btn disabled:opacity-60"
         >
           Registrar
         </button>

@@ -38,11 +38,13 @@ export default function CorpoPage() {
       <HidratacaoSection
         totalMl={hidr.totalMl}
         goalMl={waterGoalMl}
-        done={hidr.done}
         target={hidr.target}
         portionMl={waterPortionMl}
         portionReady={portionReady}
         onAddPortion={hidr.addPortion}
+        canAdd={hidr.canAdd}
+        canRemove={hidr.canRemove}
+        onRemoveLast={hidr.removeLast}
         onOpenModal={() => setWaterOpen(true)}
       />
 
@@ -68,6 +70,7 @@ export default function CorpoPage() {
         onOpenChange={setWaterOpen}
         onConfirm={hidr.addWater}
         portionMl={waterPortionMl}
+        disabled={!hidr.canAdd}
       />
       <MealModal
         open={mealOpen}
