@@ -13,9 +13,10 @@ export function useHidratacao(goalMl: number, portionMl: number) {
     useCallback(() => api.get<WaterDay>("/api/water"), []),
   );
 
-  // Adds ainda sem resposta: o `−` espera, senão o DELETE pode chegar antes do
-  // insert e apagar o registro anterior.
+  // Add e remoção em voo se excluem: o servidor apaga "o último", então um POST e um
+  // DELETE simultâneos podem tirar o registro errado.
   const [pendingAdds, setPendingAdds] = useState(0);
+  const [removing, setRemoving] = useState(false);
 
   const totalMl = data?.totalMl ?? 0;
   const { target } = portions(totalMl, goalMl, portionMl);
@@ -47,12 +48,15 @@ export function useHidratacao(goalMl: number, portionMl: number) {
     if (data && last && data.logs.reduce((s, l) => s + l.ml, 0) === totalMl) {
       setData({ logs: data.logs.slice(1), totalMl: totalMl - last.ml });
     }
+    setRemoving(true);
     try {
       await api.del("/api/water/last");
       reload();
     } catch (e) {
       if (prev) setData(prev);
       toastError(e, "Não foi possível tirar a água");
+    } finally {
+      setRemoving(false);
     }
   }, [data, totalMl, setData, reload]);
 
@@ -63,7 +67,8 @@ export function useHidratacao(goalMl: number, portionMl: number) {
     totalMl,
     target,
     loading,
-    canRemove: totalMl > 0 && pendingAdds === 0,
+    canAdd: !removing,
+    canRemove: totalMl > 0 && pendingAdds === 0 && !removing,
     addWater,
     addPortion,
     removeLast,

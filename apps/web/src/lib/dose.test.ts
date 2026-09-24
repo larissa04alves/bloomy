@@ -1,6 +1,12 @@
 import { describe, expect, it } from "bun:test";
 
-import { formatDose, formatQuantity, parseQuantity, sanitizeQuantity } from "./dose";
+import {
+  formatDose,
+  formatQuantity,
+  hasAtMostDecimals,
+  parseQuantity,
+  sanitizeQuantity,
+} from "./dose";
 
 describe("formatDose", () => {
   it("concorda a unidade com a quantidade", () => {
@@ -28,6 +34,10 @@ describe("formatQuantity", () => {
     expect(formatQuantity(30)).toBe("30");
     expect(formatQuantity(0.25)).toBe("0,25");
   });
+  it("sem separador de milhar: 1000 volta como 1000", () => {
+    expect(formatQuantity(1000)).toBe("1000");
+    expect(parseQuantity(formatQuantity(12500))).toBe(12500);
+  });
   it("ida e volta pelo input não perde precisão (125 mcg = 0,125 mg)", () => {
     expect(parseQuantity(formatQuantity(0.125))).toBe(0.125);
   });
@@ -44,5 +54,14 @@ describe("parseQuantity / sanitizeQuantity", () => {
     expect(sanitizeQuantity("1,2,3")).toBe("1,23");
     expect(sanitizeQuantity("3 comp")).toBe("3");
     expect(sanitizeQuantity("0,1256")).toBe("0,125");
+  });
+});
+
+describe("hasAtMostDecimals", () => {
+  it("aceita até 3 casas, recusa mais", () => {
+    expect(hasAtMostDecimals(0.125)).toBe(true);
+    expect(hasAtMostDecimals(30)).toBe(true);
+    expect(hasAtMostDecimals(0.00006)).toBe(false);
+    expect(hasAtMostDecimals(0.1255)).toBe(false);
   });
 });

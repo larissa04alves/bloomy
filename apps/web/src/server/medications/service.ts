@@ -9,6 +9,9 @@ import {
 } from "@bloomy/db/schema/body";
 import { and, asc, eq, sql } from "drizzle-orm";
 
+/** Mesma precisão que o `round(…, 4)` do estoque, para o delta devolvido bater com o descontado. */
+const round4 = (n: number) => Math.round(n * 1e4) / 1e4;
+
 export type IntakeSlot = {
   medicationId: string;
   name: string;
@@ -73,20 +76,38 @@ export async function updateMedication(
   medicationId: string,
   input: Partial<MedicationInput>,
 ): Promise<Medication | null> {
-  const [updated] = await db
-    .update(medication)
-    .set({
-      ...(input.name !== undefined && { name: input.name }),
-      ...(input.doseAmount !== undefined && { doseAmount: input.doseAmount }),
-      ...(input.doseUnit !== undefined && { doseUnit: input.doseUnit }),
-      ...(input.stock !== undefined && { stock: input.stock }),
-      ...(input.times !== undefined && { times: [...new Set(input.times)].sort() }),
-      updatedAt: new Date(),
-    })
-    .where(and(eq(medication.id, medicationId), eq(medication.userId, userId)))
-    .returning();
+  return db.transaction(async (tx) => {
+    const [before] = await tx
+      .select({ doseUnit: medication.doseUnit })
+      .from(medication)
+      .where(and(eq(medication.id, medicationId), eq(medication.userId, userId)));
 
-  return updated ?? null;
+    if (!before) return null;
+
+    const [updated] = await tx
+      .update(medication)
+      .set({
+        ...(input.name !== undefined && { name: input.name }),
+        ...(input.doseAmount !== undefined && { doseAmount: input.doseAmount }),
+        ...(input.doseUnit !== undefined && { doseUnit: input.doseUnit }),
+        ...(input.stock !== undefined && { stock: input.stock }),
+        ...(input.times !== undefined && { times: [...new Set(input.times)].sort() }),
+        updatedAt: new Date(),
+      })
+      .where(eq(medication.id, medicationId))
+      .returning();
+
+    // O delta das tomas já feitas está na unidade antiga: devolvê-lo no estoque novo
+    // misturaria unidades, então desmarcar essas tomas deixa de devolver.
+    if (input.doseUnit !== undefined && input.doseUnit !== before.doseUnit) {
+      await tx
+        .update(medicationIntake)
+        .set({ stockDelta: null })
+        .where(eq(medicationIntake.medicationId, medicationId));
+    }
+
+    return updated;
+  });
 }
 
 export async function deactivateMedication(
@@ -155,7 +176,8 @@ export async function markIntake(
 
     // Desconta a dose, sem passar de zero; a toma guarda quanto saiu p/ o unmark devolver exato.
     // round(…, 4): doses decimais (0,1 ml) acumulariam resíduo de float no estoque
-    const delta = current.stock === null ? 0 : Math.min(current.stock, current.doseAmount);
+    const delta =
+      current.stock === null ? 0 : round4(Math.min(current.stock, current.doseAmount));
     if (delta > 0) {
       await tx
         .update(medication)

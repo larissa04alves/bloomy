@@ -17,7 +17,11 @@ export const DOSE_UNIT_OPTIONS = Object.keys(DOSE_UNIT_LABELS) as DoseUnit[];
  *  (125 mcg = 0,125 mg). */
 const DECIMALS = 3;
 
-const NUMBER = new Intl.NumberFormat("pt-BR", { maximumFractionDigits: DECIMALS });
+// Sem separador de milhar: "1.000" voltaria do input como 1.
+const NUMBER = new Intl.NumberFormat("pt-BR", {
+  maximumFractionDigits: DECIMALS,
+  useGrouping: false,
+});
 
 export function formatQuantity(amount: number): string {
   return NUMBER.format(amount);
@@ -44,4 +48,10 @@ export function parseQuantity(text: string): number | null {
 export function sanitizeQuantity(text: string): string {
   const [int, ...rest] = text.replace(".", ",").replace(/[^\d,]/g, "").split(",");
   return rest.length ? `${int},${rest.join("").slice(0, DECIMALS)}` : int;
+}
+
+/** Guarda do contrato da API: a mesma precisão que o input aceita. */
+export function hasAtMostDecimals(n: number): boolean {
+  const scaled = n * 10 ** DECIMALS;
+  return Math.abs(scaled - Math.round(scaled)) < 1e-6;
 }

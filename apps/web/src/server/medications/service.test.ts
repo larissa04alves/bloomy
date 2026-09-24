@@ -162,6 +162,44 @@ describe("markIntake / unmarkIntake (db em memória)", () => {
     expect(row.stock).toBe(0.4);
   });
 
+  test("trocar a unidade: toma antiga desmarcada não devolve na unidade nova", async () => {
+    const db = await createTestDb();
+    const userId = await createTestUser(db);
+    const med = await createMedication(db, userId, {
+      name: "Xarope",
+      doseAmount: 1,
+      doseUnit: "comp",
+      stock: 10,
+      times: ["09:00"],
+    });
+    const input = { medicationId: med.id, time: "09:00", day: "2026-07-06" };
+
+    expect(await markIntake(db, userId, input)).toBe("ok");
+    await updateMedication(db, userId, med.id, { doseUnit: "ml", stock: 100 });
+    expect(await unmarkIntake(db, userId, input)).toBe(true);
+    const [row] = await db.select().from(medication).where(eq(medication.id, med.id));
+    expect(row.stock).toBe(100);
+  });
+
+  test("editar sem trocar a unidade mantém a devolução", async () => {
+    const db = await createTestDb();
+    const userId = await createTestUser(db);
+    const med = await createMedication(db, userId, {
+      name: "Vitamina",
+      doseAmount: 1,
+      doseUnit: "comp",
+      stock: 10,
+      times: ["09:00"],
+    });
+    const input = { medicationId: med.id, time: "09:00", day: "2026-07-06" };
+
+    expect(await markIntake(db, userId, input)).toBe("ok");
+    await updateMedication(db, userId, med.id, { doseUnit: "comp", name: "Vitamina D" });
+    expect(await unmarkIntake(db, userId, input)).toBe(true);
+    const [row] = await db.select().from(medication).where(eq(medication.id, med.id));
+    expect(row.stock).toBe(10);
+  });
+
   test("remédio inexistente: mark retorna not_found e unmark false", async () => {
     const db = await createTestDb();
     const userId = await createTestUser(db);

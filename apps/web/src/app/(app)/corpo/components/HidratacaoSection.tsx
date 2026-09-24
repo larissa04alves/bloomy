@@ -16,6 +16,7 @@ export function HidratacaoSection({
   target,
   portionMl,
   portionReady,
+  canAdd,
   canRemove,
   onAddPortion,
   onRemoveLast,
@@ -27,7 +28,9 @@ export function HidratacaoSection({
   portionMl: number;
   /** Porção já carregada do profile. Falso = o `portionMl` ainda é o fallback. */
   portionReady: boolean;
-  /** Falso com o dia zerado ou com um add ainda em voo. */
+  /** Falso enquanto uma remoção está em voo. */
+  canAdd: boolean;
+  /** Falso com o dia zerado ou com um add/remoção ainda em voo. */
   canRemove: boolean;
   onAddPortion: () => void;
   onRemoveLast: () => void;
@@ -87,7 +90,7 @@ export function HidratacaoSection({
         <button
           type="button"
           onClick={onAddPortion}
-          disabled={!portionReady}
+          disabled={!portionReady || !canAdd}
           className="flex flex-1 items-center justify-center gap-1 rounded-full bg-lilac font-bold text-white shadow-btn disabled:opacity-60 disabled:shadow-none"
         >
           <PlusIcon size={18} weight="bold" />
