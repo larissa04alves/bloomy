@@ -129,7 +129,7 @@ export async function updateAppointment(
 
     const status =
       input.status ??
-      (input.scheduledAt !== undefined ? "scheduled" : current.status);
+      (input.scheduledAt ? "scheduled" : current.status);
     const toSchedule = status === "to_schedule";
     const scheduledAt = toSchedule
       ? null

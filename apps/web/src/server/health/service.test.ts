@@ -172,6 +172,24 @@ describe("consulta a agendar", () => {
     expect(created.suggestedAt).toEqual(d);
   });
 
+  test("scheduledAt null sem status mantém a agendar", async () => {
+    const db = await createTestDb();
+    const u = await createTestUser(db);
+    const created = await makeAppointment(db, u, {
+      professional: "Dra. Marina",
+      status: "to_schedule",
+      suggestedAt: d,
+    });
+    const updated = await updateAppointment(db, u, created.id, {
+      scheduledAt: null,
+      specialty: "Derma",
+    });
+    expect(updated).not.toBe("missing_schedule");
+    if (!updated || updated === "missing_schedule") throw new Error("esperava a consulta");
+    expect(updated.status).toBe("to_schedule");
+    expect(updated.specialty).toBe("Derma");
+  });
+
   test("agendada sem data → missing_schedule", async () => {
     const db = await createTestDb();
     const u = await createTestUser(db);
