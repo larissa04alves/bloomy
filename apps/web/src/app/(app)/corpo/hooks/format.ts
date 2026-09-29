@@ -19,6 +19,8 @@ export function waterShortcuts(portionMl: number): number[] {
 
 /** Teto de gramas por item; o mesmo limite do zod das rotas de refeição. */
 export const MEAL_GRAMS_MAX = 5000;
+/** Teto de itens por refeição; o mesmo limite do zod das rotas de refeição. */
+export const MEAL_ITEMS_MAX = 30;
 
 /** Subtítulo do card: "Arroz 150 g · Feijão". */
 export function formatMealItems(items: MealItem[]): string {

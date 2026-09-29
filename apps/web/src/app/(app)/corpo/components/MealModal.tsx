@@ -7,12 +7,13 @@ import { BottomSheet } from "@/components/bottom-sheet";
 import { ChoiceChip } from "@/components/choice-chip";
 import { MEAL_LABELS, type MealItem, type MealType } from "@/lib/api-types";
 
-import { MEAL_GRAMS_MAX, toMealItems } from "../hooks/format";
+import { MEAL_GRAMS_MAX, MEAL_ITEMS_MAX, toMealItems } from "../hooks/format";
 
 const ALL_TYPES: MealType[] = ["breakfast", "lunch", "dinner", "snack"];
 
-type Row = { name: string; grams: string };
-const EMPTY_ROW: Row = { name: "", grams: "" };
+/** `id` estável: com key por índice, remover uma linha levaria o foco para o item errado. */
+type Row = { id: string; name: string; grams: string };
+const newRow = (name = "", grams = ""): Row => ({ id: crypto.randomUUID(), name, grams });
 
 export function MealModal({
   open,
@@ -28,30 +29,31 @@ export function MealModal({
   onSubmit: (input: { type: MealType; items: MealItem[] }) => void;
 }) {
   const [type, setType] = useState<MealType>(initialType ?? "breakfast");
-  const [rows, setRows] = useState<Row[]>([EMPTY_ROW]);
+  const [rows, setRows] = useState<Row[]>(() => [newRow()]);
 
   // Ao (re)abrir: pré-preenche do modo edição, ou reseta com o tipo pendente.
   useEffect(() => {
     if (open) {
       setType(editing?.type ?? initialType ?? "breakfast");
-      const seeded = editing?.items.map((i) => ({
-        name: i.name,
-        grams: i.grams === null ? "" : String(i.grams),
-      }));
-      setRows(seeded && seeded.length > 0 ? seeded : [EMPTY_ROW]);
+      const seeded = editing?.items.map((i) => newRow(i.name, i.grams === null ? "" : String(i.grams)));
+      setRows(seeded && seeded.length > 0 ? seeded : [newRow()]);
     }
   }, [open, initialType, editing?.type, editing?.items]);
 
   const items = toMealItems(rows);
   // Acima do teto o Salvar trava em vez de cortar o número calado.
   const canSave =
-    items.length > 0 && items.every((i) => i.grams === null || i.grams <= MEAL_GRAMS_MAX);
+    items.length > 0 &&
+    items.length <= MEAL_ITEMS_MAX &&
+    items.every((i) => i.grams === null || i.grams <= MEAL_GRAMS_MAX);
 
-  const updateRow = (index: number, patch: Partial<Row>) =>
-    setRows((prev) => prev.map((x, i) => (i === index ? { ...x, ...patch } : x)));
-  const addRow = () => setRows((prev) => [...prev, EMPTY_ROW]);
-  const removeRow = (index: number) =>
-    setRows((prev) => (prev.length > 1 ? prev.filter((_, i) => i !== index) : prev));
+  const atLimit = rows.length >= MEAL_ITEMS_MAX;
+  const updateRow = (id: string, patch: Partial<Row>) =>
+    setRows((prev) => prev.map((x) => (x.id === id ? { ...x, ...patch } : x)));
+  const addRow = () =>
+    setRows((prev) => (prev.length >= MEAL_ITEMS_MAX ? prev : [...prev, newRow()]));
+  const removeRow = (id: string) =>
+    setRows((prev) => (prev.length > 1 ? prev.filter((x) => x.id !== id) : prev));
 
   const submit = () => {
     if (!canSave) return;
@@ -87,11 +89,10 @@ export function MealModal({
 
       <div className="flex flex-col gap-2">
         {rows.map((row, i) => (
-          // eslint-disable-next-line react/no-array-index-key -- lista curta e efêmera
-          <div key={i} className="flex items-center gap-2">
+          <div key={row.id} className="flex items-center gap-2">
             <input
               value={row.name}
-              onChange={(e) => updateRow(i, { name: e.target.value })}
+              onChange={(e) => updateRow(row.id, { name: e.target.value })}
               maxLength={120}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
@@ -106,7 +107,7 @@ export function MealModal({
               <input
                 value={row.grams}
                 onChange={(e) =>
-                  updateRow(i, { grams: e.target.value.replace(/\D/g, "").slice(0, 4) })
+                  updateRow(row.id, { grams: e.target.value.replace(/\D/g, "").slice(0, 4) })
                 }
                 inputMode="numeric"
                 maxLength={4}
@@ -120,7 +121,7 @@ export function MealModal({
               <button
                 type="button"
                 aria-label="Remover item"
-                onClick={() => removeRow(i)}
+                onClick={() => removeRow(row.id)}
                 className="grid size-9 shrink-0 place-items-center rounded-full bg-green-tint text-green-deep"
               >
                 <XIcon size={16} weight="bold" />
@@ -129,13 +130,15 @@ export function MealModal({
           </div>
         ))}
 
-        <button
-          type="button"
-          onClick={addRow}
-          className="flex items-center justify-center gap-1 rounded-control border border-dashed border-hairline py-2.5 text-sm font-bold text-green-deep"
-        >
-          <PlusIcon size={16} weight="bold" /> Adicionar mais
-        </button>
+        {atLimit ? null : (
+          <button
+            type="button"
+            onClick={addRow}
+            className="flex items-center justify-center gap-1 rounded-control border border-dashed border-hairline py-2.5 text-sm font-bold text-green-deep"
+          >
+            <PlusIcon size={16} weight="bold" /> Adicionar mais
+          </button>
+        )}
       </div>
     </BottomSheet>
   );
