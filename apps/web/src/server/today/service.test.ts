@@ -49,7 +49,10 @@ describe("getToday", () => {
     await addWater(db, USER.id, 1500);
     await addMeal(db, USER.id, {
       type: "breakfast",
-      description: "café com pão",
+      items: [
+        { name: "café", grams: null },
+        { name: "pão", grams: 50 },
+      ],
     });
     await upsertCheckin(db, USER.id, { mood: "good" });
     const med = await createMedication(db, USER.id, {

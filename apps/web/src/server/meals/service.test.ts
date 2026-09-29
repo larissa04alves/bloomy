@@ -1,7 +1,8 @@
 import { afterAll, describe, expect, test } from "bun:test";
 
 import { cleanupTestDbs, createTestDb, createTestUser } from "@/server/shared/test-db";
-import { addMeal, pendingMealTypes, updateMeal } from "./service";
+import { dayFor } from "@/server/shared/day";
+import { addMeal, getMealsDay, pendingMealTypes, updateMeal } from "./service";
 
 afterAll(cleanupTestDbs);
 
@@ -30,23 +31,42 @@ describe("pendingMealTypes", () => {
 });
 
 describe("updateMeal (db em memória)", () => {
-  test("atualiza type e description; parcial; outro usuário → null", async () => {
+  test("atualiza type e items; parcial mantém items; outro usuário → null", async () => {
     const db = await createTestDb();
     const userId = await createTestUser(db);
-    const created = await addMeal(db, userId, { type: "lunch", description: "arroz" });
+    const created = await addMeal(db, userId, {
+      type: "lunch",
+      items: [{ name: "arroz", grams: 150 }],
+    });
 
     const updated = await updateMeal(db, userId, created.id, {
       type: "dinner",
-      description: "sopa",
+      items: [{ name: "sopa", grams: null }],
     });
     expect(updated?.type).toBe("dinner");
-    expect(updated?.description).toBe("sopa");
+    expect(updated?.items).toEqual([{ name: "sopa", grams: null }]);
 
-    const partial = await updateMeal(db, userId, created.id, { description: "sopa e pão" });
-    expect(partial?.type).toBe("dinner");
-    expect(partial?.description).toBe("sopa e pão");
+    const partial = await updateMeal(db, userId, created.id, { type: "snack" });
+    expect(partial?.type).toBe("snack");
+    expect(partial?.items).toEqual([{ name: "sopa", grams: null }]);
 
     const otherUser = await createTestUser(db, "outro-user");
-    expect(await updateMeal(db, otherUser, created.id, { description: "x" })).toBeNull();
+    expect(await updateMeal(db, otherUser, created.id, { type: "lunch" })).toBeNull();
+  });
+});
+
+describe("addMeal (db em memória)", () => {
+  test("addMeal guarda itens com e sem gramas", async () => {
+    const db = await createTestDb();
+    const userId = await createTestUser(db);
+    const items = [
+      { name: "Arroz", grams: 150 },
+      { name: "Feijão", grams: null },
+    ];
+    await addMeal(db, userId, { type: "lunch", items });
+
+    const { meals } = await getMealsDay(db, userId, dayFor());
+    expect(meals).toHaveLength(1);
+    expect(meals[0]?.items).toEqual(items);
   });
 });

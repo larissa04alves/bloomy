@@ -76,7 +76,7 @@ export default function CorpoPage() {
         open={mealOpen}
         onOpenChange={setMealOpen}
         initialType={mealType}
-        editing={editingMeal ? { type: editingMeal.type, description: editingMeal.description } : undefined}
+        editing={editingMeal ? { type: editingMeal.type, items: editingMeal.items } : undefined}
         onSubmit={(input) => {
           if (editingMeal) ref.editMeal(editingMeal.id, input);
           else ref.addMeal(input);

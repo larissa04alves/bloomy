@@ -1,3 +1,4 @@
+import { sql } from "drizzle-orm";
 import { index, integer, real, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
 
 import { user } from "./auth";
@@ -19,6 +20,8 @@ export const waterLog = sqliteTable(
   (table) => [index("water_log_user_day_idx").on(table.userId, table.day)],
 );
 
+export type MealItem = { name: string; grams: number | null };
+
 export const meal = sqliteTable(
   "meal",
   {
@@ -29,7 +32,7 @@ export const meal = sqliteTable(
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
     type: text("type").$type<"breakfast" | "lunch" | "dinner" | "snack">().notNull(),
-    description: text("description").notNull(),
+    items: text("items", { mode: "json" }).$type<MealItem[]>().default(sql`'[]'`).notNull(),
     day: text("day").notNull(),
     createdAt: timestampMs("created_at"),
   },

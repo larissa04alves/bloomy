@@ -1,6 +1,6 @@
 import { describe, expect, it } from "bun:test";
 
-import { dropFill, waterShortcuts } from "./format";
+import { dropFill, formatMealItems, toMealItems, waterShortcuts } from "./format";
 
 describe("dropFill", () => {
   it("enche a gota em fração da porção", () => {
@@ -34,5 +34,34 @@ describe("waterShortcuts", () => {
   });
   it("ignora porção zerada", () => {
     expect(waterShortcuts(0)).toEqual([200, 250, 500, 750, 1000]);
+  });
+});
+
+describe("formatMealItems", () => {
+  it("junta os itens com · e mostra gramas só quando há", () => {
+    expect(
+      formatMealItems([
+        { name: "Arroz", grams: 150 },
+        { name: "Feijão", grams: null },
+        { name: "Frango grelhado", grams: 120 },
+      ]),
+    ).toBe("Arroz 150 g · Feijão · Frango grelhado 120 g");
+  });
+});
+
+describe("toMealItems", () => {
+  it("apara nomes, descarta linha sem nome e trata gramas vazia ou zero como sem gramas", () => {
+    expect(
+      toMealItems([
+        { name: " Arroz ", grams: "150" },
+        { name: "", grams: "80" },
+        { name: "Feijão", grams: "" },
+        { name: "Ovo", grams: "0" },
+      ]),
+    ).toEqual([
+      { name: "Arroz", grams: 150 },
+      { name: "Feijão", grams: null },
+      { name: "Ovo", grams: null },
+    ]);
   });
 });
