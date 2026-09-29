@@ -1,23 +1,17 @@
 import { describe, expect, it } from "bun:test";
 
-import { dropFill, formatMealItems, toMealItems, waterShortcuts } from "./format";
+import { formatMealItems, toMealItems, waterLevel, waterShortcuts } from "./format";
 
-describe("dropFill", () => {
-  it("enche a gota em fração da porção", () => {
-    // porção de 1 L, 200 ml registrados: 1/5 da primeira gota
-    expect(dropFill(200, 1000, 0)).toBeCloseTo(0.2);
-    expect(dropFill(200, 1000, 1)).toBe(0);
+describe("waterLevel", () => {
+  it("é a fração da meta já bebida", () => {
+    expect(waterLevel(600, 1500)).toBeCloseTo(0.4);
   });
-  it("gotas anteriores ficam cheias e a seguinte recebe o resto", () => {
-    expect(dropFill(1500, 1000, 0)).toBe(1);
-    expect(dropFill(1500, 1000, 1)).toBeCloseTo(0.5);
-    expect(dropFill(1500, 1000, 2)).toBe(0);
+  it("para em cheia quando passa da meta", () => {
+    expect(waterLevel(2100, 1500)).toBe(1);
   });
-  it("não passa de cheia quando o total estoura a meta", () => {
-    expect(dropFill(9000, 1000, 3)).toBe(1);
-  });
-  it("porção inválida não vira NaN", () => {
-    expect(dropFill(500, 0, 0)).toBe(1);
+  it("dia zerado ou meta inválida ficam vazios", () => {
+    expect(waterLevel(0, 1500)).toBe(0);
+    expect(waterLevel(500, 0)).toBe(0);
   });
 });
 

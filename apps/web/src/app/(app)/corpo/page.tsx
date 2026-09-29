@@ -18,7 +18,7 @@ import { useRemedios } from "./hooks/useRemedios";
 
 export default function CorpoPage() {
   const { waterGoalMl, mealsTarget, waterPortionMl, portionReady } = useGoals();
-  const hidr = useHidratacao(waterGoalMl, waterPortionMl);
+  const hidr = useHidratacao(waterPortionMl);
   const ref = useRefeicoes();
   const rem = useRemedios();
 
@@ -38,7 +38,6 @@ export default function CorpoPage() {
       <HidratacaoSection
         totalMl={hidr.totalMl}
         goalMl={waterGoalMl}
-        target={hidr.target}
         portionMl={waterPortionMl}
         portionReady={portionReady}
         onAddPortion={hidr.addPortion}

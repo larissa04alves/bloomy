@@ -6,9 +6,8 @@ import { api } from "@/lib/api";
 import type { WaterDay } from "@/lib/api-types";
 import { toastError } from "@/lib/toast";
 import { useResource } from "@/lib/use-resource";
-import { portions } from "@/server/shared/units";
 
-export function useHidratacao(goalMl: number, portionMl: number) {
+export function useHidratacao(portionMl: number) {
   const { data, loading, reload, setData } = useResource<WaterDay>(
     useCallback(() => api.get<WaterDay>("/api/water"), []),
   );
@@ -19,7 +18,6 @@ export function useHidratacao(goalMl: number, portionMl: number) {
   const [removing, setRemoving] = useState(false);
 
   const totalMl = data?.totalMl ?? 0;
-  const { target } = portions(totalMl, goalMl, portionMl);
 
   const addWater = useCallback(
     async (ml: number) => {
@@ -65,7 +63,6 @@ export function useHidratacao(goalMl: number, portionMl: number) {
 
   return {
     totalMl,
-    target,
     loading,
     canAdd: !removing,
     canRemove: totalMl > 0 && pendingAdds === 0 && !removing,

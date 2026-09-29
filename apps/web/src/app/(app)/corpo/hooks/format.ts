@@ -1,10 +1,8 @@
-import { DEFAULT_PORTION_ML, type MealItem } from "@/lib/api-types";
+import type { MealItem } from "@/lib/api-types";
 
-/** Quanto da gota `index` está cheia (0–1): cada gota é uma porção, e o total
- *  enche as gotas em ordem, com a última parcial (200 ml numa porção de 1 L = 1/5). */
-export function dropFill(totalMl: number, portionMl: number, index: number): number {
-  const size = portionMl > 0 ? portionMl : DEFAULT_PORTION_ML;
-  return Math.min(1, Math.max(0, totalMl / size - index));
+/** Nível da água na gota (0–1): fração da meta, cheia ao passar dela. */
+export function waterLevel(totalMl: number, goalMl: number): number {
+  return goalMl > 0 ? Math.min(1, Math.max(0, totalMl / goalMl)) : 0;
 }
 
 /** Quantidades oferecidas como atalho no modal de água. */
