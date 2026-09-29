@@ -40,7 +40,9 @@ describe("numberDraft", () => {
   it("aceita uma vírgula/ponto no modo decimal", () => {
     expect(numberDraft("07,5", true)).toBe("7,5");
     expect(numberDraft("0,5", true)).toBe("0,5");
-    expect(numberDraft("7,5", false)).toBe("75");
+    // inteiro: a parte depois da vírgula é descartada, nunca colada aos dígitos
+    expect(numberDraft("7,5", false)).toBe("7");
+    expect(numberDraft("12.9")).toBe("12");
   });
 });
 

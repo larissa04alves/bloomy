@@ -14,15 +14,19 @@ export function formatDuration(totalSeconds: number): string {
   return `${Math.floor(min / 60)}h ${String(min % 60).padStart(2, "0")}`;
 }
 
-/** Rascunho sem zero à esquerda ("030" → "30"); `decimal` aceita uma vírgula. */
+/** Rascunho sem zero à esquerda ("030" → "30"); `decimal` aceita uma vírgula.
+ *  Sem `decimal`, tudo depois da vírgula é descartado ("7,5" → "7", não "75"). */
 export function numberDraft(raw: string, decimal = false): string {
   let out = "";
   let hasSeparator = false;
   for (const ch of raw) {
     if (ch >= "0" && ch <= "9") out += ch;
-    else if (decimal && !hasSeparator && (ch === "," || ch === ".")) {
-      out += ch;
-      hasSeparator = true;
+    else if (ch === "," || ch === ".") {
+      if (!decimal) break;
+      if (!hasSeparator) {
+        out += ch;
+        hasSeparator = true;
+      }
     }
   }
   return out.replace(/^0+(?=\d)/, "");
