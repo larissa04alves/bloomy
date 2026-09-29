@@ -1,6 +1,6 @@
 "use client";
 
-import { DropIcon, MinusIcon, PlusIcon } from "@phosphor-icons/react";
+import { DropIcon, MinusIcon } from "@phosphor-icons/react";
 
 import { ProgressBar } from "@/components/progress-bar";
 
@@ -77,32 +77,35 @@ export function HidratacaoSection({
         <ProgressBar value={goalMl > 0 ? totalMl / goalMl : 0} tone="lilac" />
       )}
 
-      <div className="flex gap-2">
+      <div className="flex h-11 items-center overflow-hidden rounded-full bg-lilac-tint font-bold text-lilac-deep">
         <button
           type="button"
           aria-label="Tirar último registro"
           onClick={onRemoveLast}
           disabled={!canRemove}
-          className="grid size-12 shrink-0 place-items-center rounded-full bg-lilac-tint text-lilac-deep disabled:opacity-50"
+          className="grid h-full w-13 shrink-0 place-items-center disabled:text-ink-faint disabled:opacity-50"
         >
-          <MinusIcon size={20} weight="bold" />
+          <MinusIcon size={17} weight="bold" />
         </button>
+        <span className="h-5 w-px shrink-0 bg-ring-track" aria-hidden="true" />
         <button
           type="button"
+          aria-label={portionReady ? `Adicionar ${portionMl} ml` : "Adicionar copo"}
           onClick={onAddPortion}
           disabled={!portionReady || !canAdd}
-          className="flex flex-1 items-center justify-center gap-1 rounded-full bg-lilac font-bold text-white shadow-btn disabled:opacity-60 disabled:shadow-none"
+          className="flex h-full flex-1 items-center justify-center gap-1.5 text-sm disabled:opacity-60"
         >
-          <PlusIcon size={18} weight="bold" />
-          {portionReady ? `Adicionar ${portionMl} ml` : "Adicionar porção"}
+          <DropIcon size={17} weight="fill" />
+          {portionReady ? `+ ${portionMl} ml` : "+ copo"}
         </button>
+        <span className="h-5 w-px shrink-0 bg-ring-track" aria-hidden="true" />
         <button
           type="button"
-          aria-label="Escolher quantidade"
+          aria-label="Escolher outra quantidade"
           onClick={onOpenModal}
-          className="grid size-12 shrink-0 place-items-center rounded-full bg-lilac-tint text-lilac-deep"
+          className="grid h-full w-18 shrink-0 place-items-center text-xs"
         >
-          <DropIcon size={22} weight="fill" />
+          Outra
         </button>
       </div>
     </section>
