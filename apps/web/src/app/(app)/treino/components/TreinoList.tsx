@@ -1,6 +1,11 @@
 "use client";
 
-import { BarbellIcon, CircleNotchIcon, PlayIcon } from "@phosphor-icons/react";
+import {
+  BarbellIcon,
+  CircleNotchIcon,
+  PlayIcon,
+  PlusIcon,
+} from "@phosphor-icons/react";
 
 import { IconChip } from "@/components/icon-chip";
 import { SwipeableRow } from "@/components/swipeable-row";
@@ -12,18 +17,32 @@ export function TreinoList({
   onStart,
   onEdit,
   onDelete,
+  onCreate,
 }: {
   workouts: WorkoutWithExercises[];
   startingId: string | null;
   onStart: (workoutId: string) => void;
   onEdit: (workout: WorkoutWithExercises) => void;
   onDelete: (workoutId: string) => void;
+  onCreate: () => void;
 }) {
   if (workouts.length === 0) {
     return (
-      <p className="rounded-card border border-dashed border-hairline p-5 text-center text-sm font-semibold text-ink-read">
-        Nenhum treino ainda. Crie o primeiro no botão acima.
-      </p>
+      <button
+        type="button"
+        onClick={onCreate}
+        className="flex flex-col items-center gap-2 rounded-card border border-dashed border-hairline px-3 py-6 text-center"
+      >
+        <span className="grid size-10 place-items-center rounded-full bg-white text-pink-bright">
+          <PlusIcon size={22} weight="bold" />
+        </span>
+        <span className="text-sm font-bold text-pink-deep">
+          Criar primeiro treino
+        </span>
+        <span className="text-xs font-semibold text-ink-read">
+          Toque para montar
+        </span>
+      </button>
     );
   }
 
