@@ -1,4 +1,4 @@
-import type { ExamStatus } from "@/lib/api-types";
+import type { AppointmentInput, ExamStatus } from "@/lib/api-types";
 
 const MONTHS_PT = [
   "jan",
@@ -155,4 +155,47 @@ let tempIdSeq = 0;
 export function tempId(): string {
   tempIdSeq += 1;
   return `temp-${Date.now()}-${tempIdSeq}`;
+}
+
+/** Prazo do "a agendar": "keep" = mantém o `suggestedAt` atual; null = sem prazo; N = hoje + N meses. */
+export type AppointmentDue = "keep" | null | 1 | 3 | 6 | 12;
+
+export type AppointmentDraft = {
+  professional: string;
+  specialty: string;
+  location: string;
+  remindDayBefore: boolean;
+  status: AppointmentInput["status"];
+  due: AppointmentDue;
+  date?: Date;
+  hour: string;
+  minute: string;
+  currentSuggestedAt: string | null;
+};
+
+/** Formulário do modal → corpo da API. `null` quando uma consulta agendada ainda não tem data.
+ *  "A agendar" não leva horário, local nem lembrete: esses campos só existem na agendada. */
+export function buildAppointmentInput(
+  d: AppointmentDraft,
+  now: Date = new Date(),
+): AppointmentInput | null {
+  const base = { professional: d.professional.trim(), specialty: d.specialty.trim() };
+  if (d.status === "to_schedule") {
+    return {
+      ...base,
+      status: "to_schedule",
+      scheduledAt: null,
+      suggestedAt:
+        d.due === "keep" ? d.currentSuggestedAt : d.due === null ? null : addMonthsIso(d.due, now),
+    };
+  }
+  if (!d.date) return null;
+  return {
+    ...base,
+    status: "scheduled",
+    scheduledAt: combineDateTime(d.date, d.hour, d.minute),
+    suggestedAt: d.currentSuggestedAt,
+    location: d.location.trim(),
+    remindDayBefore: d.remindDayBefore,
+  };
 }

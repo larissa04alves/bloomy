@@ -2,6 +2,8 @@ import { describe, expect, test } from "bun:test";
 
 import {
   addMonthsIso,
+  buildAppointmentInput,
+  combineDateTime,
   byCompletedDesc,
   dayMonth,
   examStatusTone,
@@ -110,4 +112,47 @@ test("addMonthsIso: soma meses ao instante e devolve ISO", () => {
   expect(addMonthsIso(3, new Date("2026-09-29T12:00:00-03:00"))).toStartWith(
     "2026-12-29",
   );
+});
+
+describe("buildAppointmentInput", () => {
+  const now = new Date("2026-09-29T12:00:00-03:00");
+  const base = {
+    professional: " Dra. Marina ",
+    specialty: " Derma ",
+    location: " Clínica X ",
+    remindDayBefore: true,
+    hour: "14",
+    minute: "30",
+    currentSuggestedAt: "2026-12-01T12:00:00.000Z",
+  };
+
+  test("a agendar com prazo em meses: sem horário, local nem lembrete", () => {
+    expect(buildAppointmentInput({ ...base, status: "to_schedule", due: 3 }, now)).toEqual({
+      professional: "Dra. Marina",
+      specialty: "Derma",
+      status: "to_schedule",
+      scheduledAt: null,
+      suggestedAt: addMonthsIso(3, now),
+    });
+  });
+
+  test("a agendar mantém ou limpa o prazo atual", () => {
+    expect(buildAppointmentInput({ ...base, status: "to_schedule", due: "keep" }, now)?.suggestedAt).toBe(
+      base.currentSuggestedAt,
+    );
+    expect(buildAppointmentInput({ ...base, status: "to_schedule", due: null }, now)?.suggestedAt).toBeNull();
+  });
+
+  test("agendada exige data e leva local e lembrete", () => {
+    expect(buildAppointmentInput({ ...base, status: "scheduled", due: null }, now)).toBeNull();
+    const date = new Date("2026-10-05T00:00:00-03:00");
+    const input = buildAppointmentInput({ ...base, status: "scheduled", due: null, date }, now);
+    expect(input).toMatchObject({
+      status: "scheduled",
+      location: "Clínica X",
+      remindDayBefore: true,
+      suggestedAt: base.currentSuggestedAt,
+    });
+    expect(input?.scheduledAt).toBe(combineDateTime(date, "14", "30"));
+  });
 });

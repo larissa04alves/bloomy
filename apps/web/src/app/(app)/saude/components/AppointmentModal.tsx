@@ -11,8 +11,8 @@ import { ToggleSwitch } from "@/components/toggle-switch";
 import type { Appointment, AppointmentInput } from "@/lib/api-types";
 
 import {
-  addMonthsIso,
-  combineDateTime,
+  type AppointmentDue,
+  buildAppointmentInput,
   monthShort,
   splitDateTime,
 } from "../hooks/format";
@@ -27,8 +27,6 @@ const schema = z.object({
 });
 
 type ApptStatus = AppointmentInput["status"];
-/** Prazo do "a agendar": "keep" = mantém o `suggestedAt` atual; null = sem prazo; N = hoje + N meses. */
-type Due = "keep" | null | 1 | 3 | 6 | 12;
 
 const STATUS_OPTIONS: { value: ApptStatus; label: string }[] = [
   { value: "to_schedule", label: "A agendar" },
@@ -50,7 +48,7 @@ export function AppointmentModal({
   onSubmit: (input: AppointmentInput) => void;
 }) {
   const [status, setStatus] = useState<ApptStatus>("to_schedule");
-  const [due, setDue] = useState<Due>(null);
+  const [due, setDue] = useState<AppointmentDue>(null);
   const [date, setDate] = useState<Date | undefined>();
   const [hour, setHour] = useState("09");
   const [minute, setMinute] = useState("00");
@@ -65,33 +63,17 @@ export function AppointmentModal({
     },
     validators: { onChange: schema },
     onSubmit: ({ value }) => {
-      const base = {
-        professional: value.professional.trim(),
-        specialty: value.specialty.trim(),
-      };
-      if (status === "to_schedule") {
-        onSubmit({
-          ...base,
-          status,
-          scheduledAt: null,
-          suggestedAt:
-            due === "keep"
-              ? (initial?.suggestedAt ?? null)
-              : due === null
-                ? null
-                : addMonthsIso(due),
-        });
-      } else {
-        if (!date) return;
-        onSubmit({
-          ...base,
-          status,
-          scheduledAt: combineDateTime(date, hour, minute),
-          suggestedAt: initial?.suggestedAt ?? null,
-          location: value.location.trim(),
-          remindDayBefore: value.remindDayBefore,
-        });
-      }
+      const input = buildAppointmentInput({
+        ...value,
+        status,
+        due,
+        date,
+        hour,
+        minute,
+        currentSuggestedAt: initial?.suggestedAt ?? null,
+      });
+      if (!input) return;
+      onSubmit(input);
       onOpenChange(false);
     },
   });
