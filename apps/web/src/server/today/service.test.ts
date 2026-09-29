@@ -49,7 +49,10 @@ describe("getToday", () => {
     await addWater(db, USER.id, 1500);
     await addMeal(db, USER.id, {
       type: "breakfast",
-      description: "café com pão",
+      items: [
+        { name: "café", grams: null },
+        { name: "pão", grams: 50 },
+      ],
     });
     await upsertCheckin(db, USER.id, { mood: "good" });
     const med = await createMedication(db, USER.id, {
@@ -80,7 +83,7 @@ describe("getToday", () => {
     await createTestUser(db);
     const w = await createWorkout(db, USER.id, {
       name: "Pernas",
-      focus: "legs",
+      focuses: ["legs"],
       exercises: [
         {
           name: "Agachamento",
@@ -145,6 +148,8 @@ describe("getToday", () => {
       professional: "Dr. Paulo",
       scheduledAt: new Date("2026-07-01T17:00:00.000Z"),
     });
+    if (created === "missing_schedule")
+      throw new Error("fixture inválida: falta scheduledAt");
     // followUpMonths: 0 → suggestedAt fica no instante da conclusão, sempre
     // dentro da janela de 30 dias do serviço, sem depender do dia em que o teste roda.
     const result = await completeAppointment(db, USER.id, created.id, {

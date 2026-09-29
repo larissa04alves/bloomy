@@ -233,7 +233,7 @@ export function useSessao() {
       const body = {
         name: picked.namePt,
         catalogId: picked.id,
-        muscleGroup: null,
+        muscleGroups: [],
         ...NEW_EXERCISE_DEFAULTS,
       };
       const sessionId = detail.session.id;

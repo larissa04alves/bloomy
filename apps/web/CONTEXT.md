@@ -40,7 +40,7 @@ _Avoid_: copo (como unidade de dado)
 Unidade de exibição de água, equivalente a 250 ml. Existe só na apresentação ("5 de 8 copos"), nunca como medida registrada.
 
 **Refeição**:
-Registro de alimentação com tipo (Café, Almoço, Jantar, Lanche) e descrição livre.
+Registro de alimentação com tipo (Café, Almoço, Jantar, Lanche) e uma lista de itens, cada um com gramas opcionais.
 
 **Refeição principal**:
 Café, Almoço ou Jantar — as únicas que geram pendência. Lanche conta para a meta, mas nunca fica pendente.

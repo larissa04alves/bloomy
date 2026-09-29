@@ -1,14 +1,18 @@
 import type { DoseUnit } from "@/lib/api-types";
 
-/** Rótulo singular/plural de cada unidade; abreviações e medidas não flexionam. */
-export const DOSE_UNIT_LABELS: Record<DoseUnit, { one: string; many: string }> = {
-  comp: { one: "comp.", many: "comp." },
-  capsula: { one: "cápsula", many: "cápsulas" },
-  gotas: { one: "gota", many: "gotas" },
-  ml: { one: "ml", many: "ml" },
-  g: { one: "g", many: "g" },
-  mg: { one: "mg", many: "mg" },
-  scoop: { one: "scoop", many: "scoops" },
+/** Rótulo singular/plural de cada unidade (abreviações e medidas não flexionam) e o
+ *  nome extenso da lista de escolha. */
+export const DOSE_UNIT_LABELS: Record<
+  DoseUnit,
+  { one: string; many: string; name: string }
+> = {
+  comp: { one: "comp.", many: "comp.", name: "comprimido" },
+  capsula: { one: "cápsula", many: "cápsulas", name: "cápsula" },
+  gotas: { one: "gota", many: "gotas", name: "gotas" },
+  ml: { one: "ml", many: "ml", name: "ml" },
+  g: { one: "g", many: "g", name: "g" },
+  mg: { one: "mg", many: "mg", name: "mg" },
+  scoop: { one: "scoop", many: "scoops", name: "scoop" },
 };
 
 export const DOSE_UNIT_OPTIONS = Object.keys(DOSE_UNIT_LABELS) as DoseUnit[];

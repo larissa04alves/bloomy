@@ -23,6 +23,11 @@ export default function TreinoPage() {
     undefined,
   );
 
+  const openCreate = () => {
+    setEditing(undefined);
+    setModalOpen(true);
+  };
+
   if (sessao.detail) {
     const workoutName =
       treinos.workouts.find((w) => w.id === sessao.detail!.session.workoutId)
@@ -47,28 +52,30 @@ export default function TreinoPage() {
         <h2 className="font-display text-base font-bold text-ink">
           Seus treinos
         </h2>
-        <button
-          type="button"
-          onClick={() => {
-            setEditing(undefined);
-            setModalOpen(true);
-          }}
-          className="flex items-center gap-1 text-sm font-bold text-pink-deep"
-        >
-          <PlusIcon size={16} weight="bold" /> Novo treino
-        </button>
+        {treinos.workouts.length > 0 ? (
+          <button
+            type="button"
+            onClick={openCreate}
+            className="flex items-center gap-1 text-sm font-bold text-pink-deep"
+          >
+            <PlusIcon size={16} weight="bold" /> Novo treino
+          </button>
+        ) : null}
       </div>
 
-      <TreinoList
-        workouts={treinos.workouts}
-        startingId={sessao.startingId}
-        onStart={sessao.start}
-        onEdit={(w) => {
-          setEditing(w);
-          setModalOpen(true);
-        }}
-        onDelete={treinos.remove}
-      />
+      {treinos.loading && treinos.workouts.length === 0 ? null : (
+        <TreinoList
+          workouts={treinos.workouts}
+          startingId={sessao.startingId}
+          onStart={sessao.start}
+          onEdit={(w) => {
+            setEditing(w);
+            setModalOpen(true);
+          }}
+          onDelete={treinos.remove}
+          onCreate={openCreate}
+        />
+      )}
 
       <TreinoModal
         open={modalOpen}

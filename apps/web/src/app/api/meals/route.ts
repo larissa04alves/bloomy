@@ -9,11 +9,11 @@ import {
   unauthorized,
 } from "@/server/shared/api";
 import { resolveDay } from "@/server/shared/day";
-import { addMeal, getMealsDay } from "@/server/meals/service";
+import { MEAL_ITEMS_SCHEMA, addMeal, getMealsDay } from "@/server/meals/service";
 
 const BODY_SCHEMA = z.object({
   type: z.enum(["breakfast", "lunch", "dinner", "snack"]),
-  description: z.string().min(1).max(500),
+  items: MEAL_ITEMS_SCHEMA,
 });
 
 export async function GET(request: Request) {

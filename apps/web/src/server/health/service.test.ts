@@ -6,6 +6,7 @@ import {
   createAppointment,
   listAppointments,
   nextAppointment,
+  updateAppointment,
 } from "./service";
 import {
   attachExam,
@@ -20,6 +21,13 @@ import {
 } from "./service";
 import type { ExamStorageError, ExamTransitionError } from "./service";
 import type { ExamStorage } from "./r2";
+
+async function makeAppointment(...args: Parameters<typeof createAppointment>) {
+  const created = await createAppointment(...args);
+  if (created === "missing_schedule")
+    throw new Error("fixture inválida: falta scheduledAt");
+  return created;
+}
 
 async function makeExam(...args: Parameters<typeof createExam>) {
   const created = await createExam(...args);
@@ -55,7 +63,7 @@ describe("completeAppointment (ciclo de retorno)", () => {
   test("needsReturn cria retorno to_schedule copiando profissional", async () => {
     const db = await createTestDb();
     const userId = await createTestUser(db);
-    const appt = await createAppointment(db, userId, {
+    const appt = await makeAppointment(db, userId, {
       professional: "Dra. Marina",
       specialty: "Nutricionista",
       scheduledAt: new Date("2026-07-01T14:00:00Z"),
@@ -79,7 +87,7 @@ describe("completeAppointment (ciclo de retorno)", () => {
   test("needsReturn=false não cria retorno", async () => {
     const db = await createTestDb();
     const userId = await createTestUser(db);
-    const appt = await createAppointment(db, userId, {
+    const appt = await makeAppointment(db, userId, {
       professional: "Dr. Paulo",
       scheduledAt: new Date("2026-07-01T14:00:00Z"),
     });
@@ -93,7 +101,7 @@ describe("completeAppointment (ciclo de retorno)", () => {
   test("double-tap não recria retorno (idempotente)", async () => {
     const db = await createTestDb();
     const userId = await createTestUser(db);
-    const appt = await createAppointment(db, userId, {
+    const appt = await makeAppointment(db, userId, {
       professional: "Dra. Marina",
       scheduledAt: new Date("2026-07-01T14:00:00Z"),
     });
@@ -133,7 +141,7 @@ describe("nextAppointment (janela de 30 dias)", () => {
   test("ignora retorno com data sugerida além de 30 dias", async () => {
     const db = await createTestDb();
     const userId = await createTestUser(db);
-    const appt = await createAppointment(db, userId, {
+    const appt = await makeAppointment(db, userId, {
       professional: "Dra. Marina",
       scheduledAt: new Date(Date.now() - 24 * 60 * 60 * 1000), // passada
     });
@@ -145,6 +153,178 @@ describe("nextAppointment (janela de 30 dias)", () => {
 
     const next = await nextAppointment(db, userId);
     expect(next).toBeNull();
+  });
+});
+
+describe("consulta a agendar", () => {
+  const d = new Date("2026-12-29T15:00:00Z");
+
+  test("cria a agendar sem data", async () => {
+    const db = await createTestDb();
+    const u = await createTestUser(db);
+    const created = await makeAppointment(db, u, {
+      professional: "Dra. Marina",
+      status: "to_schedule",
+      suggestedAt: d,
+    });
+    expect(created.status).toBe("to_schedule");
+    expect(created.scheduledAt).toBeNull();
+    expect(created.suggestedAt).toEqual(d);
+  });
+
+  test("scheduledAt null sem status mantém a agendar", async () => {
+    const db = await createTestDb();
+    const u = await createTestUser(db);
+    const created = await makeAppointment(db, u, {
+      professional: "Dra. Marina",
+      status: "to_schedule",
+      suggestedAt: d,
+    });
+    const updated = await updateAppointment(db, u, created.id, {
+      scheduledAt: null,
+      specialty: "Derma",
+    });
+    expect(updated).not.toBe("missing_schedule");
+    if (!updated || updated === "missing_schedule") throw new Error("esperava a consulta");
+    expect(updated.status).toBe("to_schedule");
+    expect(updated.specialty).toBe("Derma");
+  });
+
+  test("agendada sem data → missing_schedule", async () => {
+    const db = await createTestDb();
+    const u = await createTestUser(db);
+    expect(
+      await createAppointment(db, u, {
+        professional: "Dra. Marina",
+        status: "scheduled",
+      }),
+    ).toBe("missing_schedule");
+    expect(
+      await createAppointment(db, u, { professional: "Dra. Marina" }),
+    ).toBe("missing_schedule");
+  });
+
+  test("agendada → a agendar zera horário", async () => {
+    const db = await createTestDb();
+    const u = await createTestUser(db);
+    const appt = await makeAppointment(db, u, {
+      professional: "Dra. Marina",
+      scheduledAt: new Date("2026-10-10T14:00:00Z"),
+      remindDayBefore: true,
+    });
+    const updated = await updateAppointment(db, u, appt.id, {
+      status: "to_schedule",
+      suggestedAt: null,
+    });
+    if (!updated || updated === "missing_schedule")
+      throw new Error(`update falhou: ${updated}`);
+    expect(updated.status).toBe("to_schedule");
+    expect(updated.scheduledAt).toBeNull();
+    expect(updated.remindDayBefore).toBe(false);
+    expect(updated.suggestedAt).toBeNull();
+  });
+
+  test("update sem suggestedAt preserva o prazo", async () => {
+    const db = await createTestDb();
+    const u = await createTestUser(db);
+    const appt = await makeAppointment(db, u, {
+      professional: "Dra. Marina",
+      status: "to_schedule",
+      suggestedAt: d,
+    });
+    const updated = await updateAppointment(db, u, appt.id, {
+      specialty: "Derma",
+    });
+    if (!updated || updated === "missing_schedule")
+      throw new Error(`update falhou: ${updated}`);
+    expect(updated.suggestedAt).toEqual(d);
+    expect(updated.status).toBe("to_schedule");
+    expect(updated.specialty).toBe("Derma");
+  });
+
+  test("status scheduled sem data no patch nem na linha → missing_schedule", async () => {
+    const db = await createTestDb();
+    const u = await createTestUser(db);
+    const appt = await makeAppointment(db, u, {
+      professional: "Dra. Marina",
+      status: "to_schedule",
+    });
+    expect(
+      await updateAppointment(db, u, appt.id, { status: "scheduled" }),
+    ).toBe("missing_schedule");
+  });
+
+  test("a agendar → agendada via Agendar", async () => {
+    const db = await createTestDb();
+    const u = await createTestUser(db);
+    const s = new Date("2026-11-20T13:00:00Z");
+    const appt = await makeAppointment(db, u, {
+      professional: "Dra. Marina",
+      status: "to_schedule",
+      suggestedAt: d,
+    });
+    const updated = await updateAppointment(db, u, appt.id, {
+      status: "scheduled",
+      scheduledAt: s,
+    });
+    if (!updated || updated === "missing_schedule")
+      throw new Error(`update falhou: ${updated}`);
+    expect(updated.status).toBe("scheduled");
+    expect(updated.scheduledAt).toEqual(s);
+  });
+
+  test("promoção por scheduledAt sem status", async () => {
+    const db = await createTestDb();
+    const u = await createTestUser(db);
+    const s = new Date("2026-11-20T13:00:00Z");
+    const appt = await makeAppointment(db, u, {
+      professional: "Dra. Marina",
+      status: "to_schedule",
+    });
+    const updated = await updateAppointment(db, u, appt.id, {
+      scheduledAt: s,
+    });
+    if (!updated || updated === "missing_schedule")
+      throw new Error(`update falhou: ${updated}`);
+    expect(updated.status).toBe("scheduled");
+    expect(updated.scheduledAt).toEqual(s);
+  });
+
+  test("edição simples de agendada", async () => {
+    const db = await createTestDb();
+    const u = await createTestUser(db);
+    const at = new Date("2026-10-10T14:00:00Z");
+    const appt = await makeAppointment(db, u, {
+      professional: "Dra. Marina",
+      scheduledAt: at,
+    });
+    const updated = await updateAppointment(db, u, appt.id, {
+      location: "Clínica X",
+    });
+    if (!updated || updated === "missing_schedule")
+      throw new Error(`update falhou: ${updated}`);
+    expect(updated.location).toBe("Clínica X");
+    expect(updated.scheduledAt).toEqual(at);
+    expect(updated.status).toBe("scheduled");
+  });
+
+  test("nextAppointment inclui a agendar com prazo em 30 dias e ignora a sem prazo", async () => {
+    const db = await createTestDb();
+    const u = await createTestUser(db);
+    await makeAppointment(db, u, {
+      professional: "Sem prazo",
+      status: "to_schedule",
+    });
+    expect(await nextAppointment(db, u)).toBeNull();
+
+    await makeAppointment(db, u, {
+      professional: "Com prazo",
+      status: "to_schedule",
+      suggestedAt: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000),
+    });
+    const next = await nextAppointment(db, u);
+    expect(next?.professional).toBe("Com prazo");
+    expect(next?.status).toBe("to_schedule");
   });
 });
 

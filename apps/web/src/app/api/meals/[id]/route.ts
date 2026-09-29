@@ -9,14 +9,14 @@ import {
   requireUserId,
   unauthorized,
 } from "@/server/shared/api";
-import { deleteMeal, updateMeal } from "@/server/meals/service";
+import { MEAL_ITEMS_SCHEMA, deleteMeal, updateMeal } from "@/server/meals/service";
 
 const updateMealSchema = z
   .object({
     type: z.enum(["breakfast", "lunch", "dinner", "snack"]).optional(),
-    description: z.string().trim().min(1, "Conta o que você comeu").optional(),
+    items: MEAL_ITEMS_SCHEMA.optional(),
   })
-  .refine((v) => v.type !== undefined || v.description !== undefined, {
+  .refine((v) => v.type !== undefined || v.items !== undefined, {
     message: "Informe ao menos um campo",
   });
 

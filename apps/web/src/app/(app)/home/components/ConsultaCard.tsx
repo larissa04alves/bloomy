@@ -20,7 +20,11 @@ export function ConsultaCard({ appointment }: { appointment: Appointment | null 
       <IconChip tone="lilac" icon={<CalendarHeartIcon size={22} weight="fill" />} />
       <div className="min-w-0 flex-1">
         <p className="text-xs font-semibold tracking-wide text-ink-faint uppercase">
-          {isToSchedule ? "Retorno a agendar" : "Próxima consulta"}
+          {isToSchedule
+            ? appointment.parentId
+              ? "Retorno a agendar"
+              : "Consulta a agendar"
+            : "Próxima consulta"}
         </p>
         <p className="mt-0.5 truncate font-display text-sm font-bold text-ink">
           {appointment
@@ -34,7 +38,9 @@ export function ConsultaCard({ appointment }: { appointment: Appointment | null 
             <p className="font-display text-sm font-bold text-lilac-deep">
               {monthShort(appointment.suggestedAt!)}
             </p>
-            <p className="text-xs font-semibold text-ink-soft">sugerido</p>
+            <p className="text-xs font-semibold text-ink-soft">
+              {appointment.parentId ? "sugerido" : "até"}
+            </p>
           </>
         ) : when ? (
           <>

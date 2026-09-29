@@ -6,10 +6,16 @@ import { useEffect, useRef, useState } from "react";
 import { z } from "zod";
 
 import { BottomSheet } from "@/components/bottom-sheet";
+import { ChoiceChip } from "@/components/choice-chip";
 import { ToggleSwitch } from "@/components/toggle-switch";
 import type { Appointment, AppointmentInput } from "@/lib/api-types";
 
-import { combineDateTime, splitDateTime } from "../hooks/format";
+import {
+  type AppointmentDue,
+  buildAppointmentInput,
+  monthShort,
+  splitDateTime,
+} from "../hooks/format";
 import { DatePickerField } from "./DatePickerField";
 import { TimeSelect } from "@/components/time-select";
 
@@ -20,17 +26,29 @@ const schema = z.object({
   remindDayBefore: z.boolean(),
 });
 
+type ApptStatus = AppointmentInput["status"];
+
+const STATUS_OPTIONS: { value: ApptStatus; label: string }[] = [
+  { value: "to_schedule", label: "A agendar" },
+  { value: "scheduled", label: "Agendada" },
+];
+const DUE_MONTHS = [1, 3, 6, 12] as const;
+
 export function AppointmentModal({
   open,
   onOpenChange,
   initial,
+  initialStatus,
   onSubmit,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   initial?: Appointment;
+  initialStatus?: ApptStatus;
   onSubmit: (input: AppointmentInput) => void;
 }) {
+  const [status, setStatus] = useState<ApptStatus>("to_schedule");
+  const [due, setDue] = useState<AppointmentDue>(null);
   const [date, setDate] = useState<Date | undefined>();
   const [hour, setHour] = useState("09");
   const [minute, setMinute] = useState("00");
@@ -45,14 +63,17 @@ export function AppointmentModal({
     },
     validators: { onChange: schema },
     onSubmit: ({ value }) => {
-      if (!date) return;
-      onSubmit({
-        professional: value.professional.trim(),
-        specialty: value.specialty.trim(),
-        scheduledAt: combineDateTime(date, hour, minute),
-        location: value.location.trim(),
-        remindDayBefore: value.remindDayBefore,
+      const input = buildAppointmentInput({
+        ...value,
+        status,
+        due,
+        date,
+        hour,
+        minute,
+        currentSuggestedAt: initial?.suggestedAt ?? null,
       });
+      if (!input) return;
+      onSubmit(input);
       onOpenChange(false);
     },
   });
@@ -70,16 +91,31 @@ export function AppointmentModal({
     form.setFieldValue("specialty", initial?.specialty ?? "");
     form.setFieldValue("location", initial?.location ?? "");
     form.setFieldValue("remindDayBefore", initial?.remindDayBefore ?? false);
+    setStatus(
+      initialStatus ??
+        (initial?.status === "to_schedule"
+          ? "to_schedule"
+          : initial
+            ? "scheduled"
+            : "to_schedule"),
+    );
+    setDue(initial?.suggestedAt ? "keep" : null);
     const t = splitDateTime(
       initial?.scheduledAt ?? initial?.suggestedAt ?? null,
     );
     setDate(t.date);
     setHour(t.hour);
     setMinute(t.minute);
-  }, [open, initial, form]);
+  }, [open, initial, initialStatus, form]);
 
-  // "Editar" só quando a consulta já tem horário; retorno "a agendar" (to_schedule) é agendamento.
-  const isEdit = Boolean(initial?.scheduledAt);
+  const scheduled = status === "scheduled";
+  const scheduling = initial?.status === "to_schedule" && scheduled;
+  const title = !initial
+    ? "Adicionar consulta"
+    : scheduling
+      ? "Agendar consulta"
+      : "Editar consulta";
+  const submitLabel = !initial ? "Adicionar" : scheduling ? "Agendar" : "Salvar";
   const inputCls =
     "rounded-control border border-hairline bg-white px-4 py-3 text-sm font-semibold text-ink placeholder:text-ink-faint focus:border-lilac focus:outline-none";
 
@@ -87,7 +123,7 @@ export function AppointmentModal({
     <BottomSheet
       open={open}
       onOpenChange={onOpenChange}
-      title={isEdit ? "Editar consulta" : "Agendar consulta"}
+      title={title}
       tone="lilac"
       icon={<StethoscopeIcon size={22} weight="fill" />}
       footer={
@@ -95,11 +131,11 @@ export function AppointmentModal({
           {(canSubmit) => (
             <button
               type="button"
-              disabled={!canSubmit || !date}
+              disabled={!canSubmit || (scheduled && !date)}
               onClick={() => form.handleSubmit()}
               className="w-full rounded-full bg-lilac py-3.5 font-display font-bold text-white shadow-btn disabled:opacity-60"
             >
-              {isEdit ? "Salvar" : "Agendar"}
+              {submitLabel}
             </button>
           )}
         </form.Subscribe>
@@ -128,49 +164,92 @@ export function AppointmentModal({
         )}
       </form.Field>
 
-      <div className="flex items-end gap-3">
-        <div className="flex flex-1 flex-col gap-2">
-          <span className="text-sm font-bold text-ink">Data</span>
-          <DatePickerField value={date} onChange={setDate} />
-        </div>
-        <div className="flex flex-col gap-2">
-          <span className="text-sm font-bold text-ink">Hora</span>
-          <TimeSelect
-            hour={hour}
-            minute={minute}
-            onChange={(t) => {
-              setHour(t.hour);
-              setMinute(t.minute);
-            }}
-          />
+      <div className="flex flex-col gap-2">
+        <span className="text-sm font-bold text-ink">Status</span>
+        <div className="flex flex-wrap gap-2">
+          {STATUS_OPTIONS.map((o) => (
+            <ChoiceChip
+              key={o.value}
+              selected={status === o.value}
+              onClick={() => setStatus(o.value)}
+            >
+              {o.label}
+            </ChoiceChip>
+          ))}
         </div>
       </div>
 
-      <form.Field name="location">
-        {(field) => (
-          <input
-            value={field.state.value}
-            aria-label="Local"
-            onChange={(e) => field.handleChange(e.target.value)}
-            placeholder="Local (opcional)"
-            className={inputCls}
-          />
-        )}
-      </form.Field>
-      <form.Field name="remindDayBefore">
-        {(field) => (
-          <div className="flex items-center justify-between rounded-control bg-lilac-tint-soft px-4 py-3">
-            <span className="text-sm font-bold text-ink">
-              Lembrar 1 dia antes
-            </span>
-            <ToggleSwitch
-              checked={field.state.value}
-              onCheckedChange={(v) => field.handleChange(v)}
-              label="Lembrar 1 dia antes"
-            />
+      {scheduled ? (
+        <>
+          <div className="flex items-end gap-3">
+            <div className="flex flex-1 flex-col gap-2">
+              <span className="text-sm font-bold text-ink">Data</span>
+              <DatePickerField value={date} onChange={setDate} />
+            </div>
+            <div className="flex flex-col gap-2">
+              <span className="text-sm font-bold text-ink">Hora</span>
+              <TimeSelect
+                hour={hour}
+                minute={minute}
+                onChange={(t) => {
+                  setHour(t.hour);
+                  setMinute(t.minute);
+                }}
+              />
+            </div>
           </div>
-        )}
-      </form.Field>
+
+          <form.Field name="location">
+            {(field) => (
+              <input
+                value={field.state.value}
+                aria-label="Local"
+                onChange={(e) => field.handleChange(e.target.value)}
+                placeholder="Local (opcional)"
+                className={inputCls}
+              />
+            )}
+          </form.Field>
+          <form.Field name="remindDayBefore">
+            {(field) => (
+              <div className="flex items-center justify-between rounded-control bg-lilac-tint-soft px-4 py-3">
+                <span className="text-sm font-bold text-ink">
+                  Lembrar 1 dia antes
+                </span>
+                <ToggleSwitch
+                  checked={field.state.value}
+                  onCheckedChange={(v) => field.handleChange(v)}
+                  label="Lembrar 1 dia antes"
+                />
+              </div>
+            )}
+          </form.Field>
+        </>
+      ) : (
+        <div className="flex flex-col gap-2">
+          <span className="text-sm font-bold text-ink">
+            Agendar até (opcional)
+          </span>
+          <div className="flex flex-wrap gap-2">
+            {initial?.suggestedAt ? (
+              <ChoiceChip
+                selected={due === "keep"}
+                onClick={() => setDue("keep")}
+              >
+                Até {monthShort(initial.suggestedAt)}
+              </ChoiceChip>
+            ) : null}
+            <ChoiceChip selected={due === null} onClick={() => setDue(null)}>
+              Sem prazo
+            </ChoiceChip>
+            {DUE_MONTHS.map((n) => (
+              <ChoiceChip key={n} selected={due === n} onClick={() => setDue(n)}>
+                {n === 1 ? "1 mês" : `${n} meses`}
+              </ChoiceChip>
+            ))}
+          </div>
+        </div>
+      )}
     </BottomSheet>
   );
 }

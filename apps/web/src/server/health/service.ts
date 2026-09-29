@@ -27,18 +27,16 @@ function addMonths(date: Date, months: number): Date {
 export type AppointmentInput = {
   professional: string;
   specialty?: string;
-  scheduledAt: Date;
+  status?: "scheduled" | "to_schedule";
+  scheduledAt?: Date | null;
+  suggestedAt?: Date | null;
   location?: string;
   remindDayBefore?: boolean;
 };
 
-export type AppointmentUpdate = {
-  professional?: string;
-  specialty?: string;
-  scheduledAt?: Date;
-  location?: string;
-  remindDayBefore?: boolean;
-};
+export type AppointmentUpdate = Partial<AppointmentInput>;
+
+export type AppointmentScheduleError = "missing_schedule";
 
 export async function listAppointments(
   db: Db,
@@ -91,49 +89,79 @@ export async function createAppointment(
   db: Db,
   userId: string,
   input: AppointmentInput,
-): Promise<Appointment> {
+): Promise<Appointment | AppointmentScheduleError> {
+  const status = input.status ?? "scheduled";
+  if (status === "scheduled" && !input.scheduledAt) return "missing_schedule";
+
+  const toSchedule = status === "to_schedule";
   const [created] = await db
     .insert(appointment)
     .values({
       userId,
       professional: input.professional,
       specialty: input.specialty ?? null,
-      status: "scheduled",
-      scheduledAt: input.scheduledAt,
-      location: input.location ?? null,
-      remindDayBefore: input.remindDayBefore ?? false,
+      status,
+      scheduledAt: toSchedule ? null : input.scheduledAt,
+      suggestedAt: input.suggestedAt ?? null,
+      location: toSchedule ? null : (input.location ?? null),
+      remindDayBefore: toSchedule ? false : (input.remindDayBefore ?? false),
     })
     .returning();
   return created;
 }
 
-/** Parcial. Dar `scheduledAt` a um retorno `to_schedule` promove pra `scheduled`. */
+/**
+ * Parcial; valida o estado final (patch + linha atual). `scheduledAt` sem `status` promove pra
+ * `scheduled`; `status: "to_schedule"` zera horário e lembrete; `suggestedAt` só muda se vier.
+ */
 export async function updateAppointment(
   db: Db,
   userId: string,
   id: string,
   input: AppointmentUpdate,
-): Promise<Appointment | null> {
-  const [updated] = await db
-    .update(appointment)
-    .set({
-      ...(input.professional !== undefined && {
-        professional: input.professional,
-      }),
-      ...(input.specialty !== undefined && { specialty: input.specialty }),
-      ...(input.scheduledAt !== undefined && {
-        scheduledAt: input.scheduledAt,
-        status: "scheduled" as const,
-      }),
-      ...(input.location !== undefined && { location: input.location }),
-      ...(input.remindDayBefore !== undefined && {
-        remindDayBefore: input.remindDayBefore,
-      }),
-      updatedAt: new Date(),
-    })
-    .where(and(eq(appointment.id, id), eq(appointment.userId, userId)))
-    .returning();
-  return updated ?? null;
+): Promise<Appointment | null | AppointmentScheduleError> {
+  return db.transaction(async (tx) => {
+    const [current] = await tx
+      .select()
+      .from(appointment)
+      .where(and(eq(appointment.id, id), eq(appointment.userId, userId)));
+    if (!current) return null;
+
+    const status =
+      input.status ??
+      (input.scheduledAt ? "scheduled" : current.status);
+    const toSchedule = status === "to_schedule";
+    const scheduledAt = toSchedule
+      ? null
+      : input.scheduledAt !== undefined
+        ? input.scheduledAt
+        : current.scheduledAt;
+    if (status === "scheduled" && !scheduledAt) return "missing_schedule";
+
+    const [updated] = await tx
+      .update(appointment)
+      .set({
+        ...(input.professional !== undefined && {
+          professional: input.professional,
+        }),
+        ...(input.specialty !== undefined && { specialty: input.specialty }),
+        status,
+        scheduledAt,
+        ...(input.suggestedAt !== undefined && {
+          suggestedAt: input.suggestedAt,
+        }),
+        ...(input.location !== undefined && { location: input.location }),
+        ...(toSchedule
+          ? { remindDayBefore: false }
+          : input.remindDayBefore !== undefined && {
+              remindDayBefore: input.remindDayBefore,
+            }),
+        updatedAt: new Date(),
+      })
+      .where(and(eq(appointment.id, id), eq(appointment.userId, userId)))
+      .returning();
+    return updated ?? null;
+  });
 }
 
 export async function deleteAppointment(

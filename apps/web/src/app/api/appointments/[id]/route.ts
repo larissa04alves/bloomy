@@ -2,6 +2,7 @@ import { db } from "@bloomy/db";
 import { z } from "zod";
 
 import {
+  badRequest,
   invalidBody,
   notFound,
   parseJson,
@@ -13,7 +14,9 @@ import { deleteAppointment, updateAppointment } from "@/server/health/service";
 const BODY_SCHEMA = z.object({
   professional: z.string().min(1).max(120).optional(),
   specialty: z.string().max(120).optional(),
-  scheduledAt: z.coerce.date().optional(),
+  status: z.enum(["scheduled", "to_schedule"]).optional(),
+  scheduledAt: z.coerce.date().nullable().optional(),
+  suggestedAt: z.coerce.date().nullable().optional(),
   location: z.string().max(200).optional(),
   remindDayBefore: z.boolean().optional(),
 });
@@ -31,6 +34,7 @@ export async function PUT(
   const { id } = await params;
   const appointment = await updateAppointment(db, userId, id, parsed.data);
   if (!appointment) return notFound();
+  if (appointment === "missing_schedule") return badRequest("consulta agendada precisa de data");
 
   return Response.json({ appointment });
 }

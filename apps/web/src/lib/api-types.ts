@@ -1,6 +1,6 @@
 // DTOs como chegam pela API (JSON). createdAt/updatedAt são strings ISO, não Date.
 
-import type { DoseUnit } from "@bloomy/db/schema/body";
+import type { DoseUnit, MealItem } from "@bloomy/db/schema/body";
 
 export type GoalDomain = "water" | "meals" | "workout";
 
@@ -41,11 +41,12 @@ export const MAIN_MEAL_TYPES: MealType[] = ["breakfast", "lunch", "dinner"];
 export type Meal = {
   id: string;
   type: MealType;
-  description: string;
+  items: MealItem[];
   day: string;
   createdAt: string;
 };
 export type MealsDay = { meals: Meal[]; pendingTypes: MealType[] };
+export type { MealItem };
 
 export type { DoseUnit };
 
@@ -125,7 +126,7 @@ export type Exercise = {
   restSeconds: number;
   position: number;
   catalogId: string | null;
-  muscleGroup: Focus | null;
+  muscleGroups: Focus[]; // [] = sem grupo
 };
 
 export type CatalogExercise = {
@@ -141,7 +142,7 @@ export type CatalogExercise = {
 export type Workout = {
   id: string;
   name: string;
-  focus: Focus;
+  focuses: Focus[];
   active: boolean;
   createdAt: string;
 };
@@ -251,7 +252,9 @@ export type Appointment = {
 export type AppointmentInput = {
   professional: string;
   specialty?: string;
-  scheduledAt: string; // ISO
+  status: "scheduled" | "to_schedule";
+  scheduledAt: string | null; // ISO
+  suggestedAt: string | null; // ISO
   location?: string;
   remindDayBefore?: boolean;
 };

@@ -15,6 +15,7 @@ import {
 } from "@/lib/api-types";
 
 import type { WorkoutInput } from "../hooks/useTreinos";
+import { commitDraft, numberDraft } from "../hooks/format";
 import { NEW_EXERCISE_DEFAULTS } from "../hooks/session";
 import { useCatalogo } from "../hooks/useCatalogo";
 import { BuscaExercicio } from "./BuscaExercicio";
@@ -27,7 +28,7 @@ type ExRow = {
   targetReps: number;
   restSeconds: number;
   catalogId: string | null;
-  muscleGroup: Focus | null;
+  muscleGroups: Focus[];
   /** UI-only: grupo do exercício de catálogo (p/ o chip); não enviado ao back. */
   group?: Focus;
 };
@@ -36,8 +37,13 @@ const NEW_ROW: ExRow = {
   name: "",
   ...NEW_EXERCISE_DEFAULTS,
   catalogId: null,
-  muscleGroup: null,
+  muscleGroups: [],
 };
+
+/** Liga/desliga um foco mantendo a ordem de FOCUS_VALUES. */
+function toggleFocus(list: Focus[], f: Focus): Focus[] {
+  return FOCUS_VALUES.filter((x) => (x === f ? !list.includes(f) : list.includes(x)));
+}
 
 function clamp(n: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, Math.round(Number.isFinite(n) ? n : min)));
@@ -59,15 +65,19 @@ function NumField({
   ariaLabel: string;
   onChange: (v: number) => void;
 }) {
+  // Rascunho em texto: apagar não vira o mínimo na hora e "030" vira "30".
+  const [draft, setDraft] = useState<string | null>(null);
   return (
     <label className="flex flex-1 items-center justify-center gap-1 rounded-control border border-hairline bg-white px-2 py-2">
       <input
-        type="number"
+        type="text"
         inputMode="numeric"
-        min={min}
-        max={max}
-        value={value}
-        onChange={(e) => onChange(clamp(Number(e.target.value), min, max))}
+        value={draft ?? String(value)}
+        onChange={(e) => setDraft(numberDraft(e.target.value))}
+        onBlur={() => {
+          if (draft !== null) onChange(commitDraft(draft, min, max));
+          setDraft(null);
+        }}
         aria-label={ariaLabel}
         className="w-9 bg-transparent text-center text-sm font-bold text-ink outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
       />
@@ -76,13 +86,13 @@ function NumField({
   );
 }
 
-/** Seletor de grupo muscular (custom): botão 💪 colapsado que expande os 8 grupos. */
+/** Seletor de grupos musculares (custom): botão 💪 colapsado que expande os 8 grupos. */
 function MuscleGroupPicker({
   value,
   onChange,
 }: {
-  value: Focus | null;
-  onChange: (g: Focus | null) => void;
+  value: Focus[];
+  onChange: (g: Focus[]) => void;
 }) {
   const [open, setOpen] = useState(false);
   return (
@@ -91,15 +101,15 @@ function MuscleGroupPicker({
         type="button"
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
-        aria-label="Escolher grupo muscular"
+        aria-label="Escolher grupos musculares"
         className={`flex items-center gap-1.5 self-start rounded-full border px-3 py-1.5 text-xs font-bold ${
-          value
+          value.length > 0
             ? "border-pink-bright bg-pink-tint text-pink-deep"
             : "border-hairline bg-lilac-tint-soft text-ink-read"
         }`}
       >
         <PersonSimpleTaiChiIcon size={16} weight="fill" />
-        {value ? FOCUS_LABELS[value] : "Grupo muscular"}
+        {value.length > 0 ? value.map((f) => FOCUS_LABELS[f]).join(", ") : "Grupo muscular"}
       </button>
       {open ? (
         <div className="flex flex-wrap gap-1.5">
@@ -107,11 +117,8 @@ function MuscleGroupPicker({
             <ChoiceChip
               key={f}
               tone="pink"
-              selected={value === f}
-              onClick={() => {
-                onChange(value === f ? null : f);
-                setOpen(false);
-              }}
+              selected={value.includes(f)}
+              onClick={() => onChange(toggleFocus(value, f))}
             >
               {FOCUS_LABELS[f]}
             </ChoiceChip>
@@ -134,7 +141,7 @@ export function TreinoModal({
   onSubmit: (input: WorkoutInput) => void;
 }) {
   const [name, setName] = useState("");
-  const [focus, setFocus] = useState<Focus>("chest");
+  const [focuses, setFocuses] = useState<Focus[]>([]);
   const [rows, setRows] = useState<ExRow[]>([]);
   const [view, setView] = useState<"form" | "busca">("form");
   const [preview, setPreview] = useState<CatalogExercise | null>(null);
@@ -145,7 +152,7 @@ export function TreinoModal({
   useEffect(() => {
     if (open) {
       setName(editing?.name ?? "");
-      setFocus(editing?.focus ?? "chest");
+      setFocuses(editing?.focuses ?? []);
       setView("form");
       setPreview(null);
       setRows(
@@ -157,7 +164,7 @@ export function TreinoModal({
               targetReps: clamp(e.targetReps, 1, 50),
               restSeconds: clamp(e.restSeconds, 0, 600),
               catalogId: e.catalogId,
-              muscleGroup: e.muscleGroup,
+              muscleGroups: e.muscleGroups,
             }))
           : // novo treino: começa vazio — adiciona pela busca do catálogo
             [],
@@ -166,7 +173,7 @@ export function TreinoModal({
   }, [open, editing]);
 
   const cleanRows = rows.filter((r) => r.name.trim().length > 0);
-  const canSave = name.trim().length > 0 && cleanRows.length > 0;
+  const canSave = name.trim().length > 0 && focuses.length > 0 && cleanRows.length > 0;
 
   const setRow = (i: number, patch: Partial<ExRow>) =>
     setRows((prev) =>
@@ -184,7 +191,7 @@ export function TreinoModal({
         name: ex.namePt,
         catalogId: ex.id,
         group: ex.group,
-        muscleGroup: null,
+        muscleGroups: [],
         ...NEW_EXERCISE_DEFAULTS,
       },
     ]);
@@ -200,7 +207,7 @@ export function TreinoModal({
     if (!canSave) return;
     onSubmit({
       name: name.trim(),
-      focus,
+      focuses,
       exercises: cleanRows.map((r, i) => ({
         name: r.name.trim(),
         targetSets: r.targetSets,
@@ -208,7 +215,7 @@ export function TreinoModal({
         restSeconds: r.restSeconds,
         position: i,
         catalogId: r.catalogId,
-        muscleGroup: r.catalogId ? null : r.muscleGroup,
+        muscleGroups: r.catalogId ? [] : r.muscleGroups,
       })),
     });
     onOpenChange(false);
@@ -254,8 +261,13 @@ export function TreinoModal({
               <ChoiceChip
                 key={f}
                 tone="pink"
-                selected={focus === f}
-                onClick={() => setFocus(f)}
+                selected={focuses.includes(f)}
+                // o último foco marcado não desmarca: treino sempre tem ao menos um
+                onClick={() =>
+                  setFocuses((prev) =>
+                    prev.length === 1 && prev[0] === f ? prev : toggleFocus(prev, f),
+                  )
+                }
               >
                 {FOCUS_LABELS[f]}
               </ChoiceChip>
@@ -336,8 +348,8 @@ export function TreinoModal({
                         ) : null}
                       </div>
                       <MuscleGroupPicker
-                        value={r.muscleGroup}
-                        onChange={(g) => setRow(i, { muscleGroup: g })}
+                        value={r.muscleGroups}
+                        onChange={(g) => setRow(i, { muscleGroups: g })}
                       />
                     </>
                   )}

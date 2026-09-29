@@ -35,7 +35,7 @@ describe("startSession com snapshot", () => {
     const userId = await createTestUser(db);
     const w = await createWorkout(db, userId, {
       name: "Peito",
-      focus: "chest",
+      focuses: ["chest"],
       exercises: [
         { name: "Supino", targetSets: 2, targetReps: 8, restSeconds: 90, position: 0 },
       ],
@@ -61,7 +61,7 @@ describe("startSession com snapshot", () => {
     const userId = await createTestUser(db);
     const w = await createWorkout(db, userId, {
       name: "Costas",
-      focus: "back",
+      focuses: ["back"],
       exercises: [
         { name: "Remada", targetSets: 1, targetReps: 12, restSeconds: 45, position: 0 },
       ],
@@ -88,7 +88,7 @@ describe("startSession / completeSession (db em arquivo)", () => {
     // valores não-default de propósito (defaults do schema são 12 reps / 45s).
     const w = await createWorkout(db, userId, {
       name: "Peito",
-      focus: "chest",
+      focuses: ["chest"],
       exercises: [{ name: "Supino", targetSets: 4, targetReps: 8, restSeconds: 90, position: 0 }],
     });
 
@@ -126,7 +126,7 @@ describe("startSession / completeSession (db em arquivo)", () => {
     const userId = await createTestUser(db);
     const w = await createWorkout(db, userId, {
       name: "Costas",
-      focus: "back",
+      focuses: ["back"],
       exercises: [{ name: "Remada", targetSets: 1, targetReps: 12, restSeconds: 45, position: 0 }],
     });
     const s = await startSession(db, userId, w.id);
@@ -154,7 +154,7 @@ describe("ajustes na sessão ativa", () => {
     });
     const w = await createWorkout(db, userId, {
       name: "Peito",
-      focus: "chest",
+      focuses: ["chest"],
       exercises: [
         { name: "Supino", targetSets: 2, targetReps: 10, restSeconds: 60, position: 0 },
       ],
@@ -384,7 +384,7 @@ describe("salvar no treino", () => {
     ]);
     const w = await createWorkout(db, userId, {
       name: "Peito",
-      focus: "chest",
+      focuses: ["chest"],
       exercises: [
         { name: "Supino", targetSets: 2, targetReps: 10, restSeconds: 60, position: 0 },
         { name: "Voador", targetSets: 2, targetReps: 12, restSeconds: 45, position: 1 },
@@ -430,7 +430,7 @@ describe("salvar no treino", () => {
     const userId = await createTestUser(db);
     const w = await createWorkout(db, userId, {
       name: "Costas",
-      focus: "back",
+      focuses: ["back"],
       exercises: [
         { name: "Remada", targetSets: 1, targetReps: 12, restSeconds: 45, position: 0 },
       ],
@@ -452,7 +452,7 @@ describe("salvar no treino", () => {
     const userId = await createTestUser(db);
     const w = await createWorkout(db, userId, {
       name: "Peito",
-      focus: "chest",
+      focuses: ["chest"],
       exercises: [
         { name: "Supino", targetSets: 2, targetReps: 10, restSeconds: 60, position: 0 },
         { name: "Voador", targetSets: 2, targetReps: 12, restSeconds: 45, position: 1 },
@@ -484,7 +484,7 @@ describe("salvar no treino", () => {
     const userId = await createTestUser(db);
     const w = await createWorkout(db, userId, {
       name: "Costas",
-      focus: "back",
+      focuses: ["back"],
       exercises: [
         { name: "Remada", targetSets: 2, targetReps: 10, restSeconds: 60, position: 0 },
         { name: "Puxada", targetSets: 2, targetReps: 12, restSeconds: 45, position: 1 },
@@ -510,7 +510,7 @@ describe("salvar no treino", () => {
     const userId = await createTestUser(db);
     const w = await createWorkout(db, userId, {
       name: "Pernas",
-      focus: "legs",
+      focuses: ["legs"],
       exercises: [
         { name: "Agachamento", targetSets: 2, targetReps: 10, restSeconds: 60, position: 0 },
         { name: "Leg press", targetSets: 2, targetReps: 12, restSeconds: 45, position: 1 },
@@ -564,13 +564,45 @@ describe("salvar no treino", () => {
   });
 });
 
+describe("grupos musculares do exercício personalizado", () => {
+  test("a cópia treino → sessão e o apply-to-workout preservam muscleGroups", async () => {
+    const db = await createTestDb();
+    const userId = await createTestUser(db);
+    const w = await createWorkout(db, userId, {
+      name: "Superior",
+      focuses: ["shoulders", "arms"],
+      exercises: [
+        { name: "Elevação", targetSets: 2, targetReps: 12, restSeconds: 45, position: 0, muscleGroups: ["shoulders", "arms"] },
+      ],
+    });
+    const s = await startSession(db, userId, w.id);
+    if (s === "already_active" || s === "not_found") throw new Error("unreachable");
+
+    const [copied] = await db.select().from(sessionExercise);
+    expect(copied.muscleGroups).toEqual(["shoulders", "arms"]);
+
+    await addSessionExercise(db, userId, s.session.id, {
+      name: "Prancha",
+      targetSets: 3,
+      targetReps: 1,
+      restSeconds: 30,
+      muscleGroups: ["abs", "legs"],
+    });
+    const updated = await applySessionToWorkout(db, userId, s.session.id);
+    expect(updated!.exercises.map((e) => e.muscleGroups)).toEqual([
+      ["shoulders", "arms"],
+      ["legs", "abs"], // sem duplicado, na ordem de FOCUS_VALUES
+    ]);
+  });
+});
+
 describe("reorderSessionExercises", () => {
   async function setup() {
     const db = await createTestDb();
     const userId = await createTestUser(db);
     const w = await createWorkout(db, userId, {
       name: "Peito",
-      focus: "chest",
+      focuses: ["chest"],
       exercises: [
         { name: "Supino", targetSets: 2, targetReps: 10, restSeconds: 60, position: 0 },
         { name: "Voador", targetSets: 2, targetReps: 12, restSeconds: 45, position: 1 },
@@ -670,7 +702,7 @@ describe("reorderSessionExercises", () => {
 
     const w2 = await createWorkout(db, userId, {
       name: "Costas",
-      focus: "back",
+      focuses: ["back"],
       exercises: [
         { name: "Remada", targetSets: 1, targetReps: 12, restSeconds: 45, position: 0 },
         { name: "Puxada", targetSets: 1, targetReps: 10, restSeconds: 45, position: 1 },
@@ -740,7 +772,7 @@ describe("completedSessionOn", () => {
     const userId = await createTestUser(db);
     const w = await createWorkout(db, userId, {
       name: "Pernas",
-      focus: "legs",
+      focuses: ["legs"],
       exercises: [
         { name: "Agachamento", targetSets: 3, targetReps: 10, restSeconds: 45, position: 0 },
       ],
@@ -765,7 +797,7 @@ describe("completedSessionOn", () => {
     const userId = await createTestUser(db);
     const w = await createWorkout(db, userId, {
       name: "Cardio leve",
-      focus: "cardio",
+      focuses: ["cardio"],
       exercises: [
         { name: "Corrida", targetSets: 1, targetReps: 1, restSeconds: 30, position: 0 },
       ],
@@ -782,7 +814,7 @@ describe("completedSessionOn", () => {
     const userId = await createTestUser(db);
     const w = await createWorkout(db, userId, {
       name: "Costas",
-      focus: "back",
+      focuses: ["back"],
       exercises: [
         { name: "Remada", targetSets: 3, targetReps: 10, restSeconds: 45, position: 0 },
       ],
@@ -811,14 +843,14 @@ describe("completedSessionOn", () => {
     const userId = await createTestUser(db);
     const w1 = await createWorkout(db, userId, {
       name: "Pernas",
-      focus: "legs",
+      focuses: ["legs"],
       exercises: [
         { name: "Agachamento", targetSets: 3, targetReps: 10, restSeconds: 45, position: 0 },
       ],
     });
     const w2 = await createWorkout(db, userId, {
       name: "Peito",
-      focus: "chest",
+      focuses: ["chest"],
       exercises: [{ name: "Supino", targetSets: 3, targetReps: 10, restSeconds: 45, position: 0 }],
     });
 

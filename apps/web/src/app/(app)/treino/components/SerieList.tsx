@@ -6,10 +6,12 @@ import {
   MinusIcon,
   PlusIcon,
 } from "@phosphor-icons/react";
+import { useState } from "react";
 
 import type { CatalogExercise, SessionExercise } from "@/lib/api-types";
 import { FOCUS_LABELS } from "@/lib/api-types";
 
+import { numberDraft, parseDraft, settleDraft } from "../hooks/format";
 import { GifThumb } from "./GifThumb";
 
 function StepperField({
@@ -25,7 +27,7 @@ function StepperField({
   value: number | null;
   mode?: "numeric" | "decimal";
   ariaLabel: string;
-  onChange: (v: number) => void;
+  onChange: (v: number | null) => void;
   onCommit: (v: number) => void;
   onBlurCommit: () => void;
 }) {
@@ -35,10 +37,12 @@ function StepperField({
     onCommit(next);
   };
 
-  // Digitação manual: nunca deixa reps/carga ir para negativo ou NaN.
-  const sanitize = (raw: string) => {
-    const n = Number(raw);
-    return Number.isFinite(n) ? Math.max(0, n) : 0;
+  // Rascunho em texto: guarda "7," enquanto digita; ao sair, vazio vira 0 e persiste.
+  const [draft, setDraft] = useState<string | null>(null);
+  const handleType = (raw: string) => {
+    const next = numberDraft(raw, mode === "decimal");
+    setDraft(next);
+    onChange(parseDraft(next));
   };
 
   return (
@@ -54,12 +58,20 @@ function StepperField({
           <MinusIcon size={14} weight="bold" />
         </button>
         <input
-          type="number"
-          min={0}
+          type="text"
           inputMode={mode}
-          value={value ?? ""}
-          onChange={(e) => onChange(sanitize(e.target.value))}
-          onBlur={onBlurCommit}
+          value={draft ?? (value == null ? "" : String(value))}
+          onChange={(e) => handleType(e.target.value)}
+          onBlur={() => {
+            if (draft === null) {
+              onBlurCommit();
+            } else {
+              const v = settleDraft(draft);
+              onChange(v);
+              onCommit(v);
+            }
+            setDraft(null);
+          }}
           className="w-full min-w-0 bg-transparent text-center text-base font-bold text-ink outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none"
           aria-label={ariaLabel}
         />
@@ -89,8 +101,8 @@ export function SerieList({
   exercise: SessionExercise;
   catalogExercise?: CatalogExercise | null;
   onBack: () => void;
-  onChangeReps: (setId: string, reps: number) => void;
-  onChangeLoad: (setId: string, load: number) => void;
+  onChangeReps: (setId: string, reps: number | null) => void;
+  onChangeLoad: (setId: string, load: number | null) => void;
   onPersist: (
     setId: string,
     patch: { reps: number | null; load: number | null },

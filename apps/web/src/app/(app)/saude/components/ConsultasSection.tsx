@@ -6,7 +6,7 @@ import { IconChip } from "@/components/icon-chip";
 import { SwipeableRow } from "@/components/swipeable-row";
 import type { Appointment } from "@/lib/api-types";
 
-import { hourLabel, weekdayDay } from "../hooks/format";
+import { hourLabel, monthShort, weekdayDay } from "../hooks/format";
 import { ReturnBadge } from "./ReturnBadge";
 
 export function ConsultasSection({
@@ -15,6 +15,7 @@ export function ConsultasSection({
   onEdit,
   onDelete,
   onComplete,
+  onSchedule,
   onHistory,
 }: {
   ativas: Appointment[];
@@ -22,6 +23,7 @@ export function ConsultasSection({
   onEdit: (a: Appointment) => void;
   onDelete: (id: string) => void;
   onComplete: (a: Appointment) => void;
+  onSchedule: (a: Appointment) => void;
   onHistory: () => void;
 }) {
   return (
@@ -41,73 +43,83 @@ export function ConsultasSection({
             onClick={onAdd}
             className="flex items-center gap-1 text-sm font-bold text-lilac-deep"
           >
-            <PlusIcon size={16} weight="bold" /> Agendar
+            <PlusIcon size={16} weight="bold" /> Adicionar
           </button>
         </div>
       </div>
 
       {ativas.length === 0 ? (
         <p className="rounded-card border border-dashed border-hairline p-4 text-center text-sm font-semibold text-ink-read">
-          Nenhuma consulta agendada.
+          Nenhuma consulta por aqui.
         </p>
       ) : (
-        ativas.map((a) => (
-          <SwipeableRow
-            key={a.id}
-            onEdit={() => onEdit(a)}
-            onDelete={() => onDelete(a.id)}
-          >
-            <div className="flex items-center gap-3 rounded-card bg-white p-3 shadow-card-sm">
-              <IconChip
-                tone="lilac"
-                icon={<StethoscopeIcon size={22} weight="fill" />}
-              />
-              <div className="flex flex-1 flex-col">
-                <div className="flex items-center gap-1.5">
-                  <span className="text-sm font-bold text-ink">
-                    {a.professional}
-                  </span>
-                  {a.parentId ? <ReturnBadge /> : null}
-                </div>
-                {a.specialty ? (
-                  <span className="text-xs font-semibold text-ink-read">
-                    {a.specialty}
-                  </span>
-                ) : null}
-              </div>
-              {a.status === "to_schedule" ? (
-                <button
-                  type="button"
-                  aria-label={`Agendar consulta ${a.professional}`}
-                  onClick={() => onEdit(a)}
-                  className="rounded-full bg-lilac-tint px-3 py-1.5 text-xs font-bold text-lilac-deep"
-                >
-                  Agendar
-                </button>
-              ) : (
-                <>
-                  {a.scheduledAt ? (
-                    <div className="flex flex-col items-end">
-                      <span className="text-xs font-bold text-lilac-deep">
-                        {weekdayDay(a.scheduledAt)}
-                      </span>
-                      <span className="text-xs font-semibold text-ink-read">
-                        {hourLabel(a.scheduledAt)}
-                      </span>
-                    </div>
+        ativas.map((a) => {
+          const subtitle = [
+            a.specialty,
+            a.status === "to_schedule" && a.suggestedAt
+              ? `até ${monthShort(a.suggestedAt)}`
+              : null,
+          ]
+            .filter(Boolean)
+            .join(" · ");
+          return (
+            <SwipeableRow
+              key={a.id}
+              onEdit={() => onEdit(a)}
+              onDelete={() => onDelete(a.id)}
+            >
+              <div className="flex items-center gap-3 rounded-card bg-white p-3 shadow-card-sm">
+                <IconChip
+                  tone="lilac"
+                  icon={<StethoscopeIcon size={22} weight="fill" />}
+                />
+                <div className="flex flex-1 flex-col">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-sm font-bold text-ink">
+                      {a.professional}
+                    </span>
+                    {a.parentId ? <ReturnBadge /> : null}
+                  </div>
+                  {subtitle ? (
+                    <span className="text-xs font-semibold text-ink-read">
+                      {subtitle}
+                    </span>
                   ) : null}
+                </div>
+                {a.status === "to_schedule" ? (
                   <button
                     type="button"
-                    aria-label={`Concluir consulta ${a.professional}`}
-                    onClick={() => onComplete(a)}
+                    aria-label={`Agendar consulta ${a.professional}`}
+                    onClick={() => onSchedule(a)}
+                    className="rounded-full bg-lilac-tint px-3 py-1.5 text-xs font-bold text-lilac-deep"
                   >
-                    <CircleIcon size={24} className="text-control-off" />
+                    Agendar
                   </button>
-                </>
-              )}
-            </div>
-          </SwipeableRow>
-        ))
+                ) : (
+                  <>
+                    {a.scheduledAt ? (
+                      <div className="flex flex-col items-end">
+                        <span className="text-xs font-bold text-lilac-deep">
+                          {weekdayDay(a.scheduledAt)}
+                        </span>
+                        <span className="text-xs font-semibold text-ink-read">
+                          {hourLabel(a.scheduledAt)}
+                        </span>
+                      </div>
+                    ) : null}
+                    <button
+                      type="button"
+                      aria-label={`Concluir consulta ${a.professional}`}
+                      onClick={() => onComplete(a)}
+                    >
+                      <CircleIcon size={24} className="text-control-off" />
+                    </button>
+                  </>
+                )}
+              </div>
+            </SwipeableRow>
+          );
+        })
       )}
     </section>
   );

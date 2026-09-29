@@ -1,0 +1,1 @@
+ALTER TABLE `meal` DROP COLUMN `description`;

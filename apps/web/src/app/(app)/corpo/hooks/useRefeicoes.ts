@@ -3,7 +3,13 @@
 import { useCallback } from "react";
 
 import { api } from "@/lib/api";
-import { MAIN_MEAL_TYPES, type Meal, type MealsDay, type MealType } from "@/lib/api-types";
+import {
+  MAIN_MEAL_TYPES,
+  type Meal,
+  type MealItem,
+  type MealsDay,
+  type MealType,
+} from "@/lib/api-types";
 import { toastError } from "@/lib/toast";
 import { useResource } from "@/lib/use-resource";
 
@@ -37,11 +43,11 @@ export function useRefeicoes() {
   );
 
   const addMeal = useCallback(
-    (input: { type: MealType; description: string }) => {
+    (input: { type: MealType; items: MealItem[] }) => {
       const optimistic: Meal = {
         id: `tmp-${crypto.randomUUID()}`,
         type: input.type,
-        description: input.description,
+        items: input.items,
         day: "",
         createdAt: new Date().toISOString(),
       };
@@ -55,7 +61,7 @@ export function useRefeicoes() {
   );
 
   const editMeal = useCallback(
-    (id: string, input: { type: MealType; description: string }) =>
+    (id: string, input: { type: MealType; items: MealItem[] }) =>
       commit(
         meals.map((m) => (m.id === id ? { ...m, ...input } : m)),
         () => api.put(`/api/meals/${id}`, input),

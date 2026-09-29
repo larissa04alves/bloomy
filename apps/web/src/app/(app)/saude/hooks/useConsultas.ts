@@ -7,7 +7,7 @@ import type { Appointment, AppointmentInput } from "@/lib/api-types";
 import { toastError } from "@/lib/toast";
 import { useResource } from "@/lib/use-resource";
 
-import { byCompletedDesc, sortByWhen, tempId } from "./format";
+import { addMonthsIso, byCompletedDesc, sortByWhen, tempId } from "./format";
 
 type ListResponse = { appointments: Appointment[] };
 type NextResponse = { appointment: Appointment | null };
@@ -37,10 +37,10 @@ export function useConsultas() {
           list.setData(data);
           next.reload();
         } catch (e) {
-          toastError(e, "Consulta agendada, mas a lista não atualizou — recarregue");
+          toastError(e, "Consulta salva, mas a lista não atualizou — recarregue");
         }
       } catch (e) {
-        toastError(e, "Não foi possível agendar a consulta");
+        toastError(e, "Não foi possível salvar a consulta");
       } finally {
         setCreating(false);
       }
@@ -100,15 +100,13 @@ export function useConsultas() {
       // Retorno otimista: o item `to_schedule` é 100% derivável do concluído
       // (id/timestamps reais chegam no reload e reconciliam o temporário).
       if (opts.needsReturn && done) {
-        const suggested = new Date();
-        suggested.setMonth(suggested.getMonth() + (opts.followUpMonths ?? 1));
         optimistic.push({
           id: tempId(),
           professional: done.professional,
           specialty: done.specialty,
           status: "to_schedule",
           scheduledAt: null,
-          suggestedAt: suggested.toISOString(),
+          suggestedAt: addMonthsIso(opts.followUpMonths ?? 1),
           completedAt: null,
           location: null,
           remindDayBefore: false,

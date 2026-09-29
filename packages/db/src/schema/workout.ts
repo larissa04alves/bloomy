@@ -1,3 +1,4 @@
+import { sql } from "drizzle-orm";
 import {
   index,
   integer,
@@ -9,6 +10,16 @@ import {
 import { user } from "./auth";
 import { timestampMs } from "./_columns";
 
+type MuscleGroup =
+  | "chest"
+  | "back"
+  | "legs"
+  | "shoulders"
+  | "glutes"
+  | "arms"
+  | "abs"
+  | "cardio";
+
 export const workout = sqliteTable(
   "workout",
   {
@@ -19,18 +30,7 @@ export const workout = sqliteTable(
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
     name: text("name").notNull(),
-    focus: text("focus")
-      .$type<
-        | "chest"
-        | "back"
-        | "legs"
-        | "shoulders"
-        | "glutes"
-        | "arms"
-        | "abs"
-        | "cardio"
-      >()
-      .notNull(),
+    focuses: text("focuses", { mode: "json" }).$type<MuscleGroup[]>().default(sql`'[]'`).notNull(),
     active: integer("active", { mode: "boolean" }).default(true).notNull(),
     createdAt: timestampMs("created_at"),
     updatedAt: timestampMs("updated_at"),
@@ -58,16 +58,8 @@ export const exercise = sqliteTable(
     catalogId: text("catalog_id").references(() => exerciseCatalog.id, {
       onDelete: "set null",
     }),
-    muscleGroup: text("muscle_group").$type<
-      | "chest"
-      | "back"
-      | "legs"
-      | "shoulders"
-      | "glutes"
-      | "arms"
-      | "abs"
-      | "cardio"
-    >(),
+    // [] = sem grupo (exercício de catálogo usa o grupo do catálogo)
+    muscleGroups: text("muscle_groups", { mode: "json" }).$type<MuscleGroup[]>().default(sql`'[]'`).notNull(),
     createdAt: timestampMs("created_at"),
   },
   (table) => [index("exercise_workout_idx").on(table.workoutId)],
@@ -144,16 +136,8 @@ export const sessionExercise = sqliteTable(
     catalogId: text("catalog_id").references(() => exerciseCatalog.id, {
       onDelete: "set null",
     }),
-    muscleGroup: text("muscle_group").$type<
-      | "chest"
-      | "back"
-      | "legs"
-      | "shoulders"
-      | "glutes"
-      | "arms"
-      | "abs"
-      | "cardio"
-    >(),
+    // [] = sem grupo (exercício de catálogo usa o grupo do catálogo)
+    muscleGroups: text("muscle_groups", { mode: "json" }).$type<MuscleGroup[]>().default(sql`'[]'`).notNull(),
     origin: text("origin")
       .$type<"template" | "added" | "replaced">()
       .default("template")

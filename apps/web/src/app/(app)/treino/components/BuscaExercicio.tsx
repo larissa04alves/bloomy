@@ -84,7 +84,7 @@ export function BuscaExercicio({
       </div>
 
       {filterOpen ? (
-        <div className="flex gap-2 overflow-x-auto pb-1">
+        <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           <Chip active={group === null} onClick={() => setGroup(null)}>
             Todos
           </Chip>

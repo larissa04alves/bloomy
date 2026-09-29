@@ -14,6 +14,8 @@ import { IconChip } from "@/components/icon-chip";
 import { SwipeableRow } from "@/components/swipeable-row";
 import { MEAL_LABELS, type Meal, type MealType } from "@/lib/api-types";
 
+import { formatMealItems } from "../hooks/format";
+
 /** Um ícone por refeição (visual do mock). */
 const MEAL_ICONS: Record<MealType, Icon> = {
   breakfast: CoffeeIcon,
@@ -56,7 +58,7 @@ export function RefeicoesSection({
               <IconChip tone="green" icon={<MealIcon size={22} weight="fill" />} />
               <div className="flex flex-1 flex-col">
                 <span className="text-sm font-bold text-ink">{MEAL_LABELS[m.type]}</span>
-                <span className="text-xs font-semibold text-ink-read">{m.description}</span>
+                <span className="text-xs font-semibold text-ink-read">{formatMealItems(m.items)}</span>
               </div>
               <CheckCircleIcon size={24} weight="fill" className="text-green-deep" />
             </div>

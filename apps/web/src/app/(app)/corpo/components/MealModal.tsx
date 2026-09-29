@@ -5,9 +5,15 @@ import { useEffect, useState } from "react";
 
 import { BottomSheet } from "@/components/bottom-sheet";
 import { ChoiceChip } from "@/components/choice-chip";
-import { MEAL_LABELS, type MealType } from "@/lib/api-types";
+import { MEAL_LABELS, type MealItem, type MealType } from "@/lib/api-types";
+
+import { MEAL_GRAMS_MAX, MEAL_ITEMS_MAX, toMealItems } from "../hooks/format";
 
 const ALL_TYPES: MealType[] = ["breakfast", "lunch", "dinner", "snack"];
+
+/** `id` estável: com key por índice, remover uma linha levaria o foco para o item errado. */
+type Row = { id: string; name: string; grams: string };
+const newRow = (name = "", grams = ""): Row => ({ id: crypto.randomUUID(), name, grams });
 
 export function MealModal({
   open,
@@ -19,40 +25,39 @@ export function MealModal({
   open: boolean;
   onOpenChange: (open: boolean) => void;
   initialType?: MealType;
-  editing?: { type: MealType; description: string };
-  onSubmit: (input: { type: MealType; description: string }) => void;
+  editing?: { type: MealType; items: MealItem[] };
+  onSubmit: (input: { type: MealType; items: MealItem[] }) => void;
 }) {
   const [type, setType] = useState<MealType>(initialType ?? "breakfast");
-  const [items, setItems] = useState<string[]>([""]);
+  const [rows, setRows] = useState<Row[]>(() => [newRow()]);
 
   // Ao (re)abrir: pré-preenche do modo edição, ou reseta com o tipo pendente.
   useEffect(() => {
     if (open) {
       setType(editing?.type ?? initialType ?? "breakfast");
-      const parsed = editing?.description
-        .split(",")
-        .map((s) => s.trim())
-        .filter(Boolean);
-      setItems(parsed && parsed.length > 0 ? parsed : [""]);
+      const seeded = editing?.items.map((i) => newRow(i.name, i.grams === null ? "" : String(i.grams)));
+      setRows(seeded && seeded.length > 0 ? seeded : [newRow()]);
     }
-  }, [open, initialType, editing?.type, editing?.description]);
+  }, [open, initialType, editing?.type, editing?.items]);
 
-  // Itens viram uma descrição única ("arroz, feijão") — a API guarda um texto só.
-  const description = items
-    .map((i) => i.trim())
-    .filter(Boolean)
-    .join(", ");
-  const canSave = description.length > 0;
+  const items = toMealItems(rows);
+  // Acima do teto o Salvar trava em vez de cortar o número calado.
+  const canSave =
+    items.length > 0 &&
+    items.length <= MEAL_ITEMS_MAX &&
+    items.every((i) => i.grams === null || i.grams <= MEAL_GRAMS_MAX);
 
-  const updateItem = (index: number, value: string) =>
-    setItems((prev) => prev.map((x, i) => (i === index ? value : x)));
-  const addItem = () => setItems((prev) => [...prev, ""]);
-  const removeItem = (index: number) =>
-    setItems((prev) => (prev.length > 1 ? prev.filter((_, i) => i !== index) : prev));
+  const atLimit = rows.length >= MEAL_ITEMS_MAX;
+  const updateRow = (id: string, patch: Partial<Row>) =>
+    setRows((prev) => prev.map((x) => (x.id === id ? { ...x, ...patch } : x)));
+  const addRow = () =>
+    setRows((prev) => (prev.length >= MEAL_ITEMS_MAX ? prev : [...prev, newRow()]));
+  const removeRow = (id: string) =>
+    setRows((prev) => (prev.length > 1 ? prev.filter((x) => x.id !== id) : prev));
 
   const submit = () => {
     if (!canSave) return;
-    onSubmit({ type, description });
+    onSubmit({ type, items });
     onOpenChange(false);
   };
 
@@ -83,26 +88,40 @@ export function MealModal({
       </div>
 
       <div className="flex flex-col gap-2">
-        {items.map((item, i) => (
-          // eslint-disable-next-line react/no-array-index-key -- lista curta e efêmera
-          <div key={i} className="flex items-center gap-2">
+        {rows.map((row, i) => (
+          <div key={row.id} className="flex items-center gap-2">
             <input
-              value={item}
-              onChange={(e) => updateItem(i, e.target.value)}
+              value={row.name}
+              onChange={(e) => updateRow(row.id, { name: e.target.value })}
+              maxLength={120}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   e.preventDefault();
-                  addItem();
+                  addRow();
                 }
               }}
               placeholder={i === 0 ? "O que você comeu?" : "Mais um item…"}
-              className="flex-1 rounded-control border border-hairline bg-white px-4 py-3 text-sm font-semibold text-ink placeholder:text-ink-faint focus:border-lilac focus:outline-none"
+              className="min-w-0 flex-1 rounded-control border border-hairline bg-white px-4 py-3 text-sm font-semibold text-ink placeholder:text-ink-faint focus:border-lilac focus:outline-none"
             />
-            {items.length > 1 ? (
+            <label className="flex w-19.5 shrink-0 items-center gap-1 rounded-control border border-hairline bg-white px-3 py-3 focus-within:border-lilac">
+              <input
+                value={row.grams}
+                onChange={(e) =>
+                  updateRow(row.id, { grams: e.target.value.replace(/\D/g, "").slice(0, 4) })
+                }
+                inputMode="numeric"
+                maxLength={4}
+                placeholder="—"
+                aria-label="Gramas"
+                className="w-full min-w-0 bg-transparent text-right text-sm font-semibold text-ink placeholder:text-ink-faint focus:outline-none"
+              />
+              <span className="text-sm font-semibold text-ink-read">g</span>
+            </label>
+            {rows.length > 1 ? (
               <button
                 type="button"
                 aria-label="Remover item"
-                onClick={() => removeItem(i)}
+                onClick={() => removeRow(row.id)}
                 className="grid size-9 shrink-0 place-items-center rounded-full bg-green-tint text-green-deep"
               >
                 <XIcon size={16} weight="bold" />
@@ -111,13 +130,15 @@ export function MealModal({
           </div>
         ))}
 
-        <button
-          type="button"
-          onClick={addItem}
-          className="flex items-center justify-center gap-1 rounded-control border border-dashed border-hairline py-2.5 text-sm font-bold text-green-deep"
-        >
-          <PlusIcon size={16} weight="bold" /> Adicionar mais
-        </button>
+        {atLimit ? null : (
+          <button
+            type="button"
+            onClick={addRow}
+            className="flex items-center justify-center gap-1 rounded-control border border-dashed border-hairline py-2.5 text-sm font-bold text-green-deep"
+          >
+            <PlusIcon size={16} weight="bold" /> Adicionar mais
+          </button>
+        )}
       </div>
     </BottomSheet>
   );

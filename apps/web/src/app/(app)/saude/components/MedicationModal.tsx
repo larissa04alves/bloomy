@@ -1,6 +1,6 @@
 "use client";
 
-import { PillIcon, PlusIcon, XIcon } from "@phosphor-icons/react";
+import { CaretDownIcon, PillIcon, PlusIcon, XIcon } from "@phosphor-icons/react";
 import { useForm } from "@tanstack/react-form";
 import { useEffect, useState } from "react";
 import { z } from "zod";
@@ -9,6 +9,7 @@ import { BottomSheet } from "@/components/bottom-sheet";
 import { ChoiceChip } from "@/components/choice-chip";
 import type { DoseUnit, Medication, MedicationInput } from "@/lib/api-types";
 import {
+  DOSE_UNIT_LABELS,
   DOSE_UNIT_OPTIONS,
   formatQuantity,
   parseQuantity,
@@ -119,24 +120,12 @@ export function MedicationModal({
         )}
       </form.Field>
 
-      <div className="flex flex-col gap-2">
-        <span className="text-sm font-bold text-ink">Dose</span>
-        <div className="flex flex-wrap gap-2">
-          {DOSE_UNIT_OPTIONS.map((u) => (
-            <ChoiceChip
-              key={u}
-              tone="coral"
-              selected={doseUnit === u}
-              onClick={() => setDoseUnit(u)}
-            >
-              {unitLabel(2, u)}
-            </ChoiceChip>
-          ))}
-        </div>
-        <div className="flex gap-2">
+      <div className="flex gap-2">
+        <div className="flex min-w-0 flex-[1.3] flex-col gap-2">
+          <span className="text-sm font-bold text-ink">Dose</span>
           <form.Field name="doseAmount">
             {(field) => (
-              <label className="flex flex-1 items-center gap-2 rounded-control border border-hairline bg-white px-4 py-3 focus-within:border-lilac">
+              <div className="flex items-center gap-2 rounded-control border border-hairline bg-white py-1.5 pr-1.5 pl-4 focus-within:border-lilac">
                 <input
                   value={field.state.value}
                   aria-label="Quantidade dose"
@@ -147,15 +136,31 @@ export function MedicationModal({
                   placeholder="1"
                   className="w-full min-w-0 bg-transparent text-sm font-semibold text-ink placeholder:text-ink-faint focus:outline-none"
                 />
-                <span className="shrink-0 text-sm font-semibold text-ink-read">
-                  dose
-                </span>
-              </label>
+                <label className="relative flex shrink-0 items-center gap-1 rounded-control bg-coral-tint px-3 py-1.5 text-sm font-bold text-coral focus-within:ring-2 focus-within:ring-coral">
+                  {unitLabel(2, doseUnit)}
+                  <CaretDownIcon size={14} weight="bold" />
+                  <select
+                    aria-label="Unidade da dose"
+                    value={doseUnit}
+                    onChange={(e) => setDoseUnit(e.target.value as DoseUnit)}
+                    className="absolute inset-0 cursor-pointer opacity-0"
+                  >
+                    {DOSE_UNIT_OPTIONS.map((u) => (
+                      <option key={u} value={u}>
+                        {DOSE_UNIT_LABELS[u].name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </div>
             )}
           </form.Field>
+        </div>
+        <div className="flex min-w-0 flex-1 flex-col gap-2">
+          <span className="text-sm font-bold text-ink">Estoque</span>
           <form.Field name="stock">
             {(field) => (
-              <label className="flex flex-1 items-center gap-2 rounded-control border border-hairline bg-white px-4 py-3 focus-within:border-lilac">
+              <label className="flex items-center gap-2 rounded-control border border-hairline bg-white px-4 py-3 focus-within:border-lilac">
                 <input
                   value={field.state.value}
                   aria-label="Estoque"

@@ -1,19 +1,11 @@
 "use client";
 
-import { DropIcon, MinusIcon, PlusIcon } from "@phosphor-icons/react";
-
-import { ProgressBar } from "@/components/progress-bar";
-
-import { dropFill } from "../hooks/format";
-
-/** Até 3 linhas de 8 gotas; acima disso a fileira deixa de ser legível e vira barra. */
-const MAX_DROPS = 24;
-const DROPS_PER_ROW = 8;
+import { useWaterDrop } from "../hooks/useWaterDrop";
+import { WaterDrop } from "./WaterDrop";
 
 export function HidratacaoSection({
   totalMl,
   goalMl,
-  target,
   portionMl,
   portionReady,
   canAdd,
@@ -24,7 +16,6 @@ export function HidratacaoSection({
 }: {
   totalMl: number;
   goalMl: number;
-  target: number;
   portionMl: number;
   /** Porção já carregada do profile. Falso = o `portionMl` ainda é o fallback. */
   portionReady: boolean;
@@ -36,73 +27,67 @@ export function HidratacaoSection({
   onRemoveLast: () => void;
   onOpenModal: () => void;
 }) {
+  const drop = useWaterDrop({
+    totalMl,
+    goalMl,
+    portionReady,
+    canAdd,
+    canRemove,
+    onAddPortion,
+    onRemoveLast,
+  });
+
   return (
     <section className="flex flex-col gap-3">
-      <div className="flex items-end justify-between">
-        <h2 className="font-display text-base font-bold text-ink">
-          Hidratação
-        </h2>
-        <span className="font-display text-base font-bold text-lilac-deep">
-          {totalMl} de {goalMl} ml
-        </span>
-      </div>
+      <h2 className="font-display text-base font-bold text-ink">Hidratação</h2>
 
-      {target <= MAX_DROPS ? (
-        <div
-          className="grid gap-1.5"
-          style={{
-            gridTemplateColumns: `repeat(${Math.min(target, DROPS_PER_ROW)}, minmax(0, 38px))`,
-          }}
-          aria-hidden="true"
-        >
-          {Array.from({ length: target }, (_, i) => {
-            const fill = dropFill(totalMl, portionMl, i);
-            return (
-              <div key={i} className="relative aspect-square">
-                <DropIcon
-                  weight="fill"
-                  className="absolute inset-0 size-full text-control-off"
-                />
-                <DropIcon
-                  weight="fill"
-                  className="absolute inset-0 size-full text-lilac"
-                  // enche de baixo para cima, como nível de água
-                  style={{ clipPath: `inset(${(1 - fill) * 100}% 0 0 0)` }}
-                />
-              </div>
-            );
-          })}
+      <div className="flex items-center justify-between gap-3 rounded-card-lg bg-lilac-tint py-4 pr-5 pl-4">
+        <div className="flex min-w-0 flex-col gap-1">
+          <span className="font-display text-2xl font-bold text-lilac-deep">
+            {totalMl} <span className="text-sm opacity-70">/ {goalMl} ml</span>
+          </span>
+          <span className="text-sm font-bold text-lilac-deep">
+            {drop.leftMl > 0 ? `faltam ${drop.leftMl} ml` : "meta batida 💜"}
+          </span>
+          <span className="text-xs font-semibold text-ink-read">
+            {portionReady
+              ? `Toque na gota: +${portionMl} ml`
+              : "Toque na gota: +1 copo"}
+            <br />
+            Segure para remover
+          </span>
+          <button
+            type="button"
+            onClick={onOpenModal}
+            className="mt-1.5 self-start rounded-full bg-white px-3 py-1.5 text-xs font-bold text-lilac-deep"
+          >
+            Outra quantidade
+          </button>
+          {/* segurar não existe no teclado nem no leitor de tela */}
+          <button
+            type="button"
+            onClick={drop.undo}
+            // aria-disabled (não disabled): o foco não se perde enquanto a remoção está em voo
+            aria-disabled={!canRemove}
+            className="sr-only self-start text-xs font-bold text-lilac-deep focus:not-sr-only aria-disabled:opacity-50"
+          >
+            Tirar último copo
+          </button>
         </div>
-      ) : (
-        <ProgressBar value={goalMl > 0 ? totalMl / goalMl : 0} tone="lilac" />
-      )}
 
-      <div className="flex gap-2">
         <button
           type="button"
-          aria-label="Tirar último registro"
-          onClick={onRemoveLast}
-          disabled={!canRemove}
-          className="grid size-12 shrink-0 place-items-center rounded-full bg-lilac-tint text-lilac-deep disabled:opacity-50"
+          aria-label={portionReady ? `Beber ${portionMl} ml` : "Beber um copo"}
+          aria-disabled={!drop.canDrink}
+          {...drop.hold.handlers}
+          className="shrink-0 touch-manipulation select-none rounded-full [-webkit-touch-callout:none] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-lilac"
         >
-          <MinusIcon size={20} weight="bold" />
-        </button>
-        <button
-          type="button"
-          onClick={onAddPortion}
-          disabled={!portionReady || !canAdd}
-          className="flex flex-1 items-center justify-center gap-1 rounded-full bg-lilac font-bold text-white shadow-btn disabled:opacity-60 disabled:shadow-none"
-        >
-          <PlusIcon size={18} weight="bold" />
-          {portionReady ? `Adicionar ${portionMl} ml` : "Adicionar porção"}
-        </button>
-        <button
-          type="button"
-          aria-label="Escolher quantidade"
-          onClick={onOpenModal}
-          className="grid size-12 shrink-0 place-items-center rounded-full bg-lilac-tint text-lilac-deep"
-        >
-          <DropIcon size={22} weight="fill" />
+          <WaterDrop
+            level={drop.level}
+            holding={drop.hold.holding}
+            ringMs={drop.hold.ringMs}
+            burst={drop.burst}
+          />
         </button>
       </div>
     </section>
