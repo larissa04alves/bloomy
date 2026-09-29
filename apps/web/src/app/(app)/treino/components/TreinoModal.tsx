@@ -15,6 +15,7 @@ import {
 } from "@/lib/api-types";
 
 import type { WorkoutInput } from "../hooks/useTreinos";
+import { commitDraft, numberDraft } from "../hooks/format";
 import { NEW_EXERCISE_DEFAULTS } from "../hooks/session";
 import { useCatalogo } from "../hooks/useCatalogo";
 import { BuscaExercicio } from "./BuscaExercicio";
@@ -59,15 +60,19 @@ function NumField({
   ariaLabel: string;
   onChange: (v: number) => void;
 }) {
+  // Rascunho em texto: apagar não vira o mínimo na hora e "030" vira "30".
+  const [draft, setDraft] = useState<string | null>(null);
   return (
     <label className="flex flex-1 items-center justify-center gap-1 rounded-control border border-hairline bg-white px-2 py-2">
       <input
-        type="number"
+        type="text"
         inputMode="numeric"
-        min={min}
-        max={max}
-        value={value}
-        onChange={(e) => onChange(clamp(Number(e.target.value), min, max))}
+        value={draft ?? String(value)}
+        onChange={(e) => setDraft(numberDraft(e.target.value))}
+        onBlur={() => {
+          if (draft !== null) onChange(commitDraft(draft, min, max));
+          setDraft(null);
+        }}
         aria-label={ariaLabel}
         className="w-9 bg-transparent text-center text-sm font-bold text-ink outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
       />
