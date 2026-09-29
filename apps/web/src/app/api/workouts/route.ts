@@ -12,12 +12,12 @@ const EXERCISE_SCHEMA = z.object({
   restSeconds: z.number().int().min(0).max(600),
   position: z.number().int().min(0),
   catalogId: z.string().nullable().optional(),
-  muscleGroup: z.enum(FOCUS_VALUES).nullable().optional(),
+  muscleGroups: z.array(z.enum(FOCUS_VALUES)).max(8).default([]),
 });
 
 const BODY_SCHEMA = z.object({
   name: z.string().min(1).max(120),
-  focus: z.enum(FOCUS_VALUES),
+  focuses: z.array(z.enum(FOCUS_VALUES)).min(1).max(8),
   exercises: z.array(EXERCISE_SCHEMA).max(30),
 });
 

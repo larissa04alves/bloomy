@@ -25,7 +25,7 @@ import {
 
 import { dayFor, previousDay } from "@/server/shared/day";
 
-import { workoutSummary, type WorkoutWithExercises } from "./service";
+import { normalizeFocuses, workoutSummary, type WorkoutWithExercises } from "./service";
 
 export type SessionExercise = {
   id: string; // linha de session_exercise (é por aqui que a UI age)
@@ -205,7 +205,7 @@ export async function startSession(
               restSeconds: ex.restSeconds,
               position: ex.position,
               catalogId: ex.catalogId,
-              muscleGroup: ex.muscleGroup,
+              muscleGroups: ex.muscleGroups,
               origin: "template" as const,
             })),
           )
@@ -419,7 +419,7 @@ export type SessionExerciseInput = {
   targetReps: number;
   restSeconds: number;
   catalogId?: string | null;
-  muscleGroup?: SessionExerciseRow["muscleGroup"];
+  muscleGroups?: SessionExerciseRow["muscleGroups"];
 };
 
 /** Sessão em andamento do usuário, por id. Null = 404 (inexistente, alheia ou concluída). */
@@ -529,7 +529,7 @@ export async function addSessionExercise(
         restSeconds: input.restSeconds,
         position: (maxPosition ?? -1) + 1,
         catalogId: input.catalogId ?? null,
-        muscleGroup: input.catalogId ? null : (input.muscleGroup ?? null),
+        muscleGroups: input.catalogId ? [] : normalizeFocuses(input.muscleGroups ?? []),
         origin: "added",
       })
       .returning();
@@ -625,7 +625,7 @@ export async function swapSessionExercise(
         targetReps: input.targetReps,
         restSeconds: input.restSeconds,
         catalogId: input.catalogId ?? null,
-        muscleGroup: input.catalogId ? null : (input.muscleGroup ?? null),
+        muscleGroups: input.catalogId ? [] : normalizeFocuses(input.muscleGroups ?? []),
         origin: "replaced",
       })
       .where(eq(sessionExercise.id, sessionExerciseId));
@@ -798,7 +798,7 @@ export async function applySessionToWorkout(
         restSeconds: row.restSeconds,
         position: i,
         catalogId: row.catalogId,
-        muscleGroup: row.muscleGroup,
+        muscleGroups: row.muscleGroups,
       };
       if (row.exerciseId) {
         await tx

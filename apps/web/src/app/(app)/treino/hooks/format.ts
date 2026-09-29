@@ -1,3 +1,5 @@
+import { FOCUS_LABELS, type Focus } from "@/lib/api-types";
+
 /** Segundos → "M:SS" (timer da sessão e do descanso). Ex.: 372 → "6:12". */
 export function mmss(totalSeconds: number): string {
   const s = Math.max(0, Math.floor(totalSeconds));
@@ -42,4 +44,9 @@ export function commitDraft(draft: string, min: number, max: number): number {
 /** Rascunho ao sair do campo de reps/carga: vazio ou inválido → 0; decimal sem arredondar. */
 export function settleDraft(draft: string): number {
   return parseDraft(draft) ?? 0;
+}
+
+/** Focos → rótulos PT juntos. Ex.: ["chest", "arms"] → "Peito · Braços". */
+export function formatFocuses(focuses: Focus[]): string {
+  return focuses.map((f) => FOCUS_LABELS[f]).join(" · ");
 }

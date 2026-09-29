@@ -126,7 +126,7 @@ export type Exercise = {
   restSeconds: number;
   position: number;
   catalogId: string | null;
-  muscleGroup: Focus | null;
+  muscleGroups: Focus[]; // [] = sem grupo
 };
 
 export type CatalogExercise = {
@@ -142,7 +142,7 @@ export type CatalogExercise = {
 export type Workout = {
   id: string;
   name: string;
-  focus: Focus;
+  focuses: Focus[];
   active: boolean;
   createdAt: string;
 };

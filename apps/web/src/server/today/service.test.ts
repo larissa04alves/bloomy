@@ -83,7 +83,7 @@ describe("getToday", () => {
     await createTestUser(db);
     const w = await createWorkout(db, USER.id, {
       name: "Pernas",
-      focus: "legs",
+      focuses: ["legs"],
       exercises: [
         {
           name: "Agachamento",

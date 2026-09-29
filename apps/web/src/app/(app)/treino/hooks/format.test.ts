@@ -3,6 +3,7 @@ import { describe, expect, it } from "bun:test";
 import {
   commitDraft,
   formatDuration,
+  formatFocuses,
   mmss,
   numberDraft,
   parseDraft,
@@ -65,5 +66,11 @@ describe("settleDraft", () => {
     expect(settleDraft(",")).toBe(0);
     expect(settleDraft("7,5")).toBe(7.5);
     expect(settleDraft("12")).toBe(12);
+  });
+});
+
+describe("formatFocuses", () => {
+  it("junta os rótulos PT com ponto médio", () => {
+    expect(formatFocuses(["chest", "arms"])).toBe("Peito · Braços");
   });
 });

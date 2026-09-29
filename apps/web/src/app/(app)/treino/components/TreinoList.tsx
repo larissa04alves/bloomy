@@ -9,7 +9,9 @@ import {
 
 import { IconChip } from "@/components/icon-chip";
 import { SwipeableRow } from "@/components/swipeable-row";
-import { FOCUS_LABELS, type WorkoutWithExercises } from "@/lib/api-types";
+import type { WorkoutWithExercises } from "@/lib/api-types";
+
+import { formatFocuses } from "../hooks/format";
 
 export function TreinoList({
   workouts,
@@ -55,7 +57,7 @@ export function TreinoList({
             <div className="flex flex-1 flex-col">
               <span className="text-sm font-bold text-ink">{w.name}</span>
               <span className="text-xs font-semibold text-ink-read">
-                {w.exercises.length} exercícios · {FOCUS_LABELS[w.focus]}
+                {w.exercises.length} exercícios · {formatFocuses(w.focuses)}
               </span>
             </div>
             <button

@@ -1,11 +1,12 @@
 import { afterAll, describe, expect, test } from "bun:test";
 
 import { goal } from "@bloomy/db/schema/goals";
+import { exerciseCatalog } from "@bloomy/db/schema/workout";
 
 import { DEFAULT_GOAL_TARGETS } from "@/lib/api-types";
 import { cleanupTestDbs, createTestDb, createTestUser } from "@/server/shared/test-db";
 
-import { summarizeWorkouts, workoutSummary } from "./service";
+import { createWorkout, listWorkouts, summarizeWorkouts, workoutSummary } from "./service";
 
 afterAll(cleanupTestDbs);
 
@@ -76,5 +77,51 @@ describe("workoutSummary (alvo da semana, com banco)", () => {
     const { weekTarget } = await workoutSummary(db, owner, now);
 
     expect(weekTarget).toBe(DEFAULT_GOAL_TARGETS.workout);
+  });
+});
+
+describe("vários grupos musculares", () => {
+  test("cria treino com vários focos", async () => {
+    const db = await createTestDb();
+    const userId = await createTestUser(db);
+
+    const w = await createWorkout(db, userId, {
+      name: "Superior",
+      focuses: ["arms", "chest", "arms"],
+      exercises: [],
+    });
+
+    // sem duplicado e na ordem de FOCUS_VALUES
+    expect(w.focuses).toEqual(["chest", "arms"]);
+    const [saved] = await listWorkouts(db, userId);
+    expect(saved.focuses).toEqual(["chest", "arms"]);
+  });
+
+  test("exercício personalizado com vários grupos", async () => {
+    const db = await createTestDb();
+    const userId = await createTestUser(db);
+    await db.insert(exerciseCatalog).values({
+      id: "0025",
+      name: "barbell chest fly",
+      namePt: "Crucifixo com barra",
+      group: "chest",
+      bodyPart: "chest",
+      target: "pectorals",
+      equipment: "barbell",
+      secondaryMuscles: [],
+    });
+
+    const w = await createWorkout(db, userId, {
+      name: "Inferior",
+      focuses: ["legs"],
+      exercises: [
+        { name: "Afundo", targetSets: 3, targetReps: 10, restSeconds: 60, position: 0, muscleGroups: ["legs", "glutes"] },
+        { name: "Crucifixo", targetSets: 3, targetReps: 12, restSeconds: 45, position: 1, catalogId: "0025", muscleGroups: ["chest"] },
+      ],
+    });
+
+    expect(w.exercises[0].muscleGroups).toEqual(["legs", "glutes"]);
+    // catálogo usa o grupo do catálogo: não grava grupos próprios
+    expect(w.exercises[1].muscleGroups).toEqual([]);
   });
 });

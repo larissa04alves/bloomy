@@ -11,10 +11,15 @@ import {
 import { goal } from "@bloomy/db/schema/goals";
 import { and, asc, eq, inArray, isNotNull } from "drizzle-orm";
 
-import { DEFAULT_GOAL_TARGETS } from "@/lib/api-types";
+import { DEFAULT_GOAL_TARGETS, FOCUS_VALUES } from "@/lib/api-types";
 import { dayFor } from "@/server/shared/day";
 
-export type Focus = Workout["focus"];
+export type Focus = Workout["focuses"][number];
+
+/** Sem duplicados e na ordem de FOCUS_VALUES. */
+export function normalizeFocuses(focuses: readonly Focus[]): Focus[] {
+  return FOCUS_VALUES.filter((f) => focuses.includes(f));
+}
 
 export type ExerciseInput = {
   name: string;
@@ -23,9 +28,9 @@ export type ExerciseInput = {
   restSeconds: number;
   position: number;
   catalogId?: string | null;
-  muscleGroup?: Focus | null;
+  muscleGroups?: Focus[];
 };
-export type WorkoutInput = { name: string; focus: Focus; exercises: ExerciseInput[] };
+export type WorkoutInput = { name: string; focuses: Focus[]; exercises: ExerciseInput[] };
 export type WorkoutWithExercises = Workout & { exercises: Exercise[] };
 
 export async function listWorkouts(
@@ -59,7 +64,7 @@ export async function createWorkout(
   return db.transaction(async (tx) => {
     const [created] = await tx
       .insert(workout)
-      .values({ userId, name: input.name, focus: input.focus })
+      .values({ userId, name: input.name, focuses: normalizeFocuses(input.focuses) })
       .returning();
 
     const rows = input.exercises.map((e) => ({
@@ -71,7 +76,7 @@ export async function createWorkout(
       restSeconds: e.restSeconds,
       position: e.position,
       catalogId: e.catalogId ?? null,
-      muscleGroup: e.catalogId ? null : (e.muscleGroup ?? null),
+      muscleGroups: e.catalogId ? [] : normalizeFocuses(e.muscleGroups ?? []),
     }));
     const exercises = rows.length ? await tx.insert(exercise).values(rows).returning() : [];
 
@@ -91,7 +96,7 @@ export async function updateWorkout(
       .update(workout)
       .set({
         ...(input.name !== undefined && { name: input.name }),
-        ...(input.focus !== undefined && { focus: input.focus }),
+        ...(input.focuses !== undefined && { focuses: normalizeFocuses(input.focuses) }),
         updatedAt: new Date(),
       })
       .where(and(eq(workout.id, id), eq(workout.userId, userId)))
@@ -110,7 +115,7 @@ export async function updateWorkout(
         restSeconds: e.restSeconds,
         position: e.position,
         catalogId: e.catalogId ?? null,
-        muscleGroup: e.catalogId ? null : (e.muscleGroup ?? null),
+        muscleGroups: e.catalogId ? [] : normalizeFocuses(e.muscleGroups ?? []),
       }));
       exercises = rows.length ? await tx.insert(exercise).values(rows).returning() : [];
     } else {

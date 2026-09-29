@@ -9,7 +9,7 @@ import { useResource } from "@/lib/use-resource";
 
 export type WorkoutInput = {
   name: string;
-  focus: Focus;
+  focuses: Focus[];
   exercises: {
     name: string;
     targetSets: number;
@@ -17,7 +17,7 @@ export type WorkoutInput = {
     restSeconds: number;
     position: number;
     catalogId: string | null;
-    muscleGroup: Focus | null;
+    muscleGroups: Focus[];
   }[];
 };
 
