@@ -35,12 +35,12 @@ export function HidratacaoSection({
   const drink = () => {
     if (!portionReady || !canAdd) return;
     onAddPortion();
-    setBurst({ id: Date.now(), kind: "add" });
+    setBurst((prev) => ({ id: (prev?.id ?? 0) + 1, kind: "add" }));
   };
   const undo = () => {
     if (!canRemove) return;
     onRemoveLast();
-    setBurst({ id: Date.now(), kind: "remove" });
+    setBurst((prev) => ({ id: (prev?.id ?? 0) + 1, kind: "remove" }));
   };
   const hold = useHoldPress({ onTap: drink, onHold: undo, canHold: canRemove });
 
@@ -76,8 +76,9 @@ export function HidratacaoSection({
           <button
             type="button"
             onClick={undo}
-            disabled={!canRemove}
-            className="sr-only self-start text-xs font-bold text-lilac-deep focus:not-sr-only disabled:opacity-50"
+            // aria-disabled (não disabled): o foco não se perde enquanto a remoção está em voo
+            aria-disabled={!canRemove}
+            className="sr-only self-start text-xs font-bold text-lilac-deep focus:not-sr-only aria-disabled:opacity-50"
           >
             Tirar último copo
           </button>
@@ -92,12 +93,9 @@ export function HidratacaoSection({
         >
           <WaterDrop
             level={waterLevel(totalMl, goalMl)}
-            totalMl={totalMl}
-            goalMl={goalMl}
             holding={hold.holding}
             ringMs={hold.ringMs}
             burst={burst}
-            showTotal={false}
           />
         </button>
       </div>

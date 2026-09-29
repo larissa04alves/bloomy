@@ -1,6 +1,6 @@
 "use client";
 
-import { useId } from "react";
+import { useEffect, useId, useRef } from "react";
 
 const SHAPE = "M50 6 C60 24 92 52 92 84 C92 108 73 126 50 126 C27 126 8 108 8 84 C8 52 40 24 50 6 Z";
 const PINGO = "M50 20 C50 20 44 28 44 32 A6 6 0 0 0 56 32 C56 28 50 20 50 20 Z";
@@ -15,35 +15,41 @@ const BUBBLES = [
   { cx: 66, cy: 112, r: 2.2, delay: 0.24 },
   { cx: 40, cy: 120, r: 3, delay: 0.32 },
 ];
+const SQUISH: Keyframe[] = [
+  { transform: "scale(1)" },
+  { transform: "scale(1.06, 0.94)", offset: 0.4 },
+  { transform: "scale(0.97, 1.03)", offset: 0.7 },
+  { transform: "scale(1)" },
+];
 
 export type DropBurst = { id: number; kind: "add" | "remove" };
 
 /** Gota da Hidratação: nível da água, onda contínua, anel do "segurar" e a reação a cada registro. */
 export function WaterDrop({
   level,
-  totalMl,
-  goalMl,
   holding,
   ringMs,
   burst,
-  showTotal = true,
 }: {
   /** 0–1, fração da meta. */
   level: number;
-  totalMl: number;
-  goalMl: number;
   holding: boolean;
   ringMs: number;
   burst: DropBurst | null;
-  /** Falso quando o total já aparece ao lado da gota. */
-  showTotal?: boolean;
 }) {
   const uid = useId().replace(/:/g, "");
   const clipId = `drop-clip-${uid}`;
   const gradId = `drop-grad-${uid}`;
+  const bodyRef = useRef<SVGGElement>(null);
   // Superfície da água no viewBox (topo da gota em ~6, fundo em ~126).
   const surface = 124 - level * 120;
   const landing = burst?.kind === "add" ? LAND_S : 0;
+
+  // O corpo não pode remontar a cada registro: a água perderia a transição de nível.
+  useEffect(() => {
+    if (!burst || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    bodyRef.current?.animate(SQUISH, { duration: 350, delay: landing * 1000, easing: "ease" });
+  }, [burst, landing]);
 
   return (
     <svg width="96" height="125" viewBox="0 0 100 130" overflow="visible" aria-hidden="true">
@@ -71,24 +77,18 @@ export function WaterDrop({
         style={{ transition: `stroke-dashoffset ${holding ? ringMs : 0}ms linear` }}
       />
 
-      <g
-        key={burst?.id ?? "idle"}
-        className={burst ? "animate-squish" : undefined}
-        style={{ transformOrigin: "50px 120px", animationDelay: `${landing}s` }}
-      >
+      <g ref={bodyRef} style={{ transformOrigin: "50px 120px" }}>
         <path d={SHAPE} className="fill-white/70" />
         <g clipPath={`url(#${clipId})`}>
           <g
-            style={{
-              transform: `translateY(${surface}px)`,
-              transition: `transform 0.7s cubic-bezier(0.3, 1.35, 0.5, 1) ${landing}s`,
-            }}
+            className="transition-transform duration-700 ease-[cubic-bezier(0.3,1.35,0.5,1)] motion-reduce:transition-none"
+            style={{ transform: `translateY(${surface}px)`, transitionDelay: `${landing}s` }}
           >
             <path d={WAVE} fill="#D9CCF0" opacity={0.55} transform="translate(0 -4)" className="animate-wave-slow" />
             <path d={WAVE} fill={`url(#${gradId})`} className="animate-wave" />
           </g>
           {burst ? (
-            <>
+            <g key={burst.id}>
               <ellipse
                 cx={50}
                 cy={surface + 8}
@@ -113,22 +113,12 @@ export function WaterDrop({
                     />
                   ))
                 : null}
-            </>
+            </g>
           ) : null}
         </g>
         {/* reflexo de luz */}
         <path d="M30 60 C32 46 40 34 46 26" fill="none" stroke="#fff" strokeWidth={5} strokeLinecap="round" opacity={0.85} />
         <circle cx={27} cy={72} r={3} fill="#fff" opacity={0.8} />
-        {showTotal ? (
-          <>
-            <text x={50} y={92} textAnchor="middle" fontSize={20} className="fill-[#5E4696] font-display font-bold">
-              {totalMl}
-            </text>
-            <text x={50} y={108} textAnchor="middle" fontSize={9} className="fill-lilac-deep font-bold">
-              de {goalMl} ml
-            </text>
-          </>
-        ) : null}
       </g>
 
       {burst ? (

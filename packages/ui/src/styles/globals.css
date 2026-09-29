@@ -158,16 +158,6 @@
     }
   }
 
-  --animate-squish: squish 0.35s ease;
-  @keyframes squish {
-    40% {
-      transform: scale(1.06, 0.94);
-    }
-    70% {
-      transform: scale(0.97, 1.03);
-    }
-  }
-
   --animate-ripple: ripple 0.6s ease-out forwards;
   @keyframes ripple {
     from {
@@ -225,7 +215,6 @@
   .animate-fade-in,
   .animate-wave,
   .animate-wave-slow,
-  .animate-squish,
   .animate-ripple,
   .animate-drop-fall,
   .animate-drop-rise,

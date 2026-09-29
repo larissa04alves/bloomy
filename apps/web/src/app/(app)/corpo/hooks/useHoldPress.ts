@@ -29,6 +29,11 @@ export function useHoldPress({
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
   // O `click` chega depois do `pointerup`: é por aqui que ele sabe que o gesto já foi um segurar.
   const held = useRef(false);
+  // Os timers leem o estado de quando disparam, não de quando o dedo encostou.
+  const latest = useRef({ onTap, onHold, canHold });
+  useEffect(() => {
+    latest.current = { onTap, onHold, canHold };
+  });
 
   const cancel = useCallback(() => {
     timers.current.forEach(clearTimeout);
@@ -44,15 +49,17 @@ export function useHoldPress({
     ringMs: holdMs - showAfterMs,
     handlers: {
       onPointerDown: (e: PointerEvent) => {
+        if (e.button !== 0 || !e.isPrimary) return;
+        cancel();
         held.current = false;
-        if (e.button !== 0 || !canHold) return;
+        // Arma mesmo sem o que tirar: segurar nunca pode virar um toque (um copo a mais).
         timers.current = [
-          setTimeout(() => setHolding(true), showAfterMs),
+          setTimeout(() => setHolding(latest.current.canHold), showAfterMs),
           setTimeout(() => {
             held.current = true;
             timers.current = [];
             setHolding(false);
-            onHold();
+            if (latest.current.canHold) latest.current.onHold();
           }, holdMs),
         ];
       },
@@ -60,12 +67,11 @@ export function useHoldPress({
       onPointerLeave: cancel,
       onPointerCancel: cancel,
       onContextMenu: (e: MouseEvent) => e.preventDefault(),
-      onClick: () => {
-        if (held.current) {
-          held.current = false;
-          return;
-        }
-        onTap();
+      onClick: (e: MouseEvent) => {
+        // `detail` 0 = Enter/Espaço: nunca é o fim de um segurar.
+        const endOfHold = held.current && e.detail !== 0;
+        held.current = false;
+        if (!endOfHold) latest.current.onTap();
       },
     },
   };
