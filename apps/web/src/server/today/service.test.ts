@@ -145,6 +145,8 @@ describe("getToday", () => {
       professional: "Dr. Paulo",
       scheduledAt: new Date("2026-07-01T17:00:00.000Z"),
     });
+    if (created === "missing_schedule")
+      throw new Error("fixture inválida: falta scheduledAt");
     // followUpMonths: 0 → suggestedAt fica no instante da conclusão, sempre
     // dentro da janela de 30 dias do serviço, sem depender do dia em que o teste roda.
     const result = await completeAppointment(db, USER.id, created.id, {

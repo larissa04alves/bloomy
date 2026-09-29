@@ -251,7 +251,9 @@ export type Appointment = {
 export type AppointmentInput = {
   professional: string;
   specialty?: string;
-  scheduledAt: string; // ISO
+  status: "scheduled" | "to_schedule";
+  scheduledAt: string | null; // ISO
+  suggestedAt: string | null; // ISO
   location?: string;
   remindDayBefore?: boolean;
 };

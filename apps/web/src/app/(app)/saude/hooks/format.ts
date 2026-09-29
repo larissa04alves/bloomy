@@ -36,6 +36,12 @@ export function monthShort(iso: string): string {
   return MONTHS_PT[new Date(iso).getMonth()];
 }
 
+export function addMonthsIso(months: number, now: Date = new Date()): string {
+  const d = new Date(now);
+  d.setMonth(d.getMonth() + months);
+  return d.toISOString();
+}
+
 /** "qui, 16" */
 export function weekdayDay(iso: string): string {
   const d = new Date(iso);

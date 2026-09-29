@@ -10,7 +10,8 @@ import { hourLabel, monthShort, relativeDays, weekdayDay } from "../hooks/format
 export function ProximaConsultaCard({ proxima }: { proxima: Appointment | null }) {
   const title = (() => {
     if (!proxima) return "Nenhuma consulta marcada";
-    if (proxima.status === "to_schedule") return "Retorno a agendar";
+    if (proxima.status === "to_schedule")
+      return proxima.parentId ? "Retorno a agendar" : "Consulta a agendar";
     if (!proxima.scheduledAt) return "Próxima consulta";
     return `Próxima consulta ${relativeDays(proxima.scheduledAt)}`;
   })();
@@ -19,7 +20,8 @@ export function ProximaConsultaCard({ proxima }: { proxima: Appointment | null }
     if (!proxima) return "Agende quando precisar 💜";
     const who = proxima.professional;
     if (proxima.status === "to_schedule") {
-      const when = proxima.suggestedAt ? ` · sugerido em ${monthShort(proxima.suggestedAt)}` : "";
+      const prefix = proxima.parentId ? "sugerido em" : "até";
+      const when = proxima.suggestedAt ? ` · ${prefix} ${monthShort(proxima.suggestedAt)}` : "";
       return `${who}${when}`;
     }
     const at = proxima.scheduledAt;

@@ -35,7 +35,11 @@ export default function SaudePage() {
   const peso = usePeso();
 
   // Modais de consulta / exame / remédio (undefined = criar; objeto = editar).
-  const [apptModal, setApptModal] = useState<{ open: boolean; initial?: Appointment }>({ open: false });
+  const [apptModal, setApptModal] = useState<{
+    open: boolean;
+    initial?: Appointment;
+    initialStatus?: "scheduled" | "to_schedule";
+  }>({ open: false });
   const [examModal, setExamModal] = useState<{ open: boolean; initial?: Exam }>({ open: false });
   const [medModal, setMedModal] = useState<{ open: boolean; initial?: Medication }>({ open: false });
   // Modal de peso (undefined = registrar; objeto = editar) e sheet de histórico.
@@ -60,6 +64,7 @@ export default function SaudePage() {
         onEdit={(a) => setApptModal({ open: true, initial: a })}
         onDelete={consultas.remove}
         onComplete={(a) => setRetorno({ open: true, target: { kind: "consulta", id: a.id } })}
+        onSchedule={(a) => setApptModal({ open: true, initial: a, initialStatus: "scheduled" })}
         onHistory={() => history.openHistory("consulta")}
       />
 
@@ -93,6 +98,7 @@ export default function SaudePage() {
         open={apptModal.open}
         onOpenChange={(open) => setApptModal((s) => ({ ...s, open }))}
         initial={apptModal.initial}
+        initialStatus={apptModal.initialStatus}
         onSubmit={(input) =>
           apptModal.initial
             ? consultas.update(apptModal.initial.id, input)
@@ -179,7 +185,7 @@ export default function SaudePage() {
         <LoadingOverlay
           label={
             consultas.creating
-              ? "Agendando consulta…"
+              ? "Salvando consulta…"
               : exames.creating
                 ? "Adicionando exame…"
                 : "Cadastrando remédio…"

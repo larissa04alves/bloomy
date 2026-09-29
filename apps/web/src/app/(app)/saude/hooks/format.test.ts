@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
 
 import {
+  addMonthsIso,
   byCompletedDesc,
   dayMonth,
   examStatusTone,
@@ -103,4 +104,10 @@ test("byCompletedDesc: mais recente primeiro", () => {
     { id: "c", completedAt: null },
   ];
   expect(byCompletedDesc(items).map((x) => x.id)).toEqual(["b", "a", "c"]);
+});
+
+test("addMonthsIso: soma meses ao instante e devolve ISO", () => {
+  expect(addMonthsIso(3, new Date("2026-09-29T12:00:00-03:00"))).toStartWith(
+    "2026-12-29",
+  );
 });
