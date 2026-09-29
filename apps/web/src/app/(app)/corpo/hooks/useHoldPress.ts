@@ -27,8 +27,9 @@ export function useHoldPress({
 }) {
   const [holding, setHolding] = useState(false);
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
-  // O `click` chega depois do `pointerup`: é por aqui que ele sabe que o gesto já foi um segurar.
-  const held = useRef(false);
+  // O `click` chega depois do `pointerup`: é por aqui que ele sabe que o gesto já foi um
+  // segurar, ou foi abandonado (o dedo saiu da gota antes de soltar).
+  const skipClick = useRef(false);
   // Os timers leem o estado de quando disparam, não de quando o dedo encostou.
   const latest = useRef({ onTap, onHold, canHold });
   useEffect(() => {
@@ -51,12 +52,12 @@ export function useHoldPress({
       onPointerDown: (e: PointerEvent) => {
         if (e.button !== 0 || !e.isPrimary) return;
         cancel();
-        held.current = false;
+        skipClick.current = false;
         // Arma mesmo sem o que tirar: segurar nunca pode virar um toque (um copo a mais).
         timers.current = [
           setTimeout(() => setHolding(latest.current.canHold), showAfterMs),
           setTimeout(() => {
-            held.current = true;
+            skipClick.current = true;
             timers.current = [];
             setHolding(false);
             if (latest.current.canHold) latest.current.onHold();
@@ -64,14 +65,18 @@ export function useHoldPress({
         ];
       },
       onPointerUp: cancel,
-      onPointerLeave: cancel,
+      onPointerLeave: () => {
+        // Saiu com o gesto ainda armado: foi desistência, não toque.
+        if (timers.current.length > 0) skipClick.current = true;
+        cancel();
+      },
       onPointerCancel: cancel,
       onContextMenu: (e: MouseEvent) => e.preventDefault(),
       onClick: (e: MouseEvent) => {
-        // `detail` 0 = Enter/Espaço: nunca é o fim de um segurar.
-        const endOfHold = held.current && e.detail !== 0;
-        held.current = false;
-        if (!endOfHold) latest.current.onTap();
+        // `detail` 0 = Enter/Espaço: nunca é o fim de um gesto de ponteiro.
+        const skip = skipClick.current && e.detail !== 0;
+        skipClick.current = false;
+        if (!skip) latest.current.onTap();
       },
     },
   };

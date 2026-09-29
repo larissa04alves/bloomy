@@ -1,10 +1,7 @@
 "use client";
 
-import { useState } from "react";
-
-import { useHoldPress } from "../hooks/useHoldPress";
-import { waterLevel } from "../hooks/format";
-import { type DropBurst, WaterDrop } from "./WaterDrop";
+import { useWaterDrop } from "../hooks/useWaterDrop";
+import { WaterDrop } from "./WaterDrop";
 
 export function HidratacaoSection({
   totalMl,
@@ -30,21 +27,15 @@ export function HidratacaoSection({
   onRemoveLast: () => void;
   onOpenModal: () => void;
 }) {
-  const [burst, setBurst] = useState<DropBurst | null>(null);
-
-  const drink = () => {
-    if (!portionReady || !canAdd) return;
-    onAddPortion();
-    setBurst((prev) => ({ id: (prev?.id ?? 0) + 1, kind: "add" }));
-  };
-  const undo = () => {
-    if (!canRemove) return;
-    onRemoveLast();
-    setBurst((prev) => ({ id: (prev?.id ?? 0) + 1, kind: "remove" }));
-  };
-  const hold = useHoldPress({ onTap: drink, onHold: undo, canHold: canRemove });
-
-  const left = Math.max(0, goalMl - totalMl);
+  const drop = useWaterDrop({
+    totalMl,
+    goalMl,
+    portionReady,
+    canAdd,
+    canRemove,
+    onAddPortion,
+    onRemoveLast,
+  });
 
   return (
     <section className="flex flex-col gap-3">
@@ -56,7 +47,7 @@ export function HidratacaoSection({
             {totalMl} <span className="text-sm opacity-70">/ {goalMl} ml</span>
           </span>
           <span className="text-sm font-bold text-lilac-deep">
-            {left > 0 ? `faltam ${left} ml` : "meta batida 💜"}
+            {drop.leftMl > 0 ? `faltam ${drop.leftMl} ml` : "meta batida 💜"}
           </span>
           <span className="text-xs font-semibold text-ink-read">
             {portionReady
@@ -75,7 +66,7 @@ export function HidratacaoSection({
           {/* segurar não existe no teclado nem no leitor de tela */}
           <button
             type="button"
-            onClick={undo}
+            onClick={drop.undo}
             // aria-disabled (não disabled): o foco não se perde enquanto a remoção está em voo
             aria-disabled={!canRemove}
             className="sr-only self-start text-xs font-bold text-lilac-deep focus:not-sr-only aria-disabled:opacity-50"
@@ -87,15 +78,15 @@ export function HidratacaoSection({
         <button
           type="button"
           aria-label={portionReady ? `Beber ${portionMl} ml` : "Beber um copo"}
-          aria-disabled={!portionReady || !canAdd}
-          {...hold.handlers}
+          aria-disabled={!drop.canDrink}
+          {...drop.hold.handlers}
           className="shrink-0 touch-manipulation select-none rounded-full [-webkit-touch-callout:none] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-lilac"
         >
           <WaterDrop
-            level={waterLevel(totalMl, goalMl)}
-            holding={hold.holding}
-            ringMs={hold.ringMs}
-            burst={burst}
+            level={drop.level}
+            holding={drop.hold.holding}
+            ringMs={drop.hold.ringMs}
+            burst={drop.burst}
           />
         </button>
       </div>

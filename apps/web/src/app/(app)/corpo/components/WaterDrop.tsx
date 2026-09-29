@@ -2,6 +2,8 @@
 
 import { useEffect, useId, useRef } from "react";
 
+import type { DropBurst } from "../hooks/useWaterDrop";
+
 const SHAPE = "M50 6 C60 24 92 52 92 84 C92 108 73 126 50 126 C27 126 8 108 8 84 C8 52 40 24 50 6 Z";
 const PINGO = "M50 20 C50 20 44 28 44 32 A6 6 0 0 0 56 32 C56 28 50 20 50 20 Z";
 const WAVE = "M0 8 Q12.5 0 25 8 T50 8 T75 8 T100 8 T125 8 T150 8 T175 8 T200 8 V200 H0 Z";
@@ -21,8 +23,6 @@ const SQUISH: Keyframe[] = [
   { transform: "scale(0.97, 1.03)", offset: 0.7 },
   { transform: "scale(1)" },
 ];
-
-export type DropBurst = { id: number; kind: "add" | "remove" };
 
 /** Gota da Hidratação: nível da água, onda contínua, anel do "segurar" e a reação a cada registro. */
 export function WaterDrop({
@@ -66,7 +66,6 @@ export function WaterDrop({
       <path
         d={SHAPE}
         fill="none"
-        className="stroke-lilac"
         strokeWidth={5}
         strokeLinecap="round"
         pathLength={100}
@@ -74,7 +73,8 @@ export function WaterDrop({
         strokeDashoffset={holding ? 0 : 100}
         opacity={holding ? 1 : 0}
         transform="translate(50 70) scale(1.12) translate(-50 -70)"
-        style={{ transition: `stroke-dashoffset ${holding ? ringMs : 0}ms linear` }}
+        className="stroke-lilac transition-[stroke-dashoffset] ease-linear motion-reduce:transition-none"
+        style={{ transitionDuration: `${holding ? ringMs : 0}ms` }}
       />
 
       <g ref={bodyRef} style={{ transformOrigin: "50px 120px" }}>
