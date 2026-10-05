@@ -27,6 +27,22 @@ export function applySetPatch(
   }));
 }
 
+/** Série extra devolvida pelo servidor, no fim do exercício dono dela. */
+export function appendSet(
+  exercises: SessionExercise[],
+  sessionExerciseId: string,
+  set: SetLog,
+): SessionExercise[] {
+  return exercises.map((ex) =>
+    ex.id === sessionExerciseId ? { ...ex, sets: [...ex.sets, set] } : ex,
+  );
+}
+
+/** Remove uma série (imutável). */
+export function dropSet(exercises: SessionExercise[], setId: string): SessionExercise[] {
+  return exercises.map((ex) => ({ ...ex, sets: ex.sets.filter((s) => s.id !== setId) }));
+}
+
 /** Exercício concluído: tem ao menos uma série e todas estão feitas. */
 export function isExerciseDone(ex: SessionExercise): boolean {
   return ex.sets.length > 0 && ex.sets.every((s) => s.done);

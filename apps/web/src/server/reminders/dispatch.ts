@@ -22,15 +22,27 @@ import { dropDeadSubscription } from "@/server/push/service";
 import {
   deliveryKey,
   dueSlotsAt,
+  TOLERANCE_MINUTES,
   type DueSlot,
   type HealthEvent,
   type ReminderRow,
   type UserState,
 } from "./slots";
 
-/** Teto por envio. Bem abaixo do limite da função serverless, para que um
- *  aparelho lento não roube o tempo dos seguintes. */
-const SEND_TIMEOUT_MS = 10_000;
+/** Opções de cada envio.
+ *
+ *  - `urgency: "high"`: o default do protocolo é `normal`, que o FCM segura enquanto
+ *    o Android está em Doze (tela apagada, aparelho parado) — o lembrete só chegaria
+ *    quando a pessoa pegasse o celular.
+ *  - `TTL` igual à tolerância de envio: o default do `web-push` é 4 semanas, e
+ *    "hora do remédio" entregue horas depois é pior que não entregar.
+ *  - `timeout`: sem ele a lib espera para sempre; um push service lento travaria o
+ *    loop sequencial e a varredura estouraria o tempo do serverless. */
+export const SEND_OPTIONS = {
+  urgency: "high",
+  TTL: TOLERANCE_MINUTES * 60,
+  timeout: 10_000,
+} as const satisfies webpush.RequestOptions;
 
 /** Por quantos dias guardar o histórico de entregas. Curto de propósito: serve
  *  para investigar "por que não recebi ontem", não para virar arquivo. */
@@ -138,9 +150,7 @@ async function sendToDevices(db: Db, userId: string, slot: DueSlot): Promise<boo
           keys: { p256dh: device.p256dh, auth: device.auth },
         },
         payload,
-        // Sem timeout a lib espera para sempre; um push service lento travaria o
-        // loop sequencial e a varredura inteira estouraria o tempo do serverless.
-        { timeout: SEND_TIMEOUT_MS },
+        SEND_OPTIONS,
       );
       anyDelivered = true;
     } catch (error) {

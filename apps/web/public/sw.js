@@ -44,8 +44,10 @@ self.addEventListener("push", (event) => {
   event.waitUntil(
     self.registration.showNotification(data.title, {
       body: data.body,
-      // tag agrupa: dois lembretes de água não empilham na bandeja.
+      // tag agrupa: dois lembretes de água não empilham na bandeja. renotify faz
+      // a substituta tocar e vibrar — sem ele ela troca a anterior em silêncio.
       tag: data.tag,
+      renotify: true,
       icon: ICON,
       data: { url: data.url },
     }),

@@ -2,12 +2,14 @@ import {
   ArrowLeftIcon,
   ArrowsOutIcon,
   CheckCircleIcon,
+  CircleNotchIcon,
   ClockCounterClockwiseIcon,
   MinusIcon,
   PlusIcon,
 } from "@phosphor-icons/react";
 import { useState } from "react";
 
+import { SwipeableRow } from "@/components/swipeable-row";
 import type { CatalogExercise, SessionExercise } from "@/lib/api-types";
 import { FOCUS_LABELS } from "@/lib/api-types";
 
@@ -96,11 +98,17 @@ export function SerieList({
   onChangeLoad,
   onPersist,
   onDone,
+  onAddSet,
+  addingSet,
+  onRemoveSet,
   onVerExecucao,
 }: {
   exercise: SessionExercise;
   catalogExercise?: CatalogExercise | null;
   onBack: () => void;
+  onAddSet: () => void;
+  addingSet: boolean;
+  onRemoveSet: (setId: string) => void;
   onChangeReps: (setId: string, reps: number | null) => void;
   onChangeLoad: (setId: string, load: number | null) => void;
   onPersist: (
@@ -204,59 +212,81 @@ export function SerieList({
             : current
               ? "bg-lilac-tint"
               : "bg-lilac-tint-soft";
+          // Número pela posição, não por `setIndex`: depois de remover uma série do
+          // meio o índice gravado deixa buraco.
+          const n = i + 1;
+          // Série feita é registro de treino; e a última que sobra não sai — para
+          // tirar o exercício inteiro há o remover exercício da lista.
+          const removable = !s.done && total > 1;
           return (
-            <div
+            <SwipeableRow
               key={s.id}
-              className={`flex flex-col gap-3 rounded-2xl p-3.5 ${bg}`}
+              onDelete={removable ? () => onRemoveSet(s.id) : undefined}
             >
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-bold text-ink-read">
-                  Série {s.setIndex}
-                </span>
-                {s.done ? (
-                  <span className="flex items-center gap-1 text-xs font-bold text-green-deep">
-                    <CheckCircleIcon size={16} weight="fill" /> Finalizada
+              <div className={`flex flex-col gap-3 rounded-2xl p-3.5 ${bg}`}>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-bold text-ink-read">
+                    Série {n}
                   </span>
+                  {s.done ? (
+                    <span className="flex items-center gap-1 text-xs font-bold text-green-deep">
+                      <CheckCircleIcon size={16} weight="fill" /> Finalizada
+                    </span>
+                  ) : null}
+                </div>
+
+                <div className="flex gap-2">
+                  <StepperField
+                    label="reps"
+                    value={s.reps}
+                    mode="numeric"
+                    ariaLabel={`Repetições da série ${n}`}
+                    onChange={(v) => onChangeReps(s.id, v)}
+                    onCommit={(v) => onPersist(s.id, { reps: v, load: s.load })}
+                    onBlurCommit={() =>
+                      onPersist(s.id, { reps: s.reps, load: s.load })
+                    }
+                  />
+                  <StepperField
+                    label="kg"
+                    value={s.load}
+                    mode="decimal"
+                    ariaLabel={`Carga da série ${n}`}
+                    onChange={(v) => onChangeLoad(s.id, v)}
+                    onCommit={(v) => onPersist(s.id, { reps: s.reps, load: v })}
+                    onBlurCommit={() =>
+                      onPersist(s.id, { reps: s.reps, load: s.load })
+                    }
+                  />
+                </div>
+
+                {!s.done ? (
+                  <button
+                    type="button"
+                    onClick={() => onDone(s.id, { reps: s.reps, load: s.load })}
+                    className="w-full rounded-xl bg-lilac py-3 text-sm font-bold text-white"
+                  >
+                    Completar
+                  </button>
                 ) : null}
               </div>
-
-              <div className="flex gap-2">
-                <StepperField
-                  label="reps"
-                  value={s.reps}
-                  mode="numeric"
-                  ariaLabel={`Repetições da série ${s.setIndex}`}
-                  onChange={(v) => onChangeReps(s.id, v)}
-                  onCommit={(v) => onPersist(s.id, { reps: v, load: s.load })}
-                  onBlurCommit={() =>
-                    onPersist(s.id, { reps: s.reps, load: s.load })
-                  }
-                />
-                <StepperField
-                  label="kg"
-                  value={s.load}
-                  mode="decimal"
-                  ariaLabel={`Carga da série ${s.setIndex}`}
-                  onChange={(v) => onChangeLoad(s.id, v)}
-                  onCommit={(v) => onPersist(s.id, { reps: s.reps, load: v })}
-                  onBlurCommit={() =>
-                    onPersist(s.id, { reps: s.reps, load: s.load })
-                  }
-                />
-              </div>
-
-              {!s.done ? (
-                <button
-                  type="button"
-                  onClick={() => onDone(s.id, { reps: s.reps, load: s.load })}
-                  className="w-full rounded-xl bg-lilac py-3 text-sm font-bold text-white"
-                >
-                  Completar
-                </button>
-              ) : null}
-            </div>
+            </SwipeableRow>
           );
         })}
+
+        <button
+          type="button"
+          onClick={onAddSet}
+          disabled={addingSet}
+          className="flex items-center justify-center gap-1.5 rounded-2xl border border-dashed border-lilac py-3 text-sm font-bold text-lilac-deep disabled:opacity-60"
+        >
+          {addingSet ? (
+            <CircleNotchIcon size={16} weight="bold" className="animate-spin" />
+          ) : (
+            <PlusIcon size={16} weight="bold" />
+          )}{" "}
+          Adicionar série
+        </button>
       </div>
     </div>
   );

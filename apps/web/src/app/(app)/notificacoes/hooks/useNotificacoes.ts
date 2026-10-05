@@ -128,6 +128,10 @@ export function useNotificacoes() {
     sheet,
     hasMedication: (medsData?.medications ?? []).some((m) => m.active),
     permission,
+    // Os lembretes nascem ligados, então o toggle (que hoje pede a permissão) pode
+    // nunca ser tocado: sem este convite o aparelho jamais se registraria.
+    askActivation: permission === "default" && reminders.some((r) => r.enabled),
+    activate: useCallback(() => syncPush(true), [syncPush]),
 
     // `ready` só com os DOIS recursos em mãos: sem os remédios a linha de remédios
     // piscaria habilitada antes de descobrir que não há cadastro.

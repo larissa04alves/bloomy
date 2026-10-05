@@ -6,25 +6,32 @@ import { cn } from "@bloomy/ui/lib/utils";
 
 import { TONE, type Tone } from "@/lib/tone";
 
+import type { OnboardingStep } from "../hooks/format";
+
 export function PassoLayout({
   step,
+  total,
   tone,
   icon,
   title,
   subtitle,
   ctaLabel,
+  skipLabel = "Pular",
   pending,
   onNext,
   onSkip,
   onBack,
   children,
 }: {
-  step: 1 | 2 | 3;
+  step: OnboardingStep;
+  /** 3 ou 4: o passo de lembretes só existe quando há permissão a pedir. */
+  total: number;
   tone: Tone;
   icon: ReactNode;
   title: string;
   subtitle: string;
   ctaLabel: string;
+  skipLabel?: string;
   pending: boolean;
   onNext: () => void;
   onSkip: () => void;
@@ -36,7 +43,7 @@ export function PassoLayout({
   return (
     <div className="flex min-h-dvh flex-col px-7 pt-4 pb-8">
       <div className="flex gap-1.5" aria-hidden>
-        {[1, 2, 3].map((n) => (
+        {Array.from({ length: total }, (_, i) => i + 1).map((n) => (
           <span
             key={n}
             className={cn(
@@ -49,7 +56,7 @@ export function PassoLayout({
 
       <div className="flex items-center justify-between pt-2">
         <span className="text-xs font-bold text-ink-faint">
-          Passo {step} de 3
+          Passo {step} de {total}
         </span>
         <button
           type="button"
@@ -57,7 +64,7 @@ export function PassoLayout({
           disabled={pending}
           className="text-xs font-bold text-lilac-deep disabled:opacity-60"
         >
-          Pular
+          {skipLabel}
         </button>
       </div>
 

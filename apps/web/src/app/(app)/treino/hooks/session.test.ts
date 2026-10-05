@@ -2,7 +2,7 @@ import { describe, expect, it } from "bun:test";
 
 import type { SessionExercise } from "@/lib/api-types";
 
-import { applySetPatch, completedExercises, doneCount } from "./session";
+import { appendSet, applySetPatch, completedExercises, doneCount, dropSet } from "./session";
 
 function ex(id: string, sets: { id: string; done: boolean }[]): SessionExercise {
   return {
@@ -55,5 +55,23 @@ describe("completedExercises", () => {
       ex("b", [{ id: "s3", done: true }, { id: "s4", done: false }]),
     ];
     expect(completedExercises(exercises)).toBe(1);
+  });
+});
+
+describe("appendSet", () => {
+  it("põe a série no fim do exercício certo, sem tocar nos outros", () => {
+    const list = [ex("a", [{ id: "a1", done: true }]), ex("b", [{ id: "b1", done: false }])];
+    const extra = { ...list[0].sets[0], id: "a2", setIndex: 2, done: false };
+
+    const next = appendSet(list, "a", extra);
+    expect(next[0].sets.map((s) => s.id)).toEqual(["a1", "a2"]);
+    expect(next[1]).toBe(list[1]);
+  });
+});
+
+describe("dropSet", () => {
+  it("tira a série de onde ela estiver", () => {
+    const list = [ex("a", [{ id: "a1", done: false }, { id: "a2", done: false }])];
+    expect(dropSet(list, "a2")[0].sets.map((s) => s.id)).toEqual(["a1"]);
   });
 });

@@ -1,17 +1,19 @@
 "use client";
 
 import { PlusIcon } from "@phosphor-icons/react";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
 import { BicepsFlexedIcon } from "@/components/icons/biceps-flexed";
 import { LoadingOverlay } from "@/components/loading-overlay";
 import { Screen } from "@/components/screen";
 import type { WorkoutWithExercises } from "@/lib/api-types";
 
+import { PreviaTreino } from "./components/PreviaTreino";
 import { ResumoTreinoCard } from "./components/ResumoTreinoCard";
 import { SessaoAtiva } from "./components/SessaoAtiva";
 import { TreinoList } from "./components/TreinoList";
 import { TreinoModal } from "./components/TreinoModal";
+import { useBackStack, useDropStaleLayers } from "./hooks/useBackStack";
 import { useSessao } from "./hooks/useSessao";
 import { useTreinos } from "./hooks/useTreinos";
 
@@ -22,6 +24,10 @@ export default function TreinoPage() {
   const [editing, setEditing] = useState<WorkoutWithExercises | undefined>(
     undefined,
   );
+  const [previewing, setPreviewing] = useState<WorkoutWithExercises | null>(null);
+  // A prévia também é uma camada: o voltar do celular fecha o sheet em vez de sair.
+  useBackStack(previewing ? 1 : 0, useCallback(() => setPreviewing(null), []));
+  useDropStaleLayers();
 
   const openCreate = () => {
     setEditing(undefined);
@@ -68,6 +74,7 @@ export default function TreinoPage() {
           workouts={treinos.workouts}
           startingId={sessao.startingId}
           onStart={sessao.start}
+          onPreview={setPreviewing}
           onEdit={(w) => {
             setEditing(w);
             setModalOpen(true);
@@ -76,6 +83,18 @@ export default function TreinoPage() {
           onCreate={openCreate}
         />
       )}
+
+      <PreviaTreino
+        workout={previewing}
+        starting={sessao.startingId !== null}
+        onOpenChange={(open) => {
+          if (!open) window.history.back();
+        }}
+        onStart={async () => {
+          if (!previewing) return;
+          if (await sessao.start(previewing.id)) setPreviewing(null);
+        }}
+      />
 
       <TreinoModal
         open={modalOpen}

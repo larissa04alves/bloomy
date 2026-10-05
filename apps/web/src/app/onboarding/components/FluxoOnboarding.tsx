@@ -2,6 +2,7 @@
 
 import { useOnboarding } from "../hooks/useOnboarding";
 import { PassoAgua } from "./PassoAgua";
+import { PassoLembretes } from "./PassoLembretes";
 import { PassoRefeicoes } from "./PassoRefeicoes";
 import { PassoTreino } from "./PassoTreino";
 
@@ -9,11 +10,13 @@ export function FluxoOnboarding() {
   const {
     state,
     pending,
+    totalSteps,
     setWaterMl,
     setPortionMl,
     setMeals,
     toggleDay,
     advance,
+    activatePush,
     back,
     skip,
   } = useOnboarding();
@@ -21,6 +24,7 @@ export function FluxoOnboarding() {
   if (state.step === 1) {
     return (
       <PassoAgua
+        total={totalSteps}
         waterMl={state.waterMl}
         portionMl={state.portionMl}
         pending={pending}
@@ -35,6 +39,7 @@ export function FluxoOnboarding() {
   if (state.step === 2) {
     return (
       <PassoRefeicoes
+        total={totalSteps}
         meals={state.meals}
         pending={pending}
         onMeals={setMeals}
@@ -45,12 +50,24 @@ export function FluxoOnboarding() {
     );
   }
 
+  if (state.step === 3) {
+    return (
+      <PassoTreino
+        total={totalSteps}
+        selected={state.workoutDays}
+        pending={pending}
+        onToggle={toggleDay}
+        onNext={advance}
+        onBack={back}
+        onSkip={skip}
+      />
+    );
+  }
+
   return (
-    <PassoTreino
-      selected={state.workoutDays}
+    <PassoLembretes
       pending={pending}
-      onToggle={toggleDay}
-      onNext={advance}
+      onActivate={() => void activatePush()}
       onBack={back}
       onSkip={skip}
     />

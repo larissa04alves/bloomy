@@ -8,12 +8,13 @@ import type {
   SessionAdjustments,
   SessionDetail,
   SessionExercise,
+  SetLog,
   WorkoutSummary,
 } from "@/lib/api-types";
 import { toastError } from "@/lib/toast";
 import { useResource } from "@/lib/use-resource";
 
-import { applySetPatch, NEW_EXERCISE_DEFAULTS } from "./session";
+import { appendSet, applySetPatch, dropSet, NEW_EXERCISE_DEFAULTS } from "./session";
 
 type View = "lista" | "ex" | "fim";
 type SetPatch = { reps?: number | null; load?: number | null };
@@ -59,6 +60,8 @@ export function useSessao() {
   const [adjust, setAdjust] = useState<AdjustState>(null);
   const [applying, setApplying] = useState(false);
   const [applied, setApplied] = useState(false);
+  // Troca/adição leva segundos no servidor: sem um estado visível a pessoa toca de novo.
+  const [picking, setPicking] = useState(false);
   const [pendingRemoval, setPendingRemoval] = useState<{
     id: string;
     name: string;
@@ -121,8 +124,9 @@ export function useSessao() {
     }
   }, [detail, setData, reload]);
 
+  /** Devolve se há sessão ativa ao fim — a prévia só fecha quando há. */
   const start = useCallback(
-    async (workoutId: string) => {
+    async (workoutId: string): Promise<boolean> => {
       setStartingId(workoutId);
       try {
         const { session } = await api.post<{ session: SessionDetail }>(
@@ -131,12 +135,14 @@ export function useSessao() {
         setData({ session });
         setView("lista");
         setActiveEx(0);
+        return true;
       } catch (e) {
         if (e instanceof ApiError && e.status === 409) {
           reload(); // já havia uma sessão ativa — recarrega em vez de erro
-          return;
+          return true;
         }
         toastError(e, "Não foi possível iniciar o treino");
+        return false;
       } finally {
         setStartingId(null);
       }
@@ -229,7 +235,7 @@ export function useSessao() {
   // Um único caminho para adicionar e trocar: o modo vem do estado `adjust`.
   const pickExercise = useCallback(
     async (picked: CatalogExercise) => {
-      if (!detail || !adjust) return;
+      if (!detail || !adjust || picking) return;
       const body = {
         name: picked.namePt,
         catalogId: picked.id,
@@ -237,6 +243,7 @@ export function useSessao() {
         ...NEW_EXERCISE_DEFAULTS,
       };
       const sessionId = detail.session.id;
+      setPicking(true);
       try {
         if (adjust.mode === "add") {
           const { session } = await api.post<{ session: SessionDetail }>(
@@ -265,9 +272,58 @@ export function useSessao() {
             ? "Não foi possível adicionar o exercício"
             : "Não foi possível trocar o exercício",
         );
+      } finally {
+        setPicking(false);
       }
     },
-    [detail, adjust, setData],
+    [detail, adjust, picking, setData],
+  );
+
+  /** Série extra só desta sessão (não muda o treino salvo). Uma por vez: dois toques
+   *  rápidos leriam o mesmo último índice no servidor. */
+  const [addingSet, setAddingSet] = useState(false);
+  const addSet = useCallback(
+    async (sessionExerciseId: string) => {
+      if (!detail || addingSet) return;
+      setAddingSet(true);
+      try {
+        const { set } = await api.post<{ set: SetLog }>(
+          `/api/sessions/${detail.session.id}/exercises/${sessionExerciseId}/sets`,
+        );
+        // Funcional: um "Completar" feito durante o POST não pode ser desfeito por um
+        // `detail` capturado antes dele.
+        setData((prev) =>
+          prev?.session
+            ? {
+                session: {
+                  ...prev.session,
+                  exercises: appendSet(prev.session.exercises, sessionExerciseId, set),
+                },
+              }
+            : prev,
+        );
+      } catch (e) {
+        toastError(e, "Não foi possível adicionar a série");
+      } finally {
+        setAddingSet(false);
+      }
+    },
+    [detail, addingSet, setData],
+  );
+
+  /** Remove (otimista) uma série ainda não completada. */
+  const removeSet = useCallback(
+    async (setId: string) => {
+      if (!detail) return;
+      setData({ session: { ...detail, exercises: dropSet(detail.exercises, setId) } });
+      try {
+        await api.del(`/api/sessions/${detail.session.id}/sets/${setId}`);
+      } catch (e) {
+        reload();
+        toastError(e, "Não foi possível remover a série");
+      }
+    },
+    [detail, setData, reload],
   );
 
   const removeExercise = useCallback(
@@ -343,6 +399,8 @@ export function useSessao() {
     adjust,
     applying,
     applied,
+    picking,
+    addingSet,
     pendingRemoval,
     start,
     openExercise,
@@ -350,6 +408,8 @@ export function useSessao() {
     setSetValue,
     persistSet,
     markDone,
+    addSet,
+    removeSet,
     reorderLocal,
     persistOrder,
     complete,

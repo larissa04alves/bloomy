@@ -6,11 +6,13 @@ import { dayFor, previousDay } from "@/server/shared/day";
 import { createTestDb, createTestUser } from "@/server/shared/test-db";
 import {
   addSessionExercise,
+  addSessionSet,
   applySessionToWorkout,
   completedSessionOn,
   completeSession,
   getActiveSession,
   removeSessionExercise,
+  removeSessionSet,
   reorderSessionExercises,
   startSession,
   swapSessionExercise,
@@ -353,6 +355,84 @@ describe("ajustes na sessão ativa", () => {
     const { db, s } = await setup();
     const outro = await createTestUser(db, "user-2");
     expect(await removeSessionExercise(db, outro, s.session.id, s.exercises[0].id)).toBeNull();
+  });
+});
+
+describe("série extra na sessão", () => {
+  async function setup() {
+    const db = await createTestDb();
+    const userId = await createTestUser(db);
+    const w = await createWorkout(db, userId, {
+      name: "Peito",
+      focuses: ["chest"],
+      exercises: [
+        { name: "Supino", targetSets: 2, targetReps: 10, restSeconds: 60, position: 0 },
+      ],
+    });
+    const s = await startSession(db, userId, w.id);
+    if (s === "already_active" || s === "not_found") throw new Error("unreachable");
+    return { db, userId, w, s, ex: s.exercises[0] };
+  }
+
+  test("adicionar cria a série no fim, copiando reps e carga da última", async () => {
+    const { db, userId, s, ex } = await setup();
+    await updateSet(db, userId, s.session.id, ex.sets[1].id, { reps: 8, load: 40 });
+
+    const created = await addSessionSet(db, userId, s.session.id, ex.id);
+    expect(created).not.toBeNull();
+    expect(created!.setIndex).toBe(3);
+    expect(created!.reps).toBe(8);
+    expect(created!.load).toBe(40);
+    expect(created!.done).toBe(false);
+
+    const active = await getActiveSession(db, userId);
+    expect(active!.exercises[0].sets).toHaveLength(3);
+  });
+
+  test("a série extra não muda o treino, nem com salvar no treino", async () => {
+    const { db, userId, w, s, ex } = await setup();
+    await addSessionSet(db, userId, s.session.id, ex.id);
+    await completeSession(db, userId, s.session.id);
+    await applySessionToWorkout(db, userId, s.session.id);
+
+    const [template] = await listWorkouts(db, userId);
+    expect(template.id).toBe(w.id);
+    expect(template.exercises[0].targetSets).toBe(2);
+  });
+
+  test("sessão concluída ou de outro usuário não aceita série extra", async () => {
+    const { db, userId, s, ex } = await setup();
+    const outro = await createTestUser(db, "outro");
+    expect(await addSessionSet(db, outro, s.session.id, ex.id)).toBeNull();
+
+    await completeSession(db, userId, s.session.id);
+    expect(await addSessionSet(db, userId, s.session.id, ex.id)).toBeNull();
+  });
+
+  test("remover apaga uma série não completada", async () => {
+    const { db, userId, s, ex } = await setup();
+    expect(await removeSessionSet(db, userId, s.session.id, ex.sets[1].id)).toBe("removed");
+
+    const active = await getActiveSession(db, userId);
+    expect(active!.exercises[0].sets.map((set) => set.id)).toEqual([ex.sets[0].id]);
+  });
+
+  test("série completada não é removida", async () => {
+    const { db, userId, s, ex } = await setup();
+    await updateSet(db, userId, s.session.id, ex.sets[1].id, { done: true });
+    expect(await removeSessionSet(db, userId, s.session.id, ex.sets[1].id)).toBe("done");
+  });
+
+  test("a última série que sobra não é removida", async () => {
+    const { db, userId, s, ex } = await setup();
+    await removeSessionSet(db, userId, s.session.id, ex.sets[1].id);
+    expect(await removeSessionSet(db, userId, s.session.id, ex.sets[0].id)).toBe("last");
+  });
+
+  test("série de outro usuário não é removida", async () => {
+    const { db, s, ex } = await setup();
+    const outro = await createTestUser(db, "outro");
+    expect(await removeSessionSet(db, outro, s.session.id, ex.sets[1].id)).toBeNull();
   });
 });
 

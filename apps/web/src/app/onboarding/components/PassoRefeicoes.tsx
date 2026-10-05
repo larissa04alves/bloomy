@@ -7,6 +7,7 @@ import { Stepper } from "@/components/stepper";
 import { PassoLayout } from "./PassoLayout";
 
 export function PassoRefeicoes({
+  total,
   meals,
   pending,
   onMeals,
@@ -14,6 +15,7 @@ export function PassoRefeicoes({
   onBack,
   onSkip,
 }: {
+  total: number;
   meals: number;
   pending: boolean;
   onMeals: (value: number) => void;
@@ -24,6 +26,7 @@ export function PassoRefeicoes({
   return (
     <PassoLayout
       step={2}
+      total={total}
       tone="green"
       icon={<ForkKnifeIcon size={50} weight="fill" />}
       title="Quantas refeições por dia?"

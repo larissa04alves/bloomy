@@ -9,7 +9,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 /** Varredura dos lembretes. Chamada pelo agendador externo (cron-job.org) a cada
- *  5 minutos; nunca por navegador. Wrapper fino, como manda o ADR-0001: valida o
+ *  minuto; nunca por navegador. Wrapper fino, como manda o ADR-0001: valida o
  *  segredo e chama o serviço. */
 export async function GET(request: Request) {
   const secret = env.CRON_SECRET;

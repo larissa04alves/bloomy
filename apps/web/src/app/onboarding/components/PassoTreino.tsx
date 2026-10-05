@@ -7,6 +7,7 @@ import { PassoLayout } from "./PassoLayout";
 import { SeletorDias } from "./SeletorDias";
 
 export function PassoTreino({
+  total,
   selected,
   pending,
   onToggle,
@@ -14,6 +15,7 @@ export function PassoTreino({
   onBack,
   onSkip,
 }: {
+  total: number;
   selected: Set<number>;
   pending: boolean;
   onToggle: (index: number) => void;
@@ -24,11 +26,12 @@ export function PassoTreino({
   return (
     <PassoLayout
       step={3}
+      total={total}
       tone="pink"
       icon={<BarbellIcon size={50} weight="fill" />}
       title="Quantos dias de treino?"
       subtitle="Escolha os dias que você costuma treinar."
-      ctaLabel="Começar a usar"
+      ctaLabel={total === 3 ? "Começar a usar" : "Continuar"}
       pending={pending}
       onNext={onNext}
       onBack={onBack}

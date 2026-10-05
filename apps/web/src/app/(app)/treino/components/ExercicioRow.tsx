@@ -86,7 +86,9 @@ export function ExercicioRow({
             <div className="flex flex-1 flex-col">
               <span className="text-sm font-bold text-ink">{ex.name}</span>
               <span className="text-xs font-semibold text-ink-read">
-                {doneCount(ex)}/{ex.targetSets} séries
+                {/* Total pelas séries do dia, não `targetSets`: a série extra e a removida
+                    só existem na sessão. */}
+                {doneCount(ex)}/{ex.sets.length} séries
                 {ex.lastPerformance?.load != null ? ` · ${ex.lastPerformance.load} kg` : ""}
               </span>
             </div>

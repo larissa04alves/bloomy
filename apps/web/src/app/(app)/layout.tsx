@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@bloomy/auth";
 import { db } from "@bloomy/db";
 
+import { PushSync } from "@/components/push-sync";
 import { TabBar } from "@/components/tab-bar";
 import { isOnboarded } from "@/server/onboarding/service";
 import { PATHNAME_HEADER, loginPathFor } from "@/server/shared/login-redirect";
@@ -24,6 +25,7 @@ export default async function AppLayout({
     <div className="flex min-h-dvh flex-col">
       <main className="flex flex-1 flex-col pb-2">{children}</main>
       <TabBar />
+      <PushSync />
     </div>
   );
 }
