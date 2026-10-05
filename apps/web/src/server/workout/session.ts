@@ -316,6 +316,90 @@ export async function updateSet(
   return updated ?? null;
 }
 
+/** Série extra só do dia: cria a linha em `set_log` e não toca em `targetSets`, então o
+ *  "salvar no treino" não a leva para o template. Copia reps e carga da última série do
+ *  exercício — quem pede mais uma quase sempre repete a anterior. */
+export async function addSessionSet(
+  db: Db,
+  userId: string,
+  sessionId: string,
+  sessionExerciseId: string,
+): Promise<SetLog | null> {
+  const session = await activeSessionById(db, userId, sessionId);
+  if (!session) return null;
+
+  const [row] = await db
+    .select()
+    .from(sessionExercise)
+    .where(
+      and(
+        eq(sessionExercise.id, sessionExerciseId),
+        eq(sessionExercise.sessionId, sessionId),
+        eq(sessionExercise.userId, userId),
+      ),
+    );
+  if (!row) return null;
+
+  const [last] = await db
+    .select()
+    .from(setLog)
+    .where(eq(setLog.sessionExerciseId, sessionExerciseId))
+    .orderBy(desc(setLog.setIndex))
+    .limit(1);
+
+  const [created] = await db
+    .insert(setLog)
+    .values({
+      sessionId,
+      sessionExerciseId,
+      exerciseId: row.exerciseId,
+      userId,
+      exerciseName: row.name,
+      setIndex: (last?.setIndex ?? 0) + 1,
+      reps: last?.reps ?? row.targetReps,
+      load: last?.load ?? null,
+      done: false,
+    })
+    .returning();
+  return created;
+}
+
+/** Remove uma série ainda não completada. Série feita é registro de treino e não some
+ *  por um arraste; a última série do exercício fica — sem ela o exercício não tem o que
+ *  completar (para tirar o exercício inteiro há o remover exercício). */
+export async function removeSessionSet(
+  db: Db,
+  userId: string,
+  sessionId: string,
+  setId: string,
+): Promise<"removed" | "done" | "last" | null> {
+  const session = await activeSessionById(db, userId, sessionId);
+  if (!session) return null;
+
+  const [target] = await db
+    .select()
+    .from(setLog)
+    .where(
+      and(eq(setLog.id, setId), eq(setLog.sessionId, sessionId), eq(setLog.userId, userId)),
+    );
+  if (!target || !target.sessionExerciseId) return null;
+  if (target.done) return "done";
+
+  const [{ n }] = await db
+    .select({ n: count() })
+    .from(setLog)
+    .where(eq(setLog.sessionExerciseId, target.sessionExerciseId));
+  if (n <= 1) return "last";
+
+  // `done = false` no próprio delete: se a série foi completada entre a leitura e aqui,
+  // nada é apagado
+  const deleted = await db
+    .delete(setLog)
+    .where(and(eq(setLog.id, setId), eq(setLog.done, false)))
+    .returning({ id: setLog.id });
+  return deleted.length > 0 ? "removed" : "done";
+}
+
 export type SessionAdjustments = {
   added: number;
   replaced: number;

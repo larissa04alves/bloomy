@@ -7,8 +7,9 @@ import {
   parseJson,
   requireUserId,
   unauthorized,
+  unprocessable,
 } from "@/server/shared/api";
-import { updateSet } from "@/server/workout/session";
+import { removeSessionSet, updateSet } from "@/server/workout/session";
 
 const BODY_SCHEMA = z
   .object({
@@ -35,4 +36,20 @@ export async function PUT(
   if (!set) return notFound();
 
   return Response.json({ set });
+}
+
+export async function DELETE(
+  request: Request,
+  { params }: { params: Promise<{ id: string; setId: string }> },
+) {
+  const userId = await requireUserId(request);
+  if (!userId) return unauthorized();
+
+  const { id, setId } = await params;
+  const result = await removeSessionSet(db, userId, id, setId);
+  if (!result) return notFound();
+  if (result === "done") return unprocessable("set already done");
+  if (result === "last") return unprocessable("exercise needs at least one set");
+
+  return Response.json({ ok: true });
 }
