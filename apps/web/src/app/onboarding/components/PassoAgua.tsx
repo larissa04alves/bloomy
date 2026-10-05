@@ -11,6 +11,7 @@ import { PassoLayout } from "./PassoLayout";
 const MAX_GOTAS = 12;
 
 export function PassoAgua({
+  total,
   waterMl,
   portionMl,
   pending,
@@ -19,6 +20,7 @@ export function PassoAgua({
   onNext,
   onSkip,
 }: {
+  total: number;
   waterMl: number;
   portionMl: number;
   pending: boolean;
@@ -32,6 +34,7 @@ export function PassoAgua({
   return (
     <PassoLayout
       step={1}
+      total={total}
       tone="lilac"
       icon={<DropIcon size={52} weight="fill" />}
       title="Quanto de água por dia?"

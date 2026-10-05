@@ -1,6 +1,13 @@
 import { describe, expect, it } from "bun:test";
 
-import { onboardingPayload, portionHint, workoutDaysHint, type OnboardingState } from "./format";
+import {
+  nextStep,
+  onboardingPayload,
+  portionHint,
+  skipTarget,
+  workoutDaysHint,
+  type OnboardingState,
+} from "./format";
 
 const state = (over: Partial<OnboardingState> = {}): OnboardingState => ({
   step: 1,
@@ -28,6 +35,35 @@ describe("workoutDaysHint", () => {
   it("concorda em número", () => {
     expect(workoutDaysHint(1)).toBe("1 dia por semana");
     expect(workoutDaysHint(5)).toBe("5 dias por semana");
+  });
+});
+
+describe("nextStep", () => {
+  it("avança passo a passo até as metas acabarem", () => {
+    expect(nextStep(1, true)).toBe(2);
+    expect(nextStep(2, false)).toBe(3);
+  });
+  it("depois das metas vai para os lembretes quando a permissão ainda não foi pedida", () => {
+    expect(nextStep(3, true)).toBe(4);
+  });
+  it("termina depois das metas quando não há permissão a pedir", () => {
+    expect(nextStep(3, false)).toBe("finish");
+  });
+  it("o passo de lembretes é o último", () => {
+    expect(nextStep(4, true)).toBe("finish");
+  });
+});
+
+describe("skipTarget", () => {
+  it("pular as metas cai no passo de lembretes", () => {
+    expect(skipTarget(1, true)).toBe(4);
+    expect(skipTarget(3, true)).toBe(4);
+  });
+  it("sem permissão a pedir, pular termina", () => {
+    expect(skipTarget(2, false)).toBe("finish");
+  });
+  it("pular o próprio passo de lembretes termina", () => {
+    expect(skipTarget(4, true)).toBe("finish");
   });
 });
 
