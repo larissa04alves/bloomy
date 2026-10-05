@@ -4,6 +4,8 @@ import type { Db } from "@bloomy/db";
 import { pushSubscription, type PushSubscription } from "@bloomy/db/schema/reminder";
 import { and, eq } from "drizzle-orm";
 
+import { listReminders } from "@/server/reminders/service";
+
 export type SubscriptionInput = {
   endpoint: string;
   p256dh: string;
@@ -11,12 +13,20 @@ export type SubscriptionInput = {
 };
 
 /** Registra a subscription do aparelho. O mesmo endpoint pode reaparecer depois de
- *  reinstalar o app ou trocar de conta — daí o upsert em vez de insert puro. */
+ *  reinstalar o app ou trocar de conta — daí o upsert em vez de insert puro.
+ *
+ *  Garante os lembretes default antes: o aparelho pode ser ativado no onboarding,
+ *  antes de a pessoa abrir /notificacoes, e sem linha de `reminder` a varredura não
+ *  tem o que enviar. Com tudo desligado devolve `null` sem gravar — o app refaz o
+ *  registro a cada abertura, e sem lembrete ligado o servidor não guarda o endpoint. */
 export async function saveSubscription(
   db: Db,
   userId: string,
   input: SubscriptionInput,
-): Promise<PushSubscription> {
+): Promise<PushSubscription | null> {
+  const reminders = await listReminders(db, userId);
+  if (!reminders.some((r) => r.enabled)) return null;
+
   const [row] = await db
     .insert(pushSubscription)
     .values({ userId, ...input })

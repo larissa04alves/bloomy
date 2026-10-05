@@ -38,7 +38,8 @@ export async function POST(request: Request) {
     auth: parsed.data.keys.auth,
   });
 
-  return Response.json({ subscription }, { status: 201 });
+  // `null` = todos os lembretes desligados: nada a registrar, e não é erro.
+  return Response.json({ subscription }, { status: subscription ? 201 : 200 });
 }
 
 export async function DELETE(request: Request) {
