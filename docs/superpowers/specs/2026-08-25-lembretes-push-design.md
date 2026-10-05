@@ -15,13 +15,13 @@ Tela de Início; o `manifest.json` entra mesmo assim, porque é ele que torna o 
 ## Arquitetura
 
 ```
-cron-job.org  ──5 min──▶  /api/cron/reminders  ──web-push──▶  Android (service worker)
+cron-job.org  ──1 min──▶  /api/cron/reminders  ──web-push──▶  Android (service worker)
  (despertador)             (varre e decide)       (VAPID)        (recebe e abre a tela)
 ```
 
 Três peças independentes, cada uma trocável sem tocar nas outras:
 
-1. **Despertador** — chama uma rota HTTP a cada 5 min. Externo ao código.
+1. **Despertador** — chama uma rota HTTP a cada 1 min. Externo ao código.
 2. **Varredura** (`/api/cron/reminders`) — pergunta "quem tem slot devido agora?", envia, marca.
 3. **Entrega** — `web-push` (npm), protocolo W3C com VAPID. Sem terceiro, sem conta.
 
@@ -53,7 +53,7 @@ que pode disparar em qualquer momento *dentro da hora* especificada.
 
 cron-job.org é gratuito, sem limite de frequência e não exige SDK — só um GET autenticado.
 Não tem retry, mas a varredura por janela já supre isso: uma chamada perdida é recuperada
-5 minutos depois, dentro da tolerância de 30 min.
+1 minuto depois, dentro da tolerância de 30 min.
 
 Alternativa avaliada e descartada: QStash (288 chamadas/dia contra ~500/dia de free tier —
 cabe, mas sem folga, e custa uma conta e um token a mais).
@@ -400,10 +400,10 @@ Registradas de propósito, não esquecidas:
 5. **Sem retry no despertador.** cron-job.org não reenvia falhas. A varredura seguinte
    cobre, desde que dentro dos 30 min de tolerância.
 
-6. **Rotação de subscription não é tratada.** Sem handler de
+6. **Rotação de subscription não é tratada no worker.** Sem handler de
    `pushsubscriptionchange`, um aparelho cuja subscription for rotacionada pelo
-   navegador para de receber até a pessoa reabrir `/notificacoes` e mexer num
-   toggle.
+   navegador fica sem receber até a próxima abertura do app, quando o
+   re-registro silencioso (`components/push-sync.tsx`) refaz o cadastro.
 
 ## Ajustes feitos durante a implementação da Fase 1
 
@@ -516,6 +516,44 @@ Coisas que só apareceram ao escrever o código, registradas para o spec não me
     (client-safe): a tela precisa da mesma regra para decidir quem abre a sheet de
     horário, e mantê-la duplicada num array solto do `page.tsx` deixava duas fontes
     de verdade para uma decisão de domínio.
+
+## Correção pós-lançamento: nenhum aparelho registrado (2026-10-01)
+
+Em produção, `push_subscription` e `reminder_delivery` estavam vazias: nenhuma
+notificação tinha saído. Causa: o aparelho só se registrava quando um toggle
+**mudava** (`setEnabled` → `enablePush`), mas os cinco lembretes nascem ligados. Quem
+nunca desligava e religava nada nunca era perguntado, e o `PermissaoAviso` esconde o
+estado `default`, então a tela mostrava tudo ligado sem aviso. Mudar horário não
+registrava, e o logout apagava o registro sem o login recriar.
+
+1. **Passo 4 no onboarding, "Lembretes".** Só aparece com permissão `default`
+   (`nextStep`/`skipTarget` em `onboarding/hooks/format.ts`). "Pular" dos passos de
+   meta cai nele em vez de terminar. "Ativar lembretes" pede a permissão no próprio
+   toque e termina com qualquer resposta.
+2. **Card "Ative os lembretes neste aparelho"** em `/notificacoes` com permissão
+   `default` e algum lembrete ligado (`AtivarAviso.tsx`) — para quem já passou do
+   onboarding.
+3. **Re-registro silencioso a cada abertura** (`components/push-sync.tsx` no
+   `(app)/layout.tsx`) quando a permissão já está `granted`. Cobre logout/login,
+   limpeza por 404/410 e rotação.
+4. **`saveSubscription` garante os lembretes.** Registrar o aparelho roda o lazy seed
+   (o aparelho pode ser ativado no onboarding, antes de abrir `/notificacoes`) e não
+   grava nada com todos os lembretes desligados — preserva o ajuste 6 da Fase 2 mesmo
+   com o re-registro automático. A rota responde 200 com `subscription: null` nesse caso.
+5. **Entrega no Android.** `SEND_OPTIONS` em `dispatch.ts`: `urgency: "high"` (o FCM
+   segura `normal` enquanto o aparelho está em Doze) e `TTL` igual a
+   `TOLERANCE_MINUTES` (o default de 4 semanas entregaria lembrete velho). `sw.js` ganhou
+   `renotify: true`: sem ele, a notificação que substitui outra de mesma `tag` chega
+   muda.
+
+6. **Despertador a cada 1 min, não 5.** Com 5 min, um remédio às 15:27 só saía às
+   15:30. A varredura já conta o slot como devido no minuto exato (atraso 0), então
+   1 min entrega na hora sem mudar código — a idempotência de `reminder_delivery`
+   impede envio duplicado. Custo: 1.440 chamadas/dia em vez de 288 (a comparação com o
+   QStash acima foi feita com 5 min; a 1 min ele nem caberia no free tier).
+
+Com urgência alta o Android ainda pode atrasar se o Chrome estiver com bateria
+"Restrita" — é configuração do aparelho, fora do código.
 
 ## Decisões de referência
 
