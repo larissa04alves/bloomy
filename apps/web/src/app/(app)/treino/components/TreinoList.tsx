@@ -17,6 +17,7 @@ export function TreinoList({
   workouts,
   startingId,
   onStart,
+  onPreview,
   onEdit,
   onDelete,
   onCreate,
@@ -24,6 +25,7 @@ export function TreinoList({
   workouts: WorkoutWithExercises[];
   startingId: string | null;
   onStart: (workoutId: string) => void;
+  onPreview: (workout: WorkoutWithExercises) => void;
   onEdit: (workout: WorkoutWithExercises) => void;
   onDelete: (workoutId: string) => void;
   onCreate: () => void;
@@ -53,13 +55,20 @@ export function TreinoList({
       {workouts.map((w) => (
         <SwipeableRow key={w.id} onEdit={() => onEdit(w)} onDelete={() => onDelete(w.id)}>
           <div className="flex items-center gap-3 rounded-card bg-white p-3 shadow-card-sm">
-            <IconChip tone="pink" icon={<BarbellIcon size={22} weight="fill" />} />
-            <div className="flex flex-1 flex-col">
-              <span className="text-sm font-bold text-ink">{w.name}</span>
-              <span className="text-xs font-semibold text-ink-read">
-                {w.exercises.length} exercícios · {formatFocuses(w.focuses)}
+            <button
+              type="button"
+              aria-label={`Ver prévia de ${w.name}`}
+              onClick={() => onPreview(w)}
+              className="flex flex-1 items-center gap-3 text-left"
+            >
+              <IconChip tone="pink" icon={<BarbellIcon size={22} weight="fill" />} />
+              <span className="flex flex-1 flex-col">
+                <span className="text-sm font-bold text-ink">{w.name}</span>
+                <span className="text-xs font-semibold text-ink-read">
+                  {w.exercises.length} exercícios · {formatFocuses(w.focuses)}
+                </span>
               </span>
-            </div>
+            </button>
             <button
               type="button"
               aria-label={`Iniciar ${w.name}`}

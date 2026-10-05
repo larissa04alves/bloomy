@@ -50,6 +50,13 @@ export function settleDraft(draft: string): number {
   return parseDraft(draft) ?? 0;
 }
 
+/** Linha de resumo da prévia do treino. Ex.: "4 exercícios · 13 séries". */
+export function previewSummary(exercises: { targetSets: number }[]): string {
+  const sets = exercises.reduce((sum, e) => sum + e.targetSets, 0);
+  const ex = exercises.length === 1 ? "1 exercício" : `${exercises.length} exercícios`;
+  return `${ex} · ${sets === 1 ? "1 série" : `${sets} séries`}`;
+}
+
 /** Focos → rótulos PT juntos. Ex.: ["chest", "arms"] → "Peito · Braços". */
 export function formatFocuses(focuses: Focus[]): string {
   return focuses.map((f) => FOCUS_LABELS[f]).join(" · ");

@@ -7,8 +7,18 @@ import {
   mmss,
   numberDraft,
   parseDraft,
+  previewSummary,
   settleDraft,
 } from "./format";
+
+describe("previewSummary", () => {
+  it("soma exercícios e séries do treino", () => {
+    expect(previewSummary([{ targetSets: 4 }, { targetSets: 3 }])).toBe("2 exercícios · 7 séries");
+  });
+  it("concorda no singular", () => {
+    expect(previewSummary([{ targetSets: 1 }])).toBe("1 exercício · 1 série");
+  });
+});
 
 describe("mmss", () => {
   it("formata segundos como M:SS", () => {
