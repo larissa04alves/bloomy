@@ -1,11 +1,14 @@
 "use client";
 
 import { ArrowsClockwiseIcon, TrashIcon } from "@phosphor-icons/react";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { BottomSheet } from "@/components/bottom-sheet";
+import { BicepsFlexedIcon } from "@/components/icons/biceps-flexed";
+import { LoadingOverlay } from "@/components/loading-overlay";
 import type { CatalogExercise } from "@/lib/api-types";
 
+import { useBackStack } from "../hooks/useBackStack";
 import type { useSessao } from "../hooks/useSessao";
 import { useCatalogo } from "../hooks/useCatalogo";
 import { useDescanso } from "../hooks/useDescanso";
@@ -41,6 +44,20 @@ export function SessaoAtiva({
   useEffect(() => {
     if (!adjust) setConfirmedSwap(false);
   }, [adjust]);
+
+  // Cada camada aberta é uma entrada no histórico: o voltar do celular fecha a de cima
+  // (vídeo → séries → lista) em vez de sair do treino.
+  const layers = (view === "ex" ? 1 : 0) + (preview ? 1 : 0) + (adjust ? 1 : 0);
+  const { backToList, closeAdjust } = sessao;
+  useBackStack(
+    layers,
+    useCallback(() => {
+      if (preview) setPreview(null);
+      else if (adjust) closeAdjust();
+      else backToList();
+    }, [preview, adjust, closeAdjust, backToList]),
+  );
+  const goBack = () => window.history.back();
 
   if (!detail) return null;
 
@@ -112,10 +129,17 @@ export function SessaoAtiva({
     return (
       <div className="px-5.5 pt-6 pb-28">
         <BuscaExercicio
-          onBack={sessao.closeAdjust}
+          onBack={goBack}
           onPick={(picked) => sessao.pickExercise(picked)}
           alreadyAdded={detail.exercises.flatMap((e) => (e.catalogId ? [e.catalogId] : []))}
         />
+        {sessao.picking ? (
+          <LoadingOverlay
+            label={adjust.mode === "add" ? "Adicionando exercício…" : "Trocando exercício…"}
+          >
+            <BicepsFlexedIcon animate size={40} className="text-pink-bright" />
+          </LoadingOverlay>
+        ) : null}
       </div>
     );
   }
@@ -143,7 +167,9 @@ export function SessaoAtiva({
         <SerieList
           exercise={exercise}
           catalogExercise={activeCatalog}
-          onBack={sessao.backToList}
+          onBack={goBack}
+          onAddSet={() => sessao.addSet(exercise.id)}
+          onRemoveSet={sessao.removeSet}
           onChangeReps={(setId, reps) => sessao.setSetValue(setId, { reps })}
           onChangeLoad={(setId, load) => sessao.setSetValue(setId, { load })}
           onPersist={(setId, patch) => sessao.persistSet(setId, patch)}
@@ -163,7 +189,7 @@ export function SessaoAtiva({
             onSkip={descanso.stop}
           />
         ) : null}
-        {preview ? <GifViewer exercise={preview} onClose={() => setPreview(null)} /> : null}
+        {preview ? <GifViewer exercise={preview} onClose={goBack} /> : null}
       </>
     );
   }
