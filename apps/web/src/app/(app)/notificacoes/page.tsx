@@ -14,6 +14,7 @@ import type { ReactNode } from "react";
 import type { ReminderType } from "@/lib/api-types";
 import type { Tone } from "@/lib/tone";
 
+import { AtivarAviso } from "./components/AtivarAviso";
 import { HorarioSheet } from "./components/HorarioSheet";
 import { LembreteCard } from "./components/LembreteCard";
 import { NotificacoesError } from "./components/NotificacoesError";
@@ -82,6 +83,7 @@ export default function NotificacoesPage() {
         <span className="size-9.5" aria-hidden="true" />
       </header>
 
+      {n.askActivation ? <AtivarAviso onActivate={n.activate} /> : null}
       {n.permission ? <PermissaoAviso status={n.permission} /> : null}
 
       <div className="flex flex-col gap-3">
