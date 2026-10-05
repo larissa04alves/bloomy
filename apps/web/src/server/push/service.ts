@@ -25,7 +25,12 @@ export async function saveSubscription(
   input: SubscriptionInput,
 ): Promise<PushSubscription | null> {
   const reminders = await listReminders(db, userId);
-  if (!reminders.some((r) => r.enabled)) return null;
+  if (!reminders.some((r) => r.enabled)) {
+    // O aparelho pode ainda estar registrado em nome de outra conta (logout cujo
+    // DELETE falhou): sem apagar, ele seguiria recebendo os lembretes dela.
+    await dropDeadSubscription(db, input.endpoint);
+    return null;
+  }
 
   const [row] = await db
     .insert(pushSubscription)

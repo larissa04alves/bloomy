@@ -534,12 +534,15 @@ registrava, e o logout apagava o registro sem o login recriar.
    `default` e algum lembrete ligado (`AtivarAviso.tsx`) — para quem já passou do
    onboarding.
 3. **Re-registro silencioso a cada abertura** (`components/push-sync.tsx` no
-   `(app)/layout.tsx`) quando a permissão já está `granted`. Cobre logout/login,
-   limpeza por 404/410 e rotação.
+   `(app)/layout.tsx`) quando a permissão já está `granted`. Cobre logout/login e
+   rotação; não cobre subscription morta (404/410) que o navegador ainda devolve —
+   ela é regravada e apagada de novo na varredura.
 4. **`saveSubscription` garante os lembretes.** Registrar o aparelho roda o lazy seed
    (o aparelho pode ser ativado no onboarding, antes de abrir `/notificacoes`) e não
    grava nada com todos os lembretes desligados — preserva o ajuste 6 da Fase 2 mesmo
-   com o re-registro automático. A rota responde 200 com `subscription: null` nesse caso.
+   com o re-registro automático. A rota responde 200 com `subscription: null` nesse caso,
+   e apaga o registro que o endpoint tivesse em nome de outra conta (logout cujo DELETE
+   falhou), para o aparelho não seguir recebendo os lembretes dela.
 5. **Entrega no Android.** `SEND_OPTIONS` em `dispatch.ts`: `urgency: "high"` (o FCM
    segura `normal` enquanto o aparelho está em Doze) e `TTL` igual a
    `TOLERANCE_MINUTES` (o default de 4 semanas entregaria lembrete velho). `sw.js` ganhou

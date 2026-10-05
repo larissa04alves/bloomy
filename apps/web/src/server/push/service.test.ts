@@ -41,4 +41,15 @@ describe("saveSubscription", () => {
     expect(await saveSubscription(db, userId, DEVICE)).toBeNull();
     expect(await listSubscriptions(db, userId)).toHaveLength(0);
   });
+
+  test("com tudo desligado, apaga o registro que o aparelho tinha de outra conta", async () => {
+    const anterior = await createTestUser(db, "anterior");
+    await saveSubscription(db, anterior, DEVICE);
+    for (const r of await listReminders(db, userId)) {
+      await updateReminder(db, userId, r.id, { enabled: false });
+    }
+
+    await saveSubscription(db, userId, DEVICE);
+    expect(await listSubscriptions(db, anterior)).toHaveLength(0);
+  });
 });
