@@ -2,6 +2,27 @@
 
 import { useEffect, useRef } from "react";
 
+const LAYER_KEY = "treinoLayer";
+
+/**
+ * Descarta entradas de camada que sobraram. Elas ficam quando a tela some com uma
+ * camada aberta sem passar pelo hook — trocar de aba na TabBar no meio das séries,
+ * recarregar a página — e cada uma custaria um voltar sem efeito. Ao montar sobre uma
+ * delas, volta direto para a entrada base. Chamado uma vez só, na página: com dois
+ * chamadores o `go` sairia em dobro.
+ */
+export function useDropStaleLayers() {
+  // O Strict Mode (ligado por padrão no App Router) roda o efeito duas vezes em dev; o
+  // `go` sai antes de o histórico mudar, então a segunda passada voltaria em dobro.
+  const done = useRef(false);
+  useEffect(() => {
+    if (done.current) return;
+    done.current = true;
+    const depth = (window.history.state as Record<string, unknown> | null)?.[LAYER_KEY];
+    if (typeof depth === "number" && depth > 0) window.history.go(-depth);
+  }, []);
+}
+
 /**
  * Sincroniza as camadas abertas da sessão (séries, busca, vídeo) com o histórico do
  * navegador. Sem isso elas são só estado local da rota `/treino`, e o voltar do
@@ -41,7 +62,9 @@ export function useBackStack(depth: number, closeTop: () => void) {
 
   useEffect(() => {
     while (pushed.current < depth) {
-      window.history.pushState(null, "");
+      // A marca diz a `useDropStaleLayers` quantas entradas desfazer se a tela sumir
+      // com camadas abertas.
+      window.history.pushState({ [LAYER_KEY]: pushed.current + 1 }, "");
       pushed.current += 1;
     }
     if (pushed.current > depth) {

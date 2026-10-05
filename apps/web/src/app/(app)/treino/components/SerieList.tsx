@@ -2,6 +2,7 @@ import {
   ArrowLeftIcon,
   ArrowsOutIcon,
   CheckCircleIcon,
+  CircleNotchIcon,
   ClockCounterClockwiseIcon,
   MinusIcon,
   PlusIcon,
@@ -98,6 +99,7 @@ export function SerieList({
   onPersist,
   onDone,
   onAddSet,
+  addingSet,
   onRemoveSet,
   onVerExecucao,
 }: {
@@ -105,6 +107,7 @@ export function SerieList({
   catalogExercise?: CatalogExercise | null;
   onBack: () => void;
   onAddSet: () => void;
+  addingSet: boolean;
   onRemoveSet: (setId: string) => void;
   onChangeReps: (setId: string, reps: number | null) => void;
   onChangeLoad: (setId: string, load: number | null) => void;
@@ -274,9 +277,15 @@ export function SerieList({
         <button
           type="button"
           onClick={onAddSet}
-          className="flex items-center justify-center gap-1.5 rounded-2xl border border-dashed border-lilac py-3 text-sm font-bold text-lilac-deep"
+          disabled={addingSet}
+          className="flex items-center justify-center gap-1.5 rounded-2xl border border-dashed border-lilac py-3 text-sm font-bold text-lilac-deep disabled:opacity-60"
         >
-          <PlusIcon size={16} weight="bold" /> Adicionar série
+          {addingSet ? (
+            <CircleNotchIcon size={16} weight="bold" className="animate-spin" />
+          ) : (
+            <PlusIcon size={16} weight="bold" />
+          )}{" "}
+          Adicionar série
         </button>
       </div>
     </div>

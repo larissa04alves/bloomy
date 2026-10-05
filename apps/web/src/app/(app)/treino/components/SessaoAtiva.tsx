@@ -47,15 +47,20 @@ export function SessaoAtiva({
 
   // Cada camada aberta é uma entrada no histórico: o voltar do celular fecha a de cima
   // (vídeo → séries → lista) em vez de sair do treino.
-  const layers = (view === "ex" ? 1 : 0) + (preview ? 1 : 0) + (adjust ? 1 : 0);
-  const { backToList, closeAdjust } = sessao;
+  const layers =
+    (view === "ex" ? 1 : 0) +
+    (preview ? 1 : 0) +
+    (adjust ? 1 : 0) +
+    (pendingRemoval ? 1 : 0);
+  const { backToList, closeAdjust, cancelRemove } = sessao;
   useBackStack(
     layers,
     useCallback(() => {
-      if (preview) setPreview(null);
+      if (pendingRemoval) cancelRemove();
+      else if (preview) setPreview(null);
       else if (adjust) closeAdjust();
       else backToList();
-    }, [preview, adjust, closeAdjust, backToList]),
+    }, [pendingRemoval, preview, adjust, cancelRemove, closeAdjust, backToList]),
   );
   const goBack = () => window.history.back();
 
@@ -169,6 +174,7 @@ export function SessaoAtiva({
           catalogExercise={activeCatalog}
           onBack={goBack}
           onAddSet={() => sessao.addSet(exercise.id)}
+          addingSet={sessao.addingSet}
           onRemoveSet={sessao.removeSet}
           onChangeReps={(setId, reps) => sessao.setSetValue(setId, { reps })}
           onChangeLoad={(setId, load) => sessao.setSetValue(setId, { load })}

@@ -124,8 +124,9 @@ export function useSessao() {
     }
   }, [detail, setData, reload]);
 
+  /** Devolve se há sessão ativa ao fim — a prévia só fecha quando há. */
   const start = useCallback(
-    async (workoutId: string) => {
+    async (workoutId: string): Promise<boolean> => {
       setStartingId(workoutId);
       try {
         const { session } = await api.post<{ session: SessionDetail }>(
@@ -134,12 +135,14 @@ export function useSessao() {
         setData({ session });
         setView("lista");
         setActiveEx(0);
+        return true;
       } catch (e) {
         if (e instanceof ApiError && e.status === 409) {
           reload(); // já havia uma sessão ativa — recarrega em vez de erro
-          return;
+          return true;
         }
         toastError(e, "Não foi possível iniciar o treino");
+        return false;
       } finally {
         setStartingId(null);
       }
@@ -276,20 +279,36 @@ export function useSessao() {
     [detail, adjust, picking, setData],
   );
 
-  /** Série extra só desta sessão (não muda o treino salvo). */
+  /** Série extra só desta sessão (não muda o treino salvo). Uma por vez: dois toques
+   *  rápidos leriam o mesmo último índice no servidor. */
+  const [addingSet, setAddingSet] = useState(false);
   const addSet = useCallback(
     async (sessionExerciseId: string) => {
-      if (!detail) return;
+      if (!detail || addingSet) return;
+      setAddingSet(true);
       try {
         const { set } = await api.post<{ set: SetLog }>(
           `/api/sessions/${detail.session.id}/exercises/${sessionExerciseId}/sets`,
         );
-        setData({ session: { ...detail, exercises: appendSet(detail.exercises, sessionExerciseId, set) } });
+        // Funcional: um "Completar" feito durante o POST não pode ser desfeito por um
+        // `detail` capturado antes dele.
+        setData((prev) =>
+          prev?.session
+            ? {
+                session: {
+                  ...prev.session,
+                  exercises: appendSet(prev.session.exercises, sessionExerciseId, set),
+                },
+              }
+            : prev,
+        );
       } catch (e) {
         toastError(e, "Não foi possível adicionar a série");
+      } finally {
+        setAddingSet(false);
       }
     },
-    [detail, setData],
+    [detail, addingSet, setData],
   );
 
   /** Remove (otimista) uma série ainda não completada. */
@@ -381,6 +400,7 @@ export function useSessao() {
     applying,
     applied,
     picking,
+    addingSet,
     pendingRemoval,
     start,
     openExercise,

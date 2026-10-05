@@ -13,7 +13,7 @@ import { ResumoTreinoCard } from "./components/ResumoTreinoCard";
 import { SessaoAtiva } from "./components/SessaoAtiva";
 import { TreinoList } from "./components/TreinoList";
 import { TreinoModal } from "./components/TreinoModal";
-import { useBackStack } from "./hooks/useBackStack";
+import { useBackStack, useDropStaleLayers } from "./hooks/useBackStack";
 import { useSessao } from "./hooks/useSessao";
 import { useTreinos } from "./hooks/useTreinos";
 
@@ -27,6 +27,7 @@ export default function TreinoPage() {
   const [previewing, setPreviewing] = useState<WorkoutWithExercises | null>(null);
   // A prévia também é uma camada: o voltar do celular fecha o sheet em vez de sair.
   useBackStack(previewing ? 1 : 0, useCallback(() => setPreviewing(null), []));
+  useDropStaleLayers();
 
   const openCreate = () => {
     setEditing(undefined);
@@ -91,8 +92,7 @@ export default function TreinoPage() {
         }}
         onStart={async () => {
           if (!previewing) return;
-          await sessao.start(previewing.id);
-          setPreviewing(null);
+          if (await sessao.start(previewing.id)) setPreviewing(null);
         }}
       />
 
