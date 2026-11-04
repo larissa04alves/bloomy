@@ -25,7 +25,7 @@ export function PassoTreino({
 }) {
   return (
     <PassoLayout
-      step={3}
+      step={4}
       total={total}
       tone="pink"
       icon={<BarbellIcon size={50} weight="fill" />}

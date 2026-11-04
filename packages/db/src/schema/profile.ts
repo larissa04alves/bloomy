@@ -13,6 +13,9 @@ export const profile = sqliteTable("profile", {
   restSeconds: integer("rest_seconds").default(45).notNull(),
   autoRest: integer("auto_rest", { mode: "boolean" }).default(true).notNull(),
   waterPortionMl: integer("water_portion_ml").default(500).notNull(),
+  /** Coletados no onboarding, opcionais. O peso não mora aqui: vira pesagem em `weight_log`. */
+  heightCm: integer("height_cm"),
+  birthDate: text("birth_date"), // YYYY-MM-DD
   createdAt: timestampMs("created_at"),
   updatedAt: timestampMs("updated_at"),
 });

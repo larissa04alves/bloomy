@@ -20,6 +20,10 @@ export type OnboardingBody = {
   portionMl: number;
   meals: number;
   workoutDays: number;
+  /** Dados do corpo do passo "Sobre você" — todos opcionais. */
+  heightCm?: number;
+  weightGrams?: number;
+  birthDate?: string;
 };
 
 export type WaterLog = { id: string; ml: number; day: string; createdAt: string };
@@ -88,6 +92,8 @@ export type Profile = {
   autoRest: boolean;
   waterPortionMl: number;
   onboardingCompletedAt: string | null;
+  heightCm: number | null;
+  birthDate: string | null;
 };
 
 // ── Treino ────────────────────────────────────────────────────────────────

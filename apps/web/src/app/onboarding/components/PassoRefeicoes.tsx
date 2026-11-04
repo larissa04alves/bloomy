@@ -25,7 +25,7 @@ export function PassoRefeicoes({
 }) {
   return (
     <PassoLayout
-      step={2}
+      step={3}
       total={total}
       tone="green"
       icon={<ForkKnifeIcon size={50} weight="fill" />}

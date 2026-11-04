@@ -3,10 +3,11 @@ import { z } from "zod";
 
 import { invalidBody, parseJson, requireUserId, unauthorized } from "@/server/shared/api";
 import { DAY_SCHEMA, dayFor } from "@/server/shared/day";
+import { WEIGHT_GRAMS_LIMITS } from "@/lib/body";
 import { listWeights, upsertWeight } from "@/server/health/weight";
 
 // 20–300 kg em gramas. Data no futuro não existe: não dá pra pesar amanhã.
-const GRAMS = z.number().int().min(20_000).max(300_000);
+const GRAMS = z.number().int().min(WEIGHT_GRAMS_LIMITS.min).max(WEIGHT_GRAMS_LIMITS.max);
 const PAST_DAY = DAY_SCHEMA.refine((d) => d <= dayFor(), "data no futuro");
 
 const BODY_SCHEMA = z.object({ grams: GRAMS, day: PAST_DAY.optional() });

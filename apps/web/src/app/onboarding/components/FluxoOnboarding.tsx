@@ -4,13 +4,20 @@ import { useOnboarding } from "../hooks/useOnboarding";
 import { PassoAgua } from "./PassoAgua";
 import { PassoLembretes } from "./PassoLembretes";
 import { PassoRefeicoes } from "./PassoRefeicoes";
+import { PassoSobreVoce } from "./PassoSobreVoce";
 import { PassoTreino } from "./PassoTreino";
 
 export function FluxoOnboarding() {
   const {
     state,
     pending,
+    bodyErrors,
+    canContinue,
+    touchField,
     totalSteps,
+    setHeight,
+    setWeight,
+    setBirthDate,
     setWaterMl,
     setPortionMl,
     setMeals,
@@ -23,13 +30,18 @@ export function FluxoOnboarding() {
 
   if (state.step === 1) {
     return (
-      <PassoAgua
+      <PassoSobreVoce
         total={totalSteps}
-        waterMl={state.waterMl}
-        portionMl={state.portionMl}
+        heightRaw={state.heightRaw}
+        weightRaw={state.weightRaw}
+        birthRaw={state.birthRaw}
+        errors={bodyErrors}
+        canContinue={canContinue}
         pending={pending}
-        onWaterMl={setWaterMl}
-        onPortionMl={setPortionMl}
+        onHeight={setHeight}
+        onWeight={setWeight}
+        onBirthDate={setBirthDate}
+        onBlurField={touchField}
         onNext={advance}
         onSkip={skip}
       />
@@ -37,6 +49,23 @@ export function FluxoOnboarding() {
   }
 
   if (state.step === 2) {
+    return (
+      <PassoAgua
+        total={totalSteps}
+        waterMl={state.waterMl}
+        portionMl={state.portionMl}
+        recommendedMl={state.recommendedMl}
+        pending={pending}
+        onWaterMl={setWaterMl}
+        onPortionMl={setPortionMl}
+        onNext={advance}
+        onBack={back}
+        onSkip={skip}
+      />
+    );
+  }
+
+  if (state.step === 3) {
     return (
       <PassoRefeicoes
         total={totalSteps}
@@ -50,7 +79,7 @@ export function FluxoOnboarding() {
     );
   }
 
-  if (state.step === 3) {
+  if (state.step === 4) {
     return (
       <PassoTreino
         total={totalSteps}

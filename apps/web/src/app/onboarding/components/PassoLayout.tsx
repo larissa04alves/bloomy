@@ -17,6 +17,7 @@ export function PassoLayout({
   subtitle,
   ctaLabel,
   skipLabel = "Pular",
+  ctaDisabled = false,
   pending,
   onNext,
   onSkip,
@@ -24,14 +25,16 @@ export function PassoLayout({
   children,
 }: {
   step: OnboardingStep;
-  /** 3 ou 4: o passo de lembretes só existe quando há permissão a pedir. */
+  /** 4 ou 5: o passo de lembretes só existe quando há permissão a pedir. */
   total: number;
   tone: Tone;
   icon: ReactNode;
   title: string;
-  subtitle: string;
+  subtitle: ReactNode;
   ctaLabel: string;
   skipLabel?: string;
+  /** Bloqueia só o CTA (ex.: campo preenchido fora da faixa); "Pular" segue livre. */
+  ctaDisabled?: boolean;
   pending: boolean;
   onNext: () => void;
   onSkip: () => void;
@@ -93,7 +96,7 @@ export function PassoLayout({
       <button
         type="button"
         onClick={onNext}
-        disabled={pending}
+        disabled={pending || ctaDisabled}
         className="w-full rounded-control bg-lilac py-4 font-display font-bold text-white shadow-btn disabled:opacity-60"
       >
         {ctaLabel}

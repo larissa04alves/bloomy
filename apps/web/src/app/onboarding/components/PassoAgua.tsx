@@ -3,45 +3,63 @@
 import { DropIcon } from "@phosphor-icons/react";
 
 import { Stepper } from "@/components/stepper";
-import { portions } from "@/server/shared/units";
+import { waterSubtitle } from "@/lib/water";
 
-import { portionHint } from "../hooks/format";
 import { PassoLayout } from "./PassoLayout";
-
-const MAX_GOTAS = 12;
 
 export function PassoAgua({
   total,
   waterMl,
   portionMl,
+  recommendedMl,
   pending,
   onWaterMl,
   onPortionMl,
   onNext,
+  onBack,
   onSkip,
 }: {
   total: number;
   waterMl: number;
   portionMl: number;
+  /** Meta sugerida pelo peso do passo anterior; `null` sem peso. */
+  recommendedMl: number | null;
   pending: boolean;
   onWaterMl: (ml: number) => void;
   onPortionMl: (ml: number) => void;
   onNext: () => void;
+  onBack: () => void;
   onSkip: () => void;
 }) {
-  const { target } = portions(0, waterMl, portionMl);
+  const subtitle = waterSubtitle(waterMl, recommendedMl);
 
   return (
     <PassoLayout
-      step={1}
+      step={2}
       total={total}
       tone="lilac"
       icon={<DropIcon size={52} weight="fill" />}
       title="Quanto de água por dia?"
-      subtitle="A gente conta as porções ao longo do dia."
+      subtitle={
+        subtitle.restore && recommendedMl !== null ? (
+          <>
+            {subtitle.text} ·{" "}
+            <button
+              type="button"
+              onClick={() => onWaterMl(recommendedMl)}
+              className="font-bold text-lilac-deep underline"
+            >
+              restaurar
+            </button>
+          </>
+        ) : (
+          subtitle.text
+        )
+      }
       ctaLabel="Continuar"
       pending={pending}
       onNext={onNext}
+      onBack={onBack}
       onSkip={onSkip}
     >
       <div className="flex w-full flex-col gap-5">
@@ -70,14 +88,6 @@ export function PassoAgua({
             unit="ml"
             onChange={onPortionMl}
           />
-        </div>
-        <p className="text-sm font-semibold text-ink-faint">
-          {portionHint(waterMl, portionMl)}
-        </p>
-        <div className="flex flex-wrap justify-center gap-1.5" aria-hidden>
-          {Array.from({ length: Math.min(target, MAX_GOTAS) }, (_, i) => (
-            <DropIcon key={i} size={20} weight="fill" className="text-lilac" />
-          ))}
         </div>
       </div>
     </PassoLayout>

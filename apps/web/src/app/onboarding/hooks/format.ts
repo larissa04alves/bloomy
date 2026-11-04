@@ -1,37 +1,119 @@
 import { DEFAULT_GOAL_TARGETS, type OnboardingBody } from "@/lib/api-types";
-import { portions } from "@/server/shared/units";
+import { BIRTH_DATE_MIN, HEIGHT_CM_LIMITS, WEIGHT_GRAMS_LIMITS } from "@/lib/body";
+import { parseKg, recommendedWaterMl } from "@/lib/water";
+import { dayFor } from "@/server/shared/day";
 
-/** 1–3 são as metas; 4 pede a permissão de notificação. */
-export type OnboardingStep = 1 | 2 | 3 | 4;
+/** 1 = "Sobre você"; 2–4 são as metas (água, refeições, treino); 5 pede a
+ *  permissão de notificação. */
+export type OnboardingStep = 1 | 2 | 3 | 4 | 5;
 
 export type OnboardingState = {
   step: OnboardingStep;
+  /** Texto cru dos inputs ("" = não informado): o peso aceita vírgula e precisa
+   *  sobreviver a estados intermediários como "62,". */
+  heightRaw: string;
+  weightRaw: string;
+  /** Nascimento como a pessoa digita, `dd/mm/aaaa`. */
+  birthRaw: string;
+  /** Meta sugerida pelo peso; `null` quando o peso não foi informado. */
+  recommendedMl: number | null;
   waterMl: number;
   portionMl: number;
   meals: number;
   workoutDays: Set<number>;
 };
 
+export type BodyField = "height" | "weight" | "birthDate";
+export type BodyErrors = Partial<Record<BodyField, string>>;
+
+/** Erros que a tela mostra: só de campos que já perderam o foco. Enquanto a pessoa
+ *  digita "165", o "1" seria "fora da faixa" — o CTA bloqueia, mas sem gritar. */
+export function visibleErrors(errors: BodyErrors, touched: ReadonlySet<BodyField>): BodyErrors {
+  return Object.fromEntries(
+    Object.entries(errors).filter(([field]) => touched.has(field as BodyField)),
+  );
+}
+
 /** O passo de lembretes só existe quando a permissão ainda não foi pedida
  *  (`askPush`): concedida, negada ou sem suporte, não há o que perguntar. */
 export function nextStep(step: OnboardingStep, askPush: boolean): OnboardingStep | "finish" {
-  if (step < 3) return (step + 1) as OnboardingStep;
-  if (step === 3 && askPush) return 4;
+  if (step < 4) return (step + 1) as OnboardingStep;
+  if (step === 4 && askPush) return 5;
   return "finish";
 }
 
 /** "Pular" dispensa as metas, não a permissão: sem ela os lembretes, que nascem
- *  ligados, nunca chegam a este aparelho. */
+ *  ligados, nunca chegam a este aparelho. No "Sobre você" é diferente — pula só os
+ *  dados do corpo e segue para a água. */
 export function skipTarget(step: OnboardingStep, askPush: boolean): OnboardingStep | "finish" {
-  return step < 4 && askPush ? 4 : "finish";
+  if (step === 1) return 2;
+  return step < 5 && askPush ? 5 : "finish";
 }
 
-export function portionHint(goalMl: number, portionMl: number): string {
-  const { target } = portions(0, goalMl, portionMl);
-  return target === 1 ? "≈ 1 porção por dia" : `≈ ${target} porções por dia`;
+/** Máscara do nascimento: só dígitos, com as barras de `dd/mm/aaaa`. Campo de texto e
+ *  não `type="date"`, porque o nativo segue o idioma do navegador (mm/dd em inglês). */
+export function maskBirthDate(raw: string): string {
+  const d = raw.replace(/\D/g, "").slice(0, 8);
+  return [d.slice(0, 2), d.slice(2, 4), d.slice(4)].filter(Boolean).join("/");
 }
 
-/** Hint do passo 3. Zero anuncia o default em vez de aplicá-lo em silêncio. */
+/** `dd/mm/aaaa` → `AAAA-MM-DD`, ou `null` se incompleta ou inexistente (31/02). */
+export function parseBrDate(raw: string): string | null {
+  const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(raw.trim());
+  if (!m) return null;
+  const [, dd, mm, yyyy] = m;
+  const date = new Date(Date.UTC(Number(yyyy), Number(mm) - 1, Number(dd)));
+  if (date.getUTCDate() !== Number(dd) || date.getUTCMonth() !== Number(mm) - 1) return null;
+  return `${yyyy}-${mm}-${dd}`;
+}
+
+function parseCm(raw: string): number | null {
+  const text = raw.trim();
+  return /^\d+$/.test(text) ? Number(text) : null;
+}
+
+const weightGrams = (raw: string): number | null => {
+  const kg = parseKg(raw);
+  return kg === null ? null : Math.round(kg * 1000);
+};
+
+/** Campo preenchido fora da faixa vira erro; vazio é "não informado" e passa. */
+export function bodyErrors(state: OnboardingState, today: string = dayFor()): BodyErrors {
+  const errors: BodyErrors = {};
+
+  if (state.heightRaw.trim()) {
+    const cm = parseCm(state.heightRaw);
+    if (cm === null || cm < HEIGHT_CM_LIMITS.min || cm > HEIGHT_CM_LIMITS.max) {
+      errors.height = `Altura entre ${HEIGHT_CM_LIMITS.min} e ${HEIGHT_CM_LIMITS.max} cm`;
+    }
+  }
+  if (state.weightRaw.trim()) {
+    const g = weightGrams(state.weightRaw);
+    if (g === null || g < WEIGHT_GRAMS_LIMITS.min || g > WEIGHT_GRAMS_LIMITS.max) {
+      errors.weight = `Peso entre ${WEIGHT_GRAMS_LIMITS.min / 1000} e ${WEIGHT_GRAMS_LIMITS.max / 1000} kg`;
+    }
+  }
+  if (state.birthRaw.trim()) {
+    const iso = parseBrDate(state.birthRaw);
+    if (iso === null || iso < BIRTH_DATE_MIN || iso > today) {
+      errors.birthDate = "Data de nascimento inválida";
+    }
+  }
+  return errors;
+}
+
+/** Saída do passo 1. A meta só é (re)calculada quando a recomendação muda — voltar
+ *  e avançar sem trocar o peso preserva o ajuste que a pessoa fez à mão. */
+export function applyBodyStep(state: OnboardingState): OnboardingState {
+  const kg = parseKg(state.weightRaw);
+  if (kg === null) return { ...state, recommendedMl: null };
+
+  const recommendedMl = recommendedWaterMl(kg);
+  if (recommendedMl === state.recommendedMl) return state;
+  return { ...state, recommendedMl, waterMl: recommendedMl };
+}
+
+/** Hint do passo de treino. Zero anuncia o default em vez de aplicá-lo em silêncio. */
 export function workoutDaysHint(count: number): string {
   if (count === 0) {
     return `Sem dias escolhidos — vamos usar ${DEFAULT_GOAL_TARGETS.workout} dias por semana`;
@@ -39,8 +121,13 @@ export function workoutDaysHint(count: number): string {
   return count === 1 ? "1 dia por semana" : `${count} dias por semana`;
 }
 
-/** State → body do POST. Zero dias vira o default: `GOAL_LIMITS.workout.min` é 1. */
+/** State → body do POST. Zero dias vira o default: `GOAL_LIMITS.workout.min` é 1.
+ *  Dados do corpo só viajam quando informados. */
 export function onboardingPayload(state: OnboardingState): OnboardingBody {
+  const heightCm = parseCm(state.heightRaw);
+  const grams = weightGrams(state.weightRaw);
+  const birthDate = parseBrDate(state.birthRaw);
+
   return {
     waterMl: state.waterMl,
     portionMl: state.portionMl,
@@ -49,5 +136,8 @@ export function onboardingPayload(state: OnboardingState): OnboardingBody {
       state.workoutDays.size === 0
         ? DEFAULT_GOAL_TARGETS.workout
         : state.workoutDays.size,
+    ...(heightCm !== null && { heightCm }),
+    ...(grams !== null && { weightGrams: grams }),
+    ...(birthDate !== null && { birthDate }),
   };
 }

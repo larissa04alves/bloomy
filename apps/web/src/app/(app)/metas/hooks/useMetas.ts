@@ -8,18 +8,29 @@ import {
   DEFAULT_PORTION_ML,
   type Goal,
   type Profile,
+  type WeightLog,
 } from "@/lib/api-types";
 import { toastError } from "@/lib/toast";
 import { useResource } from "@/lib/use-resource";
 
-import type { SheetField } from "../components/MetaSheet";
+import { waterSubtitle } from "@/lib/water";
 
-import { portionHint, type MetaDomain } from "./format";
+import type { SheetField, SheetSubtitle, SheetTextInput } from "../components/MetaSheet";
+
+import {
+  latestWeightKg,
+  typedWeightGrams,
+  waterRecommendation,
+  weightFieldError,
+  type MetaDomain,
+} from "./format";
 
 export type MetaSheetSpec = {
   domain: MetaDomain;
   fields: SheetField[];
   hint?: (values: Record<string, number>) => string;
+  subtitle?: (values: Record<string, number>) => SheetSubtitle | null;
+  textInput?: SheetTextInput;
   onSave: (values: Record<string, number>) => void;
 };
 
@@ -41,6 +52,19 @@ export function useMetas() {
   } = useResource<{ profile: Profile }>(
     useCallback(() => api.get<{ profile: Profile }>("/api/profile"), []),
   );
+
+  // Pesagens só alimentam a recomendação da água: falhar aqui não derruba a tela —
+  // a sheet só fica sem a sugestão (por isso não entra em `ready` nem em `error`).
+  const { data: weightsData, reload: reloadWeights } = useResource<{ weights: WeightLog[] }>(
+    useCallback(() => api.get<{ weights: WeightLog[] }>("/api/weights"), []),
+  );
+  const latestKg = weightsData ? latestWeightKg(weightsData.weights) : null;
+  /** Peso digitado na sheet da água — só existe quando não há nenhuma pesagem. */
+  const [weightRaw, setWeightRaw] = useState("");
+  const [weightTouched, setWeightTouched] = useState(false);
+  const askWeight = weightsData !== null && latestKg === null;
+  const recommendedMl = waterRecommendation(latestKg, weightRaw);
+  const typedGrams = typedWeightGrams(weightRaw);
 
   const targetOf = (domain: MetaDomain, fallback: number) =>
     goalsData?.goals.find((g) => g.domain === domain)?.target ?? fallback;
@@ -118,8 +142,37 @@ export function useMetas() {
           unit: "ml",
         },
       ],
-      hint: (v) => portionHint(v.goalMl!, v.portionMl!),
-      onSave: (v) => {
+      subtitle: (v) => {
+        if (recommendedMl === null) return null;
+        const line = waterSubtitle(v.goalMl!, recommendedMl);
+        return {
+          text: line.text,
+          restore: line.restore ? { key: "goalMl", value: recommendedMl } : undefined,
+        };
+      },
+      textInput: askWeight
+        ? {
+            label: "Seu peso",
+            unit: "kg",
+            placeholder: "62,5",
+            value: weightRaw,
+            error: weightFieldError(weightRaw, weightTouched),
+            onChange: setWeightRaw,
+            onBlur: () => setWeightTouched(true),
+          }
+        : undefined,
+      onSave: async (v) => {
+        // O peso digitado vira a pesagem de hoje antes da meta: se ele falhar, nada
+        // é salvo e a pessoa tenta de novo com o mesmo contexto.
+        if (askWeight && typedGrams !== null) {
+          try {
+            await api.post("/api/weights", { grams: typedGrams });
+          } catch (e) {
+            toastError(e, "Não foi possível registrar seu peso");
+            return;
+          }
+          reloadWeights();
+        }
         saveTarget("water", v.goalMl!);
         savePortion(v.portionMl!);
       },
@@ -159,11 +212,18 @@ export function useMetas() {
     waterPortionMl,
     /** Qual sheet está aberta — a tela pergunta, não guarda. */
     isOpen: (domain: MetaDomain) => sheet === domain,
-    openSheet: useCallback((domain: MetaDomain) => setSheet(domain), []),
-    setSheetOpen: useCallback(
-      (domain: MetaDomain, open: boolean) => setSheet(open ? domain : null),
-      [],
-    ),
+    openSheet: useCallback((domain: MetaDomain) => {
+      setWeightRaw("");
+      setWeightTouched(false);
+      setSheet(domain);
+    }, []),
+    setSheetOpen: useCallback((domain: MetaDomain, open: boolean) => {
+      if (open) {
+        setWeightRaw("");
+        setWeightTouched(false);
+      }
+      setSheet(open ? domain : null);
+    }, []),
     sheets,
 
     // `ready` em vez de `loading`: a tela só renderiza com os DOIS recursos em mãos,

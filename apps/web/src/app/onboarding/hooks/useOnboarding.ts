@@ -14,6 +14,11 @@ import {
 import { toastError } from "@/lib/toast";
 
 import {
+  applyBodyStep,
+  bodyErrors,
+  maskBirthDate,
+  visibleErrors,
+  type BodyField,
   nextStep,
   onboardingPayload,
   skipTarget,
@@ -26,6 +31,10 @@ export function useOnboarding() {
   const [pending, setPending] = useState(false);
   const [state, setState] = useState<OnboardingState>({
     step: 1,
+    heightRaw: "",
+    weightRaw: "",
+    birthRaw: "",
+    recommendedMl: null,
     waterMl: DEFAULT_GOAL_TARGETS.water,
     portionMl: DEFAULT_PORTION_ML,
     meals: DEFAULT_GOAL_TARGETS.meals,
@@ -69,7 +78,12 @@ export function useOnboarding() {
         void finish(state);
         return;
       }
-      setState((s) => (s.step === state.step ? { ...s, step: target } : s));
+      setState((s) => {
+        if (s.step !== state.step) return s;
+        // Sair do "Sobre você" (avançando ou pulando) fixa a recomendação da água.
+        const base = s.step === 1 ? applyBodyStep(s) : s;
+        return { ...base, step: target };
+      });
     },
     [state, finish],
   );
@@ -101,9 +115,31 @@ export function useOnboarding() {
     });
   }, []);
 
+  const [touched, setTouched] = useState<ReadonlySet<BodyField>>(new Set());
+  const errors = bodyErrors(state);
+
   return {
     state,
     pending,
+    /** Só os erros de campos já visitados; o CTA bloqueia por todos (`canContinue`). */
+    bodyErrors: visibleErrors(errors, touched),
+    canContinue: Object.keys(errors).length === 0,
+    touchField: useCallback(
+      (field: BodyField) => setTouched((t) => (t.has(field) ? t : new Set(t).add(field))),
+      [],
+    ),
+    setHeight: useCallback(
+      (heightRaw: string) => setState((s) => ({ ...s, heightRaw })),
+      [],
+    ),
+    setWeight: useCallback(
+      (weightRaw: string) => setState((s) => ({ ...s, weightRaw })),
+      [],
+    ),
+    setBirthDate: useCallback(
+      (raw: string) => setState((s) => ({ ...s, birthRaw: maskBirthDate(raw) })),
+      [],
+    ),
     setWaterMl: useCallback(
       (waterMl: number) => setState((s) => ({ ...s, waterMl })),
       [],
@@ -117,10 +153,17 @@ export function useOnboarding() {
       [],
     ),
     toggleDay,
-    totalSteps: askPush ? 4 : 3,
+    totalSteps: askPush ? 5 : 4,
     advance,
     activatePush,
     back,
-    skip: useCallback(() => goTo(skipTarget(state.step, askPush)), [goTo, state.step, askPush]),
+    skip: useCallback(() => {
+      // Pular o "Sobre você" é não informar: o que foi digitado não vale nem gera
+      // recomendação. O `goTo` encadeia nesta atualização (setState funcional).
+      if (state.step === 1) {
+        setState((s) => ({ ...s, heightRaw: "", weightRaw: "", birthRaw: "" }));
+      }
+      goTo(skipTarget(state.step, askPush));
+    }, [goTo, state.step, askPush]),
   };
 }
