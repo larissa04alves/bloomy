@@ -90,6 +90,7 @@ export const DEFAULT_PORTION_ML = 500;
 export type Profile = {
   restSeconds: number;
   autoRest: boolean;
+  restAlert: boolean;
   waterPortionMl: number;
   onboardingCompletedAt: string | null;
   heightCm: number | null;

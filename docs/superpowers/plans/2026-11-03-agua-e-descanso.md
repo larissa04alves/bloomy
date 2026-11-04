@@ -178,13 +178,13 @@ A sheet da água ganha a mesma recomendação a partir da **última pesagem** (`
 
 | Task | Status |
 |---|---|
-| 1. Fórmula + back do onboarding | feita (sem commit) |
-| 2. Front do onboarding | feita (sem commit) |
-| 3. Metas: recomendação | feita (sem commit) |
-| 4. Descanso por `endsAt` + som no app | pendente |
-| 5. Toggle `restAlert` + inscrição | pendente |
-| 6. Back do alarme (QStash) | pendente |
-| 7. Front do alarme + service worker | pendente |
+| 1. Fórmula + back do onboarding | feita (6998a33) |
+| 2. Front do onboarding | feita (6998a33) |
+| 3. Metas: recomendação | feita (6998a33) |
+| 4. Descanso por `endsAt` + som no app | feita |
+| 5. Toggle `restAlert` + inscrição | feita |
+| 6. Back do alarme (QStash) | feita |
+| 7. Front do alarme + service worker | feita (push real ok em /home; troca de aba e clique não confirmados) |
 | 8. Provisionamento + teste em produção (Larissa) | pendente |
 
 ---

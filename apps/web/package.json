@@ -18,6 +18,7 @@
     "@libsql/client": "catalog:",
     "@phosphor-icons/react": "catalog:",
     "@swc/helpers": "^0.5.23",
+    "@upstash/qstash": "catalog:",
     "@tanstack/react-form": "^1.33.0",
     "babel-plugin-react-compiler": "^1.0.0",
     "better-auth": "catalog:",

@@ -39,19 +39,35 @@ function readPayload(event) {
   }
 }
 
-self.addEventListener("push", (event) => {
-  const data = readPayload(event);
-  event.waitUntil(
-    self.registration.showNotification(data.title, {
-      body: data.body,
-      // tag agrupa: dois lembretes de água não empilham na bandeja. renotify faz
-      // a substituta tocar e vibrar — sem ele ela troca a anterior em silêncio.
-      tag: data.tag,
-      renotify: true,
-      icon: ICON,
-      data: { url: data.url },
-    }),
+/* Fim do descanso com o treino na frente: a tela de treino já bipou e vibrou, e a
+ * notificação só avisaria duas vezes. Em qualquer outra tela do app o timer não
+ * está montado — aí a notificação é o único aviso. */
+async function workoutVisible() {
+  const windows = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
+  return windows.some(
+    (client) =>
+      client.visibilityState === "visible" &&
+      new URL(client.url).pathname.startsWith("/treino"),
   );
+}
+
+async function handlePush(data) {
+  if (data.tag === "rest" && (await workoutVisible())) return;
+  await self.registration.showNotification(data.title, {
+    body: data.body,
+    // tag agrupa: dois lembretes de água não empilham na bandeja. renotify faz
+    // a substituta tocar e vibrar — sem ele ela troca a anterior em silêncio.
+    tag: data.tag,
+    renotify: true,
+    icon: ICON,
+    // Só o aviso de descanso manda padrão próprio; os lembretes ficam no do sistema.
+    ...(data.vibrate && { vibrate: data.vibrate }),
+    data: { url: data.url },
+  });
+}
+
+self.addEventListener("push", (event) => {
+  event.waitUntil(handlePush(readPayload(event)));
 });
 
 /* Foca a aba já aberta em vez de abrir outra — quem tem o app aberto não quer

@@ -12,6 +12,9 @@ export const profile = sqliteTable("profile", {
   }),
   restSeconds: integer("rest_seconds").default(45).notNull(),
   autoRest: integer("auto_rest", { mode: "boolean" }).default(true).notNull(),
+  /** "Aviso de fim do descanso" (som + push). Vale para a conta, e conta como motivo
+   *  para o servidor guardar o push do aparelho (ver `wantsPush`). */
+  restAlert: integer("rest_alert", { mode: "boolean" }).default(true).notNull(),
   waterPortionMl: integer("water_portion_ml").default(500).notNull(),
   /** Coletados no onboarding, opcionais. O peso não mora aqui: vira pesagem em `weight_log`. */
   heightCm: integer("height_cm"),

@@ -4,6 +4,7 @@ import type { Db } from "@bloomy/db";
 import { reminder } from "@bloomy/db/schema/reminder";
 import { eq } from "drizzle-orm";
 
+import { updateProfile } from "@/server/profile/service";
 import { listReminders, updateReminder } from "@/server/reminders/service";
 import { cleanupTestDbs, createTestDb, createTestUser } from "@/server/shared/test-db";
 import { listSubscriptions, saveSubscription } from "./service";
@@ -24,6 +25,12 @@ beforeEach(async () => {
 
 afterAll(cleanupTestDbs);
 
+async function turnOffReminders(user: string) {
+  for (const r of await listReminders(db, user)) {
+    await updateReminder(db, user, r.id, { enabled: false });
+  }
+}
+
 describe("saveSubscription", () => {
   test("cria os lembretes default de quem nunca abriu /notificacoes", async () => {
     await saveSubscription(db, userId, DEVICE);
@@ -33,10 +40,16 @@ describe("saveSubscription", () => {
     expect(await listSubscriptions(db, userId)).toHaveLength(1);
   });
 
-  test("não guarda o aparelho quando todos os lembretes estão desligados", async () => {
-    for (const r of await listReminders(db, userId)) {
-      await updateReminder(db, userId, r.id, { enabled: false });
-    }
+  test("guarda o aparelho só pelo aviso de fim do descanso, mesmo com lembretes desligados", async () => {
+    await turnOffReminders(userId);
+
+    expect(await saveSubscription(db, userId, DEVICE)).not.toBeNull();
+    expect(await listSubscriptions(db, userId)).toHaveLength(1);
+  });
+
+  test("não guarda o aparelho com lembretes e aviso de descanso desligados", async () => {
+    await turnOffReminders(userId);
+    await updateProfile(db, userId, { restAlert: false });
 
     expect(await saveSubscription(db, userId, DEVICE)).toBeNull();
     expect(await listSubscriptions(db, userId)).toHaveLength(0);
@@ -45,9 +58,8 @@ describe("saveSubscription", () => {
   test("com tudo desligado, apaga o registro que o aparelho tinha de outra conta", async () => {
     const anterior = await createTestUser(db, "anterior");
     await saveSubscription(db, anterior, DEVICE);
-    for (const r of await listReminders(db, userId)) {
-      await updateReminder(db, userId, r.id, { enabled: false });
-    }
+    await turnOffReminders(userId);
+    await updateProfile(db, userId, { restAlert: false });
 
     await saveSubscription(db, userId, DEVICE);
     expect(await listSubscriptions(db, anterior)).toHaveLength(0);
