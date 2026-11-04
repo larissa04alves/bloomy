@@ -57,9 +57,11 @@ export function MetaSheet({
   hint?: (values: Record<string, number>) => string;
   subtitle?: (values: Record<string, number>) => SheetSubtitle | null;
   textInput?: SheetTextInput;
-  onSave: (values: Record<string, number>) => void;
+  /** `false` mantém a sheet aberta (ex.: falhou registrar o peso). */
+  onSave: (values: Record<string, number>) => void | boolean | Promise<void | boolean>;
 }) {
   const [draft, setDraft] = useState<Record<string, number>>({});
+  const [saving, setSaving] = useState(false);
 
   // Semeia o rascunho só na abertura: `fields` é criado inline pelo caller, então
   // entrar na dep list re-semearia a cada render e travaria a edição.
@@ -87,11 +89,16 @@ export function MetaSheet({
       footer={
         <button
           type="button"
-          onClick={() => {
-            onSave(values);
-            onOpenChange(false);
+          disabled={saving}
+          onClick={async () => {
+            setSaving(true);
+            try {
+              if ((await onSave(values)) !== false) onOpenChange(false);
+            } finally {
+              setSaving(false);
+            }
           }}
-          className="w-full rounded-full bg-lilac py-3.5 font-display font-bold text-white shadow-btn"
+          className="w-full rounded-full bg-lilac py-3.5 font-display font-bold text-white shadow-btn disabled:opacity-60"
         >
           Salvar
         </button>

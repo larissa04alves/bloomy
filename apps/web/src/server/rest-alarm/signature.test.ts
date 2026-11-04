@@ -9,11 +9,16 @@ const b64url = (bytes: ArrayBuffer | Uint8Array) =>
   Buffer.from(bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes)).toString("base64url");
 
 /** Assina como o QStash: JWT HS256 com o hash SHA-256 do corpo no claim `body`. */
-async function qstashToken(key: string, rawBody: string, url: string): Promise<string> {
+async function qstashToken(
+  key: string,
+  rawBody: string,
+  url: string,
+  expiresIn = 300,
+): Promise<string> {
   const now = Math.floor(Date.now() / 1000);
   const header = b64url(new TextEncoder().encode(JSON.stringify({ alg: "HS256", typ: "JWT" })));
   const bodyHash = b64url(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(rawBody)));
-  const claims = { iss: "Upstash", sub: url, exp: now + 300, nbf: now - 10, iat: now, jti: "t", body: bodyHash };
+  const claims = { iss: "Upstash", sub: url, exp: now + expiresIn, nbf: now - 600, iat: now - 600, jti: "t", body: bodyHash };
   const payload = b64url(new TextEncoder().encode(JSON.stringify(claims)));
   const hmac = await crypto.subtle.importKey(
     "raw",
@@ -38,6 +43,18 @@ describe("verifySignature", () => {
     expect(
       await verifySignature({ signature, rawBody: JSON.stringify({ userId: "u2" }), url: URL, keys: KEYS }),
     ).toBe(false);
+  });
+
+  test("assinatura feita para outra URL não aceita", async () => {
+    const rawBody = JSON.stringify({ userId: "u1" });
+    const signature = await qstashToken(KEYS.current, rawBody, "http://outra-url.test/api/rest-alarm/fire");
+    expect(await verifySignature({ signature, rawBody, url: URL, keys: KEYS })).toBe(false);
+  });
+
+  test("token expirado não aceita", async () => {
+    const rawBody = JSON.stringify({ userId: "u1" });
+    const signature = await qstashToken(KEYS.current, rawBody, URL, -60);
+    expect(await verifySignature({ signature, rawBody, url: URL, keys: KEYS })).toBe(false);
   });
 
   test("sem assinatura não aceita", async () => {

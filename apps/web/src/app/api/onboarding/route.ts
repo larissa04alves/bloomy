@@ -31,7 +31,7 @@ export async function POST(request: Request) {
   if (!parsed.success) return invalidBody(parsed.error);
 
   const result = await completeOnboarding(db, userId, parsed.data);
-  if (!result.ok) return unprocessable("valor de meta fora da faixa permitida");
+  if (!result.ok) return unprocessable("meta ou dado do corpo fora da faixa permitida");
 
   return Response.json({ goals: result.goals, profile: result.profile });
 }

@@ -5,6 +5,7 @@ import {
   metaLabel,
   typedWeightGrams,
   waterRecommendation,
+  waterSaveBlocked,
   weightFieldError,
 } from "./format";
 
@@ -71,5 +72,18 @@ describe("weightFieldError", () => {
   it("vazio ou válido nunca é erro", () => {
     expect(weightFieldError("", true)).toBeUndefined();
     expect(weightFieldError("62,5", true)).toBeUndefined();
+  });
+});
+
+describe("waterSaveBlocked", () => {
+  it("peso digitado inválido segura o salvar", () => {
+    expect(waterSaveBlocked(true, "6")).toBe(true);
+  });
+  it("peso vazio ou válido deixa salvar", () => {
+    expect(waterSaveBlocked(true, "")).toBe(false);
+    expect(waterSaveBlocked(true, "62,5")).toBe(false);
+  });
+  it("sem o campo de peso na tela, nada bloqueia", () => {
+    expect(waterSaveBlocked(false, "6")).toBe(false);
   });
 });

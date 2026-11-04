@@ -49,7 +49,10 @@ export function useDescanso(sessionId: string | null) {
     if (!sessionId) return;
     const t = Date.now();
     const saved = loadActiveRest(sessionId, t);
-    if (!saved) return;
+    if (!saved) {
+      setRest(null); // outra sessão: a contagem da anterior não vale aqui
+      return;
+    }
     setNow(t);
     setRest({ endsAt: saved.endsAt, total: saved.total });
   }, [sessionId]);

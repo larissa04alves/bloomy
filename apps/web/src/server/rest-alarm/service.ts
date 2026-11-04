@@ -51,9 +51,9 @@ export async function scheduleRestAlarm(
     );
   if (!device) return "no_subscription";
 
+  // Publica e grava o novo ANTES de cancelar o anterior: se o publish falhar, o
+  // alarme anterior continua valendo em vez de a pessoa ficar sem aviso nenhum.
   const previous = await currentAlarm(db, userId);
-  if (previous) await cancelQuietly(scheduler, previous.messageId);
-
   const messageId = await scheduler.publish({ userId, endsAt: input.endsAt });
   const now = new Date();
   await db
@@ -63,6 +63,7 @@ export async function scheduleRestAlarm(
       target: restAlarm.userId,
       set: { messageId, endpoint: input.endpoint, endsAt: input.endsAt, updatedAt: now },
     });
+  if (previous) await cancelQuietly(scheduler, previous.messageId);
   return "scheduled";
 }
 
@@ -85,10 +86,16 @@ export async function fireRestAlarm(
   send: RestPushSender,
   input: { userId: string; messageId: string },
 ): Promise<"sent" | "stale" | "gone" | "failed"> {
-  const alarm = await currentAlarm(db, input.userId);
-  if (!alarm || alarm.messageId !== input.messageId) return "stale";
+  // Remove só se for a mensagem vigente, e numa operação só: o QStash entrega pelo
+  // menos uma vez, e duas entregas da mesma mensagem não podem as duas passar.
+  const [alarm] = await db
+    .delete(restAlarm)
+    .where(and(eq(restAlarm.userId, input.userId), eq(restAlarm.messageId, input.messageId)))
+    .returning();
+  if (!alarm) return "stale";
 
-  await db.delete(restAlarm).where(eq(restAlarm.userId, input.userId));
+  // Aviso desligado depois de agendar: o alarme já foi consumido, só não envia.
+  if (!(await ensureProfile(db, input.userId)).restAlert) return "stale";
 
   const [device] = await db
     .select()

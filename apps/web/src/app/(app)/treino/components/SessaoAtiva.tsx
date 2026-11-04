@@ -208,9 +208,9 @@ export function SessaoAtiva({
       auto={descanso.auto}
       onToggleAuto={descanso.setAuto}
       onOpenExercise={sessao.openExercise}
-      onComplete={() => {
-        descanso.stop(); // sessão concluída: descanso pendente não vale mais
-        return sessao.complete();
+      onComplete={async () => {
+        // Só depois de confirmada: se concluir falhar, o treino segue com o descanso.
+        if (await sessao.complete()) descanso.stop();
       }}
       completing={sessao.completing}
       onSwapExercise={sessao.openSwap}

@@ -22,11 +22,12 @@ let userId: string;
 const ENDPOINT = "https://fcm.googleapis.com/fcm/send/phone";
 
 /** Agendador falso: devolve msg-1, msg-2… e registra o que foi pedido. */
-function fakeScheduler(opts: { failCancel?: boolean } = {}) {
+function fakeScheduler(opts: { failCancel?: boolean; failPublish?: boolean } = {}) {
   const published: { userId: string; endsAt: Date }[] = [];
   const cancelled: string[] = [];
   const scheduler: RestScheduler = {
     publish: async (input) => {
+      if (opts.failPublish) throw new Error("qstash down");
       published.push(input);
       return `msg-${published.length}`;
     },
@@ -100,6 +101,19 @@ describe("scheduleRestAlarm", () => {
     expect((await alarmRow())?.messageId).toBe("msg-2");
   });
 
+  test("se publicar o novo falha, o alarme anterior continua valendo", async () => {
+    const first = fakeScheduler();
+    await scheduleRestAlarm(db, first.scheduler, userId, { endsAt: IN_A_MINUTE(), endpoint: ENDPOINT });
+    const broken = fakeScheduler({ failPublish: true });
+
+    await expect(
+      scheduleRestAlarm(db, broken.scheduler, userId, { endsAt: IN_A_MINUTE(), endpoint: ENDPOINT }),
+    ).rejects.toThrow();
+
+    expect(broken.cancelled).toHaveLength(0);
+    expect((await alarmRow())?.messageId).toBe("msg-1");
+  });
+
   test("com o aviso de descanso desligado não agenda nada", async () => {
     await updateProfile(db, userId, { restAlert: false });
     const { scheduler, published } = fakeScheduler();
@@ -159,6 +173,33 @@ describe("fireRestAlarm", () => {
     expect(status).toBe("sent");
     expect(sentTo.map((s) => s.endpoint)).toEqual([ENDPOINT]);
     expect(await alarmRow()).toBeNull();
+  });
+
+  test("aviso desligado depois de agendar: o push não sai", async () => {
+    const { scheduler } = fakeScheduler();
+    await scheduleRestAlarm(db, scheduler, userId, { endsAt: IN_A_MINUTE(), endpoint: ENDPOINT });
+    await updateProfile(db, userId, { restAlert: false });
+    const { send, sentTo } = fakeSender();
+
+    const status = await fireRestAlarm(db, send, { userId, messageId: "msg-1" });
+
+    expect(status).toBe("stale");
+    expect(sentTo).toHaveLength(0);
+    expect(await alarmRow()).toBeNull();
+  });
+
+  test("entrega duplicada da mesma mensagem envia uma vez só", async () => {
+    const { scheduler } = fakeScheduler();
+    await scheduleRestAlarm(db, scheduler, userId, { endsAt: IN_A_MINUTE(), endpoint: ENDPOINT });
+    const { send, sentTo } = fakeSender();
+
+    const results = await Promise.all([
+      fireRestAlarm(db, send, { userId, messageId: "msg-1" }),
+      fireRestAlarm(db, send, { userId, messageId: "msg-1" }),
+    ]);
+
+    expect(sentTo).toHaveLength(1);
+    expect(results.sort()).toEqual(["sent", "stale"]);
   });
 
   test("aparelho morto (gone) é removido", async () => {

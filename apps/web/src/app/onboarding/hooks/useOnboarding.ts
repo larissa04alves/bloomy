@@ -17,6 +17,7 @@ import {
   applyBodyStep,
   bodyErrors,
   maskBirthDate,
+  skipBodyStep,
   visibleErrors,
   type BodyField,
   nextStep,
@@ -160,9 +161,7 @@ export function useOnboarding() {
     skip: useCallback(() => {
       // Pular o "Sobre você" é não informar: o que foi digitado não vale nem gera
       // recomendação. O `goTo` encadeia nesta atualização (setState funcional).
-      if (state.step === 1) {
-        setState((s) => ({ ...s, heightRaw: "", weightRaw: "", birthRaw: "" }));
-      }
+      if (state.step === 1) setState(skipBodyStep);
       goTo(skipTarget(state.step, askPush));
     }, [goTo, state.step, askPush]),
   };

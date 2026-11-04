@@ -3,18 +3,27 @@ import { z } from "zod";
 
 import { cancelRestAlarm, scheduleRestAlarm } from "@/server/rest-alarm/service";
 import { qstashScheduler } from "@/server/rest-alarm/qstash";
-import { invalidBody, parseJson, requireUserId, unauthorized } from "@/server/shared/api";
+import {
+  invalidBody,
+  parseJson,
+  requireUserId,
+  unauthorized,
+  unprocessable,
+} from "@/server/shared/api";
 
 /** Folga máxima para o fim do descanso: o maior descanso do app é 2 min. */
 const MAX_AHEAD_MS = 15 * 60_000;
 
+// Só a forma (400). A janela é regra do recurso: valor válido fora dela é 422.
 const BODY_SCHEMA = z.object({
-  endsAt: z.number().int().refine((ms) => {
-    const ahead = ms - Date.now();
-    return ahead > 0 && ahead <= MAX_AHEAD_MS;
-  }, "endsAt fora da janela"),
+  endsAt: z.number().int(),
   endpoint: z.url(),
 });
+
+const withinWindow = (endsAt: number) => {
+  const ahead = endsAt - Date.now();
+  return ahead > 0 && ahead <= MAX_AHEAD_MS;
+};
 
 /** Começa ou reajusta o alarme de fim do descanso. Sem QStash configurado é no-op:
  *  o aviso dentro do app continua valendo. */
@@ -24,6 +33,9 @@ export async function POST(request: Request) {
 
   const parsed = BODY_SCHEMA.safeParse(await parseJson(request));
   if (!parsed.success) return invalidBody(parsed.error);
+  if (!withinWindow(parsed.data.endsAt)) {
+    return unprocessable("endsAt fora da janela do descanso");
+  }
 
   const scheduler = qstashScheduler();
   if (!scheduler) return new Response(null, { status: 204 });

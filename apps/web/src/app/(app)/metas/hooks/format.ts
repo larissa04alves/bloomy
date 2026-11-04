@@ -45,3 +45,9 @@ export function weightFieldError(raw: string, touched: boolean): string | undefi
   if (!touched || !raw.trim() || typedWeightGrams(raw) !== null) return undefined;
   return `Peso entre ${WEIGHT_GRAMS_LIMITS.min / 1000} e ${WEIGHT_GRAMS_LIMITS.max / 1000} kg`;
 }
+
+/** Peso digitado e inválido segura o "Salvar" da sheet da água: salvar a meta sem
+ *  registrar o peso, sem a pessoa perceber, seria pior que pedir para corrigir. */
+export function waterSaveBlocked(askWeight: boolean, raw: string): boolean {
+  return askWeight && raw.trim() !== "" && typedWeightGrams(raw) === null;
+}

@@ -106,11 +106,24 @@ export function bodyErrors(state: OnboardingState, today: string = dayFor()): Bo
  *  e avançar sem trocar o peso preserva o ajuste que a pessoa fez à mão. */
 export function applyBodyStep(state: OnboardingState): OnboardingState {
   const kg = parseKg(state.weightRaw);
-  if (kg === null) return { ...state, recommendedMl: null };
+  if (kg === null) {
+    // Sem peso, a meta que só existia por causa dele volta ao default; ajuste à mão fica.
+    const derived = state.recommendedMl !== null && state.waterMl === state.recommendedMl;
+    return {
+      ...state,
+      recommendedMl: null,
+      waterMl: derived ? DEFAULT_GOAL_TARGETS.water : state.waterMl,
+    };
+  }
 
   const recommendedMl = recommendedWaterMl(kg);
   if (recommendedMl === state.recommendedMl) return state;
   return { ...state, recommendedMl, waterMl: recommendedMl };
+}
+
+/** "Pular" no "Sobre você" é não informar: descarta o digitado e o que derivou dele. */
+export function skipBodyStep(state: OnboardingState): OnboardingState {
+  return applyBodyStep({ ...state, heightRaw: "", weightRaw: "", birthRaw: "" });
 }
 
 /** Hint do passo de treino. Zero anuncia o default em vez de aplicá-lo em silêncio. */

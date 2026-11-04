@@ -21,6 +21,7 @@ import {
   latestWeightKg,
   typedWeightGrams,
   waterRecommendation,
+  waterSaveBlocked,
   weightFieldError,
   type MetaDomain,
 } from "./format";
@@ -31,7 +32,7 @@ export type MetaSheetSpec = {
   hint?: (values: Record<string, number>) => string;
   subtitle?: (values: Record<string, number>) => SheetSubtitle | null;
   textInput?: SheetTextInput;
-  onSave: (values: Record<string, number>) => void;
+  onSave: (values: Record<string, number>) => void | boolean | Promise<void | boolean>;
 };
 
 export function useMetas() {
@@ -53,9 +54,9 @@ export function useMetas() {
     useCallback(() => api.get<{ profile: Profile }>("/api/profile"), []),
   );
 
-  // Pesagens só alimentam a recomendação da água: falhar aqui não derruba a tela —
-  // a sheet só fica sem a sugestão (por isso não entra em `ready` nem em `error`).
-  const { data: weightsData, reload: reloadWeights } = useResource<{ weights: WeightLog[] }>(
+  // Pesagens só alimentam a sheet da água: falhar aqui não derruba a tela (não
+  // entra em `ready` nem em `error`); abrir a sheet tenta buscar de novo.
+  const { data: weightsData, error: weightsError, reload: reloadWeights } = useResource<{ weights: WeightLog[] }>(
     useCallback(() => api.get<{ weights: WeightLog[] }>("/api/weights"), []),
   );
   const latestKg = weightsData ? latestWeightKg(weightsData.weights) : null;
@@ -162,14 +163,18 @@ export function useMetas() {
           }
         : undefined,
       onSave: async (v) => {
-        // O peso digitado vira a pesagem de hoje antes da meta: se ele falhar, nada
-        // é salvo e a pessoa tenta de novo com o mesmo contexto.
+        if (waterSaveBlocked(askWeight, weightRaw)) {
+          setWeightTouched(true); // mostra o erro do campo e mantém a sheet aberta
+          return false;
+        }
+        // O peso digitado vira a pesagem de hoje antes da meta: se ele falhar, a
+        // sheet fica aberta com o mesmo rascunho para tentar de novo.
         if (askWeight && typedGrams !== null) {
           try {
             await api.post("/api/weights", { grams: typedGrams });
           } catch (e) {
             toastError(e, "Não foi possível registrar seu peso");
-            return;
+            return false;
           }
           reloadWeights();
         }
@@ -212,11 +217,17 @@ export function useMetas() {
     waterPortionMl,
     /** Qual sheet está aberta — a tela pergunta, não guarda. */
     isOpen: (domain: MetaDomain) => sheet === domain,
-    openSheet: useCallback((domain: MetaDomain) => {
-      setWeightRaw("");
-      setWeightTouched(false);
-      setSheet(domain);
-    }, []),
+    openSheet: useCallback(
+      (domain: MetaDomain) => {
+        setWeightRaw("");
+        setWeightTouched(false);
+        // A primeira busca de pesagens falhou: tenta de novo, senão a sheet fica
+        // sem recomendação e sem o campo de peso.
+        if (domain === "water" && weightsError) reloadWeights();
+        setSheet(domain);
+      },
+      [weightsError, reloadWeights],
+    ),
     setSheetOpen: useCallback((domain: MetaDomain, open: boolean) => {
       if (open) {
         setWeightRaw("");

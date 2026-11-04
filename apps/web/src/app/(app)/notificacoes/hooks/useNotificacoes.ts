@@ -122,8 +122,10 @@ export function useNotificacoes() {
         return;
       }
 
+      // Estado MAIS RECENTE, como em `setEnabled`: dois toques rápidos terminam fora
+      // de ordem, e o `next` deste toque pode já ter sido desfeito pelo seguinte.
       const anyReminder = (latestReminders.current ?? []).some((r) => r.enabled);
-      await syncPush(anyReminder || next);
+      await syncPush(anyReminder || latestRestAlert.current);
     },
     [profileData, setProfile, syncPush],
   );

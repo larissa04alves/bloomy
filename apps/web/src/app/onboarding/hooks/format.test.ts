@@ -6,6 +6,7 @@ import {
   maskBirthDate,
   visibleErrors,
   parseBrDate,
+  skipBodyStep,
   nextStep,
   onboardingPayload,
   skipTarget,
@@ -84,6 +85,11 @@ describe("applyBodyStep", () => {
     const next = applyBodyStep(state({ weightRaw: "70", recommendedMl: 2200, waterMl: 2500 }));
     expect(next.recommendedMl).toBe(2500);
     expect(next.waterMl).toBe(2500);
+  });
+  it("apagar o peso desfaz a meta que só existia por causa dele", () => {
+    const next = applyBodyStep(state({ weightRaw: "", recommendedMl: 2200, waterMl: 2200 }));
+    expect(next.recommendedMl).toBeNull();
+    expect(next.waterMl).toBe(2000);
   });
   it("sem peso, sem recomendação e a meta fica como está", () => {
     const next = applyBodyStep(state({ weightRaw: "", recommendedMl: 2200, waterMl: 2500 }));
@@ -170,5 +176,21 @@ describe("visibleErrors", () => {
   });
   it("mostra só os campos que já perderam o foco", () => {
     expect(visibleErrors(errors, new Set(["height"]))).toEqual({ height: "Altura entre 100 e 250 cm" });
+  });
+});
+
+describe("skipBodyStep", () => {
+  it("pular descarta o que foi digitado e a meta derivada do peso", () => {
+    const next = skipBodyStep(
+      state({ heightRaw: "165", weightRaw: "62", birthRaw: "14/03/1995", recommendedMl: 2200, waterMl: 2200 }),
+    );
+    expect(next).toMatchObject({ heightRaw: "", weightRaw: "", birthRaw: "", recommendedMl: null, waterMl: 2000 });
+    const payload = onboardingPayload(next);
+    expect("weightGrams" in payload).toBe(false);
+    expect(payload.waterMl).toBe(2000);
+  });
+  it("meta ajustada à mão sobrevive ao pular", () => {
+    const next = skipBodyStep(state({ weightRaw: "62", recommendedMl: 2200, waterMl: 2600 }));
+    expect(next.waterMl).toBe(2600);
   });
 });
