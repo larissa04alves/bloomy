@@ -203,8 +203,9 @@ export function useSessao() {
     [detail, patchLocal, reload],
   );
 
-  const complete = useCallback(async () => {
-    if (!detail) return;
+  /** `true` só quando o servidor confirmou: quem chama decide o que desfazer. */
+  const complete = useCallback(async (): Promise<boolean> => {
+    if (!detail) return false;
     setCompleting(true);
     try {
       const summary = await api.post<FinishSummary>(
@@ -212,8 +213,10 @@ export function useSessao() {
       );
       setFinishSummary(summary);
       setView("fim");
+      return true;
     } catch (e) {
       toastError(e, "Não foi possível concluir o treino");
+      return false;
     } finally {
       setCompleting(false);
     }

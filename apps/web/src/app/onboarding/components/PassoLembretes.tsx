@@ -17,8 +17,8 @@ export function PassoLembretes({
 }) {
   return (
     <PassoLayout
-      step={4}
-      total={4}
+      step={5}
+      total={5}
       tone="lilac"
       icon={<BellRingingIcon size={50} weight="fill" />}
       title="Quer receber lembretes?"

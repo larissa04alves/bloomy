@@ -28,7 +28,7 @@ export function SessaoAtiva({
   workoutName: string;
   onExit: () => void;
 }) {
-  const descanso = useDescanso();
+  const descanso = useDescanso(sessao.detail?.session.id ?? null);
   const { catalog } = useCatalogo(true);
   const catalogById = useMemo(() => new Map(catalog.map((c) => [c.id, c])), [catalog]);
   const [preview, setPreview] = useState<CatalogExercise | null>(null);
@@ -208,7 +208,10 @@ export function SessaoAtiva({
       auto={descanso.auto}
       onToggleAuto={descanso.setAuto}
       onOpenExercise={sessao.openExercise}
-      onComplete={sessao.complete}
+      onComplete={async () => {
+        // Só depois de confirmada: se concluir falhar, o treino segue com o descanso.
+        if (await sessao.complete()) descanso.stop();
+      }}
       completing={sessao.completing}
       onSwapExercise={sessao.openSwap}
       onRemoveExercise={sessao.askRemove}

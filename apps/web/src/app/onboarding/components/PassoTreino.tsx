@@ -25,13 +25,13 @@ export function PassoTreino({
 }) {
   return (
     <PassoLayout
-      step={3}
+      step={4}
       total={total}
       tone="pink"
       icon={<BarbellIcon size={50} weight="fill" />}
       title="Quantos dias de treino?"
       subtitle="Escolha os dias que você costuma treinar."
-      ctaLabel={total === 3 ? "Começar a usar" : "Continuar"}
+      ctaLabel={total === 4 ? "Começar a usar" : "Continuar"}
       pending={pending}
       onNext={onNext}
       onBack={onBack}

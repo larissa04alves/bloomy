@@ -190,3 +190,20 @@ export type ExerciseCatalog = typeof exerciseCatalog.$inferSelect;
 export type WorkoutSession = typeof workoutSession.$inferSelect;
 export type SessionExerciseRow = typeof sessionExercise.$inferSelect;
 export type SetLog = typeof setLog.$inferSelect;
+
+/** Descanso em curso com alarme agendado no QStash — no máximo um por pessoa. É a
+ *  guarda contra push velho: o callback só envia se o `messageId` recebido for o
+ *  daqui (cancelar no QStash pode falhar se a mensagem já estiver a caminho). */
+export const restAlarm = sqliteTable("rest_alarm", {
+  userId: text("user_id")
+    .primaryKey()
+    .references(() => user.id, { onDelete: "cascade" }),
+  messageId: text("message_id").notNull(),
+  /** Aparelho que iniciou o descanso: só ele recebe o push. */
+  endpoint: text("endpoint").notNull(),
+  endsAt: integer("ends_at", { mode: "timestamp_ms" }).notNull(),
+  createdAt: timestampMs("created_at"),
+  updatedAt: timestampMs("updated_at"),
+});
+
+export type RestAlarm = typeof restAlarm.$inferSelect;

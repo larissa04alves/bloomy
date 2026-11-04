@@ -4,6 +4,7 @@ import type { Db } from "@bloomy/db";
 import { pushSubscription, type PushSubscription } from "@bloomy/db/schema/reminder";
 import { and, eq } from "drizzle-orm";
 
+import { ensureProfile } from "@/server/profile/service";
 import { listReminders } from "@/server/reminders/service";
 
 export type SubscriptionInput = {
@@ -12,20 +13,28 @@ export type SubscriptionInput = {
   auth: string;
 };
 
+/** O servidor só guarda o push de quem tem motivo para recebê-lo: algum lembrete
+ *  ligado ou o aviso de fim do descanso. Também garante os lembretes default (ver
+ *  `saveSubscription`). */
+export async function wantsPush(db: Db, userId: string): Promise<boolean> {
+  const reminders = await listReminders(db, userId);
+  if (reminders.some((r) => r.enabled)) return true;
+  return (await ensureProfile(db, userId)).restAlert;
+}
+
 /** Registra a subscription do aparelho. O mesmo endpoint pode reaparecer depois de
  *  reinstalar o app ou trocar de conta — daí o upsert em vez de insert puro.
  *
  *  Garante os lembretes default antes: o aparelho pode ser ativado no onboarding,
  *  antes de a pessoa abrir /notificacoes, e sem linha de `reminder` a varredura não
- *  tem o que enviar. Com tudo desligado devolve `null` sem gravar — o app refaz o
- *  registro a cada abertura, e sem lembrete ligado o servidor não guarda o endpoint. */
+ *  tem o que enviar. Sem motivo (`wantsPush`) devolve `null` sem gravar — o app refaz
+ *  o registro a cada abertura, e sem uso o servidor não guarda o endpoint. */
 export async function saveSubscription(
   db: Db,
   userId: string,
   input: SubscriptionInput,
 ): Promise<PushSubscription | null> {
-  const reminders = await listReminders(db, userId);
-  if (!reminders.some((r) => r.enabled)) {
+  if (!(await wantsPush(db, userId))) {
     // O aparelho pode ainda estar registrado em nome de outra conta (logout cujo
     // DELETE falhou): sem apagar, ele seguiria recebendo os lembretes dela.
     await dropDeadSubscription(db, input.endpoint);

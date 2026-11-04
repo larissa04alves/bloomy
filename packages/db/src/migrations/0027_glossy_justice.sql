@@ -1,0 +1,1 @@
+ALTER TABLE `profile` ADD `rest_alert` integer DEFAULT true NOT NULL;

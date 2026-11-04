@@ -57,6 +57,14 @@ export const env = createEnv({
     VAPID_SUBJECT: z.string().startsWith("mailto:").optional(),
     /** Autentica o agendador externo (cron-job.org) na rota de varredura. */
     CRON_SECRET: z.string().min(16).optional(),
+
+    // Aviso de fim do descanso via QStash (push agendado na hora do fim). Opcionais
+    // como as VAPID_*: sem elas `/api/rest-alarm` vira no-op e fica só o aviso no app.
+    QSTASH_TOKEN: z.string().min(1).optional(),
+    QSTASH_CURRENT_SIGNING_KEY: z.string().min(1).optional(),
+    QSTASH_NEXT_SIGNING_KEY: z.string().min(1).optional(),
+    /** Só no dev local (servidor da CLI do QStash); em produção fica vazio. */
+    QSTASH_URL: z.url().optional(),
   },
   runtimeEnv: runtimeEnv,
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,

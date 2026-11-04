@@ -11,6 +11,7 @@ import {
 const PATCH_SCHEMA = z.object({
   restSeconds: z.number().int().min(15).max(600).optional(),
   autoRest: z.boolean().optional(),
+  restAlert: z.boolean().optional(),
   completeOnboarding: z.boolean().optional(),
   waterPortionMl: z
     .number()

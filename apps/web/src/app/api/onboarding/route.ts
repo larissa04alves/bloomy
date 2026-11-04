@@ -9,6 +9,7 @@ import {
   unprocessable,
 } from "@/server/shared/api";
 import { completeOnboarding } from "@/server/onboarding/service";
+import { DAY_SCHEMA } from "@/server/shared/day";
 
 // Só a forma. A faixa é do serviço, que é o dono da regra (ADR-0001) — aqui a rota
 // apenas traduz o `out_of_range` dele em 422, como `PUT /api/goals/[id]` faz.
@@ -17,6 +18,9 @@ const BODY_SCHEMA = z.object({
   portionMl: z.number().int(),
   meals: z.number().int(),
   workoutDays: z.number().int(),
+  heightCm: z.number().int().optional(),
+  weightGrams: z.number().int().optional(),
+  birthDate: DAY_SCHEMA.optional(),
 });
 
 export async function POST(request: Request) {
@@ -27,7 +31,7 @@ export async function POST(request: Request) {
   if (!parsed.success) return invalidBody(parsed.error);
 
   const result = await completeOnboarding(db, userId, parsed.data);
-  if (!result.ok) return unprocessable("valor de meta fora da faixa permitida");
+  if (!result.ok) return unprocessable("meta ou dado do corpo fora da faixa permitida");
 
   return Response.json({ goals: result.goals, profile: result.profile });
 }

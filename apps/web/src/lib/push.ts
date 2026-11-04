@@ -2,7 +2,7 @@
 
 import { api, ApiError } from "@/lib/api";
 
-const SW_PATH = "/sw.js";
+export const SW_PATH = "/sw.js";
 
 /** Mesma chave pública do `VAPID_PUBLIC_KEY` do servidor. Lida direto de
  *  `process.env` (e não de `@bloomy/env/web`) porque é o padrão do repo em

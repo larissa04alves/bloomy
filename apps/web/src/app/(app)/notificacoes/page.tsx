@@ -114,6 +114,14 @@ export default function NotificacoesPage() {
             />
           );
         })}
+        <LembreteCard
+          tone="pink"
+          icon={<BarbellIcon size={22} weight="fill" />}
+          title="Aviso de fim do descanso"
+          subtitle="Som e notificação quando o descanso acabar"
+          enabled={n.restAlert}
+          onToggle={(next) => void n.setRestAlert(next)}
+        />
       </div>
 
       <p className="rounded-card bg-lilac-tint px-4 py-3 text-center text-sm font-semibold text-lilac-deep">

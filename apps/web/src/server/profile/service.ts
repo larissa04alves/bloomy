@@ -11,6 +11,7 @@ export const PORTION_LIMITS = { min: 100, max: 2000 } as const;
 export type ProfileUpdate = {
   restSeconds?: number;
   autoRest?: boolean;
+  restAlert?: boolean;
   completeOnboarding?: boolean;
   waterPortionMl?: number;
 };
@@ -33,6 +34,7 @@ export async function updateProfile(
     .set({
       ...(input.restSeconds !== undefined && { restSeconds: input.restSeconds }),
       ...(input.autoRest !== undefined && { autoRest: input.autoRest }),
+      ...(input.restAlert !== undefined && { restAlert: input.restAlert }),
       ...(input.waterPortionMl !== undefined && { waterPortionMl: input.waterPortionMl }),
       ...(input.completeOnboarding && { onboardingCompletedAt: new Date() }),
       updatedAt: new Date(),

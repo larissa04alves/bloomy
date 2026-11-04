@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { api } from "@/lib/api";
-import type { Medication, Reminder } from "@/lib/api-types";
+import type { Medication, Profile, Reminder } from "@/lib/api-types";
 import { disablePush, enablePush, pushStatus, type PushStatus } from "@/lib/push";
 import { toastError } from "@/lib/toast";
 import { useResource } from "@/lib/use-resource";
@@ -29,6 +29,17 @@ export function useNotificacoes() {
     useCallback(() => api.get<{ medications: Medication[] }>("/api/medications"), []),
   );
 
+  // O aviso de fim do descanso mora no profile (vale para a conta).
+  const {
+    data: profileData,
+    setData: setProfile,
+    error: profileError,
+    reload: reloadProfile,
+  } = useResource<{ profile: Profile }>(
+    useCallback(() => api.get<{ profile: Profile }>("/api/profile"), []),
+  );
+  const restAlert = profileData?.profile.restAlert ?? true;
+
   // `null` até o primeiro efeito: `Notification.permission` não existe no servidor, e
   // renderizar "bloqueada" no SSR pintaria o aviso coral em quem nunca foi perguntado.
   const [permission, setPermission] = useState<PushStatus | null>(null);
@@ -42,6 +53,10 @@ export function useNotificacoes() {
   useEffect(() => {
     latestReminders.current = remindersData?.reminders ?? null;
   }, [remindersData]);
+  const latestRestAlert = useRef(restAlert);
+  useEffect(() => {
+    latestRestAlert.current = restAlert;
+  }, [restAlert]);
 
   /** A permissão é pedida ao ligar o primeiro toggle — depois da intenção declarada,
    *  que é quando as pessoas aceitam. Desligar o último devolve a subscription: sem
@@ -84,9 +99,35 @@ export function useNotificacoes() {
       // toggles em sequência rápida terminam fora de ordem, e o snapshot do
       // primeiro ainda veria o segundo ligado — reativaria o push com tudo desligado.
       const latest = latestReminders.current ?? next;
-      await syncPush(latest.some((r) => r.enabled));
+      await syncPush(latest.some((r) => r.enabled) || latestRestAlert.current);
     },
     [remindersData, setReminders, syncPush],
+  );
+
+  /** O aviso de descanso também é motivo para manter o push: desligá-lo só devolve a
+   *  subscription se nenhum lembrete estiver ligado. */
+  const setRestAlert = useCallback(
+    async (next: boolean) => {
+      const current = profileData;
+      if (!current || current.profile.restAlert === next) return;
+
+      setProfile({ profile: { ...current.profile, restAlert: next } });
+      latestRestAlert.current = next;
+      try {
+        await api.patch("/api/profile", { restAlert: next });
+      } catch (e) {
+        setProfile(current);
+        latestRestAlert.current = current.profile.restAlert;
+        toastError(e, "Não foi possível salvar o aviso de descanso");
+        return;
+      }
+
+      // Estado MAIS RECENTE, como em `setEnabled`: dois toques rápidos terminam fora
+      // de ordem, e o `next` deste toque pode já ter sido desfeito pelo seguinte.
+      const anyReminder = (latestReminders.current ?? []).some((r) => r.enabled);
+      await syncPush(anyReminder || latestRestAlert.current);
+    },
+    [profileData, setProfile, syncPush],
   );
 
   const setTime = useCallback(
@@ -130,18 +171,23 @@ export function useNotificacoes() {
     permission,
     // Os lembretes nascem ligados, então o toggle (que hoje pede a permissão) pode
     // nunca ser tocado: sem este convite o aparelho jamais se registraria.
-    askActivation: permission === "default" && reminders.some((r) => r.enabled),
+    askActivation:
+      permission === "default" && (reminders.some((r) => r.enabled) || restAlert),
     activate: useCallback(() => syncPush(true), [syncPush]),
 
-    // `ready` só com os DOIS recursos em mãos: sem os remédios a linha de remédios
-    // piscaria habilitada antes de descobrir que não há cadastro.
-    ready: remindersData !== null && medsData !== null,
-    error: remindersError ?? medsError,
+    // `ready` só com os TRÊS recursos em mãos: sem os remédios a linha de remédios
+    // piscaria habilitada antes de descobrir que não há cadastro; sem o profile, o
+    // toggle do descanso piscaria no default.
+    ready: remindersData !== null && medsData !== null && profileData !== null,
+    error: remindersError ?? medsError ?? profileError,
     reload: useCallback(() => {
       reloadReminders();
       reloadMeds();
-    }, [reloadReminders, reloadMeds]),
+      reloadProfile();
+    }, [reloadReminders, reloadMeds, reloadProfile]),
 
+    restAlert,
+    setRestAlert,
     setEnabled,
     setTime,
     openSheet: useCallback((id: string) => setSheetId(id), []),

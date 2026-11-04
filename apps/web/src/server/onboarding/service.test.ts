@@ -5,7 +5,9 @@ import { goal } from "@bloomy/db/schema/goals";
 
 import { DEFAULT_GOAL_TARGETS, type OnboardingBody } from "@/lib/api-types";
 import { ensureGoals } from "@/server/goals/service";
+import { listWeights } from "@/server/health/weight";
 import { ensureProfile } from "@/server/profile/service";
+import { dayFor } from "@/server/shared/day";
 import { cleanupTestDbs, createTestDb, createTestUser } from "@/server/shared/test-db";
 
 import { completeOnboarding, isOnboarded } from "./service";
@@ -133,4 +135,53 @@ describe("completeOnboarding", () => {
 
     expect(result).toEqual({ ok: false, reason: "out_of_range" });
   });
+});
+
+describe("completeOnboarding — dados do corpo", () => {
+  const BODY = { heightCm: 165, weightGrams: 62_500, birthDate: "1995-03-14" };
+
+  test("grava altura, nascimento e a pesagem de hoje", async () => {
+    const db = await createTestDb();
+    const userId = await createTestUser(db);
+
+    const { profile } = await complete(db, userId, { ...INPUT, ...BODY });
+
+    expect(profile.heightCm).toBe(165);
+    expect(profile.birthDate).toBe("1995-03-14");
+    const weights = await listWeights(db, userId);
+    expect(weights).toHaveLength(1);
+    expect(weights[0].grams).toBe(62_500);
+    expect(weights[0].day).toBe(dayFor());
+  });
+
+  test("sem os campos não grava pesagem nem dados do corpo", async () => {
+    const db = await createTestDb();
+    const userId = await createTestUser(db);
+
+    const { profile } = await complete(db, userId);
+
+    expect(profile.heightCm).toBeNull();
+    expect(profile.birthDate).toBeNull();
+    expect(await listWeights(db, userId)).toHaveLength(0);
+  });
+
+  const outOfRange: [string, Partial<OnboardingBody>][] = [
+    ["altura abaixo de 100 cm", { heightCm: 99 }],
+    ["peso abaixo de 20 kg", { weightGrams: 19_999 }],
+    ["nascimento no futuro", { birthDate: dayFor(new Date(Date.now() + 86_400_000)) }],
+    ["nascimento antes de 1900", { birthDate: "1899-12-31" }],
+  ];
+
+  for (const [label, patch] of outOfRange) {
+    test(`recusa ${label} sem persistir nada`, async () => {
+      const db = await createTestDb();
+      const userId = await createTestUser(db);
+
+      const result = await completeOnboarding(db, userId, { ...INPUT, ...patch });
+
+      expect(result).toEqual({ ok: false, reason: "out_of_range" });
+      expect(await isOnboarded(db, userId)).toBe(false);
+      expect(await listWeights(db, userId)).toHaveLength(0);
+    });
+  }
 });
