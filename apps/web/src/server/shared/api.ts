@@ -28,7 +28,11 @@ async function devUser(): Promise<SessionUser | null> {
 
   if (devUserCache === undefined) {
     const rows = await db
-      .select({ id: userTable.id, name: userTable.name, image: userTable.image })
+      .select({
+        id: userTable.id,
+        name: userTable.name,
+        image: userTable.image,
+      })
       .from(userTable)
       .where(eq(userTable.email, email))
       .limit(1);
@@ -51,12 +55,25 @@ export async function requireUserId(request: Request): Promise<string | null> {
 }
 
 /** Como `requireUserId`, mas também traz o nome — a Hoje saúda pelo primeiro nome. */
-export async function requireUser(request: Request): Promise<SessionUser | null> {
+export async function requireUser(
+  request: Request,
+): Promise<SessionUser | null> {
   const session = await auth.api.getSession({ headers: request.headers });
   if (session) {
-    return { id: session.user.id, name: session.user.name, image: session.user.image ?? null };
+    return {
+      id: session.user.id,
+      name: session.user.name,
+      image: session.user.image ?? null,
+    };
   }
   return devUser();
+}
+
+export async function requireSessionUserId(
+  request: Request,
+): Promise<string | null> {
+  const session = await auth.api.getSession({ headers: request.headers });
+  return session?.user.id ?? null;
 }
 
 /** Lê o corpo JSON com segurança; body malformado vira `undefined` (→ zod 400, não 500). */

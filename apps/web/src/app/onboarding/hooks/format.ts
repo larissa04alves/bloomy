@@ -1,5 +1,10 @@
 import { DEFAULT_GOAL_TARGETS, type OnboardingBody } from "@/lib/api-types";
-import { BIRTH_DATE_MIN, HEIGHT_CM_LIMITS, WEIGHT_GRAMS_LIMITS } from "@/lib/body";
+import {
+  BIRTH_DATE_MIN,
+  HEIGHT_CM_LIMITS,
+  parseBrDate,
+  WEIGHT_GRAMS_LIMITS,
+} from "@/lib/body";
 import { parseKg, recommendedWaterMl } from "@/lib/water";
 import { dayFor } from "@/server/shared/day";
 
@@ -48,23 +53,6 @@ export function nextStep(step: OnboardingStep, askPush: boolean): OnboardingStep
 export function skipTarget(step: OnboardingStep, askPush: boolean): OnboardingStep | "finish" {
   if (step === 1) return 2;
   return step < 5 && askPush ? 5 : "finish";
-}
-
-/** Máscara do nascimento: só dígitos, com as barras de `dd/mm/aaaa`. Campo de texto e
- *  não `type="date"`, porque o nativo segue o idioma do navegador (mm/dd em inglês). */
-export function maskBirthDate(raw: string): string {
-  const d = raw.replace(/\D/g, "").slice(0, 8);
-  return [d.slice(0, 2), d.slice(2, 4), d.slice(4)].filter(Boolean).join("/");
-}
-
-/** `dd/mm/aaaa` → `AAAA-MM-DD`, ou `null` se incompleta ou inexistente (31/02). */
-export function parseBrDate(raw: string): string | null {
-  const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(raw.trim());
-  if (!m) return null;
-  const [, dd, mm, yyyy] = m;
-  const date = new Date(Date.UTC(Number(yyyy), Number(mm) - 1, Number(dd)));
-  if (date.getUTCDate() !== Number(dd) || date.getUTCMonth() !== Number(mm) - 1) return null;
-  return `${yyyy}-${mm}-${dd}`;
 }
 
 function parseCm(raw: string): number | null {

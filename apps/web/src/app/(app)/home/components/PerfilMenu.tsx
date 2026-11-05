@@ -4,11 +4,9 @@ import {
   BellIcon,
   SignOutIcon,
   TargetIcon,
-  UserIcon,
+  UserCircleIcon,
 } from "@phosphor-icons/react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
 
 import {
   DropdownMenu,
@@ -18,56 +16,16 @@ import {
   DropdownMenuTrigger,
 } from "@bloomy/ui/components/dropdown-menu";
 
-import { authClient } from "@/lib/auth-client";
-import { disablePush } from "@/lib/push";
-import { toastError } from "@/lib/toast";
+import { Avatar } from "@/components/avatar";
+import { useSignOut } from "@/lib/use-sign-out";
 
 /** Chip de ícone de cada item: quadrado tint com o ícone na variante profunda
  *  do matiz (Regra do Tint + Profundo). */
 const CHIP = "grid size-7 shrink-0 place-items-center rounded-xl";
 const ITEM = "gap-2.5 rounded-control px-2 py-2.5 text-sm font-semibold";
 
-/** Foto do Google quando existe e carrega; senão a inicial do nome; sem nome, ícone.
- *  `<img>` cru em vez de `next/image`: o host da foto varia (lh3, lh4…) e o avatar
- *  é decorativo — não compensa manter `remotePatterns`. `referrerPolicy` porque o
- *  CDN do Google devolve 403 quando o Referer é uma origem que ele não conhece.
- *  Quem renderiza passa `key={image}`: URL nova remonta e zera `broken` sem efeito. */
-function Avatar({
-  name,
-  image,
-  size,
-}: {
-  name: string | null;
-  image: string | null;
-  size: "lg" | "sm";
-}) {
-  const [broken, setBroken] = useState(false);
-  const initial = name?.trim().charAt(0).toUpperCase() ?? "";
-  const dims = size === "lg" ? "size-11.5 text-lg" : "size-8 text-sm";
-
-  if (image && !broken) {
-    return (
-      <img
-        src={image}
-        alt=""
-        referrerPolicy="no-referrer"
-        onError={() => setBroken(true)}
-        className={`${dims} shrink-0 rounded-full object-cover`}
-      />
-    );
-  }
-  return (
-    <span
-      className={`grid ${dims} shrink-0 place-items-center rounded-full bg-lilac font-display font-bold text-white`}
-    >
-      {initial || <UserIcon size={size === "lg" ? 22 : 16} weight="fill" />}
-    </span>
-  );
-}
-
 export function PerfilMenu({ name, image }: { name: string | null; image: string | null }) {
-  const router = useRouter();
-  const [signingOut, setSigningOut] = useState(false);
+  const { signingOut, signOut } = useSignOut();
 
   return (
     <DropdownMenu>
@@ -90,21 +48,19 @@ export function PerfilMenu({ name, image }: { name: string | null; image: string
           <span aria-hidden="true" className="contents">
             <Avatar key={image ?? "none"} name={name} image={image} size="sm" />
           </span>
-          <span className="min-w-0">
-            <span className="block truncate font-display text-sm font-bold text-ink">
-              {name ?? "Seu perfil"}
-            </span>
-            {/* Sem nome na sessão o título já diz "Seu perfil" — repetir aqui
-                deixaria a faixa com a mesma frase duas vezes. */}
-            {name ? (
-              <span className="block text-xs font-bold text-lilac-deep">
-                Seu perfil
-              </span>
-            ) : null}
+          <span className="block min-w-0 truncate font-display text-sm font-bold text-ink">
+            {name ?? "Seu perfil"}
           </span>
         </div>
 
         <div className="p-2">
+          <DropdownMenuItem render={<Link href="/perfil" />} className={ITEM}>
+            <span className={`${CHIP} bg-lilac-tint-soft text-lilac-deep`}>
+              <UserCircleIcon size={16} weight="fill" />
+            </span>
+            Perfil
+          </DropdownMenuItem>
+
           <DropdownMenuItem render={<Link href="/metas" />} className={ITEM}>
             <span className={`${CHIP} bg-lilac-tint-soft text-lilac-deep`}>
               <TargetIcon size={16} weight="fill" />
@@ -128,31 +84,7 @@ export function PerfilMenu({ name, image }: { name: string | null; image: string
             variant="destructive"
             className={`${ITEM} text-coral focus:bg-coral-tint focus:text-coral`}
             disabled={signingOut}
-            onClick={async () => {
-              setSigningOut(true);
-              try {
-                // Devolve a subscription deste aparelho antes de sair: num celular
-                // compartilhado, a próxima conta não pode receber os lembretes desta.
-                // Falha aqui (rede) não pode barrar o logout — escolha consciente: o
-                // pior caso é a linha sobrar até o próximo toggle neste aparelho.
-                await disablePush().catch(() => {});
-                // O better-auth devolve `{ error }` em falha HTTP em vez de lançar —
-                // só o erro de rede cai no catch. Sem checar, um 500 mandaria a pessoa
-                // pro /login achando que saiu, com a sessão ainda válida.
-                const { error } = await authClient.signOut();
-                if (error) {
-                  setSigningOut(false);
-                  toastError(error, "Não foi possível sair. Tente de novo.");
-                  return;
-                }
-                router.replace("/login");
-                // sem reset no sucesso: a navegação desmonta o menu antes que o
-                // rótulo tenha chance de piscar de volta pra "Sair".
-              } catch (e) {
-                setSigningOut(false);
-                toastError(e, "Não foi possível sair. Tente de novo.");
-              }
-            }}
+            onClick={() => void signOut()}
           >
             <span className={`${CHIP} bg-coral-tint text-coral`}>
               <SignOutIcon size={16} weight="fill" />

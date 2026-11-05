@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
 import { api } from "@/lib/api";
+import { maskBirthDate } from "@/lib/body";
 import { enablePush, pushStatus } from "@/lib/push";
 import {
   DEFAULT_GOAL_TARGETS,
@@ -16,7 +17,6 @@ import { toastError } from "@/lib/toast";
 import {
   applyBodyStep,
   bodyErrors,
-  maskBirthDate,
   skipBodyStep,
   visibleErrors,
   type BodyField,

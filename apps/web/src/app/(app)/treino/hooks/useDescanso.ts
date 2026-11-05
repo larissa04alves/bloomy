@@ -4,8 +4,15 @@ import { useCallback, useEffect, useState } from "react";
 
 import { api } from "@/lib/api";
 import type { Profile } from "@/lib/api-types";
+import {
+  clearLegacyAutoRest,
+  effectiveAutoRest,
+  readLegacyAutoRest,
+} from "@/lib/legacy-auto-rest";
 import { cancelRestAlarm, scheduleRestAlarm } from "@/lib/rest-alarm";
 import { playRestEndTone, primeRestTone, vibrateRestEnd } from "@/lib/rest-alert";
+import { toastError } from "@/lib/toast";
+import { useLegacyAutoRestMigration } from "@/lib/use-legacy-auto-rest";
 import { useResource } from "@/lib/use-resource";
 
 import {
@@ -17,7 +24,6 @@ import {
   type RestPrefs,
   restLeft,
   saveActiveRest,
-  saveRestPrefs,
 } from "./rest";
 
 type ActiveRest = { endsAt: number; total: number };
@@ -28,14 +34,60 @@ const TICK_MS = 250;
 /** Descanso entre séries. O tempo vem de `endsAt` (hora do fim), não de um contador:
  *  com a tela apagada o JS para, e ao voltar o restante sai certo do relógio. */
 export function useDescanso(sessionId: string | null) {
-  const [prefs, setPrefs] = useState<RestPrefs>(() => loadRestPrefs());
+  const [prefs] = useState<RestPrefs>(() => loadRestPrefs());
   const [rest, setRest] = useState<ActiveRest | null>(null);
   const [now, setNow] = useState(() => Date.now());
-  // "Aviso de fim do descanso" (tela Notificações). Até carregar vale o default, ligado.
-  const { data: profileData } = useResource<{ profile: Profile }>(
+  const {
+    data: profileData,
+    setData: setProfile,
+    reload: reloadProfile,
+  } = useResource<{ profile: Profile }>(
     useCallback(() => api.get<{ profile: Profile }>("/api/profile"), []),
   );
+  const [legacyAuto] = useState(() => readLegacyAutoRest());
+  // Escolha feita sem profile carregado: segura o toggle até a conta refletir.
+  const [autoOverride, setAutoOverride] = useState<boolean | null>(null);
   const restAlert = profileData?.profile.restAlert ?? true;
+  const auto = effectiveAutoRest(autoOverride, profileData?.profile.autoRest ?? null, legacyAuto);
+
+  const setAuto = useCallback(
+    async (next: boolean) => {
+      const previous = profileData?.profile.autoRest;
+      if (previous === undefined) {
+        // Sem profile: o PATCH cria a linha (`ensureProfile`) e o reload a traz.
+        if (auto === next) return;
+        const previousOverride = autoOverride;
+        setAutoOverride(next);
+        try {
+          await api.patch("/api/profile", { autoRest: next });
+          clearLegacyAutoRest();
+          reloadProfile();
+        } catch (e) {
+          setAutoOverride(previousOverride);
+          toastError(e, "Não foi possível salvar o descanso automático");
+        }
+        return;
+      }
+      if (previous === next && autoOverride === null) return;
+      setAutoOverride(null);
+      setProfile((d) => d && { profile: { ...d.profile, autoRest: next } });
+      try {
+        await api.patch("/api/profile", { autoRest: next });
+        clearLegacyAutoRest();
+      } catch (e) {
+        // Volta só este campo, sobre o estado mais recente: outro save em voo fica.
+        setProfile((d) => d && { profile: { ...d.profile, autoRest: previous } });
+        toastError(e, "Não foi possível salvar o descanso automático");
+      }
+    },
+    [profileData, setProfile, auto, autoOverride, reloadProfile],
+  );
+
+  // Com escolha local de pé, a chave antiga não pode sobrescrevê-la ao carregar.
+  useLegacyAutoRestMigration(
+    autoOverride === null ? (profileData?.profile.autoRest ?? null) : null,
+    setAuto,
+  );
 
   const persist = useCallback(
     (next: ActiveRest | null) => {
@@ -92,7 +144,7 @@ export function useDescanso(sessionId: string | null) {
   // Inicia o descanso. `seconds` = descanso do exercício ativo; sem valor usa o default.
   const start = useCallback(
     (seconds?: number) => {
-      if (!prefs.auto) return;
+      if (!auto) return;
       primeRestTone(); // dentro do toque em "concluir série"
       const total = clampRest(seconds ?? prefs.seconds);
       const t = Date.now();
@@ -102,7 +154,7 @@ export function useDescanso(sessionId: string | null) {
       persist(next);
       if (restAlert) void scheduleRestAlarm(next.endsAt);
     },
-    [prefs.auto, prefs.seconds, persist, restAlert],
+    [auto, prefs.seconds, persist, restAlert],
   );
 
   // Ajusta o descanso corrente (contagem + anel), sem mexer no default global.
@@ -120,19 +172,11 @@ export function useDescanso(sessionId: string | null) {
     [rest, persist, restAlert],
   );
 
-  const setAuto = useCallback((auto: boolean) => {
-    setPrefs((p) => {
-      const np = { ...p, auto };
-      saveRestPrefs(np);
-      return np;
-    });
-  }, []);
-
   return {
     resting: rest !== null,
     left: rest ? (restLeft(rest.endsAt, now) ?? 0) : 0,
     seconds: rest?.total ?? REST_DEFAULT,
-    auto: prefs.auto,
+    auto,
     start,
     stop,
     adjust,
