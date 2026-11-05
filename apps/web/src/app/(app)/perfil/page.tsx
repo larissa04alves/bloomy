@@ -1,0 +1,94 @@
+"use client";
+
+import { ArrowLeftIcon } from "@phosphor-icons/react";
+import Link from "next/link";
+
+import { AlturaSheet } from "./components/AlturaSheet";
+import { ContaSection } from "./components/ContaSection";
+import { ExcluirContaSheet } from "./components/ExcluirContaSheet";
+import { IdentidadeCard } from "./components/IdentidadeCard";
+import { NascimentoSheet } from "./components/NascimentoSheet";
+import { PerfilError } from "./components/PerfilError";
+import { PerfilSkeleton } from "./components/PerfilSkeleton";
+import { SobreVoceSection } from "./components/SobreVoceSection";
+import { TreinoSection } from "./components/TreinoSection";
+import { usePerfil } from "./hooks/usePerfil";
+
+export default function PerfilPage() {
+  const perfil = usePerfil();
+
+  if (!perfil.ready) {
+    if (perfil.error) return <PerfilError onRetry={perfil.reload} />;
+    return <PerfilSkeleton />;
+  }
+
+  return (
+    <div className="flex flex-col gap-4 px-5.5 pt-6 pb-4">
+      <header className="flex items-center justify-between">
+        <Link
+          href="/home"
+          aria-label="Voltar"
+          className="grid size-9.5 place-items-center rounded-control bg-lilac-tint-soft text-lilac-deep"
+        >
+          <ArrowLeftIcon size={18} weight="bold" />
+        </Link>
+        <h1 className="font-display text-lg font-bold text-ink">Seu perfil</h1>
+        <span className="size-9.5" aria-hidden="true" />
+      </header>
+
+      <IdentidadeCard
+        name={perfil.account.name}
+        email={perfil.account.email}
+        image={perfil.account.image}
+      />
+
+      <SobreVoceSection
+        heightPill={perfil.heightPill}
+        birthPill={perfil.birthPill}
+        ageLabel={perfil.ageLabel}
+        onEditHeight={() => perfil.openSheet("height")}
+        onEditBirthDate={() => perfil.openSheet("birthDate")}
+      />
+
+      <TreinoSection
+        autoRest={perfil.autoRest}
+        onAutoRestChange={(next) => void perfil.setAutoRest(next)}
+        restAlert={perfil.restAlert}
+        onRestAlertChange={(next) => void perfil.setRestAlert(next)}
+      />
+
+      <ContaSection
+        signingOut={perfil.signingOut}
+        onSignOut={() => void perfil.signOut()}
+        onDelete={() => perfil.openSheet("deleteAccount")}
+      />
+
+      <AlturaSheet
+        open={perfil.isOpen("height")}
+        onOpenChange={(open) => perfil.setSheetOpen("height", open)}
+        value={perfil.heightDraft}
+        onChange={perfil.setHeightDraft}
+        onSave={perfil.submitHeight}
+      />
+
+      <NascimentoSheet
+        open={perfil.isOpen("birthDate")}
+        onOpenChange={(open) => perfil.setSheetOpen("birthDate", open)}
+        value={perfil.birthRaw}
+        onChange={perfil.setBirthRaw}
+        canSave={perfil.canSaveBirth}
+        onSave={perfil.submitBirthDate}
+      />
+
+      <ExcluirContaSheet
+        open={perfil.isOpen("deleteAccount")}
+        onOpenChange={(open) => perfil.setSheetOpen("deleteAccount", open)}
+        value={perfil.deletePhrase}
+        onChange={perfil.setDeletePhrase}
+        canDelete={perfil.canDelete}
+        deleting={perfil.deleting}
+        onDelete={() => void perfil.deleteAccount()}
+      />
+    </div>
+  );
+}

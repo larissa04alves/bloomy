@@ -98,7 +98,7 @@ describe("descanso ativo salvo", () => {
 
 describe("loadRestPrefs", () => {
   it("retorna os defaults sem window (SSR)", () => {
-    expect(loadRestPrefs()).toEqual({ seconds: REST_DEFAULT, auto: true });
+    expect(loadRestPrefs()).toEqual({ seconds: REST_DEFAULT });
   });
 
   // Simula o navegador: injeta window.localStorage com um store controlado.
@@ -117,9 +117,9 @@ describe("loadRestPrefs", () => {
     }
   }
 
-  it("seconds ausente → default; auto default true", () => {
+  it("seconds ausente → default", () => {
     withStore({}, () => {
-      expect(loadRestPrefs()).toEqual({ seconds: REST_DEFAULT, auto: true });
+      expect(loadRestPrefs()).toEqual({ seconds: REST_DEFAULT });
     });
   });
 
@@ -135,12 +135,6 @@ describe("loadRestPrefs", () => {
     });
     withStore({ "bloomy.rest.seconds": "999" }, () => {
       expect(loadRestPrefs().seconds).toBe(REST_MAX);
-    });
-  });
-
-  it("auto lido do store", () => {
-    withStore({ "bloomy.rest.auto": "false" }, () => {
-      expect(loadRestPrefs().auto).toBe(false);
     });
   });
 });

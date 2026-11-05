@@ -128,3 +128,15 @@ export async function disablePush(): Promise<void> {
   }
   await subscription.unsubscribe();
 }
+
+/** Sem API: roda após excluir a conta, com a linha já apagada no cascade e a sessão morta (401). */
+export async function unsubscribeLocalPush(): Promise<void> {
+  if (typeof window === "undefined" || !("serviceWorker" in navigator)) return;
+  try {
+    const registration = await navigator.serviceWorker.getRegistration(SW_PATH);
+    const subscription = await registration?.pushManager.getSubscription();
+    await subscription?.unsubscribe();
+  } catch {
+    /* nada a fazer: a conta já foi excluída */
+  }
+}

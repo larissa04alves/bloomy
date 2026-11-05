@@ -4,8 +4,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { api } from "@/lib/api";
 import type { Medication, Profile, Reminder } from "@/lib/api-types";
-import { disablePush, enablePush, pushStatus, type PushStatus } from "@/lib/push";
 import { toastError } from "@/lib/toast";
+import { usePushSync } from "@/lib/use-push-sync";
 import { useResource } from "@/lib/use-resource";
 import { DEFAULT_TIME, hasOwnTime } from "@/server/reminders/slots";
 
@@ -40,12 +40,7 @@ export function useNotificacoes() {
   );
   const restAlert = profileData?.profile.restAlert ?? true;
 
-  // `null` até o primeiro efeito: `Notification.permission` não existe no servidor, e
-  // renderizar "bloqueada" no SSR pintaria o aviso coral em quem nunca foi perguntado.
-  const [permission, setPermission] = useState<PushStatus | null>(null);
-  useEffect(() => {
-    setPermission(pushStatus());
-  }, []);
+  const { permission, syncPush } = usePushSync();
 
   // Espelho do estado otimista mais recente, para quem acorda depois de um `await`
   // e precisa decidir com o que a tela mostra agora, não com o que via ao começar.
@@ -57,25 +52,6 @@ export function useNotificacoes() {
   useEffect(() => {
     latestRestAlert.current = restAlert;
   }, [restAlert]);
-
-  /** A permissão é pedida ao ligar o primeiro toggle — depois da intenção declarada,
-   *  que é quando as pessoas aceitam. Desligar o último devolve a subscription: sem
-   *  lembrete ligado não há motivo para o servidor guardar o endpoint deste aparelho. */
-  const syncPush = useCallback(async (anyEnabled: boolean) => {
-    try {
-      if (anyEnabled) setPermission(await enablePush());
-      else await disablePush();
-    } catch (e) {
-      // A preferência já foi salva; o que falhou foi só o registro do aparelho.
-      toastError(
-        e,
-        anyEnabled
-          ? "Não foi possível ativar as notificações neste aparelho"
-          : "Não foi possível desativar as notificações neste aparelho",
-      );
-      setPermission(pushStatus());
-    }
-  }, []);
 
   const setEnabled = useCallback(
     async (id: string, enabled: boolean) => {
