@@ -64,6 +64,11 @@ describe("revertPatch", () => {
       restAlert: true,
     });
   });
+  it("não desfaz um save mais novo da mesma chave", () => {
+    const before = { heightCm: 160 };
+    const latest = { heightCm: 180 };
+    expect(revertPatch(latest, { heightCm: 170 }, before)).toEqual({ heightCm: 180 });
+  });
   it("não muta o estado recebido", () => {
     const latest = { autoRest: false };
     revertPatch(latest, { autoRest: false }, { autoRest: true });

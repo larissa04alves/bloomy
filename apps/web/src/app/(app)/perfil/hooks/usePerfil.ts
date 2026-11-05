@@ -171,7 +171,7 @@ export function usePerfil() {
   }, [deletePhrase, deleting, router]);
 
   return {
-    ready: profileData !== null && !session.isPending,
+    ready: profileData !== null && !session.isPending && !session.error,
     error: profileError ?? session.error ?? null,
     reload: useCallback(() => {
       reloadProfile();

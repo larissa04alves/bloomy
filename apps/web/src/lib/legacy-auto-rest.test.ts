@@ -36,8 +36,11 @@ describe("effectiveAutoRest", () => {
   it("a escolha feita nesta sessão vence tudo", () => {
     expect(effectiveAutoRest(false, true, "true")).toBe(false);
   });
-  it("sem escolha local vale a conta, mesmo com chave antiga diferente", () => {
-    expect(effectiveAutoRest(null, false, "true")).toBe(false);
+  it("chave antiga ainda não migrada vence a conta", () => {
+    expect(effectiveAutoRest(null, true, "false")).toBe(false);
+  });
+  it("sem chave antiga vale a conta", () => {
+    expect(effectiveAutoRest(null, false, null)).toBe(false);
   });
   it("sem conta (carregando ou falhou) vale a chave antiga, provisória", () => {
     expect(effectiveAutoRest(null, null, "false")).toBe(false);
@@ -76,6 +79,21 @@ describe("ler/apagar a chave", () => {
   });
   it("sem window (SSR) lê null e apagar não quebra", () => {
     expect(readLegacyAutoRest()).toBeNull();
-    clearLegacyAutoRest();
+    expect(() => clearLegacyAutoRest()).not.toThrow();
+  });
+  it("storage bloqueado lê null e apagar não quebra", () => {
+    const g = globalThis as { window?: unknown };
+    const original = g.window;
+    g.window = {
+      get localStorage(): never {
+        throw new Error("SecurityError");
+      },
+    };
+    try {
+      expect(readLegacyAutoRest()).toBeNull();
+      expect(() => clearLegacyAutoRest()).not.toThrow();
+    } finally {
+      g.window = original;
+    }
   });
 });

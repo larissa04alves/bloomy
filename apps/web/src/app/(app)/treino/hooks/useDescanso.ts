@@ -44,43 +44,31 @@ export function useDescanso(sessionId: string | null) {
   } = useResource<{ profile: Profile }>(
     useCallback(() => api.get<{ profile: Profile }>("/api/profile"), []),
   );
-  const [legacyAuto] = useState(() => readLegacyAutoRest());
-  // Escolha feita sem profile carregado: segura o toggle até a conta refletir.
+  const [legacyAuto, setLegacyAuto] = useState(() => readLegacyAutoRest());
   const [autoOverride, setAutoOverride] = useState<boolean | null>(null);
   const restAlert = profileData?.profile.restAlert ?? true;
   const auto = effectiveAutoRest(autoOverride, profileData?.profile.autoRest ?? null, legacyAuto);
+  const hasProfile = profileData !== null;
 
   const setAuto = useCallback(
     async (next: boolean) => {
-      const previous = profileData?.profile.autoRest;
-      if (previous === undefined) {
-        // Sem profile: o PATCH cria a linha (`ensureProfile`) e o reload a traz.
-        if (auto === next) return;
-        const previousOverride = autoOverride;
-        setAutoOverride(next);
-        try {
-          await api.patch("/api/profile", { autoRest: next });
-          clearLegacyAutoRest();
-          reloadProfile();
-        } catch (e) {
-          setAutoOverride(previousOverride);
-          toastError(e, "Não foi possível salvar o descanso automático");
-        }
-        return;
-      }
-      if (previous === next && autoOverride === null) return;
-      setAutoOverride(null);
-      setProfile((d) => d && { profile: { ...d.profile, autoRest: next } });
+      if (auto === next) return;
+      const previousOverride = autoOverride;
+      setAutoOverride(next);
       try {
+        // Sem profile, o PATCH cria a linha (`ensureProfile`) e o reload a traz.
         await api.patch("/api/profile", { autoRest: next });
         clearLegacyAutoRest();
+        setLegacyAuto(null);
+        if (hasProfile) setProfile((d) => d && { profile: { ...d.profile, autoRest: next } });
+        else reloadProfile();
       } catch (e) {
-        // Volta só este campo, sobre o estado mais recente: outro save em voo fica.
-        setProfile((d) => d && { profile: { ...d.profile, autoRest: previous } });
+        // Só volta se nenhum toque mais novo mudou o valor enquanto este estava em voo.
+        setAutoOverride((current) => (current === next ? previousOverride : current));
         toastError(e, "Não foi possível salvar o descanso automático");
       }
     },
-    [profileData, setProfile, auto, autoOverride, reloadProfile],
+    [auto, autoOverride, hasProfile, setProfile, reloadProfile],
   );
 
   // Com escolha local de pé, a chave antiga não pode sobrescrevê-la ao carregar.

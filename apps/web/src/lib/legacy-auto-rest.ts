@@ -23,16 +23,23 @@ export function effectiveAutoRest(
   account: boolean | null,
   legacyRaw: string | null,
 ): boolean {
-  return override ?? account ?? parseLegacyAuto(legacyRaw) ?? true;
+  return override ?? parseLegacyAuto(legacyRaw) ?? account ?? true;
 }
 
+// Storage bloqueado lança SecurityError no acesso: vira "sem valor legado".
 export function readLegacyAutoRest(): string | null {
   if (typeof window === "undefined") return null;
-  return window.localStorage.getItem(KEY_AUTO);
+  try {
+    return window.localStorage.getItem(KEY_AUTO);
+  } catch {
+    return null;
+  }
 }
 
 /** Só depois que a conta guardou o valor: se o PATCH falhar, a chave fica para a próxima vez. */
 export function clearLegacyAutoRest(): void {
   if (typeof window === "undefined") return;
-  window.localStorage.removeItem(KEY_AUTO);
+  try {
+    window.localStorage.removeItem(KEY_AUTO);
+  } catch {}
 }

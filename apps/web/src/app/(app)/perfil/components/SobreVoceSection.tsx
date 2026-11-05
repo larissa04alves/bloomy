@@ -63,7 +63,7 @@ export function SobreVoceSection({
         title="Altura"
         subtitle={null}
         pill={heightPill}
-        editLabel="Editar altura"
+        editLabel={`Editar altura, ${heightPill}`}
         onEdit={onEditHeight}
       />
       <SobreVoceCard
@@ -71,7 +71,7 @@ export function SobreVoceSection({
         title="Nascimento"
         subtitle={ageLabel}
         pill={birthPill}
-        editLabel="Editar data de nascimento"
+        editLabel={`Editar data de nascimento, ${birthPill}`}
         onEdit={onEditBirthDate}
       />
     </section>

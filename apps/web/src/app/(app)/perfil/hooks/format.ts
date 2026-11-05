@@ -29,7 +29,9 @@ export function birthIso(raw: string, today: string = dayFor()): string | null {
 
 export function revertPatch<T extends object>(latest: T, patch: Partial<T>, before: T): T {
   const restored: Partial<T> = {};
-  for (const key of Object.keys(patch) as (keyof T)[]) restored[key] = before[key];
+  for (const key of Object.keys(patch) as (keyof T)[]) {
+    if (latest[key] === patch[key]) restored[key] = before[key];
+  }
   return { ...latest, ...restored };
 }
 
