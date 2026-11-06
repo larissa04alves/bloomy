@@ -371,14 +371,20 @@ export async function getCycleState(db: Db, userId: string, today: string): Prom
 
   let pill: CycleState["pill"] = null;
   if (method.kind === "pill") {
-    const [intake] = await db
-      .select({ id: cyclePillIntake.id })
-      .from(cyclePillIntake)
-      .where(and(eq(cyclePillIntake.userId, userId), eq(cyclePillIntake.day, today)));
+    const active = scheduled?.phase === "active";
+    const from = active ? addDays(today, -(scheduled!.pill - 1)) : today;
+    const days = (
+      await db
+        .select({ day: cyclePillIntake.day })
+        .from(cyclePillIntake)
+        .where(and(eq(cyclePillIntake.userId, userId), gte(cyclePillIntake.day, from), lte(cyclePillIntake.day, today)))
+        .orderBy(asc(cyclePillIntake.day))
+    ).map((r) => r.day);
     pill = {
-      due: mode === "continuous" || scheduled?.phase === "active",
-      taken: Boolean(intake),
+      due: mode === "continuous" || active,
+      taken: days.includes(today),
       time: method.pillTime ?? "",
+      takenDays: active ? days : [],
     };
   }
 

@@ -10,6 +10,7 @@ import {
   lateLabel,
   nextPauseLabel,
   pauseLabel,
+  pillDots,
   pillLabel,
   registroTitle,
   ringStops,
@@ -281,5 +282,36 @@ describe("todayEntry", () => {
   });
   it("dia sem registro fica vazio", () => {
     expect(todayEntry({ flow: null, symptoms: [] })).toBeNull();
+  });
+});
+
+describe("pillDots", () => {
+  // Cartela de 7 com hoje no comprimido 5 (06/11): 02/11 a 05/11 ficaram para trás.
+  const base = {
+    length: 7,
+    current: 5,
+    today: "2026-11-06",
+    startedOn: "2026-11-04",
+    takenDays: ["2026-11-05"],
+    takenToday: false,
+  };
+
+  it("dia antes do início do acompanhamento fica cheio", () => {
+    expect(pillDots(base).slice(0, 2)).toEqual(["taken", "taken"]);
+  });
+  it("dia passado sem toma vira missed", () => {
+    expect(pillDots(base)[2]).toBe("missed");
+  });
+  it("dia passado com toma fica taken", () => {
+    expect(pillDots(base)[3]).toBe("taken");
+  });
+  it("hoje marcado fica taken", () => {
+    expect(pillDots({ ...base, takenToday: true })[4]).toBe("taken");
+  });
+  it("hoje não marcado fica current", () => {
+    expect(pillDots(base)[4]).toBe("current");
+  });
+  it("futuro fica left", () => {
+    expect(pillDots(base).slice(5)).toEqual(["left", "left"]);
   });
 });

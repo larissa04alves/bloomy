@@ -25,6 +25,39 @@ export function rangeParts({ from, to }: { from: string; to: string }): [string,
   return [sameMonth ? String(parts(from).date) : dayMonth(from), dayMonth(to)];
 }
 
+export type PillDot = "taken" | "missed" | "current" | "left" | "pause-left";
+
+/** Bolinhas da cartela; `current` é a posição de hoje (1-based). Antes de `startedOn` não há
+ *  marcações para consultar, então esses dias contam como tomados. */
+export function pillDots({
+  length,
+  current,
+  today,
+  startedOn,
+  takenDays,
+  takenToday,
+}: {
+  length: number;
+  current: number;
+  today: string;
+  startedOn: string;
+  takenDays: string[];
+  takenToday: boolean;
+}): PillDot[] {
+  return Array.from({ length }, (_, i) => {
+    if (i === current - 1) return takenToday ? "taken" : "current";
+    if (i >= current) return "left";
+    const day = addDays(today, i - (current - 1));
+    return day < startedOn || takenDays.includes(day) ? "taken" : "missed";
+  });
+}
+
+export function pauseDots(length: number, current: number): PillDot[] {
+  return Array.from({ length }, (_, i) =>
+    i < current - 1 ? "taken" : i === current - 1 ? "current" : "pause-left",
+  );
+}
+
 export const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
 
 export function windowLabel(range: { from: string; to: string }): string {

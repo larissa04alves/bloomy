@@ -414,7 +414,8 @@ export type CycleState = {
   scheduled?: ReturnType<typeof pillPosition>;
   continuous?: ReturnType<typeof continuousSummary>;
   today: { flow: CycleFlow | null; symptoms: CycleSymptom[] };
-  pill: { due: boolean; taken: boolean; time: string } | null;
+  /** `takenDays`: dias com toma na cartela atual até hoje; vazio fora da fase ativa da pílula com pausa. */
+  pill: { due: boolean; taken: boolean; time: string; takenDays: string[] } | null;
   hiddenSymptoms: CycleSymptom[];
   methodHistory: { kind: CycleMethodKind; startedOn: string; endedOn: string | null }[];
 };

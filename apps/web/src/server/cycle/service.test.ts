@@ -71,7 +71,7 @@ describe("activateCycle + getCycleState", () => {
       usualLength: null,
       lastPeriodStart: null,
     });
-    expect(state?.pill).toEqual({ due: true, taken: false, time: "21:00" });
+    expect(state?.pill).toEqual({ due: true, taken: false, time: "21:00", takenDays: [] });
   });
 
   test("pill.due falso na pausa; âncora 'comecei a pausa' reancora", async () => {
@@ -98,7 +98,7 @@ describe("activateCycle + getCycleState", () => {
     const state = await getCycleState(db, userId, "2026-11-05");
     expect(state?.mode).toBe("continuous");
     expect(state?.continuous).toEqual({ lastBleed: null, daysSince: null, eventsLast180: 0 });
-    expect(state?.pill).toEqual({ due: true, taken: false, time: "08:00" });
+    expect(state?.pill).toEqual({ due: true, taken: false, time: "08:00", takenDays: [] });
     expect(state?.method).toMatchObject({ activeDays: 28, pauseEvery: null, pauseDays: null });
   });
 
@@ -589,6 +589,21 @@ describe("setPillTaken", () => {
     await setPillTaken(db, userId, "2026-11-05", false);
     await setPillTaken(db, userId, "2026-11-05", false);
     expect(await db.select().from(cyclePillIntake)).toHaveLength(0);
+  });
+
+  test("takenDays: tomas da cartela atual até hoje", async () => {
+    const db = await createTestDb();
+    const userId = await createTestUser(db);
+    const otherId = await createTestUser(db, "user-other");
+    await activateCycle(db, userId, PILL, "2026-11-05");
+    await activateCycle(db, otherId, PILL, "2026-11-05");
+
+    // Cartela 3 começou em 22/10: 21/10 é da cartela anterior.
+    for (const day of ["2026-10-21", "2026-11-06", "2026-11-08"]) await setPillTaken(db, userId, day, true);
+    await setPillTaken(db, otherId, "2026-11-07", true);
+
+    const state = await getCycleState(db, userId, "2026-11-08");
+    expect(state?.pill?.takenDays).toEqual(["2026-11-06", "2026-11-08"]);
   });
 
   test("sem pílula → not_pill", async () => {

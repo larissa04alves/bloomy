@@ -9,6 +9,7 @@ import type { CicloCard, PillDot } from "../hooks/useCiclo";
 
 const DOT: Record<PillDot, string> = {
   taken: "bg-peach-deep",
+  missed: "bg-white border border-dashed border-ink-faint",
   current: "bg-white ring-2 ring-peach-deep",
   left: "bg-white",
   "pause-left": "border border-dashed border-peach-deep/50",

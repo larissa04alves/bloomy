@@ -17,19 +17,22 @@ import {
   extendEffect,
   lateLabel,
   nextPauseLabel,
+  pauseDots,
   pauseLabel,
+  pillDots,
   pillLabel,
   ringStops,
   showExtend,
   startPauseEffect,
   summaryLabel,
   todayEntry,
+  type PillDot,
   windowLabel,
 } from "./format";
 
 export const AJUSTES_HREF: Route = "/perfil#ciclo";
 
-export type PillDot = "taken" | "current" | "left" | "pause-left";
+export type { PillDot };
 
 export type CicloCard =
   | {
@@ -56,25 +59,29 @@ export type AnchorKind = CycleAnchorBody["kind"];
 
 const BLEEDING: CycleFlow[] = ["light", "medium", "heavy"];
 
-function dots(length: number, current: number, rest: PillDot): PillDot[] {
-  return Array.from({ length }, (_, i) =>
-    i < current - 1 ? "taken" : i === current - 1 ? "current" : rest,
-  );
-}
-
 function buildCard(cycle: CycleState, today: string): CicloCard {
   const { kind, activeDays: pillActiveDays } = cycle.method;
   const s = cycle.scheduled;
   if (s) {
     if (s.phase === "pause") {
       const length = Math.max(1, cycle.method.pauseDays ?? 1);
-      return { kind: "pause", ...pauseLabel(s, kind), dots: dots(length, s.pauseDay ?? 1, "pause-left") };
+      return { kind: "pause", ...pauseLabel(s, kind), dots: pauseDots(length, s.pauseDay ?? 1) };
     }
     const activeDays = activeDaysFor(kind, pillActiveDays) ?? 21;
     return {
       kind: "active",
       ...pillLabel(s, kind, activeDays),
-      dots: kind === "pill" ? dots(activeDays, s.pill, "left") : null,
+      dots:
+        kind === "pill"
+          ? pillDots({
+              length: activeDays,
+              current: s.pill,
+              today,
+              startedOn: cycle.method.startedOn,
+              takenDays: cycle.pill?.takenDays ?? [],
+              takenToday: cycle.pill?.taken ?? false,
+            })
+          : null,
       units: Array.from({ length: s.units }, (_, i) =>
         i < s.unit - 1 ? 1 : i === s.unit - 1 ? s.pill / activeDays : 0,
       ),
