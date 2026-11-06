@@ -168,6 +168,20 @@ export function pillPosition(
   };
 }
 
+/** Dias em que "comecei a pausa" pode cair: da unidade atual (ou da que a pausa atual encerrou) até hoje. */
+export function pauseStartRange(
+  position: Pick<ReturnType<typeof pillPosition>, "phase" | "pill" | "pauseDay">,
+  today: string,
+  sequenceStart: string,
+): { min: string; max: string } {
+  const unitStart =
+    position.phase === "pause"
+      ? addDays(addDays(today, -((position.pauseDay ?? 1) - 1)), -position.pill)
+      : addDays(today, -(position.pill - 1));
+  // buildSequence ignora âncora antes do início da sequência.
+  return { min: unitStart < sequenceStart ? sequenceStart : unitStart, max: today };
+}
+
 export function pillSequences(
   method: ScheduledMethod,
   anchors: Anchor[],

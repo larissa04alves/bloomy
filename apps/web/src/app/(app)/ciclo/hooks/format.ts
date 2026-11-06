@@ -3,6 +3,7 @@ import {
   CYCLE_SYMPTOMS,
   type CycleFlow,
   type CycleMethodKind,
+  type CycleSymptom,
   METHOD_LABELS,
 } from "@/lib/cycle";
 import { addDays, daysBetween } from "@/server/shared/day";
@@ -184,12 +185,34 @@ export function flowTitle(flow: CycleFlow): string {
   return FLOW_TITLES[flow];
 }
 
-export function todayEntry(today: CycleState["today"]): { flow: string | null; symptoms: string[] } | null {
+const FLOW_SHORT: Record<CycleFlow, string> = {
+  none: "Nenhum",
+  spotting: "Escape",
+  light: "Leve",
+  medium: "Médio",
+  heavy: "Intenso",
+};
+
+const SHOWN_SYMPTOMS = 2;
+
+function symptomsSummary(ids: CycleSymptom[]): { text: string; more: number } {
+  const labels = ids.map((id) => CYCLE_SYMPTOMS[id]);
+  const shown = labels.slice(0, SHOWN_SYMPTOMS).map((label, i) => (i === 0 ? label : label.toLowerCase()));
+  return { text: shown.join(", "), more: Math.max(0, labels.length - SHOWN_SYMPTOMS) };
+}
+
+export function todayEntry(today: CycleState["today"]): { flow: string; symptoms: string; more: number } | null {
   if (!today.flow) return null;
-  const symptoms = today.symptoms.map((id) => CYCLE_SYMPTOMS[id]);
-  // O rascunho salva "só sintomas" como flow "none"; "Sem sangramento" só aparece no "Nada" sozinho.
-  const flow = today.flow !== "none" ? flowTitle(today.flow) : symptoms.length ? null : flowTitle("none");
-  return { flow, symptoms };
+  const { text, more } = symptomsSummary(today.symptoms);
+  return { flow: FLOW_SHORT[today.flow], symptoms: text || "Nenhum", more };
+}
+
+export function yesterdayLabel(yesterday: CycleState["yesterday"]): string | null {
+  if (!yesterday.flow) return null;
+  const { text, more } = symptomsSummary(yesterday.symptoms);
+  const symptoms = text && (more > 0 ? `${text} +${more}` : text);
+  if (yesterday.flow === "none") return symptoms || FLOW_TITLES.none;
+  return symptoms ? `${FLOW_TITLES[yesterday.flow]} · ${symptoms}` : FLOW_TITLES[yesterday.flow];
 }
 
 export function continuousLabel(state: CycleState): { title: string; detail: string; note: string } {

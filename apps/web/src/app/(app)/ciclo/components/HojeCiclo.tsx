@@ -1,7 +1,5 @@
 import { DropIcon, PencilSimpleIcon, PlusIcon } from "@phosphor-icons/react";
 
-import { IconChip } from "@/components/icon-chip";
-
 import type { CicloView } from "../hooks/useCiclo";
 
 export function HojeCiclo({
@@ -42,25 +40,21 @@ export function HojeCiclo({
           Editar
         </button>
       </div>
-      <div className="flex flex-col gap-3 rounded-card bg-white p-4 shadow-card-sm">
-        {entry.flow ? (
-          <div className="flex items-center gap-3">
-            <IconChip tone="peach" icon={<DropIcon size={20} weight="fill" />} />
-            <span className="text-sm font-bold text-ink">{entry.flow}</span>
-          </div>
-        ) : null}
-        {entry.symptoms.length > 0 ? (
-          <div className="flex flex-wrap gap-2">
-            {entry.symptoms.map((label) => (
-              <span
-                key={label}
-                className="rounded-full bg-peach-tint px-3 py-1.5 text-xs font-bold text-peach-deep"
-              >
-                {label}
-              </span>
-            ))}
-          </div>
-        ) : null}
+      <div className="grid grid-cols-2 gap-2">
+        <div className="flex flex-col gap-1 rounded-card bg-white p-3 shadow-card-sm">
+          <span className="text-xs font-bold text-ink-faint">Fluxo</span>
+          <span className="inline-flex items-center gap-1.5 text-sm font-bold text-ink">
+            <DropIcon weight="fill" className="text-peach-deep" />
+            {entry.flow}
+          </span>
+        </div>
+        <div className="flex flex-col gap-1 rounded-card bg-white p-3 shadow-card-sm">
+          <span className="text-xs font-bold text-ink-faint">Sintomas</span>
+          <span className="text-sm font-bold text-ink">
+            {entry.symptoms}
+            {entry.more > 0 ? <span className="text-ink-read"> +{entry.more}</span> : null}
+          </span>
+        </div>
       </div>
     </section>
   );

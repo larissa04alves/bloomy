@@ -32,6 +32,7 @@ export function DatePickerField({
   value,
   onChange,
   placeholder = "Escolha a data",
+  minDate,
   maxDate,
   tone = "lilac",
   typeable = false,
@@ -40,6 +41,7 @@ export function DatePickerField({
   value: Date | undefined;
   onChange: (date: Date | undefined) => void;
   placeholder?: string;
+  minDate?: Date;
   maxDate?: Date;
   tone?: "lilac" | "peach";
   /** Campo digitável (dd/mm/aaaa) com o ícone abrindo o calendário. */
@@ -110,7 +112,7 @@ export function DatePickerField({
     const masked = maskBirthDate(next);
     setRaw(masked);
     const date = parseTyped(masked);
-    onChange(date && (!maxDate || date <= maxDate) ? date : undefined);
+    onChange(date && (!minDate || date >= minDate) && (!maxDate || date <= maxDate) ? date : undefined);
   };
 
   return (
@@ -159,7 +161,12 @@ export function DatePickerField({
               />
               <div
                 style={{ position: "absolute", zIndex: 50, ...pos }}
-                className="rounded-card border border-hairline bg-white p-1 shadow-card"
+                className={cn(
+                  "rounded-card border border-hairline bg-white p-1 shadow-card",
+                  // O Calendar do shadcn pinta seleção e hoje com as variáveis do tema (lilás).
+                  tone === "peach" &&
+                    "[--muted:var(--color-peach-tint)] [--primary:var(--color-peach)] [--ring:var(--color-peach)]",
+                )}
               >
                 <Calendar
                   mode="single"
@@ -172,7 +179,10 @@ export function DatePickerField({
                   }}
                   locale={ptBR}
                   showOutsideDays
-                  disabled={maxDate ? { after: maxDate } : undefined}
+                  disabled={[
+                    ...(minDate ? [{ before: minDate }] : []),
+                    ...(maxDate ? [{ after: maxDate }] : []),
+                  ]}
                   components={{
                     Chevron: ({
                       orientation,

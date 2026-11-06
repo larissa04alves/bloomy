@@ -9,7 +9,7 @@ import type { CycleAnchorBody, CycleDayBody, CycleState, DayEntry } from "@/lib/
 import { activeDaysFor, ATIVAR_HREF, type CycleFlow, type CycleSymptom } from "@/lib/cycle";
 import { toastError } from "@/lib/toast";
 import { useResource } from "@/lib/use-resource";
-import { dayFor } from "@/server/shared/day";
+import { addDays, dayFor } from "@/server/shared/day";
 
 import {
   calendarHint,
@@ -28,6 +28,7 @@ import {
   todayEntry,
   type PillDot,
   windowLabel,
+  yesterdayLabel,
 } from "./format";
 
 export const AJUSTES_HREF: Route = "/perfil#ciclo";
@@ -58,6 +59,14 @@ export type RegistroInitial = { flow: CycleFlow | null; symptoms: CycleSymptom[]
 export type AnchorKind = CycleAnchorBody["kind"];
 
 const BLEEDING: CycleFlow[] = ["light", "medium", "heavy"];
+
+// O DatePickerField trabalha com Date à meia-noite local; o estado guarda "YYYY-MM-DD".
+const toDate = (day: string) => {
+  const [y, m, d] = day.split("-").map(Number);
+  return new Date(y, m - 1, d);
+};
+const pad2 = (n: number) => String(n).padStart(2, "0");
+const toDay = (date: Date) => `${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(date.getDate())}`;
 
 function buildCard(cycle: CycleState, today: string): CicloCard {
   const { kind, activeDays: pillActiveDays } = cycle.method;
@@ -104,14 +113,10 @@ function buildCard(cycle: CycleState, today: string): CicloCard {
 function buildAnchors(cycle: CycleState, today: string) {
   const s = cycle.scheduled;
   if (!s) return null;
-  const { kind, activeDays, pauseDays } = cycle.method;
+  const { kind, activeDays } = cycle.method;
   const extendLabel = kind === "pill" ? "Emendar mais uma cartela" : "Emendar mais 3 semanas";
-  const confirm: Record<AnchorKind, { title: string; detail: string; action: string }> = {
-    pause_started: {
-      title: "A pausa começou hoje?",
-      detail: startPauseEffect(today, pauseDays ?? 0, kind),
-      action: "Comecei a pausa hoje",
-    },
+  const confirm = {
+    pause_started: { action: "Comecei a pausa hoje" },
     pack_extended: {
       title: `${extendLabel}?`,
       detail: extendEffect(s, today, activeDaysFor(kind, activeDays) ?? 21),
@@ -146,6 +151,7 @@ function buildView(cycle: CycleState, today: string) {
           ? ("bleeding" as const)
           : null,
     todayEntry: todayEntry(cycle.today),
+    yesterdayLabel: yesterdayLabel(cycle.yesterday),
     todayEmptyLabel:
       cycle.mode === "scheduled"
         ? "Registrar sangramento ou sintoma"
@@ -208,10 +214,11 @@ export function useCiclo() {
         return false;
       }
       // O card de hoje não pode depender do reload: um toggle da pílula em voo o invalida.
-      if (day === today) {
+      const field = day === today ? "today" : day === addDays(today, -1) ? "yesterday" : null;
+      if (field) {
         setData((prev) =>
           prev?.cycle
-            ? { cycle: { ...prev.cycle, today: { flow: saved.flow, symptoms: saved.symptoms } } }
+            ? { cycle: { ...prev.cycle, [field]: { flow: saved.flow, symptoms: saved.symptoms } } }
             : prev,
         );
       }
@@ -256,10 +263,10 @@ export function useCiclo() {
   }, [cycle, setData]);
 
   const addAnchor = useCallback(
-    async (kind: AnchorKind): Promise<boolean> => {
+    async (body: CycleAnchorBody): Promise<boolean> => {
       setBusy(true);
       try {
-        setData(await api.post<{ cycle: CycleState | null }>("/api/cycle/anchors", { kind }));
+        setData(await api.post<{ cycle: CycleState | null }>("/api/cycle/anchors", body));
         return true;
       } catch (e) {
         toastError(e, "Não foi possível ajustar a cartela");
@@ -270,22 +277,49 @@ export function useCiclo() {
     },
     [setData],
   );
-  const startPause = useCallback(() => addAnchor("pause_started"), [addAnchor]);
-  const extendPack = useCallback(() => addAnchor("pack_extended"), [addAnchor]);
-
   // Âncora não tem desfazer: toda gravação passa por confirmação.
-  const [anchorConfirm, setAnchorConfirm] = useState<{ open: boolean; kind: AnchorKind }>({
-    open: false,
-    kind: "pause_started",
-  });
-  const askAnchor = useCallback((kind: AnchorKind) => setAnchorConfirm({ open: true, kind }), []);
-  const setAnchorConfirmOpen = useCallback(
-    (open: boolean) => setAnchorConfirm((c) => ({ ...c, open })),
+  const [extendOpen, setExtendOpen] = useState(false);
+  const [pauseSheet, setPauseSheet] = useState<{ open: boolean; day: string }>({ open: false, day: today });
+
+  const askAnchor = useCallback(
+    (kind: AnchorKind) => {
+      if (kind === "pause_started") setPauseSheet({ open: true, day: today });
+      else setExtendOpen(true);
+    },
+    [today],
+  );
+  const scheduled = cycle?.scheduled;
+  const askPauseFix = useCallback(() => {
+    if (scheduled?.phase !== "pause") return;
+    setPauseSheet({ open: true, day: addDays(today, -((scheduled.pauseDay ?? 1) - 1)) });
+  }, [scheduled, today]);
+
+  const confirmExtend = useCallback(async () => {
+    if (await addAnchor({ kind: "pack_extended" })) setExtendOpen(false);
+  }, [addAnchor]);
+
+  const setPauseSheetOpen = useCallback((open: boolean) => setPauseSheet((p) => ({ ...p, open })), []);
+  const setPauseDay = useCallback(
+    (date: Date | undefined) => setPauseSheet((p) => ({ ...p, day: date ? toDay(date) : "" })),
     [],
   );
-  const confirmAnchor = useCallback(async () => {
-    if (await addAnchor(anchorConfirm.kind)) setAnchorConfirmOpen(false);
-  }, [addAnchor, anchorConfirm.kind, setAnchorConfirmOpen]);
+  const confirmPause = useCallback(async () => {
+    if (!pauseSheet.day) return;
+    if (await addAnchor({ kind: "pause_started", day: pauseSheet.day })) setPauseSheetOpen(false);
+  }, [addAnchor, pauseSheet.day, setPauseSheetOpen]);
+
+  const pauseSheetView = useMemo(() => {
+    if (!cycle?.scheduled) return null;
+    const { min, max } = cycle.scheduled.pauseStartRange;
+    const { day } = pauseSheet;
+    return {
+      open: pauseSheet.open,
+      value: day ? toDate(day) : undefined,
+      minDate: toDate(min),
+      maxDate: toDate(max),
+      effect: day ? startPauseEffect(day, cycle.method.pauseDays ?? 0, cycle.method.kind) : null,
+    };
+  }, [cycle, pauseSheet]);
 
   return {
     ready: view !== null,
@@ -302,11 +336,16 @@ export function useCiclo() {
     saveDay,
     setHiddenSymptoms,
     togglePill,
-    startPause,
-    extendPack,
-    anchorConfirm,
     askAnchor,
-    setAnchorConfirmOpen,
-    confirmAnchor,
+    askPauseFix,
+    extendOpen,
+    setExtendOpen,
+    confirmExtend,
+    pauseSheet: pauseSheetView,
+    setPauseSheetOpen,
+    setPauseDay,
+    confirmPause,
   };
 }
+
+export type PauseSheetView = NonNullable<ReturnType<typeof useCiclo>["pauseSheet"]>;

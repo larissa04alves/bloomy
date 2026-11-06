@@ -411,9 +411,11 @@ export type CycleState = {
   };
   mode: CycleMode;
   natural?: ReturnType<typeof naturalPrediction>;
-  scheduled?: ReturnType<typeof pillPosition>;
+  /** `pauseStartRange`: dias aceitos como início da pausa (do início da cartela atual até hoje). */
+  scheduled?: ReturnType<typeof pillPosition> & { pauseStartRange: { min: string; max: string } };
   continuous?: ReturnType<typeof continuousSummary>;
   today: { flow: CycleFlow | null; symptoms: CycleSymptom[] };
+  yesterday: { flow: CycleFlow | null; symptoms: CycleSymptom[] };
   /** `takenDays`: dias com toma na cartela atual até hoje; vazio fora da fase ativa da pílula com pausa. */
   pill: { due: boolean; taken: boolean; time: string; takenDays: string[] } | null;
   hiddenSymptoms: CycleSymptom[];
@@ -445,4 +447,4 @@ export type CycleHistory = { sections: CycleHistorySection[] };
 
 export type CycleSettingsBody = { enabled?: boolean; hiddenSymptoms?: CycleSymptom[] };
 export type CycleDayBody = { flow: CycleFlow; symptoms: CycleSymptom[] };
-export type CycleAnchorBody = { kind: "pause_started" | "pack_extended" };
+export type CycleAnchorBody = { kind: "pause_started"; day?: string } | { kind: "pack_extended" };

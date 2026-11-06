@@ -12,6 +12,8 @@ import { CicloError } from "./components/CicloError";
 import { ConfirmarAncoraSheet } from "./components/ConfirmarAncoraSheet";
 import { CicloSkeleton } from "./components/CicloSkeleton";
 import { HojeCiclo } from "./components/HojeCiclo";
+import { IniciarPausaSheet } from "./components/IniciarPausaSheet";
+import { OntemCiclo } from "./components/OntemCiclo";
 import { PilulaHoje } from "./components/PilulaHoje";
 import { RegistroSheet } from "./components/RegistroSheet";
 import { ResumoCiclo } from "./components/ResumoCiclo";
@@ -41,7 +43,7 @@ export default function CicloPage() {
         </Link>
       }
     >
-      <ResumoCiclo card={view.card} />
+      <ResumoCiclo card={view.card} onFixPause={c.askPauseFix} />
 
       {view.primary === "period" ? (
         <button
@@ -68,14 +70,24 @@ export default function CicloPage() {
         <>
           <AcoesCartela anchors={view.anchors} onAsk={c.askAnchor} />
           <ConfirmarAncoraSheet
-            open={c.anchorConfirm.open}
-            onOpenChange={c.setAnchorConfirmOpen}
-            title={view.anchors.confirm[c.anchorConfirm.kind].title}
-            detail={view.anchors.confirm[c.anchorConfirm.kind].detail}
+            open={c.extendOpen}
+            onOpenChange={c.setExtendOpen}
+            title={view.anchors.confirm.pack_extended.title}
+            detail={view.anchors.confirm.pack_extended.detail}
             busy={c.busy}
-            onConfirm={c.confirmAnchor}
+            onConfirm={c.confirmExtend}
           />
         </>
+      ) : null}
+
+      {c.pauseSheet ? (
+        <IniciarPausaSheet
+          sheet={c.pauseSheet}
+          onOpenChange={c.setPauseSheetOpen}
+          onDayChange={c.setPauseDay}
+          busy={c.busy}
+          onConfirm={c.confirmPause}
+        />
       ) : null}
 
       <HojeCiclo
@@ -83,6 +95,7 @@ export default function CicloPage() {
         emptyLabel={view.todayEmptyLabel}
         onOpen={() => c.openRegistro()}
       />
+      {view.yesterdayLabel ? <OntemCiclo label={view.yesterdayLabel} /> : null}
 
       <Link
         href={CALENDARIO_HREF}

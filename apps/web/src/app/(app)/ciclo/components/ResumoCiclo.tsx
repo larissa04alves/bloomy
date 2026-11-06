@@ -1,4 +1,4 @@
-import { DropHalfBottomIcon, MoonIcon, PillIcon } from "@phosphor-icons/react";
+import { DropHalfBottomIcon, MoonIcon, PencilSimpleIcon, PillIcon } from "@phosphor-icons/react";
 import type { ReactNode } from "react";
 
 import { cn } from "@bloomy/ui/lib/utils";
@@ -37,7 +37,7 @@ function Heading({ icon, title, detail }: { icon: ReactNode; title: string; deta
   );
 }
 
-export function ResumoCiclo({ card }: { card: CicloCard }) {
+export function ResumoCiclo({ card, onFixPause }: { card: CicloCard; onFixPause: () => void }) {
   if (card.kind === "natural") {
     const { period, from, to } = card.ring;
     return (
@@ -88,6 +88,14 @@ export function ResumoCiclo({ card }: { card: CicloCard }) {
       <div className="flex flex-col gap-3 rounded-card-lg bg-peach-tint p-4">
         <Heading icon={<MoonIcon size={22} weight="fill" />} title={card.title} detail={card.detail} />
         <Dots dots={card.dots} />
+        <button
+          type="button"
+          onClick={onFixPause}
+          className="inline-flex min-h-9 items-center gap-1 self-start text-xs font-bold text-peach-deep"
+        >
+          <PencilSimpleIcon weight="bold" />
+          Começou em outro dia?
+        </button>
       </div>
     );
   }

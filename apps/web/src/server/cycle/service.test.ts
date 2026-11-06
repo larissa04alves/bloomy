@@ -138,6 +138,52 @@ describe("activateCycle + getCycleState", () => {
   });
 });
 
+describe("addAnchor com data da pausa", () => {
+  // PILL em 06/11: cartela 3 começou em 22/10, comprimido 16.
+  async function setup() {
+    const db = await createTestDb();
+    const userId = await createTestUser(db);
+    await activateCycle(db, userId, PILL, "2026-11-05");
+    return { db, userId };
+  }
+
+  test("estado expõe o intervalo do início da pausa", async () => {
+    const { db, userId } = await setup();
+    expect((await getCycleState(db, userId, "2026-11-06"))?.scheduled?.pauseStartRange).toEqual({
+      min: "2026-10-22",
+      max: "2026-11-06",
+    });
+  });
+
+  test("pausa marcada com data de ontem: hoje é o 2º dia da pausa", async () => {
+    const { db, userId } = await setup();
+    expect(await addAnchor(db, userId, "pause_started", "2026-11-06", "2026-11-05")).toEqual({ ok: true });
+    expect((await getCycleState(db, userId, "2026-11-06"))?.scheduled).toMatchObject({ phase: "pause", pauseDay: 2 });
+  });
+
+  test("correção: marcada hoje e depois para ontem deixa uma âncora só", async () => {
+    const { db, userId } = await setup();
+    await addAnchor(db, userId, "pause_started", "2026-11-06");
+    expect(await addAnchor(db, userId, "pause_started", "2026-11-06", "2026-11-05")).toEqual({ ok: true });
+
+    const anchors = await db.select().from(cycleAnchor).where(eq(cycleAnchor.userId, userId));
+    expect(anchors.map((a) => a.day)).toEqual(["2026-11-05"]);
+    expect((await getCycleState(db, userId, "2026-11-06"))?.scheduled).toMatchObject({ phase: "pause", pauseDay: 2 });
+  });
+
+  test.each([
+    ["antes do início da cartela", "2026-10-21"],
+    ["depois de hoje", "2026-11-07"],
+  ])("data %s é recusada", async (_, day) => {
+    const { db, userId } = await setup();
+    expect(await addAnchor(db, userId, "pause_started", "2026-11-06", day)).toEqual({
+      ok: false,
+      reason: "day_out_of_range",
+    });
+    expect(await db.select().from(cycleAnchor).where(eq(cycleAnchor.userId, userId))).toEqual([]);
+  });
+});
+
 describe("saveDay", () => {
   test("cria, atualiza, guarda 'none' sem sintomas e recusa dia futuro", async () => {
     const db = await createTestDb();
@@ -186,6 +232,29 @@ describe("saveDay", () => {
 
     await saveDay(db, userId, today, { flow: "none", symptoms: [] });
     expect((await getCycleState(db, userId, today))?.today).toEqual({ flow: "none", symptoms: [] });
+  });
+
+  test("registro de ontem e de hoje caem cada um no seu campo", async () => {
+    const db = await createTestDb();
+    const userId = await createTestUser(db);
+    const today = dayFor();
+    await activateCycle(db, userId, { kind: "hormonal_iud" }, today);
+
+    await saveDay(db, userId, addDays(today, -1), { flow: "spotting", symptoms: ["cramps"] });
+    await saveDay(db, userId, today, { flow: "none", symptoms: ["headache"] });
+    const state = await getCycleState(db, userId, today);
+    expect(state?.yesterday).toEqual({ flow: "spotting", symptoms: ["cramps"] });
+    expect(state?.today).toEqual({ flow: "none", symptoms: ["headache"] });
+  });
+
+  test("sem registro ontem, yesterday vem vazio", async () => {
+    const db = await createTestDb();
+    const userId = await createTestUser(db);
+    const today = dayFor();
+    await activateCycle(db, userId, { kind: "hormonal_iud" }, today);
+
+    await saveDay(db, userId, today, { flow: "light", symptoms: [] });
+    expect((await getCycleState(db, userId, today))?.yesterday).toEqual({ flow: null, symptoms: [] });
   });
 
   test("listDays devolve o intervalo em ordem", async () => {

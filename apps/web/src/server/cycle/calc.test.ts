@@ -5,6 +5,7 @@ import {
   continuousSummary,
   deducePeriods,
   naturalPrediction,
+  pauseStartRange,
   pillPosition,
   pillSequences,
   type ScheduledMethod,
@@ -200,6 +201,41 @@ describe("pillPosition", () => {
       pill: 1,
       nextPause: { from: "2027-02-27", to: "2027-02-27" },
     });
+  });
+});
+
+describe("pauseStartRange", () => {
+  const method: ScheduledMethod = { sequenceStart: "2026-09-10", activeDays: 21, pauseEvery: 4, pauseDays: 7 };
+
+  test("fase ativa: do início da cartela atual até hoje", () => {
+    const position = pillPosition(method, [], "2026-11-05");
+    expect(pauseStartRange(position, "2026-11-05", method.sequenceStart)).toEqual({
+      min: "2026-10-22",
+      max: "2026-11-05",
+    });
+  });
+
+  test("fase de pausa: do início da cartela que a pausa encerrou até hoje", () => {
+    const position = pillPosition(method, [], "2026-12-05");
+    expect(pauseStartRange(position, "2026-12-05", method.sequenceStart)).toEqual({
+      min: "2026-11-12",
+      max: "2026-12-05",
+    });
+  });
+
+  test("pausa reancorada no meio da 4ª cartela: começa no início dessa cartela", () => {
+    const anchors = [{ day: "2026-11-20", kind: "pause_started" as const }];
+    const position = pillPosition(method, anchors, "2026-11-22");
+    expect(pauseStartRange(position, "2026-11-22", method.sequenceStart)).toEqual({
+      min: "2026-11-12",
+      max: "2026-11-22",
+    });
+  });
+
+  test("não recua antes do início da sequência", () => {
+    expect(
+      pauseStartRange({ phase: "active", pill: 5, pauseDay: null }, "2026-09-12", method.sequenceStart),
+    ).toEqual({ min: "2026-09-10", max: "2026-09-12" });
   });
 });
 

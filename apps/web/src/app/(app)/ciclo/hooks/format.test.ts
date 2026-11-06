@@ -19,6 +19,7 @@ import {
   summaryLabel,
   todayEntry,
   windowLabel,
+  yesterdayLabel,
 } from "./format";
 
 type Position = NonNullable<CycleState["scheduled"]>;
@@ -31,6 +32,7 @@ const HER_CASE: Position = {
   pill: 15,
   pauseDay: null,
   nextPause: { from: "2026-12-03", to: "2026-12-09" },
+  pauseStartRange: { min: "2026-10-22", max: "2026-11-05" },
 };
 
 const PAUSE: Position = {
@@ -40,6 +42,7 @@ const PAUSE: Position = {
   pill: 21,
   pauseDay: 3,
   nextPause: { from: "2026-12-03", to: "2026-12-09" },
+  pauseStartRange: { min: "2026-11-12", max: "2026-12-05" },
 };
 
 function state(over: Partial<CycleState>): CycleState {
@@ -57,6 +60,7 @@ function state(over: Partial<CycleState>): CycleState {
     },
     mode: "scheduled",
     today: { flow: null, symptoms: [] },
+    yesterday: { flow: null, symptoms: [] },
     pill: null,
     hiddenSymptoms: [],
     methodHistory: [],
@@ -278,17 +282,48 @@ describe("extendEffect", () => {
 });
 
 describe("todayEntry", () => {
-  it("'Nada' sozinho mostra 'Sem sangramento'", () => {
-    expect(todayEntry({ flow: "none", symptoms: [] })).toEqual({ flow: "Sem sangramento", symptoms: [] });
+  it("um sintoma: fluxo curto e o sintoma", () => {
+    expect(todayEntry({ flow: "spotting", symptoms: ["cramps"] })).toEqual({ flow: "Escape", symptoms: "Cólica", more: 0 });
   });
-  it("só sintomas (flow none) mostra só os chips", () => {
-    expect(todayEntry({ flow: "none", symptoms: ["cramps"] })).toEqual({ flow: null, symptoms: ["Cólica"] });
+  it("quatro sintomas: os dois primeiros e o resto em more", () => {
+    expect(todayEntry({ flow: "medium", symptoms: ["cramps", "bloating", "fatigue", "acne"] })).toEqual({
+      flow: "Médio",
+      symptoms: "Cólica, inchaço",
+      more: 2,
+    });
   });
-  it("fluxo vira título", () => {
-    expect(todayEntry({ flow: "medium", symptoms: [] })).toEqual({ flow: "Fluxo médio", symptoms: [] });
+  it("só sintomas (flow none): fluxo 'Nenhum'", () => {
+    expect(todayEntry({ flow: "none", symptoms: ["cramps", "headache"] })).toEqual({
+      flow: "Nenhum",
+      symptoms: "Cólica, dor de cabeça",
+      more: 0,
+    });
+  });
+  it("'Nada' sozinho: 'Nenhum' nas duas colunas", () => {
+    expect(todayEntry({ flow: "none", symptoms: [] })).toEqual({ flow: "Nenhum", symptoms: "Nenhum", more: 0 });
   });
   it("dia sem registro fica vazio", () => {
     expect(todayEntry({ flow: null, symptoms: [] })).toBeNull();
+  });
+});
+
+describe("yesterdayLabel", () => {
+  it("sem registro não mostra nada", () => {
+    expect(yesterdayLabel({ flow: null, symptoms: [] })).toBeNull();
+  });
+  it("fluxo com sintomas", () => {
+    expect(yesterdayLabel({ flow: "light", symptoms: ["cramps"] })).toBe("Fluxo leve · Cólica");
+  });
+  it("só sintomas (flow none)", () => {
+    expect(yesterdayLabel({ flow: "none", symptoms: ["cramps", "headache"] })).toBe("Cólica, dor de cabeça");
+  });
+  it("'Nada' vira 'Sem sangramento'", () => {
+    expect(yesterdayLabel({ flow: "none", symptoms: [] })).toBe("Sem sangramento");
+  });
+  it("mais de 2 sintomas: os dois primeiros e +N", () => {
+    expect(yesterdayLabel({ flow: "spotting", symptoms: ["cramps", "bloating", "fatigue", "acne"] })).toBe(
+      "Escape · Cólica, inchaço +2",
+    );
   });
 });
 

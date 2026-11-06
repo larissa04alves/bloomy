@@ -31,6 +31,7 @@ import {
   continuousSummary,
   deducePeriods,
   naturalPrediction,
+  pauseStartRange,
   pillPosition,
   pillSequences,
   type DayLog,
@@ -277,12 +278,34 @@ export async function addAnchor(
   userId: string,
   kind: AnchorKind,
   today: string,
-): Promise<{ ok: true } | { ok: false; reason: "not_scheduled" }> {
+  day: string = today,
+): Promise<{ ok: true } | { ok: false; reason: "not_scheduled" | "day_out_of_range" }> {
   const method = await currentMethod(db, userId);
   if (!method || modeOf(method) !== "scheduled") {
     return { ok: false, reason: "not_scheduled" };
   }
-  await db.insert(cycleAnchor).values({ userId, day: today, kind });
+  if (kind === "pack_extended") {
+    await db.insert(cycleAnchor).values({ userId, day: today, kind });
+    return { ok: true };
+  }
+
+  const { min, max } = (await scheduledPosition(db, userId, method, today)).pauseStartRange;
+  if (day < min || day > max) return { ok: false, reason: "day_out_of_range" };
+  // Uma pausa já marcada no intervalo é a mesma pausa: marcar de novo corrige o dia.
+  await db.transaction(async (tx) => {
+    await tx
+      .delete(cycleAnchor)
+      .where(
+        and(
+          eq(cycleAnchor.userId, userId),
+          eq(cycleAnchor.kind, "pause_started"),
+          gte(cycleAnchor.day, min),
+          lte(cycleAnchor.day, today),
+          gte(cycleAnchor.createdAt, method.createdAt),
+        ),
+      );
+    await tx.insert(cycleAnchor).values({ userId, day, kind });
+  });
   return { ok: true };
 }
 
@@ -328,6 +351,17 @@ const scheduledOf = (method: CycleMethod): ScheduledMethod => ({
   pauseDays: method.pauseDays!,
 });
 
+async function scheduledPosition(db: Db, userId: string, method: CycleMethod, today: string) {
+  // Ordem de gravação dentro do mesmo dia: pillPosition faz sort estável por dia.
+  const anchors = await db
+    .select({ day: cycleAnchor.day, kind: cycleAnchor.kind })
+    .from(cycleAnchor)
+    .where(and(eq(cycleAnchor.userId, userId), gte(cycleAnchor.createdAt, method.createdAt)))
+    .orderBy(asc(cycleAnchor.day), asc(cycleAnchor.id));
+  const position = pillPosition(scheduledOf(method), anchors, today);
+  return { ...position, pauseStartRange: pauseStartRange(position, today, method.sequenceStart!) };
+}
+
 export async function getCycleState(db: Db, userId: string, today: string): Promise<CycleState | null> {
   const [settings] = await db.select().from(cycleSettings).where(eq(cycleSettings.userId, userId));
   if (!settings?.enabledAt) return null;
@@ -342,7 +376,12 @@ export async function getCycleState(db: Db, userId: string, today: string): Prom
 
   const logsFrom = async (from: string) =>
     (await listDays(db, userId, from, today)).map(({ day, flow }) => ({ day, flow }));
-  const [todayRow] = await listDays(db, userId, today, today);
+  const yesterdayDay = addDays(today, -1);
+  const recent = await listDays(db, userId, yesterdayDay, today);
+  const entryOn = (day: string) => {
+    const row = recent.find((r) => r.day === day);
+    return { flow: row?.flow ?? null, symptoms: row?.symptoms ?? [] };
+  };
   const mode = modeOf(method);
 
   let natural: CycleState["natural"];
@@ -358,13 +397,7 @@ export async function getCycleState(db: Db, userId: string, today: string): Prom
       periods,
     });
   } else if (mode === "scheduled") {
-    // Ordem de gravação dentro do mesmo dia: pillPosition faz sort estável por dia.
-    const anchors = await db
-      .select({ day: cycleAnchor.day, kind: cycleAnchor.kind })
-      .from(cycleAnchor)
-      .where(and(eq(cycleAnchor.userId, userId), gte(cycleAnchor.createdAt, method.createdAt)))
-      .orderBy(asc(cycleAnchor.day), asc(cycleAnchor.id));
-    scheduled = pillPosition(scheduledOf(method), anchors, today);
+    scheduled = await scheduledPosition(db, userId, method, today);
   } else {
     continuous = continuousSummary(await logsFrom(method.startedOn), today);
   }
@@ -404,7 +437,8 @@ export async function getCycleState(db: Db, userId: string, today: string): Prom
     ...(natural && { natural }),
     ...(scheduled && { scheduled }),
     ...(continuous && { continuous }),
-    today: { flow: todayRow?.flow ?? null, symptoms: todayRow?.symptoms ?? [] },
+    today: entryOn(today),
+    yesterday: entryOn(yesterdayDay),
     pill,
     hiddenSymptoms: settings.hiddenSymptoms as CycleSymptom[],
     methodHistory: methods.map((m) => ({ kind: m.kind, startedOn: m.startedOn, endedOn: m.endedOn })),
