@@ -3,7 +3,11 @@
 import { ArrowLeftIcon } from "@phosphor-icons/react";
 import Link from "next/link";
 
+import { CycleMethodSheet } from "@/components/cycle-method-sheet";
+
 import { AlturaSheet } from "./components/AlturaSheet";
+import { ApagarCicloSheet } from "./components/ApagarCicloSheet";
+import { CicloSection } from "./components/CicloSection";
 import { ContaSection } from "./components/ContaSection";
 import { ExcluirContaSheet } from "./components/ExcluirContaSheet";
 import { IdentidadeCard } from "./components/IdentidadeCard";
@@ -57,6 +61,16 @@ export default function PerfilPage() {
         onRestAlertChange={(next) => void perfil.setRestAlert(next)}
       />
 
+      <CicloSection
+        status={perfil.cicloStatus}
+        methodPill={perfil.methodPill}
+        busy={perfil.cycleBusy}
+        onRetry={perfil.retryCycle}
+        onEditMethod={() => perfil.openSheet("cycleMethod")}
+        onEnabledChange={(next) => void perfil.setCycleEnabled(next)}
+        onDelete={() => perfil.openSheet("deleteCycle")}
+      />
+
       <ContaSection
         signingOut={perfil.signingOut}
         onSignOut={() => void perfil.signOut()}
@@ -78,6 +92,21 @@ export default function PerfilPage() {
         onChange={perfil.setBirthRaw}
         canSave={perfil.canSaveBirth}
         onSave={perfil.submitBirthDate}
+      />
+
+      <CycleMethodSheet
+        open={perfil.isOpen("cycleMethod")}
+        onOpenChange={(open) => perfil.setSheetOpen("cycleMethod", open)}
+        initial={perfil.methodInitial}
+        saving={perfil.cycleBusy}
+        onSubmit={(input) => void perfil.saveMethod(input)}
+      />
+
+      <ApagarCicloSheet
+        open={perfil.isOpen("deleteCycle")}
+        onOpenChange={(open) => perfil.setSheetOpen("deleteCycle", open)}
+        deleting={perfil.cycleBusy}
+        onDelete={() => void perfil.deleteCycle()}
       />
 
       <ExcluirContaSheet

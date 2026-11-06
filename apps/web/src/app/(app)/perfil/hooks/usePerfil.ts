@@ -4,8 +4,10 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { api } from "@/lib/api";
-import type { Profile, Reminder } from "@/lib/api-types";
+import type { CyclePayload, CycleResponse, MethodUpdateInput, Profile, Reminder } from "@/lib/api-types";
 import { authClient } from "@/lib/auth-client";
+import { METHOD_LABELS } from "@/lib/cycle";
+import { type MethodForm, methodFormFromState } from "@/lib/cycle-method-form";
 import { clearLegacyAutoRest } from "@/lib/legacy-auto-rest";
 import { maskBirthDate } from "@/lib/body";
 import { unsubscribeLocalPush } from "@/lib/push";
@@ -17,7 +19,9 @@ import { useSignOut } from "@/lib/use-sign-out";
 
 import { ageFrom, birthIso, birthPill, heightPill, isDeletePhrase, revertPatch } from "./format";
 
-export type PerfilSheet = "height" | "birthDate" | "deleteAccount";
+export type PerfilSheet = "height" | "birthDate" | "deleteAccount" | "cycleMethod" | "deleteCycle";
+
+export type CicloStatus = "loading" | "error" | "inactive" | "on" | "off";
 
 const HEIGHT_START_CM = 165;
 
@@ -35,6 +39,14 @@ export function usePerfil() {
   const { data: remindersData, reload: reloadReminders } = useResource<{ reminders: Reminder[] }>(
     useCallback(() => api.get<{ reminders: Reminder[] }>("/api/reminders"), []),
   );
+
+  // O ciclo não segura a tela: o perfil é onde se desativa o ciclo e se exclui a conta.
+  const {
+    data: cycleData,
+    setData: setCycleData,
+    error: cycleError,
+    reload: reloadCycle,
+  } = useResource<CyclePayload>(useCallback(() => api.get<CyclePayload>("/api/cycle"), []));
 
   const { syncPush } = usePushSync();
 
@@ -134,16 +146,19 @@ export function usePerfil() {
   const [sheet, setSheet] = useState<PerfilSheet | null>(null);
   const [heightDraft, setHeightDraft] = useState(HEIGHT_START_CM);
   const [birthRaw, setBirthRaw] = useState("");
+  const [methodInitial, setMethodInitial] = useState<MethodForm | undefined>();
 
   const openSheet = useCallback(
     (which: PerfilSheet) => {
       if (which === "height") setHeightDraft(profile?.heightCm ?? HEIGHT_START_CM);
       else if (which === "birthDate")
         setBirthRaw(profile?.birthDate ? birthPill(profile.birthDate) : "");
-      else setDeletePhrase("");
+      else if (which === "deleteAccount") setDeletePhrase("");
+      else if (which === "cycleMethod")
+        setMethodInitial(cycleData?.cycle ? methodFormFromState(cycleData.cycle) : undefined);
       setSheet(which);
     },
-    [profile?.heightCm, profile?.birthDate],
+    [profile?.heightCm, profile?.birthDate, cycleData],
   );
 
   const birthDraftIso = birthIso(birthRaw);
@@ -170,14 +185,84 @@ export function usePerfil() {
     router.replace("/login");
   }, [deletePhrase, deleting, router]);
 
+  const cycle = cycleData?.cycle ?? null;
+  const [cycleBusy, setCycleBusy] = useState(false);
+  const cicloStatus: CicloStatus = !cycleData
+    ? cycleError
+      ? "error"
+      : "loading"
+    : cycle
+      ? "on"
+      : cycleData.configured
+        ? "off"
+        : "inactive";
+
+  const setCycleEnabled = useCallback(
+    async (next: boolean) => {
+      if (cycleBusy) return;
+      setCycleBusy(true);
+      try {
+        const { cycle } = await api.patch<CycleResponse>("/api/cycle/settings", { enabled: next });
+        setCycleData({ cycle, configured: true });
+        // A aba Ciclo vem do layout (servidor).
+        router.refresh();
+      } catch (e) {
+        toastError(e, next ? "Não foi possível ativar o ciclo" : "Não foi possível desativar o ciclo");
+      } finally {
+        setCycleBusy(false);
+      }
+    },
+    [cycleBusy, setCycleData, router],
+  );
+
+  const saveMethod = useCallback(
+    async (input: MethodUpdateInput) => {
+      setCycleBusy(true);
+      try {
+        const { cycle } = await api.put<CycleResponse>("/api/cycle/method", input);
+        setCycleData({ cycle, configured: true });
+        setSheet(null);
+      } catch (e) {
+        toastError(e, "Não foi possível salvar o método");
+      } finally {
+        setCycleBusy(false);
+      }
+    },
+    [setCycleData],
+  );
+
+  const deleteCycle = useCallback(async () => {
+    if (cycleBusy) return;
+    setCycleBusy(true);
+    try {
+      await api.del("/api/cycle");
+      setCycleData({ cycle: null, configured: false });
+      setSheet(null);
+      router.refresh();
+    } catch {
+      toastError(null, "Não foi possível apagar os dados do ciclo. Tente de novo.");
+    } finally {
+      setCycleBusy(false);
+    }
+  }, [cycleBusy, setCycleData, router]);
+
+  const ready = profileData !== null && !session.isPending && !session.error;
+
+  // A seção só existe depois do skeleton: o scroll nativo do #ciclo já passou.
+  const cycleSettled = cycleData !== null || cycleError !== null;
+  useEffect(() => {
+    if (ready && cycleSettled && window.location.hash === "#ciclo") document.getElementById("ciclo")?.scrollIntoView();
+  }, [ready, cycleSettled]);
+
   return {
-    ready: profileData !== null && !session.isPending && !session.error,
+    ready,
     error: profileError ?? session.error ?? null,
     reload: useCallback(() => {
       reloadProfile();
       reloadReminders();
+      reloadCycle();
       void refetchSession();
-    }, [reloadProfile, reloadReminders, refetchSession]),
+    }, [reloadProfile, reloadReminders, reloadCycle, refetchSession]),
 
     account,
     profile,
@@ -190,9 +275,10 @@ export function usePerfil() {
     setSheetOpen: useCallback(
       (which: PerfilSheet, open: boolean) => {
         if (open) openSheet(which);
-        else if (!(which === "deleteAccount" && deleting)) setSheet(null);
+        else if (!(which === "deleteAccount" && deleting) && !(which === "deleteCycle" && cycleBusy))
+          setSheet(null);
       },
-      [openSheet, deleting],
+      [openSheet, deleting, cycleBusy],
     ),
 
     heightDraft,
@@ -225,5 +311,14 @@ export function usePerfil() {
     canDelete: isDeletePhrase(deletePhrase) && !deleting,
     deleteAccount,
     deleting,
+
+    cicloStatus,
+    retryCycle: reloadCycle,
+    methodPill: cycle ? METHOD_LABELS[cycle.method.kind] : null,
+    methodInitial,
+    cycleBusy,
+    setCycleEnabled,
+    saveMethod,
+    deleteCycle,
   };
 }
