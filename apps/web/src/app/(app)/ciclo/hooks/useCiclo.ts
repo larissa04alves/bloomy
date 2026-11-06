@@ -2,7 +2,7 @@
 
 import type { Route } from "next";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { ApiError, api } from "@/lib/api";
 import type { CycleAnchorBody, CycleDayBody, CycleState, DayEntry } from "@/lib/api-types";
@@ -20,6 +20,7 @@ import {
   pauseDots,
   pauseLabel,
   pillDots,
+  pillDotsLabel,
   pillLabel,
   ringStops,
   showExtend,
@@ -40,7 +41,7 @@ export type CicloCard =
       kind: "active";
       title: string;
       detail: string;
-      dots: PillDot[] | null;
+      dots: { list: PillDot[]; label: string } | null;
       units: number[];
       nextPause: string;
     }
@@ -77,20 +78,21 @@ function buildCard(cycle: CycleState, today: string): CicloCard {
       return { kind: "pause", ...pauseLabel(s, kind), dots: pauseDots(length, s.pauseDay ?? 1) };
     }
     const activeDays = activeDaysFor(kind, pillActiveDays) ?? 21;
+    const dots =
+      kind === "pill"
+        ? pillDots({
+            length: activeDays,
+            current: s.pill,
+            today,
+            startedOn: cycle.method.startedOn,
+            takenDays: cycle.pill?.takenDays ?? [],
+            takenToday: cycle.pill?.taken ?? false,
+          })
+        : null;
     return {
       kind: "active",
       ...pillLabel(s, kind, activeDays),
-      dots:
-        kind === "pill"
-          ? pillDots({
-              length: activeDays,
-              current: s.pill,
-              today,
-              startedOn: cycle.method.startedOn,
-              takenDays: cycle.pill?.takenDays ?? [],
-              takenToday: cycle.pill?.taken ?? false,
-            })
-          : null,
+      dots: dots && { list: dots, label: pillDotsLabel(dots) },
       units: Array.from({ length: s.units }, (_, i) =>
         i < s.unit - 1 ? 1 : i === s.unit - 1 ? s.pill / activeDays : 0,
       ),
@@ -172,6 +174,8 @@ const REASON_MESSAGES: Record<string, string> = {
 
 function toastCycleError(e: unknown, fallback: string) {
   if (e instanceof ApiError && e.status === 422) toastErrorText(REASON_MESSAGES[e.message] ?? fallback);
+  // Ciclo desativado em outra aba ou aparelho.
+  else if (e instanceof ApiError && e.status === 409) toastErrorText("O ciclo está desativado");
   else toastError(e, fallback);
 }
 
@@ -241,15 +245,18 @@ export function useCiclo() {
         setData(await api.patch<{ cycle: CycleState | null }>("/api/cycle/settings", { hiddenSymptoms: ids }));
         return true;
       } catch (e) {
-        toastError(e, "Não foi possível salvar a lista");
+        toastCycleError(e, "Não foi possível salvar a lista");
         return false;
       }
     },
     [setData],
   );
 
+  // POST e DELETE em voo ao mesmo tempo podem chegar fora de ordem: um toque por vez.
+  const pillPending = useRef(false);
   const togglePill = useCallback(async () => {
-    if (!cycle?.pill) return;
+    if (!cycle?.pill || pillPending.current) return;
+    pillPending.current = true;
     const taken = !cycle.pill.taken;
     const markPill = (value: boolean) =>
       setData((prev) =>
@@ -257,14 +264,20 @@ export function useCiclo() {
       );
     markPill(taken);
     try {
-      setData(
-        taken
-          ? await api.post<{ cycle: CycleState | null }>("/api/cycle/pill")
-          : await api.del<{ cycle: CycleState | null }>("/api/cycle/pill"),
+      const { cycle: next } = taken
+        ? await api.post<{ cycle: CycleState | null }>("/api/cycle/pill")
+        : await api.del<{ cycle: CycleState | null }>("/api/cycle/pill");
+      // Um registro salvo enquanto a pílula estava em voo é mais novo que este snapshot.
+      setData((prev) =>
+        next && prev?.cycle
+          ? { cycle: { ...next, today: prev.cycle.today, yesterday: prev.cycle.yesterday } }
+          : { cycle: next },
       );
     } catch (e) {
       markPill(!taken);
-      toastError(e, "Não foi possível atualizar a pílula");
+      toastCycleError(e, "Não foi possível atualizar a pílula");
+    } finally {
+      pillPending.current = false;
     }
   }, [cycle, setData]);
 

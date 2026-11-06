@@ -138,6 +138,18 @@ describe("activateCycle + getCycleState", () => {
   });
 });
 
+test("emendar de novo no mesmo dia (resposta perdida e nova tentativa) não soma outra cartela", async () => {
+  const db = await createTestDb();
+  const userId = await createTestUser(db);
+  await activateCycle(db, userId, PILL, "2026-11-05");
+
+  // Na pausa de 03/12: emendar interrompe a pausa e a cartela extra começa hoje.
+  expect(await addAnchor(db, userId, "pack_extended", "2026-12-05")).toEqual({ ok: true });
+  const once = await getCycleState(db, userId, "2026-12-05");
+  expect(await addAnchor(db, userId, "pack_extended", "2026-12-05")).toEqual({ ok: true });
+  expect((await getCycleState(db, userId, "2026-12-05"))?.scheduled).toEqual(once?.scheduled);
+});
+
 describe("addAnchor com data da pausa", () => {
   // PILL em 06/11: cartela 3 começou em 22/10, comprimido 16.
   async function setup() {
@@ -312,6 +324,28 @@ describe("menstruação que atravessa o started_on", () => {
     const state = await getCycleState(db, userId, "2025-01-03");
     expect(state?.natural?.cycleDay).toBe(3);
     expect(state?.natural?.window).toEqual({ from: "2025-01-29", to: "2025-02-02" });
+  });
+
+  test("ativar no 5º dia da menstruação e marcar o fluxo de hoje segue no dia 5", async () => {
+    const db = await createTestDb();
+    const userId = await createTestUser(db);
+    await activateCycle(db, userId, { kind: "none", lastPeriodStart: "2025-01-01", usualLength: 30 }, "2025-01-05");
+    await saveDay(db, userId, "2025-01-05", { flow: "light", symptoms: [] });
+
+    const state = await getCycleState(db, userId, "2025-01-05");
+    expect(state?.natural?.cycleDay).toBe(5);
+    expect(state?.natural?.avgPeriodLength).toBeNull();
+    // Menstruação terminada (último fluxo há mais de 2 dias) conta com o início declarado.
+    expect((await getCycleState(db, userId, "2025-01-09"))?.natural?.avgPeriodLength).toBe(5);
+  });
+
+  test("fluxo semanas depois do início declarado é menstruação nova", async () => {
+    const db = await createTestDb();
+    const userId = await createTestUser(db);
+    await activateCycle(db, userId, { kind: "none", lastPeriodStart: "2025-01-01", usualLength: 30 }, "2025-01-20");
+    await saveDay(db, userId, "2025-01-20", { flow: "medium", symptoms: [] });
+
+    expect((await getCycleState(db, userId, "2025-01-20"))?.natural?.cycleDay).toBe(1);
   });
 
   test("ciclos seguintes contam a partir de lastPeriodStart", async () => {

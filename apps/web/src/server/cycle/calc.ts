@@ -60,8 +60,9 @@ export function naturalPrediction(input: {
   const center = addDays(lastStart, avgLength);
   const window = { from: addDays(center, -margin), to: addDays(center, margin) };
 
+  // Menstruação com fluxo nos últimos 2 dias ainda pode crescer (groupDays junta falhas de 1 dia).
   const periods = (input.periods ?? [])
-    .filter((p) => p.start >= starts[0])
+    .filter((p) => p.start >= starts[0] && daysBetween(p.end, input.today) > 2)
     .sort((a, b) => a.start.localeCompare(b.start))
     .slice(-MAX_CYCLES);
   const avgPeriodLength = periods.length

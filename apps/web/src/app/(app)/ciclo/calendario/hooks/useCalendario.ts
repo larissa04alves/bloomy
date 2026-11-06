@@ -107,6 +107,8 @@ export function useCalendario() {
           ? { ...prev, days: [...prev.days.filter((d) => d.day !== day), { day, ...entry }] }
           : prev,
       );
+      // Um GET do mês em voo foi lido antes do salvamento: refazê-lo descarta a resposta antiga.
+      setMonthAttempt((n) => n + 1);
       reloadHistory();
       return true;
     },

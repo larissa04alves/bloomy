@@ -53,6 +53,14 @@ export function pillDots({
   });
 }
 
+export function pillDotsLabel(dots: PillDot[]): string {
+  const taken = dots.filter((d) => d === "taken").length;
+  const missed = dots.filter((d) => d === "missed").length;
+  return [`${taken} de ${dots.length} pílulas marcadas`, missed > 0 && `${missed} sem marcação`]
+    .filter(Boolean)
+    .join(", ");
+}
+
 export function pauseDots(length: number, current: number): PillDot[] {
   return Array.from({ length }, (_, i) =>
     i < current - 1 ? "taken" : i === current - 1 ? "current" : "pause-left",

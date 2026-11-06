@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import type { CycleDayBody } from "@/lib/api-types";
 import {
@@ -44,9 +44,13 @@ export function useRegistroDraft({
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
 
+  // Cada abertura ganha um número: um salvamento que termina depois de fechar e reabrir a sheet
+  // não pode fechar o registro novo.
+  const opening = useRef(0);
   // Semeia o rascunho só na abertura: `initial` costuma vir de um objeto novo a cada render.
   useEffect(() => {
     if (!open) return;
+    opening.current += 1;
     setFlow(initial.flow);
     setSymptoms(initial.symptoms);
     setHidden(hiddenSymptoms);
@@ -60,11 +64,12 @@ export function useRegistroDraft({
     : CYCLE_SYMPTOM_IDS.filter((id) => !hidden.includes(id) || symptoms.includes(id));
 
   const save = async () => {
+    const started = opening.current;
     setSaving(true);
     try {
       if (editing) {
         if (await onHiddenChange(hidden)) setEditing(false);
-      } else if (await onSave(day, { flow: flow ?? "none", symptoms })) {
+      } else if ((await onSave(day, { flow: flow ?? "none", symptoms })) && started === opening.current) {
         onOpenChange(false);
       }
     } finally {

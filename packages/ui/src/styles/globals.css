@@ -224,7 +224,8 @@
   .animate-ripple,
   .animate-drop-fall,
   .animate-drop-rise,
-  .animate-bubble {
+  .animate-bubble,
+  .animate-pulse {
     animation: none !important;
   }
 }

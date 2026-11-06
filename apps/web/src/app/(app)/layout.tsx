@@ -28,7 +28,7 @@ export default async function AppLayout({
     <div className="flex min-h-dvh flex-col">
       <main className="flex flex-1 flex-col pb-2">{children}</main>
       <TabBar showCycle={showCycle} />
-      <PushSync />
+      <PushSync cycleEnabled={showCycle} />
     </div>
   );
 }

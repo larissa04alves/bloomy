@@ -10,7 +10,7 @@ import { METHOD_LABELS } from "@/lib/cycle";
 import { type MethodForm, methodFormFromState } from "@/lib/cycle-method-form";
 import { clearLegacyAutoRest } from "@/lib/legacy-auto-rest";
 import { maskBirthDate } from "@/lib/body";
-import { unsubscribeLocalPush } from "@/lib/push";
+import { resyncPush, unsubscribeLocalPush } from "@/lib/push";
 import { toastError } from "@/lib/toast";
 import { useLegacyAutoRestMigration } from "@/lib/use-legacy-auto-rest";
 import { usePushSync } from "@/lib/use-push-sync";
@@ -222,6 +222,9 @@ export function usePerfil() {
         const { cycle } = await api.put<CycleResponse>("/api/cycle/method", input);
         setCycleData({ cycle, configured: true });
         setSheet(null);
+        // O método novo pode trazer um lembrete que vale (ex.: pílula) para quem o servidor
+        // não guardava o aparelho.
+        resyncPush();
       } catch (e) {
         toastError(e, "Não foi possível salvar o método");
       } finally {

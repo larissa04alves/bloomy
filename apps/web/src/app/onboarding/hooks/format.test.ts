@@ -80,6 +80,8 @@ describe("skipTarget", () => {
 describe("finishHref", () => {
   it("com 'Ativar' escolhido no passo do ciclo, termina na ativação do ciclo", () => {
     expect(finishHref(state({ step: 5, cycleIntent: true }))).toBe("/ciclo/ativar");
+    // Concluir ou pular os lembretes (passo 6) mantém o destino.
+    expect(finishHref(state({ step: 6, cycleIntent: true }))).toBe("/ciclo/ativar");
   });
   it("sem a intenção, termina na Hoje", () => {
     expect(finishHref(state({ step: 6 }))).toBe("/home");

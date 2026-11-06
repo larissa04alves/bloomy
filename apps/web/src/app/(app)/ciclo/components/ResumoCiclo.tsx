@@ -15,9 +15,13 @@ const DOT: Record<PillDot, string> = {
   "pause-left": "border border-dashed border-peach-deep/50",
 };
 
-function Dots({ dots }: { dots: PillDot[] }) {
+// Sem `label` as bolinhas repetem o título (dia da pausa) e ficam fora do leitor de tela.
+function Dots({ dots, label }: { dots: PillDot[]; label?: string }) {
   return (
-    <div className="grid grid-cols-7 gap-1.5 px-1">
+    <div
+      className="grid grid-cols-7 gap-1.5 px-1"
+      {...(label ? { role: "img", "aria-label": label } : { "aria-hidden": true })}
+    >
       {dots.map((d, i) => (
         <span key={i} className={cn("size-3.5 rounded-full", DOT[d])} />
       ))}
@@ -103,7 +107,7 @@ export function ResumoCiclo({ card, onFixPause }: { card: CicloCard; onFixPause:
   return (
     <div className="flex flex-col gap-3 rounded-card-lg bg-peach-tint p-4">
       <Heading icon={<PillIcon size={22} weight="fill" />} title={card.title} detail={card.detail} />
-      {card.dots ? <Dots dots={card.dots} /> : null}
+      {card.dots ? <Dots dots={card.dots.list} label={card.dots.label} /> : null}
       <div className="flex items-center gap-1.5">
         {card.units.map((fill, i) => (
           <span key={i} className="h-1.75 flex-1 overflow-hidden rounded-full bg-white">

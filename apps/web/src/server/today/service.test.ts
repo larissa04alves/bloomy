@@ -9,7 +9,7 @@ import { addMeal } from "@/server/meals/service";
 import { createMedication, markIntake } from "@/server/medications/service";
 import { updateProfile } from "@/server/profile/service";
 import { upsertCheckin } from "@/server/mind/service";
-import { dayFor } from "@/server/shared/day";
+import { addDays, dayFor } from "@/server/shared/day";
 import { createTestDb, createTestUser } from "@/server/shared/test-db";
 import { addWater } from "@/server/water/service";
 import { createWorkout } from "@/server/workout/service";
@@ -224,6 +224,19 @@ describe("getToday", () => {
     test("na pausa não conta", async () => {
       const db = await withPill();
       expect((await getToday(db, USER, "2026-12-05")).meds).toEqual({ taken: 0, total: 0 });
+    });
+
+    test("soma com os remédios do dia", async () => {
+      const db = await createTestDb();
+      await createTestUser(db);
+      const today = dayFor();
+      await activateCycle(db, USER.id, { ...PILL, currentUnitStart: addDays(today, -3), currentUnit: 1 }, today);
+      const med = await createMedication(db, USER.id, { name: "Vitamina D", times: ["09:00", "21:00"] });
+      await markIntake(db, USER.id, { medicationId: med.id, time: "09:00", day: today });
+      expect((await getToday(db, USER, today)).meds).toEqual({ taken: 1, total: 3 });
+
+      await setPillTaken(db, USER.id, today, true);
+      expect((await getToday(db, USER, today)).meds).toEqual({ taken: 2, total: 3 });
     });
 
     test("ciclo desativado não conta", async () => {

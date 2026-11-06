@@ -78,6 +78,7 @@ function IntakeRow({
     <button
       type="button"
       onClick={onClick}
+      aria-pressed={taken}
       className="flex items-center gap-3 rounded-card bg-white p-3 text-left shadow-card-sm"
     >
       <IconChip tone={tone} icon={icon} />

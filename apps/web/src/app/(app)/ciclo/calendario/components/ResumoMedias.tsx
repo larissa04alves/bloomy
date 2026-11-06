@@ -12,7 +12,7 @@ function Media({ value, label }: { value: string; label: string }) {
     <div className="flex flex-col items-center gap-0.5">
       <span className="font-display text-2xl font-bold text-peach-deep">
         {value}
-        <span className="text-base opacity-60"> dias</span>
+        {value === "—" ? null : <span className="text-base opacity-60"> dias</span>}
       </span>
       <span className="text-xs font-bold text-peach-deep">{label}</span>
     </div>

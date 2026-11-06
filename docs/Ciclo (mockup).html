@@ -1616,5 +1616,11 @@
         </figure>
       </div>
     </div>
+    <script>
+      // Uma escolha por grupo de opções.
+      function toggleSelect(el) {
+        el.closest(".options").querySelectorAll(".option").forEach((o) => o.classList.toggle("selected", o === el));
+      }
+    </script>
   </body>
 </html>

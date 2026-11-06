@@ -14,9 +14,13 @@ import { cn } from "@bloomy/ui/lib/utils";
 
 import { maskBirthDate, parseBrDate } from "@/lib/body";
 
-// Posição do calendário relativa ao Drawer.Content (px). Abre pra cima, ancorado ao campo;
-// campo na metade direita alinha pela direita para o calendário não sair da tela.
-type Pos = { bottom: number } & ({ left: number } | { right: number });
+// Posição do calendário relativa ao Drawer.Content (px). Abre pra cima, ancorado ao campo, e
+// para baixo quando não cabe em cima; campo na metade direita alinha pela direita para o
+// calendário não sair da tela.
+type Pos = ({ bottom: number } | { top: number }) & ({ left: number } | { right: number });
+
+// Altura do calendário com seis semanas, para decidir o lado antes de ele existir.
+const CALENDAR_HEIGHT = 340;
 
 const pad2 = (n: number) => String(n).padStart(2, "0");
 const formatDateBR = (d: Date) => `${pad2(d.getDate())}/${pad2(d.getMonth() + 1)}/${d.getFullYear()}`;
@@ -74,11 +78,14 @@ export function DatePickerField({
       if (!anchor) return;
       const b = anchor.getBoundingClientRect();
       const h = host.getBoundingClientRect();
-      const bottom = h.bottom - b.top + 4;
+      const vertical =
+        b.top < CALENDAR_HEIGHT && window.innerHeight - b.bottom > b.top
+          ? { top: b.bottom - h.top + 4 }
+          : { bottom: h.bottom - b.top + 4 };
       setPos(
         b.left - h.left > h.width / 2
-          ? { bottom, right: h.right - b.right }
-          : { bottom, left: b.left - h.left },
+          ? { ...vertical, right: h.right - b.right }
+          : { ...vertical, left: b.left - h.left },
       );
     };
     place();

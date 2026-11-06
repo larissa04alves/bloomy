@@ -285,7 +285,21 @@ export async function addAnchor(
     return { ok: false, reason: "not_scheduled" };
   }
   if (kind === "pack_extended") {
-    await db.insert(cycleAnchor).values({ userId, day: today, kind });
+    // A tela só oferece emendar perto da pausa, e depois de emendar a pausa fica uma cartela
+    // adiante: uma segunda emenda no mesmo dia é repetição (ex.: resposta perdida), não intenção.
+    const [already] = await db
+      .select({ id: cycleAnchor.id })
+      .from(cycleAnchor)
+      .where(
+        and(
+          eq(cycleAnchor.userId, userId),
+          eq(cycleAnchor.kind, kind),
+          eq(cycleAnchor.day, today),
+          gte(cycleAnchor.createdAt, method.createdAt),
+        ),
+      )
+      .limit(1);
+    if (!already) await db.insert(cycleAnchor).values({ userId, day: today, kind });
     return { ok: true };
   }
 
@@ -331,11 +345,23 @@ export async function setPillTaken(
 const naturalLogsFrom = (method: CycleMethod) =>
   method.lastPeriodStart! < method.startedOn ? method.lastPeriodStart! : method.startedOn;
 
+// Fluxo registrado até o 8º dia depois do início declarado ainda é a menstruação declarada.
+const DECLARED_PERIOD_MAX_DAYS = 7;
+
 function naturalPeriods(method: CycleMethod, logs: DayLog[]): { merged: Period[]; periods: Period[] } {
   const lastPeriodStart = method.lastPeriodStart!;
-  // O sangramento sintético em lastPeriodStart junta a ela a menstruação que estava em curso na
+  // Quem ativa no meio da menstruação e marca o fluxo depois: os dias entre o início declarado e
+  // esse fluxo não foram registrados, mas são a mesma menstruação.
+  const firstBleed = deducePeriods(logs).find((p) => p.start >= method.startedOn && p.start > lastPeriodStart);
+  const bridgeTo =
+    firstBleed && daysBetween(lastPeriodStart, firstBleed.start) <= DECLARED_PERIOD_MAX_DAYS
+      ? firstBleed.start
+      : addDays(lastPeriodStart, 1);
+  const declared: DayLog[] = [];
+  for (let day = lastPeriodStart; day < bridgeTo; day = addDays(day, 1)) declared.push({ day, flow: "medium" });
+  // O sangramento sintético desde lastPeriodStart junta a ela a menstruação que estava em curso na
   // troca; outros blocos entre lastPeriodStart e started_on são do método antigo (ex.: privação).
-  const merged = deducePeriods([{ day: lastPeriodStart, flow: "medium" }, ...logs]).filter(
+  const merged = deducePeriods([...declared, ...logs]).filter(
     (p) => !(p.start > lastPeriodStart && p.start < method.startedOn),
   );
   const logged = deducePeriods(logs);

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
 
 import { api } from "@/lib/api";
 import type { IntakeSlot, IntakesPayload } from "@/lib/api-types";
@@ -44,8 +44,11 @@ export function useRemedios() {
     [data, intakes, pill, setData, reload],
   );
 
+  // POST e DELETE em voo ao mesmo tempo podem chegar fora de ordem: um toque por vez.
+  const pillPending = useRef(false);
   const togglePill = useCallback(async () => {
-    if (!pill) return;
+    if (!pill || pillPending.current) return;
+    pillPending.current = true;
     const taken = !pill.taken;
     const markPill = (value: boolean) =>
       setData((prev) => (prev?.pill ? { ...prev, pill: { ...prev.pill, taken: value } } : prev));
@@ -56,6 +59,8 @@ export function useRemedios() {
     } catch (e) {
       markPill(!taken);
       toastError(e, "Não foi possível salvar a pílula");
+    } finally {
+      pillPending.current = false;
     }
   }, [pill, setData]);
 

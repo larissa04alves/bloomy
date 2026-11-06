@@ -71,6 +71,17 @@ describe("METHOD_UPDATE_SCHEMA", () => {
   });
 });
 
+test("edição recusa posição pela metade (só o início ou só a cartela)", () => {
+  const okUpdate = (v: unknown) => METHOD_UPDATE_SCHEMA.safeParse(v).success;
+  expect(okUpdate(pill({ currentUnit: undefined }))).toBe(false);
+  expect(okUpdate(pill({ currentUnitStart: undefined }))).toBe(false);
+  const ring = { kind: "ring", pauseEvery: 1, pauseDays: 7 };
+  expect(okUpdate({ ...ring, currentUnitStart: dayFor() })).toBe(false);
+  expect(okUpdate({ ...ring, currentUnit: 1 })).toBe(false);
+  expect(okUpdate({ ...ring, currentUnitStart: dayFor(), currentUnit: 1 })).toBe(true);
+  expect(okUpdate(ring)).toBe(true);
+});
+
 test("sintomas validam ids, não rótulos", () => {
   expect(DAY_BODY_SCHEMA.safeParse({ flow: "light", symptoms: ["cramps"] }).success).toBe(true);
   expect(DAY_BODY_SCHEMA.safeParse({ flow: "light", symptoms: ["Cólica"] }).success).toBe(false);

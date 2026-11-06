@@ -54,12 +54,21 @@ export const METHOD_SCHEMA = z.discriminatedUnion("kind", [
   CONTINUOUS,
 ]);
 
+// Pela metade, a posição seria descartada em silêncio pelo serviço (que só a vê completa).
+const wholePosition = (v: { currentUnitStart?: string; currentUnit?: number }) =>
+  (v.currentUnitStart === undefined) === (v.currentUnit === undefined);
+const POSITION_MSG = { message: "currentUnitStart and currentUnit go together" };
+
 // Edição sem troca de tipo: a posição (última menstruação, cartela atual) pode faltar; o serviço
 // a ignora quando o tipo é o mesmo e responde position_required quando não é.
 export const METHOD_UPDATE_SCHEMA = z.discriminatedUnion("kind", [
   NATURAL.partial({ lastPeriodStart: true }),
-  PILL.refine(pillComplete(false), PILL_MSG).refine(unitWithinSequence, UNIT_MSG),
-  UNITS.partial({ currentUnitStart: true, currentUnit: true }).refine(unitWithinSequence, UNIT_MSG),
+  PILL.refine(pillComplete(false), PILL_MSG)
+    .refine(wholePosition, POSITION_MSG)
+    .refine(unitWithinSequence, UNIT_MSG),
+  UNITS.partial({ currentUnitStart: true, currentUnit: true })
+    .refine(wholePosition, POSITION_MSG)
+    .refine(unitWithinSequence, UNIT_MSG),
   CONTINUOUS,
 ]);
 

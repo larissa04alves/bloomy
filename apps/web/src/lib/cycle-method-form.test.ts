@@ -54,6 +54,7 @@ describe("methodFormValid", () => {
     expect(methodFormValid({ ...pill21, activeDays: 9 }, TODAY)).toBe(false);
     expect(methodFormValid({ ...pill21, activeDays: 61 }, TODAY)).toBe(false);
     expect(methodFormValid({ ...pill21, pauses: false, activeDays: 61 }, TODAY)).toBe(false);
+    expect(methodFormValid({ ...pill21, activeDays: 21.5 }, TODAY)).toBe(false);
   });
 
   it("'Faz pausa? Não' não exige a posição", () => {

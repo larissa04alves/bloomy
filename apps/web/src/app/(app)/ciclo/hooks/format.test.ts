@@ -11,6 +11,7 @@ import {
   nextPauseLabel,
   pauseLabel,
   pillDots,
+  pillDotsLabel,
   pillLabel,
   registroTitle,
   ringStops,
@@ -355,5 +356,14 @@ describe("pillDots", () => {
   });
   it("futuro fica left", () => {
     expect(pillDots(base).slice(5)).toEqual(["left", "left"]);
+  });
+});
+
+describe("pillDotsLabel", () => {
+  it("conta as marcadas e as sem marcação para o leitor de tela", () => {
+    expect(pillDotsLabel(["taken", "taken", "missed", "current", "left"])).toBe(
+      "2 de 5 pílulas marcadas, 1 sem marcação",
+    );
+    expect(pillDotsLabel(["taken", "left"])).toBe("1 de 2 pílulas marcadas");
   });
 });
