@@ -105,10 +105,14 @@ export const workoutSession = sqliteTable(
     day: text("day").notNull(),
     startedAt: timestampMs("started_at"),
     completedAt: integer("completed_at", { mode: "timestamp_ms" }),
+    // Push de "treino esquecido aberto" já enviado para o período parado que terminou aqui.
+    staleNotifiedAt: integer("stale_notified_at", { mode: "timestamp_ms" }),
     createdAt: timestampMs("created_at"),
   },
   (table) => [
     index("workout_session_user_day_idx").on(table.userId, table.day),
+    // Parcial: a varredura do treino esquecido (a cada minuto) só lê sessões em andamento.
+    index("workout_session_open_idx").on(table.startedAt).where(sql`${table.completedAt} is null`),
   ],
 );
 

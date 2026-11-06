@@ -1,10 +1,14 @@
 import { afterAll, describe, expect, test } from "bun:test";
 
-import { reminder } from "@bloomy/db/schema/reminder";
+import { pushSubscription, reminder } from "@bloomy/db/schema/reminder";
+import { setLog, workoutSession } from "@bloomy/db/schema/workout";
+import { eq } from "drizzle-orm";
 
 import { activateCycle, saveDay, setPillTaken } from "@/server/cycle/service";
 import { cleanupTestDbs, createTestDb, createTestUser } from "@/server/shared/test-db";
-import { loadCycle, loadReminderRows, SEND_OPTIONS } from "./dispatch";
+import { createWorkout } from "@/server/workout/service";
+import { startSession } from "@/server/workout/session";
+import { claimStaleSessions, loadCycle, loadReminderRows, SEND_OPTIONS } from "./dispatch";
 import { TOLERANCE_MINUTES } from "./slots";
 
 afterAll(cleanupTestDbs);
@@ -183,5 +187,75 @@ describe("loadReminderRows", () => {
   test("quem nunca teve lembrete continua sem nenhum", async () => {
     const { db, userId } = await setup();
     expect(await loadReminderRows(db, userId)).toEqual([]);
+  });
+});
+
+describe("claimStaleSessions", () => {
+  const HOUR = 60 * 60 * 1000;
+  const now = new Date("2026-11-06T21:00:00-03:00");
+  const ago = (ms: number) => new Date(now.getTime() - ms);
+
+  async function openSession(startedAgo: number, lastSetAgo: number | null, device = true) {
+    const { db, userId } = await setup();
+    if (device) {
+      await db.insert(pushSubscription).values({ userId, endpoint: `https://push.example/${userId}`, p256dh: "k", auth: "a" });
+    }
+    const w = await createWorkout(db, userId, {
+      name: "Pernas",
+      focuses: ["legs"],
+      exercises: [{ name: "Agachamento", targetSets: 1, targetReps: 10, restSeconds: 60, position: 0 }],
+    });
+    const s = await startSession(db, userId, w.id);
+    if (s === "already_active" || s === "not_found") throw new Error("unreachable");
+    await db.update(workoutSession).set({ startedAt: ago(startedAgo) }).where(eq(workoutSession.id, s.session.id));
+    if (lastSetAgo !== null) {
+      await db
+        .update(setLog)
+        .set({ done: true, doneAt: ago(lastSetAgo) })
+        .where(eq(setLog.id, s.exercises[0].sets[0].id));
+    }
+    return { db, userId, sessionId: s.session.id };
+  }
+
+  test("parado há 2 horas desde a última série: avisa uma vez só", async () => {
+    const { db, userId } = await openSession(3 * HOUR, 2 * HOUR);
+    expect(await claimStaleSessions(db, now)).toEqual([{ userId, workoutName: "Pernas" }]);
+    expect(await claimStaleSessions(db, now)).toEqual([]);
+  });
+
+  test("série concluída há menos de 2 horas não avisa, mesmo com o início antigo", async () => {
+    const { db } = await openSession(3 * HOUR, HOUR);
+    expect(await claimStaleSessions(db, now)).toEqual([]);
+  });
+
+  test("voltou a treinar depois do aviso e parou de novo: avisa outra vez", async () => {
+    const { db, userId, sessionId } = await openSession(6 * HOUR, 5 * HOUR);
+    // Aviso às 18h (parado desde 16h); série nova às 18h30; às 21h está parado há 2h30.
+    expect(await claimStaleSessions(db, ago(3 * HOUR))).toHaveLength(1);
+    await db.insert(setLog).values({
+      sessionId,
+      userId,
+      exerciseName: "Agachamento",
+      setIndex: 1,
+      done: true,
+      doneAt: ago(2.5 * HOUR),
+    });
+    expect(await claimStaleSessions(db, now)).toEqual([{ userId, workoutName: "Pernas" }]);
+  });
+
+  test("treino aberto há mais de um dia não avisa (esquecido de vez, não de agora)", async () => {
+    const { db } = await openSession(30 * HOUR, null);
+    expect(await claimStaleSessions(db, now)).toEqual([]);
+  });
+
+  test("sem aparelho com push não marca nada", async () => {
+    const { db } = await openSession(3 * HOUR, 2 * HOUR, false);
+    expect(await claimStaleSessions(db, now)).toEqual([]);
+  });
+
+  test("treino concluído não avisa", async () => {
+    const { db, sessionId } = await openSession(3 * HOUR, null);
+    await db.update(workoutSession).set({ completedAt: ago(HOUR) }).where(eq(workoutSession.id, sessionId));
+    expect(await claimStaleSessions(db, now)).toEqual([]);
   });
 });

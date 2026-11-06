@@ -13,6 +13,7 @@ import type {
 } from "@/lib/api-types";
 import { toastError } from "@/lib/toast";
 import { useResource } from "@/lib/use-resource";
+import { isStale, staleChoiceCopy } from "@/lib/workout-stale";
 
 import { appendSet, applySetPatch, dropSet, NEW_EXERCISE_DEFAULTS } from "./session";
 
@@ -191,6 +192,11 @@ export function useSessao() {
           `/api/sessions/${detail.session.id}/sets/${setId}`,
           toSetBody({ ...patch, done: true }),
         );
+        // A série concluída é atividade: sem isso, concluir depois perguntaria pelo horário antigo.
+        const now = new Date().toISOString();
+        setData((prev) =>
+          prev?.session ? { session: { ...prev.session, session: { ...prev.session.session, lastActivityAt: now } } } : prev,
+        );
         return true;
       } catch (e) {
         // Não restaura snapshot completo: se outra série foi marcada nesse meio
@@ -203,14 +209,31 @@ export function useSessao() {
     [detail, patchLocal, reload],
   );
 
+  // Treino parado há 2h: concluir pergunta se fecha no horário da última série.
+  const [staleChoice, setStaleChoice] = useState<ReturnType<typeof staleChoiceCopy> | null>(null);
+  const closeStaleChoice = useCallback(() => setStaleChoice(null), []);
+
+  /** "ask" abre a escolha do horário; "now" é para concluir direto. */
+  const requestComplete = useCallback((): "ask" | "now" => {
+    if (!detail) return "now";
+    const last = new Date(detail.session.lastActivityAt);
+    const now = new Date();
+    // Sem série concluída a última atividade é o início: concluir nela daria duração zero.
+    if (!isStale(last, now) || last.getTime() === new Date(detail.session.startedAt).getTime()) return "now";
+    setStaleChoice(staleChoiceCopy(last, now));
+    return "ask";
+  }, [detail]);
+
   /** `true` só quando o servidor confirmou: quem chama decide o que desfazer. */
-  const complete = useCallback(async (): Promise<boolean> => {
+  const complete = useCallback(async (endAt: "now" | "last_activity" = "now"): Promise<boolean> => {
     if (!detail) return false;
     setCompleting(true);
     try {
       const summary = await api.post<FinishSummary>(
         `/api/sessions/${detail.session.id}/complete`,
+        { endAt },
       );
+      setStaleChoice(null);
       setFinishSummary(summary);
       setView("fim");
       return true;
@@ -416,6 +439,9 @@ export function useSessao() {
     reorderLocal,
     persistOrder,
     complete,
+    requestComplete,
+    staleChoice,
+    closeStaleChoice,
     reset,
     openAdd,
     openSwap,

@@ -5,34 +5,44 @@ export const REST_VIBRATION_PATTERN = [200, 100, 200, 100, 400];
 let ctx: AudioContext | null = null;
 
 /** Cria ou retoma o `AudioContext`. Tem que rodar dentro de um gesto (o toque em
- *  "concluir série"): fora dele o Chrome cria o contexto suspenso e o bipe não sai. */
+ *  "concluir série"): fora dele o Chrome cria o contexto suspenso e o som não sai. */
 export function primeRestTone(): void {
   if (typeof window === "undefined" || !("AudioContext" in window)) return;
   ctx ??= new AudioContext();
   if (ctx.state === "suspended") void ctx.resume();
 }
 
-function beep(at: number, frequency: number): void {
+// Timbre de kalimba: fundamental + parcial em ≈4×, cada um com [razão, amplitude, fração da queda].
+const KALIMBA_PARTIALS = [
+  [1, 1, 1],
+  [4.02, 0.18, 0.15],
+] as const;
+const PARTIALS_TOTAL = KALIMBA_PARTIALS.reduce((sum, [, amp]) => sum + amp, 0);
+
+// Nota dedilhada: ataque de 5 ms e queda exponencial. Soa sozinha até sumir, sem o corte seco
+// do bipe sustentado; destaca-se da música pelo timbre, não pelo volume.
+function pluck(at: number, frequency: number, decay: number): void {
   if (!ctx) return;
-  const osc = ctx.createOscillator();
-  const gain = ctx.createGain();
-  osc.type = "sine";
-  osc.frequency.value = frequency;
-  // Ataque e queda curtos: sem eles o corte seco da senoide estala.
-  gain.gain.setValueAtTime(0.0001, at);
-  gain.gain.exponentialRampToValueAtTime(0.4, at + 0.02);
-  gain.gain.exponentialRampToValueAtTime(0.0001, at + 0.18);
-  osc.connect(gain).connect(ctx.destination);
-  osc.start(at);
-  osc.stop(at + 0.2);
+  for (const [ratio, amp, fall] of KALIMBA_PARTIALS) {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = "sine";
+    osc.frequency.value = frequency * ratio;
+    const end = at + decay * fall;
+    gain.gain.setValueAtTime(0.0001, at);
+    gain.gain.exponentialRampToValueAtTime((0.5 * amp) / PARTIALS_TOTAL, at + 0.005);
+    gain.gain.exponentialRampToValueAtTime(0.0001, end);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start(at);
+    osc.stop(end + 0.02);
+  }
 }
 
-/** Dois bipes curtos subindo (≈880 Hz → 1320 Hz). Gerado na hora, sem arquivo. */
+/** Arpejo de kalimba subindo (Dó6, Mi6, Sol6, Dó7), a última nota mais longa. Gerado na hora, sem arquivo. */
 export function playRestEndTone(): void {
   if (!ctx || ctx.state !== "running") return;
   const t = ctx.currentTime;
-  beep(t, 880);
-  beep(t + 0.22, 1320);
+  [1047, 1319, 1568, 2093].forEach((frequency, i) => pluck(t + i * 0.14, frequency, i === 3 ? 0.7 : 0.45));
 }
 
 export function vibrateRestEnd(): void {

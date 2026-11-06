@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowsClockwiseIcon, TrashIcon } from "@phosphor-icons/react";
+import { ArrowsClockwiseIcon, FlagCheckeredIcon, TrashIcon } from "@phosphor-icons/react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { BottomSheet } from "@/components/bottom-sheet";
@@ -33,7 +33,7 @@ export function SessaoAtiva({
   const catalogById = useMemo(() => new Map(catalog.map((c) => [c.id, c])), [catalog]);
   const [preview, setPreview] = useState<CatalogExercise | null>(null);
   const [confirmedSwap, setConfirmedSwap] = useState(false);
-  const { detail, view, activeEx, finishSummary, adjust, pendingRemoval } = sessao;
+  const { detail, view, activeEx, finishSummary, adjust, pendingRemoval, staleChoice } = sessao;
 
   // Fecha o "ver execução" ao navegar entre exercícios ou voltar pra lista
   // (não depende do overlay do GifViewer cobrir a tela inteira).
@@ -51,20 +51,64 @@ export function SessaoAtiva({
     (view === "ex" ? 1 : 0) +
     (preview ? 1 : 0) +
     (adjust ? 1 : 0) +
-    (pendingRemoval ? 1 : 0);
-  const { backToList, closeAdjust, cancelRemove } = sessao;
+    (pendingRemoval ? 1 : 0) +
+    (staleChoice ? 1 : 0);
+  const { backToList, closeAdjust, cancelRemove, closeStaleChoice } = sessao;
   useBackStack(
     layers,
     useCallback(() => {
-      if (pendingRemoval) cancelRemove();
+      if (staleChoice) closeStaleChoice();
+      else if (pendingRemoval) cancelRemove();
       else if (preview) setPreview(null);
       else if (adjust) closeAdjust();
       else backToList();
-    }, [pendingRemoval, preview, adjust, cancelRemove, closeAdjust, backToList]),
+    }, [staleChoice, pendingRemoval, preview, adjust, closeStaleChoice, cancelRemove, closeAdjust, backToList]),
   );
   const goBack = () => window.history.back();
 
   if (!detail) return null;
+
+  // Só depois de confirmada: se concluir falhar, o treino segue com o descanso.
+  const finish = async (endAt: "now" | "last_activity") => {
+    if (await sessao.complete(endAt)) descanso.stop();
+  };
+
+  // Treino parado há 2h: provavelmente esqueceram de concluir; oferece o horário da última série.
+  if (staleChoice) {
+    return (
+      <BottomSheet
+        open
+        onOpenChange={(open) => {
+          if (!open) closeStaleChoice();
+        }}
+        title={staleChoice.title}
+        tone="pink"
+        icon={<FlagCheckeredIcon size={22} weight="fill" />}
+        footer={
+          <div className="flex flex-col gap-3">
+            <button
+              type="button"
+              onClick={() => finish("last_activity")}
+              disabled={sessao.completing}
+              className="w-full rounded-full bg-pink-deep py-3.5 font-display font-bold text-white shadow-btn disabled:opacity-70"
+            >
+              {staleChoice.endLabel}
+            </button>
+            <button
+              type="button"
+              onClick={() => finish("now")}
+              disabled={sessao.completing}
+              className="w-full rounded-full bg-pink-tint py-3.5 font-display font-bold text-pink-deep disabled:opacity-70"
+            >
+              Concluir agora
+            </button>
+          </div>
+        }
+      >
+        <p className="text-sm font-semibold text-ink-read">{staleChoice.body}</p>
+      </BottomSheet>
+    );
+  }
 
   // Remoção com séries feitas: confirma antes de apagar.
   if (pendingRemoval) {
@@ -208,9 +252,8 @@ export function SessaoAtiva({
       auto={descanso.auto}
       onToggleAuto={descanso.setAuto}
       onOpenExercise={sessao.openExercise}
-      onComplete={async () => {
-        // Só depois de confirmada: se concluir falhar, o treino segue com o descanso.
-        if (await sessao.complete()) descanso.stop();
+      onComplete={() => {
+        if (sessao.requestComplete() === "now") void finish("now");
       }}
       completing={sessao.completing}
       onSwapExercise={sessao.openSwap}

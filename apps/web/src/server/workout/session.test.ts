@@ -139,6 +139,43 @@ describe("startSession / completeSession (db em arquivo)", () => {
   });
 });
 
+describe("treino esquecido aberto", () => {
+  async function staleSession() {
+    const db = await createTestDb();
+    const userId = await createTestUser(db);
+    const w = await createWorkout(db, userId, {
+      name: "Pernas",
+      focuses: ["legs"],
+      exercises: [{ name: "Agachamento", targetSets: 2, targetReps: 10, restSeconds: 60, position: 0 }],
+    });
+    const s = await startSession(db, userId, w.id);
+    if (s === "already_active" || s === "not_found") throw new Error("unreachable");
+    const startedAt = new Date(Date.now() - 3 * 60 * 60 * 1000);
+    const lastSet = new Date(Date.now() - 150 * 60 * 1000);
+    await db.update(workoutSession).set({ startedAt }).where(eq(workoutSession.id, s.session.id));
+    await db.update(setLog).set({ done: true, doneAt: lastSet }).where(eq(setLog.id, s.exercises[0].sets[0].id));
+    return { db, userId, sessionId: s.session.id, startedAt, lastSet };
+  }
+
+  test("a sessão ativa expõe a última atividade", async () => {
+    const { db, userId, lastSet } = await staleSession();
+    expect((await getActiveSession(db, userId))?.session.lastActivityAt).toEqual(lastSet);
+  });
+
+  test("concluir na última atividade usa o horário da última série", async () => {
+    const { db, userId, sessionId, startedAt, lastSet } = await staleSession();
+    const done = await completeSession(db, userId, sessionId, "last_activity");
+    expect(done?.completedAt).toEqual(lastSet);
+    expect(done?.durationSec).toBe(Math.round((lastSet.getTime() - startedAt.getTime()) / 1000));
+  });
+
+  test("concluir agora continua sendo o padrão", async () => {
+    const { db, userId, sessionId, lastSet } = await staleSession();
+    const done = await completeSession(db, userId, sessionId);
+    expect(done!.completedAt.getTime()).toBeGreaterThan(lastSet.getTime() + 60 * 60 * 1000);
+  });
+});
+
 describe("ajustes na sessão ativa", () => {
   async function setup() {
     const db = await createTestDb();

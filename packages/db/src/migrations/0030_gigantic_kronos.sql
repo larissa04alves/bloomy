@@ -1,0 +1,1 @@
+ALTER TABLE `workout_session` ADD `stale_notified_at` integer;
