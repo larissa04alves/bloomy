@@ -211,6 +211,13 @@
       "when": 1793974035945,
       "tag": "0029_mixed_christian_walker",
       "breakpoints": true
+    },
+    {
+      "idx": 30,
+      "version": "6",
+      "when": 1794008414233,
+      "tag": "0030_gigantic_kronos",
+      "breakpoints": true
     }
   ]
 }

@@ -105,6 +105,8 @@ export const workoutSession = sqliteTable(
     day: text("day").notNull(),
     startedAt: timestampMs("started_at"),
     completedAt: integer("completed_at", { mode: "timestamp_ms" }),
+    // Push de "treino esquecido aberto" já enviado para o período parado que terminou aqui.
+    staleNotifiedAt: integer("stale_notified_at", { mode: "timestamp_ms" }),
     createdAt: timestampMs("created_at"),
   },
   (table) => [

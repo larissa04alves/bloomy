@@ -23,6 +23,7 @@ import {
   max,
 } from "drizzle-orm";
 
+import { lastActivityAt } from "@/lib/workout-stale";
 import { dayFor, previousDay } from "@/server/shared/day";
 
 import { normalizeFocuses, workoutSummary, type WorkoutWithExercises } from "./service";
@@ -41,7 +42,7 @@ export type SessionExercise = {
 };
 
 export type SessionDetail = {
-  session: WorkoutSession;
+  session: WorkoutSession & { lastActivityAt: Date };
   exercises: SessionExercise[];
 };
 
@@ -121,7 +122,8 @@ async function buildSessionDetail(
     sets: sets.filter((s) => s.sessionExerciseId === row.id),
     lastPerformance: cache.get(row.name) ?? null,
   }));
-  return { session, exercises: detail };
+  const lastActivity = lastActivityAt(session.startedAt, sets.map((s) => s.doneAt));
+  return { session: { ...session, lastActivityAt: lastActivity }, exercises: detail };
 }
 
 /** Inicia uma sessão: 1 ativa por vez; pré-preenche séries com o último treino. */
@@ -449,10 +451,13 @@ export async function sessionAdjustments(
   };
 }
 
+/** `last_activity` conclui no horário da última série (ou do início): para o treino esquecido
+ *  aberto, a duração fica a real, sem as horas paradas. */
 export async function completeSession(
   db: Db,
   userId: string,
   sessionId: string,
+  endAt: "now" | "last_activity" = "now",
 ): Promise<{
   completedAt: Date;
   durationSec: number;
@@ -460,7 +465,8 @@ export async function completeSession(
   adjustments: SessionAdjustments;
   summary: Awaited<ReturnType<typeof workoutSummary>>;
 } | null> {
-  const completedAt = new Date();
+  const completedAt = endAt === "now" ? new Date() : await sessionLastActivity(db, userId, sessionId);
+  if (!completedAt) return null;
   // update atômico: só conclui se ainda estava em andamento — double-tap perde a corrida e recebe null
   const [session] = await db
     .update(workoutSession)
@@ -505,6 +511,17 @@ export type SessionExerciseInput = {
   catalogId?: string | null;
   muscleGroups?: SessionExerciseRow["muscleGroups"];
 };
+
+/** Início ou última série concluída da sessão. Null quando a sessão não é desta pessoa. */
+export async function sessionLastActivity(db: Db, userId: string, sessionId: string): Promise<Date | null> {
+  const [session] = await db
+    .select({ startedAt: workoutSession.startedAt })
+    .from(workoutSession)
+    .where(and(eq(workoutSession.id, sessionId), eq(workoutSession.userId, userId)));
+  if (!session) return null;
+  const sets = await db.select({ doneAt: setLog.doneAt }).from(setLog).where(eq(setLog.sessionId, sessionId));
+  return lastActivityAt(session.startedAt, sets.map((s) => s.doneAt));
+}
 
 /** Sessão em andamento do usuário, por id. Null = 404 (inexistente, alheia ou concluída). */
 async function activeSessionById(

@@ -11,7 +11,7 @@ import {
   reminderDelivery,
 } from "@bloomy/db/schema/reminder";
 import { workout, workoutSession } from "@bloomy/db/schema/workout";
-import { and, eq, gte, isNotNull, lt, lte } from "drizzle-orm";
+import { and, eq, gte, isNotNull, isNull, lt, lte, or } from "drizzle-orm";
 import webpush from "web-push";
 
 import { env } from "@bloomy/env/server";
@@ -19,7 +19,9 @@ import { DEFAULT_GOAL_TARGETS } from "@/lib/api-types";
 import { getCycleState, listDays, pillTodayFrom } from "@/server/cycle/service";
 import { deducePeriods } from "@/server/cycle/calc";
 import { addDays, dayFor, daysBetween, previousDay } from "@/server/shared/day";
-import { notificationFor } from "./messages";
+import { isStale, STALE_AFTER_MS } from "@/lib/workout-stale";
+import { sessionLastActivity } from "@/server/workout/session";
+import { notificationFor, staleWorkoutNotification, type Notification } from "./messages";
 import { listReminders, REMINDER_TYPES } from "./service";
 import { dropDeadSubscription } from "@/server/push/service";
 import {
@@ -62,6 +64,8 @@ export type DispatchResult = {
   missed: number;
   failed: number;
   cleaned: number;
+  /** Avisos de treino esquecido aberto enviados. */
+  stale: number;
 };
 
 function vapidReady(): boolean {
@@ -72,7 +76,7 @@ function vapidReady(): boolean {
  *  `now` entra por parâmetro (e não por `new Date()` interno) para o dispatch ser
  *  exercitável em teste e para a varredura inteira usar um único instante. */
 export async function dispatchReminders(db: Db, now: Date = new Date()): Promise<DispatchResult> {
-  const result: DispatchResult = { scanned: 0, sent: 0, missed: 0, failed: 0, cleaned: 0 };
+  const result: DispatchResult = { scanned: 0, sent: 0, missed: 0, failed: 0, cleaned: 0, stale: 0 };
 
   if (!vapidReady()) {
     console.warn("[reminders] VAPID não configurado — varredura ignorada");
@@ -104,10 +108,15 @@ export async function dispatchReminders(db: Db, now: Date = new Date()): Promise
         continue;
       }
 
-      const delivered = await sendToDevices(db, userId, slot);
+      const delivered = await sendToDevices(db, userId, notificationFor(slot));
       if (delivered) result.sent += 1;
       else result.failed += 1;
     }
+  }
+
+  // Sempre ligado, fora dos lembretes configuráveis: não depende de `reminder`.
+  for (const { userId, workoutName } of await claimStaleSessions(db, now)) {
+    if (await sendToDevices(db, userId, staleWorkoutNotification(workoutName))) result.stale += 1;
   }
 
   result.cleaned = await purgeOldDeliveries(db, now);
@@ -137,13 +146,13 @@ async function claimSlot(db: Db, userId: string, slot: DueSlot): Promise<boolean
 /** Envia para todos os aparelhos do usuário. Uma subscription morta (404/410) é
  *  apagada na hora — é o único sinal que o protocolo dá de app desinstalado ou
  *  permissão revogada. */
-async function sendToDevices(db: Db, userId: string, slot: DueSlot): Promise<boolean> {
+async function sendToDevices(db: Db, userId: string, notification: Notification): Promise<boolean> {
   const devices = await db
     .select()
     .from(pushSubscription)
     .where(eq(pushSubscription.userId, userId));
 
-  const payload = JSON.stringify(notificationFor(slot));
+  const payload = JSON.stringify(notification);
   let anyDelivered = false;
 
   for (const device of devices) {
@@ -169,6 +178,48 @@ async function sendToDevices(db: Db, userId: string, slot: DueSlot): Promise<boo
   }
 
   return anyDelivered;
+}
+
+// Aberto há mais que isso sem mexer não é esquecimento de agora: não vale acordar ninguém.
+const STALE_MAX_MS = 24 * 60 * 60 * 1000;
+
+/** Treinos parados há 2h (desde o início ou a última série) que ainda não foram avisados neste
+ *  período parado. Marca antes de enviar, como `claimSlot`: o update condicional é o que impede
+ *  duas varreduras cruzadas de avisarem duas vezes. Uma série nova depois do aviso abre outro
+ *  período, que pode ser avisado de novo. */
+export async function claimStaleSessions(
+  db: Db,
+  now: Date,
+): Promise<{ userId: string; workoutName: string }[]> {
+  const open = await db
+    .select({ id: workoutSession.id, userId: workoutSession.userId, workoutName: workout.name })
+    .from(workoutSession)
+    .innerJoin(workout, eq(workout.id, workoutSession.workoutId))
+    .where(
+      and(
+        isNull(workoutSession.completedAt),
+        lte(workoutSession.startedAt, new Date(now.getTime() - STALE_AFTER_MS)),
+      ),
+    );
+
+  const claimed: { userId: string; workoutName: string }[] = [];
+  for (const session of open) {
+    const last = await sessionLastActivity(db, session.userId, session.id);
+    if (!last || !isStale(last, now) || now.getTime() - last.getTime() > STALE_MAX_MS) continue;
+    const marked = await db
+      .update(workoutSession)
+      .set({ staleNotifiedAt: now })
+      .where(
+        and(
+          eq(workoutSession.id, session.id),
+          isNull(workoutSession.completedAt),
+          or(isNull(workoutSession.staleNotifiedAt), lt(workoutSession.staleNotifiedAt, last)),
+        ),
+      )
+      .returning({ id: workoutSession.id });
+    if (marked.length > 0) claimed.push({ userId: session.userId, workoutName: session.workoutName });
+  }
+  return claimed;
 }
 
 /** Apaga entregas antigas na própria varredura — sem job extra nem infra nova. */

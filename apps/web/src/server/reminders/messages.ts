@@ -94,3 +94,13 @@ export function notificationFor(slot: DueSlot): Notification {
       };
   }
 }
+
+/** Treino em andamento sem série concluída há 2 horas. */
+export function staleWorkoutNotification(workoutName: string): Notification {
+  return {
+    title: "Esqueceu de concluir o treino?",
+    body: `${workoutName} está aberto e sem séries há 2 horas.`,
+    url: "/treino",
+    tag: "workout-stale",
+  };
+}

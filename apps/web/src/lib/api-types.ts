@@ -203,6 +203,8 @@ export type SessionDetail = {
     day: string;
     startedAt: string;
     completedAt: string | null;
+    /** Início ou última série concluída: base do aviso de treino esquecido aberto. */
+    lastActivityAt: string;
   };
   exercises: SessionExercise[];
 };
