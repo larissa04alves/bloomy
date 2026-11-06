@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
 import { api } from "@/lib/api";
 import type { IntakeSlot, IntakesPayload } from "@/lib/api-types";
@@ -11,6 +11,15 @@ export function useRemedios() {
   const { data, loading, reload, setData } = useResource<IntakesPayload>(
     useCallback(() => api.get<IntakesPayload>("/api/intakes"), []),
   );
+
+  // Como na Home: revalida quando a aba volta a ficar visível, cobrindo a virada da meia-noite.
+  useEffect(() => {
+    const onVisible = () => {
+      if (document.visibilityState === "visible") reload();
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => document.removeEventListener("visibilitychange", onVisible);
+  }, [reload]);
 
   const intakes = data?.intakes ?? [];
   const pill = data?.pill ?? null;

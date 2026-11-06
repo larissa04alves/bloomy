@@ -192,6 +192,15 @@ export function useCiclo() {
     if (inactive) router.replace(ATIVAR_HREF);
   }, [inactive, router]);
 
+  // Como na Home: revalida quando a aba volta a ficar visível, cobrindo a virada da meia-noite.
+  useEffect(() => {
+    const onVisible = () => {
+      if (document.visibilityState === "visible") reload();
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => document.removeEventListener("visibilitychange", onVisible);
+  }, [reload]);
+
   const view = useMemo(() => (cycle ? buildView(cycle, today) : null), [cycle, today]);
 
   const [registro, setRegistro] = useState<{ open: boolean; day: string; initial: RegistroInitial }>({
