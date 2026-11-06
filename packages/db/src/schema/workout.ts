@@ -111,6 +111,8 @@ export const workoutSession = sqliteTable(
   },
   (table) => [
     index("workout_session_user_day_idx").on(table.userId, table.day),
+    // Parcial: a varredura do treino esquecido (a cada minuto) só lê sessões em andamento.
+    index("workout_session_open_idx").on(table.startedAt).where(sql`${table.completedAt} is null`),
   ],
 );
 

@@ -1,6 +1,6 @@
 import { afterAll, describe, expect, test } from "bun:test";
 
-import { reminder } from "@bloomy/db/schema/reminder";
+import { pushSubscription, reminder } from "@bloomy/db/schema/reminder";
 import { setLog, workoutSession } from "@bloomy/db/schema/workout";
 import { eq } from "drizzle-orm";
 
@@ -195,8 +195,11 @@ describe("claimStaleSessions", () => {
   const now = new Date("2026-11-06T21:00:00-03:00");
   const ago = (ms: number) => new Date(now.getTime() - ms);
 
-  async function openSession(startedAgo: number, lastSetAgo: number | null) {
+  async function openSession(startedAgo: number, lastSetAgo: number | null, device = true) {
     const { db, userId } = await setup();
+    if (device) {
+      await db.insert(pushSubscription).values({ userId, endpoint: `https://push.example/${userId}`, p256dh: "k", auth: "a" });
+    }
     const w = await createWorkout(db, userId, {
       name: "Pernas",
       focuses: ["legs"],
@@ -242,6 +245,11 @@ describe("claimStaleSessions", () => {
 
   test("treino aberto há mais de um dia não avisa (esquecido de vez, não de agora)", async () => {
     const { db } = await openSession(30 * HOUR, null);
+    expect(await claimStaleSessions(db, now)).toEqual([]);
+  });
+
+  test("sem aparelho com push não marca nada", async () => {
+    const { db } = await openSession(3 * HOUR, 2 * HOUR, false);
     expect(await claimStaleSessions(db, now)).toEqual([]);
   });
 

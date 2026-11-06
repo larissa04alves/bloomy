@@ -1,0 +1,1 @@
+CREATE INDEX `workout_session_open_idx` ON `workout_session` (`started_at`) WHERE "workout_session"."completed_at" is null;

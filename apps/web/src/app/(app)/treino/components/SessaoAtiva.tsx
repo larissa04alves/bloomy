@@ -33,7 +33,7 @@ export function SessaoAtiva({
   const catalogById = useMemo(() => new Map(catalog.map((c) => [c.id, c])), [catalog]);
   const [preview, setPreview] = useState<CatalogExercise | null>(null);
   const [confirmedSwap, setConfirmedSwap] = useState(false);
-  const { detail, view, activeEx, finishSummary, adjust, pendingRemoval, staleSince } = sessao;
+  const { detail, view, activeEx, finishSummary, adjust, pendingRemoval, staleChoice } = sessao;
 
   // Fecha o "ver execução" ao navegar entre exercícios ou voltar pra lista
   // (não depende do overlay do GifViewer cobrir a tela inteira).
@@ -52,17 +52,17 @@ export function SessaoAtiva({
     (preview ? 1 : 0) +
     (adjust ? 1 : 0) +
     (pendingRemoval ? 1 : 0) +
-    (staleSince ? 1 : 0);
+    (staleChoice ? 1 : 0);
   const { backToList, closeAdjust, cancelRemove, closeStaleChoice } = sessao;
   useBackStack(
     layers,
     useCallback(() => {
-      if (staleSince) closeStaleChoice();
+      if (staleChoice) closeStaleChoice();
       else if (pendingRemoval) cancelRemove();
       else if (preview) setPreview(null);
       else if (adjust) closeAdjust();
       else backToList();
-    }, [staleSince, pendingRemoval, preview, adjust, closeStaleChoice, cancelRemove, closeAdjust, backToList]),
+    }, [staleChoice, pendingRemoval, preview, adjust, closeStaleChoice, cancelRemove, closeAdjust, backToList]),
   );
   const goBack = () => window.history.back();
 
@@ -74,14 +74,14 @@ export function SessaoAtiva({
   };
 
   // Treino parado há 2h: provavelmente esqueceram de concluir; oferece o horário da última série.
-  if (staleSince) {
+  if (staleChoice) {
     return (
       <BottomSheet
         open
         onOpenChange={(open) => {
           if (!open) closeStaleChoice();
         }}
-        title={`Treino parado desde ${staleSince}`}
+        title={staleChoice.title}
         tone="pink"
         icon={<FlagCheckeredIcon size={22} weight="fill" />}
         footer={
@@ -92,7 +92,7 @@ export function SessaoAtiva({
               disabled={sessao.completing}
               className="w-full rounded-full bg-pink-deep py-3.5 font-display font-bold text-white shadow-btn disabled:opacity-70"
             >
-              Concluir às {staleSince}
+              {staleChoice.endLabel}
             </button>
             <button
               type="button"
@@ -105,10 +105,7 @@ export function SessaoAtiva({
           </div>
         }
       >
-        <p className="text-sm font-semibold text-ink-read">
-          Nenhuma série foi concluída depois das {staleSince}. Concluir nesse horário deixa a duração do
-          treino sem as horas paradas.
-        </p>
+        <p className="text-sm font-semibold text-ink-read">{staleChoice.body}</p>
       </BottomSheet>
     );
   }

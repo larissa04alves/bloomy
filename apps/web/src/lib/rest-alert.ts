@@ -5,7 +5,7 @@ export const REST_VIBRATION_PATTERN = [200, 100, 200, 100, 400];
 let ctx: AudioContext | null = null;
 
 /** Cria ou retoma o `AudioContext`. Tem que rodar dentro de um gesto (o toque em
- *  "concluir série"): fora dele o Chrome cria o contexto suspenso e o bipe não sai. */
+ *  "concluir série"): fora dele o Chrome cria o contexto suspenso e o som não sai. */
 export function primeRestTone(): void {
   if (typeof window === "undefined" || !("AudioContext" in window)) return;
   ctx ??= new AudioContext();

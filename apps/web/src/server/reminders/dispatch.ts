@@ -10,8 +10,8 @@ import {
   reminder,
   reminderDelivery,
 } from "@bloomy/db/schema/reminder";
-import { workout, workoutSession } from "@bloomy/db/schema/workout";
-import { and, eq, gte, isNotNull, isNull, lt, lte, or } from "drizzle-orm";
+import { setLog, workout, workoutSession } from "@bloomy/db/schema/workout";
+import { and, eq, exists, gte, isNotNull, isNull, lt, lte, or, sql } from "drizzle-orm";
 import webpush from "web-push";
 
 import { env } from "@bloomy/env/server";
@@ -20,7 +20,6 @@ import { getCycleState, listDays, pillTodayFrom } from "@/server/cycle/service";
 import { deducePeriods } from "@/server/cycle/calc";
 import { addDays, dayFor, daysBetween, previousDay } from "@/server/shared/day";
 import { isStale, STALE_AFTER_MS } from "@/lib/workout-stale";
-import { sessionLastActivity } from "@/server/workout/session";
 import { notificationFor, staleWorkoutNotification, type Notification } from "./messages";
 import { listReminders, REMINDER_TYPES } from "./service";
 import { dropDeadSubscription } from "@/server/push/service";
@@ -186,26 +185,41 @@ const STALE_MAX_MS = 24 * 60 * 60 * 1000;
 /** Treinos parados há 2h (desde o início ou a última série) que ainda não foram avisados neste
  *  período parado. Marca antes de enviar, como `claimSlot`: o update condicional é o que impede
  *  duas varreduras cruzadas de avisarem duas vezes. Uma série nova depois do aviso abre outro
- *  período, que pode ser avisado de novo. */
+ *  período, que pode ser avisado de novo. Roda a cada minuto: uma consulta só, pelo índice
+ *  parcial de sessões abertas, e só de quem tem aparelho para receber. */
 export async function claimStaleSessions(
   db: Db,
   now: Date,
 ): Promise<{ userId: string; workoutName: string }[]> {
   const open = await db
-    .select({ id: workoutSession.id, userId: workoutSession.userId, workoutName: workout.name })
+    .select({
+      id: workoutSession.id,
+      userId: workoutSession.userId,
+      workoutName: workout.name,
+      startedAt: workoutSession.startedAt,
+      // Subconsulta correlacionada, não join + GROUP BY: com o agrupamento o SQLite varre a
+      // tabela pela chave primária em vez de usar o índice parcial.
+      lastDoneMs: sql<number | null>`(select max(${setLog.doneAt}) from ${setLog} where ${setLog.sessionId} = ${workoutSession.id})`,
+    })
     .from(workoutSession)
     .innerJoin(workout, eq(workout.id, workoutSession.workoutId))
     .where(
       and(
         isNull(workoutSession.completedAt),
         lte(workoutSession.startedAt, new Date(now.getTime() - STALE_AFTER_MS)),
+        exists(
+          db
+            .select({ one: sql`1` })
+            .from(pushSubscription)
+            .where(eq(pushSubscription.userId, workoutSession.userId)),
+        ),
       ),
     );
 
   const claimed: { userId: string; workoutName: string }[] = [];
   for (const session of open) {
-    const last = await sessionLastActivity(db, session.userId, session.id);
-    if (!last || !isStale(last, now) || now.getTime() - last.getTime() > STALE_MAX_MS) continue;
+    const last = new Date(Math.max(session.startedAt.getTime(), session.lastDoneMs ?? 0));
+    if (!isStale(last, now) || now.getTime() - last.getTime() > STALE_MAX_MS) continue;
     const marked = await db
       .update(workoutSession)
       .set({ staleNotifiedAt: now })

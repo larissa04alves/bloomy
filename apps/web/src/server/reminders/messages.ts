@@ -99,7 +99,7 @@ export function notificationFor(slot: DueSlot): Notification {
 export function staleWorkoutNotification(workoutName: string): Notification {
   return {
     title: "Esqueceu de concluir o treino?",
-    body: `${workoutName} está aberto e sem séries há 2 horas.`,
+    body: `${workoutName} está aberto e sem séries há mais de 2 horas.`,
     url: "/treino",
     tag: "workout-stale",
   };
