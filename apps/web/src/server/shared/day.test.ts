@@ -1,6 +1,6 @@
 import { describe, expect, it, test } from "bun:test";
 
-import { dayFor, weekDays } from "./day";
+import { addDays, dayFor, daysBetween, weekDays } from "./day";
 
 describe("dayFor (America/Sao_Paulo, UTC-3)", () => {
   test("02:59Z ainda é o dia anterior em SP", () => {
@@ -32,5 +32,18 @@ describe("weekDays (seg→dom)", () => {
   });
   it("segunda é o primeiro dia", () => {
     expect(weekDays("2026-07-13")[0]).toBe("2026-07-13");
+  });
+});
+
+describe("addDays / daysBetween", () => {
+  test("addDays atravessa a virada de ano", () => {
+    expect(addDays("2026-12-30", 3)).toBe("2027-01-02");
+  });
+  test("addDays negativo volta para o fim de fevereiro", () => {
+    expect(addDays("2026-03-01", -1)).toBe("2026-02-28");
+  });
+  test("daysBetween conta to - from em dias", () => {
+    expect(daysBetween("2026-10-28", "2026-11-05")).toBe(8);
+    expect(daysBetween("2026-11-05", "2026-10-28")).toBe(-8);
   });
 });

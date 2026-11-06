@@ -204,6 +204,13 @@
       "when": 1793795987815,
       "tag": "0028_living_leper_queen",
       "breakpoints": true
+    },
+    {
+      "idx": 29,
+      "version": "6",
+      "when": 1793974035945,
+      "tag": "0029_mixed_christian_walker",
+      "breakpoints": true
     }
   ]
 }

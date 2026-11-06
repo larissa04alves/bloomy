@@ -27,10 +27,22 @@ export function weekDays(reference: string = dayFor()): string[] {
 
 /** A véspera de `day` (YYYY-MM-DD). Aritmética de calendário — sem fuso envolvido. */
 export function previousDay(day: string): string {
+  return addDays(day, -1);
+}
+
+function utcDate(day: string): Date {
   const [y, m, d] = day.split("-").map(Number);
-  const dt = new Date(Date.UTC(y, m - 1, d));
-  dt.setUTCDate(dt.getUTCDate() - 1);
+  return new Date(Date.UTC(y, m - 1, d));
+}
+
+export function addDays(day: string, n: number): string {
+  const dt = utcDate(day);
+  dt.setUTCDate(dt.getUTCDate() + n);
   return dt.toISOString().slice(0, 10);
+}
+
+export function daysBetween(from: string, to: string): number {
+  return Math.round((utcDate(to).getTime() - utcDate(from).getTime()) / 86_400_000);
 }
 
 export const DAY_SCHEMA = z.iso.date();

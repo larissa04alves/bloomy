@@ -8,6 +8,15 @@ import { DEFAULT_TIME, hasOwnTime, type ReminderType } from "./slots";
 
 export type ReminderUpdate = { time?: string; enabled?: boolean };
 
+// Ciclo: as linhas existem mesmo com o ciclo desativado; a tela as esconde e o
+// dispatch não gera slot sem `cycle`. "Ainda menstruada?" é opt-in pelo produto.
+// Apagar os dados do ciclo volta estas linhas a este estado.
+export const CYCLE_REMINDER_DEFAULTS = [
+  { type: "pill", time: null, enabled: true },
+  { type: "cycle_soon", time: null, enabled: true },
+  { type: "period_check", time: null, enabled: false },
+] as const satisfies readonly { type: ReminderType; time: null; enabled: boolean }[];
+
 /** Estado inicial: o app lembra por padrão. Consultas nasce ligado — diferente do
  *  protótipo, que não previa aviso de exame nem o de 1h antes; nascer desligado
  *  significaria não receber nada até ligar na mão. */
@@ -17,7 +26,10 @@ const DEFAULTS: { type: ReminderType; time: string | null; enabled: boolean }[] 
   { type: "workout", time: DEFAULT_TIME.workout, enabled: true },
   { type: "mind", time: DEFAULT_TIME.mind, enabled: true },
   { type: "appointments", time: null, enabled: true },
+  ...CYCLE_REMINDER_DEFAULTS,
 ];
+
+export const REMINDER_TYPES = DEFAULTS.map((d) => d.type);
 
 /** Garante as linhas default e devolve todas. O seed é lazy (no primeiro GET) e
  *  não no onboarding porque já existem usuários que passaram por ele — eles
@@ -38,7 +50,7 @@ export async function listReminders(db: Db, userId: string): Promise<Reminder[]>
   return sortByType(await db.select().from(reminder).where(eq(reminder.userId, userId)));
 }
 
-/** Ordem da tela, não do banco: água, remédios, treino, mente, consultas. */
+/** Ordem da tela, não do banco: a de `DEFAULTS`. */
 function sortByType(rows: Reminder[]): Reminder[] {
   const order = DEFAULTS.map((d) => d.type);
   return [...rows].sort((a, b) => order.indexOf(a.type) - order.indexOf(b.type));

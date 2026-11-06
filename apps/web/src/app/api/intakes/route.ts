@@ -12,6 +12,7 @@ import {
 } from "@/server/shared/api";
 import { DAY_SCHEMA, dayFor, resolveDay } from "@/server/shared/day";
 import { TIME_SCHEMA } from "@/server/shared/time";
+import { getPillToday } from "@/server/cycle/service";
 import { getIntakesDay, markIntake, unmarkIntake } from "@/server/medications/service";
 
 const MARK_SCHEMA = z.object({
@@ -27,7 +28,11 @@ export async function GET(request: Request) {
   const day = resolveDay(request);
   if (!day.ok) return badRequest("invalid day");
 
-  return Response.json({ intakes: await getIntakesDay(db, userId, day.day) });
+  const [intakes, pill] = await Promise.all([
+    getIntakesDay(db, userId, day.day),
+    getPillToday(db, userId, day.day),
+  ]);
+  return Response.json({ intakes, pill });
 }
 
 export async function POST(request: Request) {

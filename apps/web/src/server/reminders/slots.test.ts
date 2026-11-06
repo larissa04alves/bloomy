@@ -17,6 +17,9 @@ const R = {
   workout: { id: "r-workout", type: "workout", time: DEFAULT_TIME.workout, enabled: true },
   mind: { id: "r-mind", type: "mind", time: DEFAULT_TIME.mind, enabled: true },
   appointments: { id: "r-appt", type: "appointments", time: null, enabled: true },
+  pill: { id: "r-pill", type: "pill", time: null, enabled: true },
+  cycleSoon: { id: "r-soon", type: "cycle_soon", time: null, enabled: true },
+  periodCheck: { id: "r-check", type: "period_check", time: null, enabled: true },
 } satisfies Record<string, ReminderRow>;
 
 function state(over: Partial<UserState> = {}): UserState {
@@ -27,6 +30,7 @@ function state(over: Partial<UserState> = {}): UserState {
     workout: { hasActive: true, doneToday: false },
     mind: { checkedInToday: false },
     events: [],
+    cycle: null,
     delivered: new Set(),
     ...over,
   };
@@ -266,5 +270,70 @@ describe("toggle desligado", () => {
   test("lembrete com enabled false nunca sai", () => {
     const s = state({ reminders: [{ ...R.water, enabled: false }] });
     expect(dueSlotsAt(at("2026-07-06T12:00:00Z"), s)).toEqual([]);
+  });
+});
+
+describe("ciclo", () => {
+  const CYCLE_TYPES = ["pill", "cycle_soon", "period_check"];
+  const only = (cycle: UserState["cycle"]) =>
+    state({ reminders: [R.pill, R.cycleSoon, R.periodCheck], cycle });
+  const cycle = (over: Partial<NonNullable<UserState["cycle"]>> = {}): UserState["cycle"] => ({
+    pill: null,
+    soonDay: null,
+    soonKind: null,
+    periodCheck: false,
+    ...over,
+  });
+  const pill = { time: "21:00", taken: false, label: "comprimido 15 de 21" };
+  const at21 = at("2026-07-07T00:00:00Z"); // 21:00 local do dia 06
+
+  test("pílula devida às 21:00 e não tomada envia às 21:00", () => {
+    const due = dueSlotsAt(at21, only(cycle({ pill })));
+    expect(due.map((d) => ({ type: d.type, slot: d.slot, action: d.action, label: d.label }))).toEqual([
+      { type: "pill", slot: "21:00", action: "send", label: "comprimido 15 de 21" },
+    ]);
+  });
+
+  test("pílula já tomada não lembra", () => {
+    const due = dueSlotsAt(at21, only(cycle({ pill: { ...pill, taken: true } })));
+    expect(due).toEqual([]);
+  });
+
+  test("ciclo desativado não gera nenhum dos três", () => {
+    const due = dueSlotsAt(at21, state({ cycle: null }));
+    expect(due.some((d) => CYCLE_TYPES.includes(d.type))).toBe(false);
+  });
+
+  test("ciclo chegando sai às 09:00 no soonDay, com o tipo de previsão", () => {
+    const due = dueSlotsAt(
+      at("2026-07-06T12:00:00Z"),
+      only(cycle({ soonDay: "2026-07-06", soonKind: "pause" })),
+    );
+    expect(due.map((d) => ({ type: d.type, slot: d.slot, soonKind: d.soonKind }))).toEqual([
+      { type: "cycle_soon", slot: "09:00", soonKind: "pause" },
+    ]);
+  });
+
+  test("ciclo chegando não sai fora do soonDay", () => {
+    const due = dueSlotsAt(
+      at("2026-07-06T12:00:00Z"),
+      only(cycle({ soonDay: "2026-07-05", soonKind: "period" })),
+    );
+    expect(due).toEqual([]);
+  });
+
+  test("ainda menstruada sai às 20:00", () => {
+    const due = dueSlotsAt(at("2026-07-06T23:00:00Z"), only(cycle({ periodCheck: true })));
+    expect(due.map((d) => ({ type: d.type, slot: d.slot }))).toEqual([
+      { type: "period_check", slot: "20:00" },
+    ]);
+  });
+
+  test("toggle desligado silencia a linha do ciclo", () => {
+    const s = state({
+      reminders: [{ ...R.periodCheck, enabled: false }],
+      cycle: cycle({ periodCheck: true }),
+    });
+    expect(dueSlotsAt(at("2026-07-06T23:00:00Z"), s)).toEqual([]);
   });
 });

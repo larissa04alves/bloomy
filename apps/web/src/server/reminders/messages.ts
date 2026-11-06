@@ -65,5 +65,32 @@ export function notificationFor(slot: DueSlot): Notification {
         tag: slot.refId,
       };
     }
+
+    case "pill":
+      return {
+        title: "Hora da pílula",
+        body: slot.label ?? "",
+        url: "/ciclo",
+        tag: "pill",
+      };
+
+    case "cycle_soon":
+      return {
+        title:
+          slot.soonKind === "pause"
+            ? "Sua pausa começa em 2 dias"
+            : "Sua menstruação deve vir em ~2 dias",
+        body: "A previsão completa está no Ciclo.",
+        url: "/ciclo",
+        tag: "cycle_soon",
+      };
+
+    case "period_check":
+      return {
+        title: "Ainda menstruada?",
+        body: "Registre como está hoje",
+        url: "/ciclo",
+        tag: "period_check",
+      };
   }
 }

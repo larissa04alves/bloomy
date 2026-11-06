@@ -7,7 +7,8 @@ import { timestampMs } from "./_columns";
  *
  *  `time` é nulo nos tipos cujo horário não é escolhido aqui: `water` segue um
  *  intervalo constante, `meds` deriva de `medication.times` e `appointments`
- *  deriva de `appointment.scheduledAt`. Só `workout` e `mind` guardam horário. */
+ *  deriva de `appointment.scheduledAt`. Só `workout` e `mind` guardam horário: o da
+ *  pílula fica em `cycle_method.pill_time` e os outros do ciclo são constantes. */
 export const reminder = sqliteTable(
   "reminder",
   {
@@ -18,7 +19,7 @@ export const reminder = sqliteTable(
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
     type: text("type")
-      .$type<"water" | "meds" | "workout" | "mind" | "appointments">()
+      .$type<"water" | "meds" | "workout" | "mind" | "appointments" | "pill" | "cycle_soon" | "period_check">()
       .notNull(),
     time: text("time"),
     enabled: integer("enabled", { mode: "boolean" }).default(true).notNull(),

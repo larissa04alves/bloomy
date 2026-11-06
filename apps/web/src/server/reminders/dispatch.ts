@@ -16,10 +16,14 @@ import webpush from "web-push";
 
 import { env } from "@bloomy/env/server";
 import { DEFAULT_GOAL_TARGETS } from "@/lib/api-types";
-import { dayFor, previousDay } from "@/server/shared/day";
+import { getCycleState, listDays, pillTodayFrom } from "@/server/cycle/service";
+import { deducePeriods } from "@/server/cycle/calc";
+import { addDays, dayFor, daysBetween, previousDay } from "@/server/shared/day";
 import { notificationFor } from "./messages";
+import { listReminders, REMINDER_TYPES } from "./service";
 import { dropDeadSubscription } from "@/server/push/service";
 import {
+  CYCLE_REMINDER_TYPES,
   deliveryKey,
   dueSlotsAt,
   TOLERANCE_MINUTES,
@@ -182,7 +186,33 @@ async function purgeOldDeliveries(db: Db, now: Date): Promise<number> {
 async function loadUserState(db: Db, userId: string, now: Date): Promise<UserState | null> {
   const day = dayFor(now);
 
-  const reminders = (await db
+  const reminders = await loadReminderRows(db, userId);
+  if (!reminders.some((r) => r.enabled)) return null;
+
+  const wantsCycle = reminders.some((r) => r.enabled && CYCLE_REMINDER_TYPES.includes(r.type));
+
+  const [water, meds, workoutState, mind, events, cycle, delivered] = await Promise.all([
+    loadWater(db, userId, day),
+    loadMeds(db, userId, day),
+    loadWorkout(db, userId, day),
+    loadMind(db, userId, day),
+    loadEvents(db, userId, now),
+    wantsCycle
+      ? loadCycle(db, userId, day, {
+          periodCheck: reminders.some((r) => r.enabled && r.type === "period_check"),
+        })
+      : null,
+    loadDelivered(db, userId, day),
+  ]);
+
+  return { reminders, water, meds, workout: workoutState, mind, events, cycle, delivered };
+}
+
+/** Quem já tinha lembretes antes de um tipo novo existir ganha a linha default aqui,
+ *  e não só ao abrir a Notificações. Sem nenhuma linha, segue sem nada: o seed
+ *  completo continua sendo do primeiro GET. */
+export async function loadReminderRows(db: Db, userId: string): Promise<ReminderRow[]> {
+  let rows: ReminderRow[] = await db
     .select({
       id: reminder.id,
       type: reminder.type,
@@ -190,20 +220,57 @@ async function loadUserState(db: Db, userId: string, now: Date): Promise<UserSta
       enabled: reminder.enabled,
     })
     .from(reminder)
-    .where(eq(reminder.userId, userId))) as ReminderRow[];
+    .where(eq(reminder.userId, userId));
 
-  if (!reminders.some((r) => r.enabled)) return null;
+  if (rows.length > 0 && rows.length < REMINDER_TYPES.length) {
+    rows = (await listReminders(db, userId)).map(({ id, type, time, enabled }) => ({
+      id,
+      type,
+      time,
+      enabled,
+    }));
+  }
+  return rows;
+}
 
-  const [water, meds, workoutState, mind, events, delivered] = await Promise.all([
-    loadWater(db, userId, day),
-    loadMeds(db, userId, day),
-    loadWorkout(db, userId, day),
-    loadMind(db, userId, day),
-    loadEvents(db, userId, now),
-    loadDelivered(db, userId, day),
-  ]);
+/** Um único `getCycleState` alimenta os três lembretes do ciclo; `null` = desativado. */
+export async function loadCycle(
+  db: Db,
+  userId: string,
+  day: string,
+  opts: { periodCheck: boolean },
+): Promise<UserState["cycle"]> {
+  const state = await getCycleState(db, userId, day);
+  if (!state) return null;
 
-  return { reminders, water, meds, workout: workoutState, mind, events, delivered };
+  let soonDay: string | null = null;
+  let soonKind: "period" | "pause" | null = null;
+  if (state.natural) {
+    soonDay = addDays(state.natural.window.from, -2);
+    soonKind = "period";
+  } else if (state.scheduled?.phase === "active") {
+    soonDay = addDays(state.scheduled.nextPause.from, -2);
+    soonKind = "pause";
+  }
+
+  return {
+    pill: pillTodayFrom(state),
+    soonDay,
+    soonKind,
+    // `today.flow` só é null sem linha no dia: qualquer registro, até "Nada", silencia.
+    periodCheck:
+      opts.periodCheck && state.today.flow === null && (await bleedingSince(db, userId, day)) >= 4,
+  };
+}
+
+/** Há quantos dias começou a menstruação que seguia até ontem (0 se não seguia).
+ *  A janela curta basta: só importa se passou de 4. */
+async function bleedingSince(db: Db, userId: string, day: string): Promise<number> {
+  const yesterday = previousDay(day);
+  const recent = await listDays(db, userId, addDays(day, -10), yesterday);
+  const last = deducePeriods(recent).at(-1);
+  if (!last || last.end !== yesterday) return 0;
+  return daysBetween(last.start, day);
 }
 
 async function loadWater(db: Db, userId: string, day: string) {

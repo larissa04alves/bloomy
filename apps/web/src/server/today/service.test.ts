@@ -4,6 +4,7 @@ import {
   completeAppointment,
   createAppointment,
 } from "@/server/health/service";
+import { activateCycle, setCycleEnabled, setPillTaken } from "@/server/cycle/service";
 import { addMeal } from "@/server/meals/service";
 import { createMedication, markIntake } from "@/server/medications/service";
 import { updateProfile } from "@/server/profile/service";
@@ -192,4 +193,43 @@ describe("getToday", () => {
     });
   });
 
+  describe("pílula do ciclo em meds", () => {
+    const PILL = {
+      kind: "pill",
+      activeDays: 21,
+      pauseEvery: 4,
+      pillTime: "21:00",
+      currentUnitStart: "2026-10-22",
+      currentUnit: 3,
+    } as const;
+
+    async function withPill() {
+      const db = await createTestDb();
+      await createTestUser(db);
+      await activateCycle(db, USER.id, PILL, "2026-11-05");
+      return db;
+    }
+
+    test("ativa e não tomada conta no total", async () => {
+      const db = await withPill();
+      expect((await getToday(db, USER, "2026-11-05")).meds).toEqual({ taken: 0, total: 1 });
+    });
+
+    test("tomada conta nos dois", async () => {
+      const db = await withPill();
+      await setPillTaken(db, USER.id, "2026-11-05", true);
+      expect((await getToday(db, USER, "2026-11-05")).meds).toEqual({ taken: 1, total: 1 });
+    });
+
+    test("na pausa não conta", async () => {
+      const db = await withPill();
+      expect((await getToday(db, USER, "2026-12-05")).meds).toEqual({ taken: 0, total: 0 });
+    });
+
+    test("ciclo desativado não conta", async () => {
+      const db = await withPill();
+      await setCycleEnabled(db, USER.id, false);
+      expect((await getToday(db, USER, "2026-11-05")).meds).toEqual({ taken: 0, total: 0 });
+    });
+  });
 });
