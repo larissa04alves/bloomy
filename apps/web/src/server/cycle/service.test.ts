@@ -150,7 +150,7 @@ describe("addAnchor com data da pausa", () => {
   test("estado expõe o intervalo do início da pausa", async () => {
     const { db, userId } = await setup();
     expect((await getCycleState(db, userId, "2026-11-06"))?.scheduled?.pauseStartRange).toEqual({
-      min: "2026-10-22",
+      min: "2026-10-31",
       max: "2026-11-06",
     });
   });

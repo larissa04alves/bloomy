@@ -173,8 +173,11 @@ export function DatePickerField({
                   selected={value}
                   defaultMonth={value}
                   onSelect={(date) => {
-                    onChange(date);
-                    if (date) setRaw(formatDateBR(date));
+                    // Tocar de novo no dia selecionado o desmarcaria: no campo de data, mantém a escolha.
+                    if (date) {
+                      onChange(date);
+                      setRaw(formatDateBR(date));
+                    }
                     setOpen(false);
                   }}
                   locale={ptBR}

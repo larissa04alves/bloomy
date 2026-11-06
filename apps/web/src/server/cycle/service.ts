@@ -358,8 +358,9 @@ async function scheduledPosition(db: Db, userId: string, method: CycleMethod, to
     .from(cycleAnchor)
     .where(and(eq(cycleAnchor.userId, userId), gte(cycleAnchor.createdAt, method.createdAt)))
     .orderBy(asc(cycleAnchor.day), asc(cycleAnchor.id));
-  const position = pillPosition(scheduledOf(method), anchors, today);
-  return { ...position, pauseStartRange: pauseStartRange(position, today, method.sequenceStart!) };
+  const scheduled = scheduledOf(method);
+  const position = pillPosition(scheduled, anchors, today);
+  return { ...position, pauseStartRange: pauseStartRange(position, today, scheduled) };
 }
 
 export async function getCycleState(db: Db, userId: string, today: string): Promise<CycleState | null> {

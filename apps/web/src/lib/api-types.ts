@@ -411,7 +411,7 @@ export type CycleState = {
   };
   mode: CycleMode;
   natural?: ReturnType<typeof naturalPrediction>;
-  /** `pauseStartRange`: dias aceitos como início da pausa (do início da cartela atual até hoje). */
+  /** `pauseStartRange`: dias aceitos como início da pausa (os que deixam hoje dentro dela, sem passar do início da cartela atual). */
   scheduled?: ReturnType<typeof pillPosition> & { pauseStartRange: { min: string; max: string } };
   continuous?: ReturnType<typeof continuousSummary>;
   today: { flow: CycleFlow | null; symptoms: CycleSymptom[] };

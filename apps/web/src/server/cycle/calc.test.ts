@@ -207,35 +207,27 @@ describe("pillPosition", () => {
 describe("pauseStartRange", () => {
   const method: ScheduledMethod = { sequenceStart: "2026-09-10", activeDays: 21, pauseEvery: 4, pauseDays: 7 };
 
-  test("fase ativa: do início da cartela atual até hoje", () => {
+  test("fase ativa: só dias que deixam hoje dentro da pausa", () => {
     const position = pillPosition(method, [], "2026-11-05");
-    expect(pauseStartRange(position, "2026-11-05", method.sequenceStart)).toEqual({
-      min: "2026-10-22",
-      max: "2026-11-05",
-    });
+    expect(pauseStartRange(position, "2026-11-05", method)).toEqual({ min: "2026-10-30", max: "2026-11-05" });
   });
 
-  test("fase de pausa: do início da cartela que a pausa encerrou até hoje", () => {
+  test("fase de pausa: não volta além do 1º dia de uma pausa que inclua hoje", () => {
     const position = pillPosition(method, [], "2026-12-05");
-    expect(pauseStartRange(position, "2026-12-05", method.sequenceStart)).toEqual({
-      min: "2026-11-12",
-      max: "2026-12-05",
-    });
+    expect(pauseStartRange(position, "2026-12-05", method)).toEqual({ min: "2026-11-29", max: "2026-12-05" });
   });
 
-  test("pausa reancorada no meio da 4ª cartela: começa no início dessa cartela", () => {
-    const anchors = [{ day: "2026-11-20", kind: "pause_started" as const }];
-    const position = pillPosition(method, anchors, "2026-11-22");
-    expect(pauseStartRange(position, "2026-11-22", method.sequenceStart)).toEqual({
-      min: "2026-11-12",
-      max: "2026-11-22",
-    });
+  test("cartela mais curta que a pausa: começa no início da cartela", () => {
+    const anchors = [{ day: "2026-11-14", kind: "pause_started" as const }];
+    const position = pillPosition(method, anchors, "2026-11-16");
+    expect(pauseStartRange(position, "2026-11-16", method)).toEqual({ min: "2026-11-12", max: "2026-11-16" });
   });
 
   test("não recua antes do início da sequência", () => {
-    expect(
-      pauseStartRange({ phase: "active", pill: 5, pauseDay: null }, "2026-09-12", method.sequenceStart),
-    ).toEqual({ min: "2026-09-10", max: "2026-09-12" });
+    expect(pauseStartRange({ phase: "active", pill: 3, pauseDay: null }, "2026-09-12", method)).toEqual({
+      min: "2026-09-10",
+      max: "2026-09-12",
+    });
   });
 });
 

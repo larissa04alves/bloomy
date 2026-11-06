@@ -168,18 +168,25 @@ export function pillPosition(
   };
 }
 
-/** Dias em que "comecei a pausa" pode cair: da unidade atual (ou da que a pausa atual encerrou) até hoje. */
+/**
+ * Dias em que "comecei a pausa" pode cair: desde o início da cartela atual (ou da que a pausa
+ * atual encerrou), mas só os que deixam hoje dentro da pausa. Uma pausa já encerrada viraria
+ * cartela nova e a âncora sairia do alcance da correção.
+ */
 export function pauseStartRange(
   position: Pick<ReturnType<typeof pillPosition>, "phase" | "pill" | "pauseDay">,
   today: string,
-  sequenceStart: string,
+  method: Pick<ScheduledMethod, "sequenceStart" | "pauseDays">,
 ): { min: string; max: string } {
   const unitStart =
     position.phase === "pause"
       ? addDays(addDays(today, -((position.pauseDay ?? 1) - 1)), -position.pill)
       : addDays(today, -(position.pill - 1));
   // buildSequence ignora âncora antes do início da sequência.
-  return { min: unitStart < sequenceStart ? sequenceStart : unitStart, max: today };
+  const min = [unitStart, addDays(today, -(method.pauseDays - 1)), method.sequenceStart].reduce((a, b) =>
+    a > b ? a : b,
+  );
+  return { min, max: today };
 }
 
 export function pillSequences(

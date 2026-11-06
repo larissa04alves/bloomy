@@ -7,7 +7,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { ApiError, api } from "@/lib/api";
 import type { CycleAnchorBody, CycleDayBody, CycleState, DayEntry } from "@/lib/api-types";
 import { activeDaysFor, ATIVAR_HREF, type CycleFlow, type CycleSymptom } from "@/lib/cycle";
-import { toastError } from "@/lib/toast";
+import { toastError, toastErrorText } from "@/lib/toast";
 import { useResource } from "@/lib/use-resource";
 import { addDays, dayFor } from "@/server/shared/day";
 
@@ -164,9 +164,15 @@ function buildView(cycle: CycleState, today: string) {
 
 export type CicloView = ReturnType<typeof buildView>;
 
-function saveErrorMessage(e: unknown): string {
-  if (e instanceof ApiError && e.status === 422) return "Esse dia ainda não chegou";
-  return "Não foi possível salvar o registro";
+// O 422 traz o código da regra, não uma frase para a tela.
+const REASON_MESSAGES: Record<string, string> = {
+  future_day: "Esse dia ainda não chegou",
+  day_out_of_range: "Esse dia está fora da cartela atual",
+};
+
+function toastCycleError(e: unknown, fallback: string) {
+  if (e instanceof ApiError && e.status === 422) toastErrorText(REASON_MESSAGES[e.message] ?? fallback);
+  else toastError(e, fallback);
 }
 
 export function useCiclo() {
@@ -210,7 +216,7 @@ export function useCiclo() {
       try {
         ({ entry: saved } = await api.put<{ entry: DayEntry }>(`/api/cycle/days/${day}`, entry));
       } catch (e) {
-        toastError(e, saveErrorMessage(e));
+        toastCycleError(e, "Não foi possível salvar o registro");
         return false;
       }
       // O card de hoje não pode depender do reload: um toggle da pílula em voo o invalida.
@@ -269,7 +275,7 @@ export function useCiclo() {
         setData(await api.post<{ cycle: CycleState | null }>("/api/cycle/anchors", body));
         return true;
       } catch (e) {
-        toastError(e, "Não foi possível ajustar a cartela");
+        toastCycleError(e, "Não foi possível ajustar a cartela");
         return false;
       } finally {
         setBusy(false);
