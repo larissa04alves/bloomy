@@ -3,11 +3,19 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { api } from "@/lib/api";
-import type { Medication, Profile, Reminder } from "@/lib/api-types";
+import type { CycleState, Medication, Profile, Reminder, ReminderType } from "@/lib/api-types";
 import { toastError } from "@/lib/toast";
 import { usePushSync } from "@/lib/use-push-sync";
 import { useResource } from "@/lib/use-resource";
-import { DEFAULT_TIME, hasOwnTime } from "@/server/reminders/slots";
+import { CYCLE_REMINDER_TYPES, cycleReminderApplies, DEFAULT_TIME, hasOwnTime } from "@/server/reminders/slots";
+
+/** Com o ciclo desativado as linhas do ciclo somem (e não contam para manter o
+ *  push); as outras do ciclo só aparecem quando o método atual pode dispará-las. */
+function isVisible(type: ReminderType, cycle: CycleState | null): boolean {
+  if (!CYCLE_REMINDER_TYPES.includes(type)) return true;
+  if (!cycle) return false;
+  return cycleReminderApplies(type, { kind: cycle.method.kind, mode: cycle.mode });
+}
 
 export function useNotificacoes() {
   const {
@@ -29,6 +37,15 @@ export function useNotificacoes() {
     useCallback(() => api.get<{ medications: Medication[] }>("/api/medications"), []),
   );
 
+  const {
+    data: cycleData,
+    error: cycleError,
+    reload: reloadCycle,
+  } = useResource<{ cycle: CycleState | null }>(
+    useCallback(() => api.get<{ cycle: CycleState | null }>("/api/cycle"), []),
+  );
+  const cycle = cycleData?.cycle ?? null;
+
   // O aviso de fim do descanso mora no profile (vale para a conta).
   const {
     data: profileData,
@@ -46,8 +63,9 @@ export function useNotificacoes() {
   // e precisa decidir com o que a tela mostra agora, não com o que via ao começar.
   const latestReminders = useRef<Reminder[] | null>(null);
   useEffect(() => {
-    latestReminders.current = remindersData?.reminders ?? null;
-  }, [remindersData]);
+    latestReminders.current =
+      remindersData?.reminders.filter((r) => isVisible(r.type, cycle)) ?? null;
+  }, [remindersData, cycle]);
   const latestRestAlert = useRef(restAlert);
   useEffect(() => {
     latestRestAlert.current = restAlert;
@@ -74,10 +92,10 @@ export function useNotificacoes() {
       // Decide pelo estado MAIS RECENTE, não pelo snapshot deste toggle: dois
       // toggles em sequência rápida terminam fora de ordem, e o snapshot do
       // primeiro ainda veria o segundo ligado — reativaria o push com tudo desligado.
-      const latest = latestReminders.current ?? next;
+      const latest = latestReminders.current ?? next.filter((r) => isVisible(r.type, cycle));
       await syncPush(latest.some((r) => r.enabled) || latestRestAlert.current);
     },
-    [remindersData, setReminders, syncPush],
+    [remindersData, setReminders, syncPush, cycle],
   );
 
   /** O aviso de descanso também é motivo para manter o push: desligá-lo só devolve a
@@ -129,7 +147,7 @@ export function useNotificacoes() {
   );
 
   const [sheetId, setSheetId] = useState<string | null>(null);
-  const reminders = remindersData?.reminders ?? [];
+  const reminders = (remindersData?.reminders ?? []).filter((r) => isVisible(r.type, cycle));
 
   // A sheet só existe para tipos com horário próprio; o horário exibido cai no
   // default do próprio tipo quando o banco ainda não tem um (mente 21:00, treino 18:00).
@@ -144,6 +162,10 @@ export function useNotificacoes() {
     hasOwnTime,
     sheet,
     hasMedication: (medsData?.medications ?? []).some((m) => m.active),
+    pill:
+      cycle?.method.kind === "pill"
+        ? { time: cycle.method.pillTime ?? "", pauses: cycle.method.pauseEvery !== null }
+        : null,
     permission,
     // Os lembretes nascem ligados, então o toggle (que hoje pede a permissão) pode
     // nunca ser tocado: sem este convite o aparelho jamais se registraria.
@@ -151,16 +173,18 @@ export function useNotificacoes() {
       permission === "default" && (reminders.some((r) => r.enabled) || restAlert),
     activate: useCallback(() => syncPush(true), [syncPush]),
 
-    // `ready` só com os TRÊS recursos em mãos: sem os remédios a linha de remédios
+    // `ready` só com os QUATRO recursos em mãos: sem os remédios a linha de remédios
     // piscaria habilitada antes de descobrir que não há cadastro; sem o profile, o
-    // toggle do descanso piscaria no default.
-    ready: remindersData !== null && medsData !== null && profileData !== null,
-    error: remindersError ?? medsError ?? profileError,
+    // toggle do descanso piscaria no default; sem o ciclo, as linhas dele piscariam.
+    ready:
+      remindersData !== null && medsData !== null && profileData !== null && cycleData !== null,
+    error: remindersError ?? medsError ?? profileError ?? cycleError,
     reload: useCallback(() => {
       reloadReminders();
       reloadMeds();
       reloadProfile();
-    }, [reloadReminders, reloadMeds, reloadProfile]),
+      reloadCycle();
+    }, [reloadReminders, reloadMeds, reloadProfile, reloadCycle]),
 
     restAlert,
     setRestAlert,

@@ -36,4 +36,23 @@ describe("reminderSubtitle", () => {
   it("consultas descrevem os dois avisos", () => {
     expect(reminderSubtitle("appointments", withMeds)).toBe("1 dia antes e 1 hora antes");
   });
+
+  it("pílula mostra o horário do método e que descansa na pausa", () => {
+    expect(reminderSubtitle("pill", { ...withMeds, pill: { time: "21:00", pauses: true } })).toBe(
+      "21:00 · descansa na pausa",
+    );
+  });
+
+  it("pílula contínua não fala de pausa", () => {
+    expect(reminderSubtitle("pill", { ...withMeds, pill: { time: "08:00", pauses: false } })).toBe(
+      "Todo dia às 08:00",
+    );
+  });
+
+  it("ciclo chegando e ainda menstruada descrevem quando avisam", () => {
+    expect(reminderSubtitle("cycle_soon", withMeds)).toBe("2 dias antes da pausa ou menstruação");
+    expect(reminderSubtitle("period_check", withMeds)).toBe(
+      "a partir do 5º dia, pra fechar o registro",
+    );
+  });
 });
