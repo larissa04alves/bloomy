@@ -6,6 +6,7 @@ import { db } from "@bloomy/db";
 
 import { PushSync } from "@/components/push-sync";
 import { TabBar } from "@/components/tab-bar";
+import { isCycleEnabled } from "@/server/cycle/service";
 import { isOnboarded } from "@/server/onboarding/service";
 import { PATHNAME_HEADER, loginPathFor } from "@/server/shared/login-redirect";
 
@@ -21,10 +22,12 @@ export default async function AppLayout({
   // `isOnboarded` só lê — `ensureProfile` viraria uma escrita a cada navegação.
   if (!(await isOnboarded(db, session.user.id))) redirect("/onboarding");
 
+  const showCycle = await isCycleEnabled(db, session.user.id);
+
   return (
     <div className="flex min-h-dvh flex-col">
       <main className="flex flex-1 flex-col pb-2">{children}</main>
-      <TabBar />
+      <TabBar showCycle={showCycle} />
       <PushSync />
     </div>
   );

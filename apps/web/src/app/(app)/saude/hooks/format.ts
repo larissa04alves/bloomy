@@ -113,11 +113,6 @@ export function byCompletedDesc<T extends { completedAt: string | null }>(
 
 const pad2 = (n: number) => String(n).padStart(2, "0");
 
-/** Date → "dd/MM/yyyy" (exibição BR). */
-export function formatDateBR(date: Date): string {
-  return `${pad2(date.getDate())}/${pad2(date.getMonth() + 1)}/${date.getFullYear()}`;
-}
-
 /** Junta data + hora/minuto (strings "HH"/"MM") num instante ISO (hora local). */
 export function combineDateTime(
   date: Date,
