@@ -3,6 +3,7 @@ import { describe, expect, it } from "bun:test";
 import {
   applyBodyStep,
   bodyErrors,
+  finishHref,
   visibleErrors,
   skipBodyStep,
   nextStep,
@@ -22,6 +23,7 @@ const state = (over: Partial<OnboardingState> = {}): OnboardingState => ({
   portionMl: 500,
   meals: 3,
   workoutDays: new Set(),
+  cycleIntent: false,
   ...over,
 });
 
@@ -41,14 +43,18 @@ describe("nextStep", () => {
     expect(nextStep(2, true)).toBe(3);
     expect(nextStep(3, false)).toBe(4);
   });
-  it("depois das metas vai para os lembretes quando a permissão ainda não foi pedida", () => {
+  it("depois das metas vem o passo do ciclo, com ou sem permissão a pedir", () => {
     expect(nextStep(4, true)).toBe(5);
+    expect(nextStep(4, false)).toBe(5);
   });
-  it("termina depois das metas quando não há permissão a pedir", () => {
-    expect(nextStep(4, false)).toBe("finish");
+  it("depois do ciclo vai para os lembretes quando a permissão ainda não foi pedida", () => {
+    expect(nextStep(5, true)).toBe(6);
+  });
+  it("termina depois do ciclo quando não há permissão a pedir", () => {
+    expect(nextStep(5, false)).toBe("finish");
   });
   it("o passo de lembretes é o último", () => {
-    expect(nextStep(5, true)).toBe("finish");
+    expect(nextStep(6, true)).toBe("finish");
   });
 });
 
@@ -57,15 +63,28 @@ describe("skipTarget", () => {
     expect(skipTarget(1, true)).toBe(2);
     expect(skipTarget(1, false)).toBe(2);
   });
-  it("pular as metas cai no passo de lembretes", () => {
+  it("pular as metas cai no passo do ciclo", () => {
     expect(skipTarget(2, true)).toBe(5);
     expect(skipTarget(4, true)).toBe(5);
+    expect(skipTarget(3, false)).toBe(5);
   });
-  it("sem permissão a pedir, pular termina", () => {
-    expect(skipTarget(3, false)).toBe("finish");
+  it("pular o ciclo segue para os lembretes, ou termina sem permissão a pedir", () => {
+    expect(skipTarget(5, true)).toBe(6);
+    expect(skipTarget(5, false)).toBe("finish");
   });
   it("pular o próprio passo de lembretes termina", () => {
-    expect(skipTarget(5, true)).toBe("finish");
+    expect(skipTarget(6, true)).toBe("finish");
+  });
+});
+
+describe("finishHref", () => {
+  it("com 'Ativar' escolhido no passo do ciclo, termina na ativação do ciclo", () => {
+    expect(finishHref(state({ step: 5, cycleIntent: true }))).toBe("/ciclo/ativar");
+    // Concluir ou pular os lembretes (passo 6) mantém o destino.
+    expect(finishHref(state({ step: 6, cycleIntent: true }))).toBe("/ciclo/ativar");
+  });
+  it("sem a intenção, termina na Hoje", () => {
+    expect(finishHref(state({ step: 6 }))).toBe("/home");
   });
 });
 

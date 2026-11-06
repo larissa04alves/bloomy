@@ -3,6 +3,7 @@
 import {
   BarbellIcon,
   FirstAidKitIcon,
+  FlowerLotusIcon,
   HeartbeatIcon,
   HouseIcon,
   type Icon,
@@ -17,15 +18,17 @@ const TABS: { href: Route; label: string; Icon: Icon }[] = [
   { href: "/corpo", label: "Corpo", Icon: HeartbeatIcon },
   { href: "/treino", label: "Treino", Icon: BarbellIcon },
   { href: "/mente", label: "Mente", Icon: SmileyIcon },
+  { href: "/ciclo", label: "Ciclo", Icon: FlowerLotusIcon },
   { href: "/saude", label: "Saúde", Icon: FirstAidKitIcon },
 ];
 
-export function TabBar() {
+export function TabBar({ showCycle }: { showCycle: boolean }) {
   const pathname = usePathname();
+  const tabs = showCycle ? TABS : TABS.filter((t) => t.href !== "/ciclo");
 
   return (
     <nav className="sticky bottom-0 z-10 flex items-stretch justify-around border-t border-hairline-soft bg-white px-1 pt-1.5 pb-[max(0.375rem,env(safe-area-inset-bottom))]">
-      {TABS.map(({ href, label, Icon }) => {
+      {tabs.map(({ href, label, Icon }) => {
         const active = pathname === href || pathname.startsWith(`${href}/`);
         return (
           <Link

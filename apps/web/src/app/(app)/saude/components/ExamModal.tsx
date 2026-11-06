@@ -16,7 +16,7 @@ import {
 
 import { combineDateTime, splitDateTime } from "../hooks/format";
 import { AttachmentPreview } from "./AttachmentPreview";
-import { DatePickerField } from "./DatePickerField";
+import { DatePickerField } from "@/components/date-picker-field";
 import { TimeSelect } from "@/components/time-select";
 
 const schema = z.object({

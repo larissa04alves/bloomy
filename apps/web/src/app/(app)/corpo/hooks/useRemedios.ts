@@ -1,18 +1,28 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
 import { api } from "@/lib/api";
-import type { IntakeSlot } from "@/lib/api-types";
+import type { IntakeSlot, IntakesPayload } from "@/lib/api-types";
 import { toastError } from "@/lib/toast";
 import { useResource } from "@/lib/use-resource";
 
 export function useRemedios() {
-  const { data, loading, reload, setData } = useResource<{
-    intakes: IntakeSlot[];
-  }>(useCallback(() => api.get<{ intakes: IntakeSlot[] }>("/api/intakes"), []));
+  const { data, loading, reload, setData } = useResource<IntakesPayload>(
+    useCallback(() => api.get<IntakesPayload>("/api/intakes"), []),
+  );
+
+  // Como na Home: revalida quando a aba volta a ficar visível, cobrindo a virada da meia-noite.
+  useEffect(() => {
+    const onVisible = () => {
+      if (document.visibilityState === "visible") reload();
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => document.removeEventListener("visibilitychange", onVisible);
+  }, [reload]);
 
   const intakes = data?.intakes ?? [];
+  const pill = data?.pill ?? null;
 
   const toggle = useCallback(
     async (slot: IntakeSlot) => {
@@ -22,7 +32,7 @@ export function useRemedios() {
           ? { ...s, taken: !s.taken }
           : s,
       );
-      setData({ intakes: next });
+      setData({ intakes: next, pill });
       try {
         if (slot.taken) {
           await api.del(
@@ -40,10 +50,32 @@ export function useRemedios() {
         toastError(e, "Não foi possível atualizar o remédio");
       }
     },
-    [data, intakes, setData, reload],
+    [data, intakes, pill, setData, reload],
   );
 
-  const taken = intakes.filter((s) => s.taken).length;
+  // POST e DELETE em voo ao mesmo tempo podem chegar fora de ordem: um toque por vez.
+  const pillPending = useRef(false);
+  const togglePill = useCallback(async () => {
+    if (!pill || pillPending.current) return;
+    pillPending.current = true;
+    const taken = !pill.taken;
+    const markPill = (value: boolean) =>
+      setData((prev) => (prev?.pill ? { ...prev, pill: { ...prev.pill, taken: value } } : prev));
+    markPill(taken);
+    try {
+      if (taken) await api.post("/api/cycle/pill");
+      else await api.del("/api/cycle/pill");
+    } catch (e) {
+      markPill(!taken);
+      toastError(e, "Não foi possível salvar a pílula");
+    } finally {
+      pillPending.current = false;
+    }
+  }, [pill, setData]);
 
-  return { intakes, taken, total: intakes.length, loading, toggle, reload };
+  const pillSubtitle = pill ? `${pill.time} · ${pill.label}` : null;
+  const taken = intakes.filter((s) => s.taken).length + (pill?.taken ? 1 : 0);
+  const total = intakes.length + (pill ? 1 : 0);
+
+  return { intakes, pill, pillSubtitle, taken, total, loading, toggle, togglePill, reload };
 }

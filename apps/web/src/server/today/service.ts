@@ -4,6 +4,7 @@ import type { Db } from "@bloomy/db";
 import type { Appointment } from "@bloomy/db/schema/health";
 
 import { DEFAULT_GOAL_TARGETS, type TodayPayload } from "@/lib/api-types";
+import { getPillToday } from "@/server/cycle/service";
 import { ensureGoals } from "@/server/goals/service";
 import { nextAppointment } from "@/server/health/service";
 import { getMealsDay } from "@/server/meals/service";
@@ -32,7 +33,7 @@ export async function getToday(
   day: string,
   now: Date = new Date(),
 ): Promise<TodayData> {
-  const [water, meals, intakes, checkin, appointment, workouts, active, completed, goals, profile] =
+  const [water, meals, intakes, checkin, appointment, workouts, active, completed, goals, profile, pill] =
     await Promise.all([
       getWaterDay(db, user.id, day),
       getMealsDay(db, user.id, day),
@@ -44,6 +45,7 @@ export async function getToday(
       completedSessionOn(db, user.id, day),
       ensureGoals(db, user.id),
       ensureProfile(db, user.id),
+      getPillToday(db, user.id, day),
     ]);
 
   const waterGoalMl = goals.find((g) => g.domain === "water")?.target ?? DEFAULT_GOAL_TARGETS.water;
@@ -62,8 +64,8 @@ export async function getToday(
     },
     meals: { done: meals.meals.length, target: mealsTarget },
     meds: {
-      taken: intakes.filter((i) => i.taken).length,
-      total: intakes.length,
+      taken: intakes.filter((i) => i.taken).length + (pill?.taken ? 1 : 0),
+      total: intakes.length + (pill ? 1 : 0),
     },
     workout: workoutCard({
       workouts,

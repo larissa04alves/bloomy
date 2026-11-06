@@ -2,6 +2,7 @@
 
 import { useOnboarding } from "../hooks/useOnboarding";
 import { PassoAgua } from "./PassoAgua";
+import { PassoCiclo } from "./PassoCiclo";
 import { PassoLembretes } from "./PassoLembretes";
 import { PassoRefeicoes } from "./PassoRefeicoes";
 import { PassoSobreVoce } from "./PassoSobreVoce";
@@ -23,6 +24,8 @@ export function FluxoOnboarding() {
     setMeals,
     toggleDay,
     advance,
+    activateCycle,
+    skipCycle,
     activatePush,
     back,
     skip,
@@ -89,6 +92,18 @@ export function FluxoOnboarding() {
         onNext={advance}
         onBack={back}
         onSkip={skip}
+      />
+    );
+  }
+
+  if (state.step === 5) {
+    return (
+      <PassoCiclo
+        total={totalSteps}
+        pending={pending}
+        onActivate={activateCycle}
+        onBack={back}
+        onSkip={skipCycle}
       />
     );
   }

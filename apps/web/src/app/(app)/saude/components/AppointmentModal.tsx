@@ -16,7 +16,7 @@ import {
   monthShort,
   splitDateTime,
 } from "../hooks/format";
-import { DatePickerField } from "./DatePickerField";
+import { DatePickerField } from "@/components/date-picker-field";
 import { TimeSelect } from "@/components/time-select";
 
 const schema = z.object({

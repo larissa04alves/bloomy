@@ -14,7 +14,7 @@ import {
   parseKgToGrams,
   toDayString,
 } from "../hooks/peso-helpers";
-import { DatePickerField } from "./DatePickerField";
+import { DatePickerField } from "@/components/date-picker-field";
 
 const MIN_GRAMS = 20_000;
 const MAX_GRAMS = 300_000;

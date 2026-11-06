@@ -3,7 +3,9 @@
 import {
   ArrowLeftIcon,
   BarbellIcon,
+  CalendarDotsIcon,
   CalendarHeartIcon,
+  DropHalfBottomIcon,
   DropIcon,
   PillIcon,
   SmileyIcon,
@@ -55,6 +57,21 @@ const META: Record<
     icon: <CalendarHeartIcon size={22} weight="fill" />,
     title: "Consultas e exames",
   },
+  pill: {
+    tone: "peach",
+    icon: <PillIcon size={22} weight="fill" />,
+    title: "Pílula",
+  },
+  cycle_soon: {
+    tone: "peach",
+    icon: <CalendarDotsIcon size={22} weight="fill" />,
+    title: "Ciclo chegando",
+  },
+  period_check: {
+    tone: "peach",
+    icon: <DropHalfBottomIcon size={22} weight="fill" />,
+    title: "Ainda menstruada?",
+  },
 };
 
 export default function NotificacoesPage() {
@@ -99,6 +116,7 @@ export default function NotificacoesPage() {
               subtitle={reminderSubtitle(reminder.type, {
                 time: reminder.time,
                 hasMedication: n.hasMedication,
+                pill: n.pill,
               })}
               enabled={reminder.enabled}
               // Sem remédio cadastrado o lembrete não tem horário para derivar: ligar

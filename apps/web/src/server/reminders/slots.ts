@@ -12,7 +12,10 @@ export type ReminderType =
   | "meds"
   | "workout"
   | "mind"
-  | "appointments";
+  | "appointments"
+  | "pill"
+  | "cycle_soon"
+  | "period_check";
 
 /** Água não tem horário escolhido: o intervalo e a janela são constantes de produto.
  *  Tornar isso editável exigiria coluna própria — decisão registrada no spec. */
@@ -20,6 +23,18 @@ export const WATER_INTERVAL_HOURS = 3;
 export const WATER_WINDOW = { start: "06:00", end: "21:00" } as const;
 
 export const DEFAULT_TIME = { workout: "18:00", mind: "21:00" } as const;
+
+export const CYCLE_REMINDER_TYPES: readonly ReminderType[] = ["pill", "cycle_soon", "period_check"];
+
+/** Lembrete do ciclo que pode disparar para o método atual: pílula só para quem usa pílula,
+ *  "ciclo chegando" nunca em método contínuo (não há previsão). */
+export function cycleReminderApplies(type: ReminderType, method: { kind: string; mode: string }): boolean {
+  if (type === "pill") return method.kind === "pill";
+  if (type === "cycle_soon") return method.mode !== "continuous";
+  return true;
+}
+
+export const CYCLE_TIME = { cycle_soon: "09:00", period_check: "20:00" } as const;
 
 export type TimedType = keyof typeof DEFAULT_TIME;
 export const TIMED_TYPES = [
@@ -64,6 +79,14 @@ export type UserState = {
   workout: { hasActive: boolean; doneToday: boolean };
   mind: { checkedInToday: boolean };
   events: HealthEvent[];
+  /** `null` com o ciclo desativado: nenhum dos três lembretes do ciclo sai. */
+  cycle: {
+    /** `null` fora da pílula ou na pausa. */
+    pill: { time: string; taken: boolean; label: string } | null;
+    soonDay: string | null;
+    soonKind: "period" | "pause" | null;
+    periodCheck: boolean;
+  } | null;
   /** Chaves já registradas em `reminder_delivery` — ver `deliveryKey`. */
   delivered: Set<string>;
 };
@@ -77,8 +100,9 @@ export type DueSlot = {
   action: "send" | "miss";
   /** Quantas tomas naquele horário — só para o texto de remédios. */
   count?: number;
-  /** Nome do profissional ou do exame — só para o texto de consultas. */
+  /** Nome do profissional ou do exame (consultas) ou posição na cartela (pílula). */
   label?: string;
+  soonKind?: "period" | "pause";
 };
 
 export function deliveryKey(
@@ -150,7 +174,7 @@ export function dueSlotsAt(now: Date, state: UserState): DueSlot[] {
     reminder: ReminderRow,
     slot: string,
     refId: string,
-    extra: Pick<DueSlot, "count" | "label"> = {},
+    extra: Pick<DueSlot, "count" | "label" | "soonKind"> = {},
     slotDay = day,
   ) => {
     // O atraso é medido dentro do dia corrente. Um slot de ontem só chegaria aqui
@@ -219,6 +243,22 @@ export function dueSlotsAt(now: Date, state: UserState): DueSlot[] {
         });
       }
     }
+  }
+
+  const cycle = state.cycle;
+  if (cycle) {
+    const pill = enabled.get("pill");
+    if (pill && cycle.pill && !cycle.pill.taken && cycle.pill.time) {
+      push(pill, cycle.pill.time, "", { label: cycle.pill.label });
+    }
+
+    const soon = enabled.get("cycle_soon");
+    if (soon && cycle.soonKind && cycle.soonDay === day) {
+      push(soon, CYCLE_TIME.cycle_soon, "", { soonKind: cycle.soonKind });
+    }
+
+    const check = enabled.get("period_check");
+    if (check && cycle.periodCheck) push(check, CYCLE_TIME.period_check, "");
   }
 
   return found;

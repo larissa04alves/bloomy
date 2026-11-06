@@ -100,6 +100,14 @@ export async function enablePush(): Promise<PushStatus> {
   return "granted";
 }
 
+/** Regrava este aparelho no servidor quando a permissão já foi dada, sem pedir permissão. */
+export function resyncPush(): void {
+  if (pushStatus() !== "granted") return;
+  // Workaround consciente: falha aqui não interrompe ninguém e a próxima abertura
+  // tenta de novo — só fica no console para diagnóstico.
+  enablePush().catch((e) => console.warn("[push] re-registro falhou", e));
+}
+
 /** 404 no DELETE quer dizer que o servidor já não tem a linha — o `dispatch.ts` do
  *  back apaga sozinho quando o push service devolve 404/410 numa varredura. É
  *  exatamente o estado final que `disablePush` quer alcançar, não uma falha: só

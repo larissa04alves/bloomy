@@ -3,19 +3,24 @@ import type { ReactNode } from "react";
 export function Screen({
   title,
   subtitle,
+  action,
   children,
 }: {
   title: string;
   subtitle?: string;
+  action?: ReactNode;
   children?: ReactNode;
 }) {
   return (
     <div className="flex flex-col gap-4 px-5.5 pt-6 pb-4">
-      <header className="flex flex-col gap-1">
-        <h1 className="font-display text-2xl font-bold text-ink">{title}</h1>
-        {subtitle ? (
-          <p className="text-sm font-semibold text-ink-read">{subtitle}</p>
-        ) : null}
+      <header className="flex items-start justify-between gap-3">
+        <div className="flex flex-col gap-1">
+          <h1 className="font-display text-2xl font-bold text-ink">{title}</h1>
+          {subtitle ? (
+            <p className="text-sm font-semibold text-ink-read">{subtitle}</p>
+          ) : null}
+        </div>
+        {action}
       </header>
       {children}
     </div>

@@ -62,7 +62,13 @@ export default function CorpoPage() {
         onDelete={ref.deleteMeal}
       />
 
-      <RemediosSection intakes={rem.intakes} onToggle={rem.toggle} />
+      <RemediosSection
+        intakes={rem.intakes}
+        onToggle={rem.toggle}
+        pill={rem.pill}
+        pillSubtitle={rem.pillSubtitle}
+        onTogglePill={rem.togglePill}
+      />
 
       <WaterModal
         open={waterOpen}

@@ -2,6 +2,9 @@
 
 import type { DoseUnit, MealItem } from "@bloomy/db/schema/body";
 
+import type { CycleFlow, CycleMethodKind, CycleMode, CycleSymptom } from "@/lib/cycle";
+import type { continuousSummary, naturalPrediction, pillPosition } from "@/server/cycle/calc";
+
 export type GoalDomain = "water" | "meals" | "workout";
 
 export type Goal = {
@@ -73,6 +76,12 @@ export type IntakeSlot = {
   time: string;
   taken: boolean;
 };
+
+/** Pílula do ciclo devida no dia; `null` com ciclo desligado, outro método ou na pausa. */
+export type PillToday = { time: string; taken: boolean; label: string };
+
+/** `GET /api/intakes` */
+export type IntakesPayload = { intakes: IntakeSlot[]; pill: PillToday | null };
 
 /** Alvos iniciais de cada meta. Compartilhado de propósito: `DEFAULT_GOALS` (servidor)
  *  deriva daqui, e as telas usam como fallback de render antes do fetch — o número não
@@ -331,12 +340,20 @@ export type TodayPayload = {
   checkin: { mood: Mood | null };
   water: { totalMl: number; goalMl: number; done: number; target: number };
   meals: { done: number; target: number };
-  meds: { taken: number; total: number }; // total 0 = nenhum remédio cadastrado
+  meds: { taken: number; total: number }; // inclui a pílula do ciclo quando devida; total 0 = nada a tomar
   workout: WorkoutCard;
   nextAppointment: Appointment | null;
 };
 
-export type ReminderType = "water" | "meds" | "workout" | "mind" | "appointments";
+export type ReminderType =
+  | "water"
+  | "meds"
+  | "workout"
+  | "mind"
+  | "appointments"
+  | "pill"
+  | "cycle_soon"
+  | "period_check";
 
 /** Preferência de lembrete (`GET /api/reminders`, `PUT /api/reminders/[id]`).
  *  `time` é `null` nos tipos sem horário próprio: água segue intervalo constante,
@@ -350,3 +367,84 @@ export type Reminder = {
   createdAt: string;
   updatedAt: string;
 };
+
+export type MethodInput =
+  | { kind: "none" | "copper_iud" | "other"; lastPeriodStart: string; usualLength: number }
+  /** Sem `pauseEvery` a pílula é contínua e não tem posição na sequência. */
+  | {
+      kind: "pill";
+      activeDays: number;
+      pauseEvery?: number;
+      pauseDays?: number;
+      pillTime: string;
+      currentUnitStart?: string;
+      currentUnit?: number;
+    }
+  | { kind: "ring" | "patch"; pauseEvery: number; pauseDays: number; currentUnitStart: string; currentUnit: number }
+  | { kind: "hormonal_iud" | "implant" | "injection" };
+
+/** `PUT /api/cycle/method`: com o mesmo tipo (e, na pílula, os mesmos comprimidos ativos e a mesma
+ *  pausa) do método atual, só a configuração muda e a posição (última menstruação, cartela atual)
+ *  pode faltar; trocar de tipo exige a posição. */
+export type MethodUpdateInput =
+  | { kind: "none" | "copper_iud" | "other"; lastPeriodStart?: string; usualLength: number }
+  | Extract<MethodInput, { kind: "pill" }>
+  | { kind: "ring" | "patch"; pauseEvery: number; pauseDays: number; currentUnitStart?: string; currentUnit?: number }
+  | { kind: "hormonal_iud" | "implant" | "injection" };
+
+export type DayEntry = { day: string; flow: CycleFlow; symptoms: CycleSymptom[] };
+
+/** Estado do ciclo ligado. Só um entre `natural`/`scheduled`/`continuous` vem preenchido,
+ *  conforme `mode`. */
+export type CycleState = {
+  enabled: true;
+  method: {
+    kind: CycleMethodKind;
+    /** Comprimidos ativos por cartela; null fora da pílula. */
+    activeDays: number | null;
+    pillTime: string | null;
+    startedOn: string;
+    pauseEvery: number | null;
+    pauseDays: number | null;
+    usualLength: number | null;
+    lastPeriodStart: string | null;
+  };
+  mode: CycleMode;
+  natural?: ReturnType<typeof naturalPrediction>;
+  /** `pauseStartRange`: dias aceitos como início da pausa (os que deixam hoje dentro dela, sem passar do início da cartela atual). */
+  scheduled?: ReturnType<typeof pillPosition> & { pauseStartRange: { min: string; max: string } };
+  continuous?: ReturnType<typeof continuousSummary>;
+  today: { flow: CycleFlow | null; symptoms: CycleSymptom[] };
+  yesterday: { flow: CycleFlow | null; symptoms: CycleSymptom[] };
+  /** `takenDays`: dias com toma na cartela atual até hoje; vazio fora da fase ativa da pílula com pausa. */
+  pill: { due: boolean; taken: boolean; time: string; takenDays: string[] } | null;
+  hiddenSymptoms: CycleSymptom[];
+  methodHistory: { kind: CycleMethodKind; startedOn: string; endedOn: string | null }[];
+};
+
+/** Resposta das mutações do ciclo; `cycle` null = ciclo desativado. */
+export type CycleResponse = { cycle: CycleState | null };
+
+/** `GET /api/cycle`. `configured` = já ativou alguma vez e não apagou (com `cycle` null, desativado). */
+export type CyclePayload = CycleResponse & { configured: boolean };
+
+export type DayRange = { from: string; to: string };
+/** "current" = método atual, ainda em andamento; "cut" = interrompido pela troca de método. */
+export type HistoryStatus = "done" | "current" | "cut";
+
+export type CycleHistorySection = { kind: CycleMethodKind; startedOn: string; endedOn: string | null } & (
+  | {
+      mode: "natural";
+      cycles: { start: string; end: string; length: number; periodDays: number | null; status: HistoryStatus }[];
+    }
+  | { mode: "scheduled"; sequences: { start: string; pause: DayRange; bleed: DayRange | null; status: HistoryStatus }[] }
+  | { mode: "continuous"; events: DayRange[] }
+);
+
+/** `GET /api/cycle/history` → `{ sections }`: um bloco por método, do mais novo ao mais antigo;
+ *  linhas também do mais novo ao mais antigo. */
+export type CycleHistory = { sections: CycleHistorySection[] };
+
+export type CycleSettingsBody = { enabled?: boolean; hiddenSymptoms?: CycleSymptom[] };
+export type CycleDayBody = { flow: CycleFlow; symptoms: CycleSymptom[] };
+export type CycleAnchorBody = { kind: "pause_started"; day?: string } | { kind: "pack_extended" };

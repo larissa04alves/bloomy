@@ -1,5 +1,6 @@
 "use client";
 
+import { CaretLeftIcon } from "@phosphor-icons/react";
 import type { ReactNode } from "react";
 
 import { cn } from "@bloomy/ui/lib/utils";
@@ -18,6 +19,8 @@ export function PassoLayout({
   ctaLabel,
   skipLabel = "Pular",
   ctaDisabled = false,
+  ctaTone = "lilac",
+  declineLabel,
   pending,
   onNext,
   onSkip,
@@ -25,7 +28,7 @@ export function PassoLayout({
   children,
 }: {
   step: OnboardingStep;
-  /** 4 ou 5: o passo de lembretes só existe quando há permissão a pedir. */
+  /** 5 ou 6: o passo de lembretes só existe quando há permissão a pedir. */
   total: number;
   tone: Tone;
   icon: ReactNode;
@@ -35,6 +38,9 @@ export function PassoLayout({
   skipLabel?: string;
   /** Bloqueia só o CTA (ex.: campo preenchido fora da faixa); "Pular" segue livre. */
   ctaDisabled?: boolean;
+  ctaTone?: "lilac" | "peach";
+  /** Pergunta de sim/não: a recusa vira texto sob o CTA (chama `onSkip`) e o "Voltar" sobe para o topo. */
+  declineLabel?: string;
   pending: boolean;
   onNext: () => void;
   onSkip: () => void;
@@ -57,19 +63,40 @@ export function PassoLayout({
         ))}
       </div>
 
-      <div className="flex items-center justify-between pt-2">
-        <span className="text-xs font-bold text-ink-faint">
-          Passo {step} de {total}
-        </span>
-        <button
-          type="button"
-          onClick={onSkip}
-          disabled={pending}
-          className="text-xs font-bold text-lilac-deep disabled:opacity-60"
-        >
-          {skipLabel}
-        </button>
-      </div>
+      {declineLabel ? (
+        <div className="flex items-center justify-between pt-2">
+          {onBack ? (
+            <button
+              type="button"
+              onClick={onBack}
+              disabled={pending}
+              className="flex items-center gap-1 text-xs font-bold text-lilac-deep disabled:opacity-60"
+            >
+              <CaretLeftIcon size={12} weight="bold" />
+              Voltar
+            </button>
+          ) : (
+            <span />
+          )}
+          <span className="text-xs font-bold text-ink-faint">
+            Passo {step} de {total}
+          </span>
+        </div>
+      ) : (
+        <div className="flex items-center justify-between pt-2">
+          <span className="text-xs font-bold text-ink-faint">
+            Passo {step} de {total}
+          </span>
+          <button
+            type="button"
+            onClick={onSkip}
+            disabled={pending}
+            className="text-xs font-bold text-lilac-deep disabled:opacity-60"
+          >
+            {skipLabel}
+          </button>
+        </div>
+      )}
 
       <div
         key={step}
@@ -97,11 +124,23 @@ export function PassoLayout({
         type="button"
         onClick={onNext}
         disabled={pending || ctaDisabled}
-        className="w-full rounded-control bg-lilac py-4 font-display font-bold text-white shadow-btn disabled:opacity-60"
+        className={cn(
+          "w-full rounded-control py-4 font-display font-bold text-white disabled:opacity-60",
+          ctaTone === "peach" ? "bg-peach shadow-btn-peach" : "bg-lilac shadow-btn",
+        )}
       >
         {ctaLabel}
       </button>
-      {onBack ? (
+      {declineLabel ? (
+        <button
+          type="button"
+          onClick={onSkip}
+          disabled={pending}
+          className="pt-3 text-sm font-bold text-ink-read disabled:opacity-60"
+        >
+          {declineLabel}
+        </button>
+      ) : onBack ? (
         <button
           type="button"
           onClick={onBack}

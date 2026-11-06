@@ -23,7 +23,12 @@ function hourLabel(time: string): string {
  */
 export function reminderSubtitle(
   type: ReminderType,
-  opts: { time: string | null; hasMedication: boolean },
+  opts: {
+    time: string | null;
+    hasMedication: boolean;
+    /** Horário vem do método do ciclo; `pauses` é falso na pílula contínua. */
+    pill?: { time: string; pauses: boolean } | null;
+  },
 ): string {
   switch (type) {
     case "water":
@@ -38,5 +43,13 @@ export function reminderSubtitle(
       return `Todo dia às ${opts.time ?? DEFAULT_TIME.mind}`;
     case "appointments":
       return "1 dia antes e 1 hora antes";
+    case "pill": {
+      const time = opts.pill?.time ?? "";
+      return opts.pill?.pauses ? `${time} · descansa na pausa` : `Todo dia às ${time}`;
+    }
+    case "cycle_soon":
+      return "2 dias antes da pausa ou menstruação";
+    case "period_check":
+      return "a partir do 5º dia, pra fechar o registro";
   }
 }

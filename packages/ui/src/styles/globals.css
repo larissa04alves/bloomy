@@ -55,6 +55,11 @@
   --color-coral: #c77e93;
   --color-coral-tint: #fbecef;
 
+  --color-peach: #e8916f;
+  --color-peach-deep: #b35c3d;
+  --color-peach-tint: #fdeee7;
+  --color-peach-soft: #f7d3c3;
+
   --color-bg: #fbfafe;
   --color-board: #e9e2f3;
 
@@ -77,6 +82,7 @@
   --shadow-card: 0 6px 18px rgba(120, 86, 164, 0.06);
   --shadow-card-sm: 0 5px 16px rgba(120, 86, 164, 0.05);
   --shadow-btn: 0 8px 20px rgba(167, 139, 208, 0.35);
+  --shadow-btn-peach: 0 8px 20px rgba(232, 145, 111, 0.35);
   --shadow-sheet: 0 -12px 40px rgba(59, 53, 82, 0.25);
   --shadow-device: 0 22px 50px rgba(120, 86, 164, 0.16);
 
@@ -218,7 +224,8 @@
   .animate-ripple,
   .animate-drop-fall,
   .animate-drop-rise,
-  .animate-bubble {
+  .animate-bubble,
+  .animate-pulse {
     animation: none !important;
   }
 }

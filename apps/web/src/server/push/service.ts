@@ -5,7 +5,9 @@ import { pushSubscription, type PushSubscription } from "@bloomy/db/schema/remin
 import { and, eq } from "drizzle-orm";
 
 import { ensureProfile } from "@/server/profile/service";
+import { activeCycleMethod } from "@/server/cycle/service";
 import { listReminders } from "@/server/reminders/service";
+import { CYCLE_REMINDER_TYPES, cycleReminderApplies } from "@/server/reminders/slots";
 
 export type SubscriptionInput = {
   endpoint: string;
@@ -17,8 +19,13 @@ export type SubscriptionInput = {
  *  ligado ou o aviso de fim do descanso. Também garante os lembretes default (ver
  *  `saveSubscription`). */
 export async function wantsPush(db: Db, userId: string): Promise<boolean> {
-  const reminders = await listReminders(db, userId);
-  if (reminders.some((r) => r.enabled)) return true;
+  const reminders = (await listReminders(db, userId)).filter((r) => r.enabled);
+  if (reminders.some((r) => !CYCLE_REMINDER_TYPES.includes(r.type))) return true;
+  // Com o ciclo desativado as linhas dele ficam escondidas e não disparam.
+  if (reminders.length > 0) {
+    const method = await activeCycleMethod(db, userId);
+    if (method && reminders.some((r) => cycleReminderApplies(r.type, method))) return true;
+  }
   return (await ensureProfile(db, userId)).restAlert;
 }
 
