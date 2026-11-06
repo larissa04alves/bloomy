@@ -23,7 +23,7 @@ export function ApagarCicloSheet({
       tone="coral"
       icon={<TrashIcon size={20} weight="fill" />}
       footer={
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-3">
           <button
             type="button"
             disabled={deleting}

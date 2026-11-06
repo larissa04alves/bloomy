@@ -82,25 +82,38 @@ export function pillLabel(
   };
 }
 
-const RETURNS: Partial<Record<CycleMethodKind, string>> = { ring: "o anel", patch: "o adesivo" };
+const LONG_MONTHS = [
+  "janeiro", "fevereiro", "março", "abril", "maio", "junho",
+  "julho", "agosto", "setembro", "outubro", "novembro", "dezembro",
+];
+const LONG_WEEKDAYS = [
+  "no domingo", "na segunda-feira", "na terça-feira", "na quarta-feira",
+  "na quinta-feira", "na sexta-feira", "no sábado",
+];
 
-const backLabel = (kind: CycleMethodKind, back: string) => {
-  const p = parts(back);
-  return `${RETURNS[kind] ?? "a cartela"} volta na ${p.weekday}, ${p.date}/${p.month}`;
+/** "na terça-feira, 10 de novembro" */
+const longDate = (day: string) => {
+  const d = new Date(`${day}T00:00:00Z`);
+  return `${LONG_WEEKDAYS[d.getUTCDay()]}, ${d.getUTCDate()} de ${LONG_MONTHS[d.getUTCMonth()]}`;
 };
 
-const capitalize = (text: string) => text.charAt(0).toUpperCase() + text.slice(1);
+const NEXT_UNIT: Partial<Record<CycleMethodKind, string>> = { ring: "Próximo anel", patch: "Próximo adesivo" };
+const NEXT_UNIT_SENTENCE: Partial<Record<CycleMethodKind, string>> = {
+  ring: "Seu próximo anel entra",
+  patch: "Seu próximo adesivo entra",
+};
 
 export function pauseLabel(position: Position, kind: CycleMethodKind): { title: string; detail: string } {
   const { from, to } = position.nextPause;
   return {
     title: `Pausa · dia ${position.pauseDay ?? 1} de ${daysBetween(from, to) + 1}`,
-    detail: backLabel(kind, addDays(to, 1)),
+    detail: `${NEXT_UNIT[kind] ?? "Próxima cartela"} ${longDate(addDays(to, 1))}`,
   };
 }
 
 export function startPauseEffect(today: string, pauseDays: number, kind: CycleMethodKind): string {
-  return capitalize(backLabel(kind, addDays(today, pauseDays)));
+  const next = NEXT_UNIT_SENTENCE[kind] ?? "Sua próxima cartela começa";
+  return `${next} ${longDate(addDays(today, pauseDays))}.`;
 }
 
 // Emendar durante a pausa interrompe a pausa: a unidade nova começa hoje (ver buildSequence em calc.ts).

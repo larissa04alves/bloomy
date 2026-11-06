@@ -89,14 +89,14 @@ describe("pillLabel", () => {
 });
 
 describe("pauseLabel", () => {
-  it("conta o dia da pausa e diz quando a cartela volta", () => {
+  it("conta o dia da pausa e diz quando começa a próxima cartela", () => {
     expect(pauseLabel(PAUSE, "pill")).toEqual({
       title: "Pausa · dia 3 de 7",
-      detail: "a cartela volta na qui, 10/dez",
+      detail: "Próxima cartela na quinta-feira, 10 de dezembro",
     });
   });
-  it("no anel quem volta é o anel", () => {
-    expect(pauseLabel(PAUSE, "ring").detail).toBe("o anel volta na qui, 10/dez");
+  it("no anel fala do próximo anel", () => {
+    expect(pauseLabel(PAUSE, "ring").detail).toBe("Próximo anel na quinta-feira, 10 de dezembro");
   });
 });
 
@@ -253,11 +253,18 @@ describe("ringStops", () => {
 });
 
 describe("startPauseEffect", () => {
-  it("diz quando a cartela volta contando a pausa a partir de hoje", () => {
-    expect(startPauseEffect("2026-12-03", 7, "pill")).toBe("A cartela volta na qui, 10/dez");
+  it("diz quando começa a próxima cartela contando a pausa a partir de hoje", () => {
+    expect(startPauseEffect("2026-12-03", 7, "pill")).toBe(
+      "Sua próxima cartela começa na quinta-feira, 10 de dezembro.",
+    );
   });
-  it("no anel quem volta é o anel", () => {
-    expect(startPauseEffect("2026-12-03", 7, "ring")).toBe("O anel volta na qui, 10/dez");
+  it("no anel e no adesivo fala do próximo anel ou adesivo", () => {
+    expect(startPauseEffect("2026-11-06", 4, "ring")).toBe(
+      "Seu próximo anel entra na terça-feira, 10 de novembro.",
+    );
+    expect(startPauseEffect("2026-11-06", 1, "patch")).toBe(
+      "Seu próximo adesivo entra no sábado, 7 de novembro.",
+    );
   });
 });
 
