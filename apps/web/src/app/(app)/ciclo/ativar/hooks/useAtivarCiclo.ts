@@ -15,9 +15,10 @@ export function useAtivarCiclo() {
   const [busy, setBusy] = useState(false);
 
   const done = useCallback(() => {
-    // O layout lê isCycleEnabled no servidor: sem refresh a aba Ciclo não aparece.
-    router.refresh();
+    // O layout lê isCycleEnabled no servidor e a navegação reaproveita o layout em cache: o
+    // refresh vem depois do replace para valer na rota nova (antes, a navegação o descartava).
     router.replace("/ciclo");
+    router.refresh();
   }, [router]);
 
   // Quem desativou mantém o método: religar recupera tudo sem pedir os dados de novo.
