@@ -1,0 +1,1620 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Ciclo · mockups</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Quicksand:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/fill/style.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/bold/style.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.1.11"></script>
+    <style type="text/tailwindcss">
+      @theme {
+        --font-display: "Quicksand", system-ui, sans-serif;
+        --font-sans: "Nunito", system-ui, sans-serif;
+        --color-lilac: #a78bd0;
+        --color-lilac-deep: #8768bc;
+        --color-lilac-tint: #ede7f8;
+        --color-lilac-tint-soft: #f4effa;
+        --color-pink: #f3b6d0;
+        --color-pink-deep: #c76e9e;
+        --color-pink-bright: #e08ab0;
+        --color-pink-tint: #fbeaf2;
+        --color-green: #a8d5ba;
+        --color-green-deep: #4e9c74;
+        --color-green-mid: #7fc4a0;
+        --color-green-tint: #e6f4ec;
+        --color-coral: #c77e93;
+        --color-coral-tint: #fbecef;
+        /* proposta: domínio Ciclo (pêssego) */
+        --color-peach: #e8916f;
+        --color-peach-deep: #b35c3d;
+        --color-peach-tint: #fdeee7;
+        --color-peach-soft: #f7d3c3;
+        --color-bg: #fbfafe;
+        --color-board: #e9e2f3;
+        --color-ink: #3b3552;
+        --color-ink-soft: #8a82a0;
+        --color-ink-faint: #a79fb8;
+        --color-ink-read: #6f6787;
+        --color-nav-inactive: #b3abc4;
+        --color-control-off: #e2d8f0;
+        --color-ring-track: #ddd1ef;
+        --color-hairline: #eae2f4;
+        --color-hairline-soft: #f1ebf8;
+        --radius-control: 16px;
+        --radius-card: 20px;
+        --radius-card-lg: 26px;
+        --radius-sheet: 28px;
+        --shadow-card: 0 6px 18px rgba(120, 86, 164, 0.06);
+        --shadow-card-sm: 0 5px 16px rgba(120, 86, 164, 0.05);
+        --shadow-btn: 0 8px 20px rgba(167, 139, 208, 0.35);
+        --shadow-btn-peach: 0 8px 20px rgba(232, 145, 111, 0.35);
+        --shadow-sheet: 0 -12px 40px rgba(59, 53, 82, 0.25);
+        --shadow-device: 0 22px 50px rgba(120, 86, 164, 0.16);
+      }
+      .option.selected {
+        outline: 3px solid var(--color-lilac);
+        outline-offset: 2px;
+      }
+    </style>
+  </head>
+  <body class="bg-board font-sans text-ink antialiased">
+    <div class="mx-auto max-w-[1240px] px-6 py-10">
+      <h1 class="font-display text-3xl font-bold">Aba Ciclo · mockups</h1>
+      <p class="mt-1 max-w-3xl text-sm font-semibold text-ink-read">
+        Mesmos componentes do app (Screen, cards, IconChip, ChoiceChip,
+        BottomSheet, Stepper, LembreteCard, tab bar). Dados de exemplo: o seu
+        caso (pílula, pausa a cada 4 cartelas) e o de quem não usa método. Hoje
+        = qui, 5/nov.
+      </p>
+
+      <!-- ============ 1. COR ============ -->
+      <h2 class="mt-10 font-display text-xl font-bold">
+        1 · Cor do domínio Ciclo
+      </h2>
+      <p class="mt-1 max-w-3xl text-sm font-semibold text-ink-read">
+        Rosa é Treino/Mente e coral é Remédios. Clique na que preferir — o resto
+        da página usa pêssego.
+      </p>
+      <div class="options mt-4 flex flex-wrap gap-5">
+        <div
+          class="option w-[300px] cursor-pointer rounded-card bg-white p-4 shadow-card"
+          data-choice="cor-pessego"
+          onclick="toggleSelect(this)"
+        >
+          <p class="font-display text-base font-bold">
+            A · Pêssego
+            <span class="text-xs font-bold text-green-deep">recomendo</span>
+          </p>
+          <p class="text-xs font-semibold text-ink-read">
+            Quente, ligado ao ciclo sem ser vermelho de alerta.
+          </p>
+          <div
+            class="mt-3 flex items-center gap-3 rounded-card-lg p-4"
+            style="background: #fdeee7"
+          >
+            <span
+              class="grid size-10 place-items-center rounded-[18px] bg-white"
+              style="color: #b35c3d"
+              ><i class="ph-fill ph-pill text-[22px]"></i></span
+            ><span
+              ><b class="font-display text-lg">Cartela 3 de 4</b><br /><span
+                class="text-xs font-semibold text-ink-read"
+                >comprimido 15 de 21</span
+              ></span
+            >
+          </div>
+          <div
+            class="mt-3 rounded-full py-2.5 text-center font-display font-bold text-white"
+            style="background: #e8916f"
+          >
+            Salvar
+          </div>
+        </div>
+        <div
+          class="option w-[300px] cursor-pointer rounded-card bg-white p-4 shadow-card"
+          data-choice="cor-cereja"
+          onclick="toggleSelect(this)"
+        >
+          <p class="font-display text-base font-bold">B · Cereja suave</p>
+          <p class="text-xs font-semibold text-ink-read">
+            Mais direto, mas encosta no vermelho que o DESIGN.md proíbe.
+          </p>
+          <div
+            class="mt-3 flex items-center gap-3 rounded-card-lg p-4"
+            style="background: #fcebeb"
+          >
+            <span
+              class="grid size-10 place-items-center rounded-[18px] bg-white"
+              style="color: #ad4b55"
+              ><i class="ph-fill ph-pill text-[22px]"></i></span
+            ><span
+              ><b class="font-display text-lg">Cartela 3 de 4</b><br /><span
+                class="text-xs font-semibold text-ink-read"
+                >comprimido 15 de 21</span
+              ></span
+            >
+          </div>
+          <div
+            class="mt-3 rounded-full py-2.5 text-center font-display font-bold text-white"
+            style="background: #e08585"
+          >
+            Salvar
+          </div>
+        </div>
+        <div
+          class="option w-[300px] cursor-pointer rounded-card bg-white p-4 shadow-card"
+          data-choice="cor-amora"
+          onclick="toggleSelect(this)"
+        >
+          <p class="font-display text-base font-bold">C · Amora</p>
+          <p class="text-xs font-semibold text-ink-read">
+            Fica entre o lilás e o rosa; confunde na tela Hoje.
+          </p>
+          <div
+            class="mt-3 flex items-center gap-3 rounded-card-lg p-4"
+            style="background: #f6eaf3"
+          >
+            <span
+              class="grid size-10 place-items-center rounded-[18px] bg-white"
+              style="color: #8e4f86"
+              ><i class="ph-fill ph-pill text-[22px]"></i></span
+            ><span
+              ><b class="font-display text-lg">Cartela 3 de 4</b><br /><span
+                class="text-xs font-semibold text-ink-read"
+                >comprimido 15 de 21</span
+              ></span
+            >
+          </div>
+          <div
+            class="mt-3 rounded-full py-2.5 text-center font-display font-bold text-white"
+            style="background: #b97aad"
+          >
+            Salvar
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ 2. ABA CICLO ============ -->
+      <h2 class="mt-12 font-display text-xl font-bold">
+        2 · Aba Ciclo, conforme o método
+      </h2>
+      <p class="mt-1 max-w-3xl text-sm font-semibold text-ink-read">
+        Mesma estrutura nos quatro casos: card-resumo no topo (muda com o
+        método), o que fazer hoje, e o atalho pro calendário. A 6ª aba só
+        aparece pra quem ativou; ativo segue lilás profundo como as outras abas.
+      </p>
+
+      <div class="mt-5 flex flex-wrap items-start gap-6">
+        <!-- A · pílula rolando -->
+        <figure>
+          <div
+            class="flex w-[360px] flex-col overflow-hidden rounded-[38px] border border-hairline bg-bg shadow-device"
+          >
+            <div class="flex flex-col gap-4 px-5.5 pt-6 pb-4">
+              <header class="flex flex-col gap-1">
+                <h1 class="font-display text-2xl font-bold text-ink">Ciclo</h1>
+                <p class="text-sm font-semibold text-ink-read">
+                  Pílula · pausa a cada 4 cartelas
+                </p>
+              </header>
+              <div
+                class="flex flex-col gap-3 rounded-card-lg bg-peach-tint p-4"
+              >
+                <div class="flex items-center gap-3">
+                  <span
+                    class="grid size-10 shrink-0 place-items-center rounded-[18px] bg-white text-peach-deep"
+                    ><i class="ph-fill ph-pill text-[22px]"></i
+                  ></span>
+                  <div class="flex flex-col">
+                    <span class="font-display text-lg font-bold"
+                      >Cartela 3 de 4</span
+                    ><span class="text-xs font-semibold text-ink-read"
+                      >comprimido 15 de 21</span
+                    >
+                  </div>
+                </div>
+                <div class="grid grid-cols-7 gap-1.5 px-1">
+                  <span class="size-3.5 rounded-full bg-peach-deep"></span
+                  ><span class="size-3.5 rounded-full bg-peach-deep"></span
+                  ><span class="size-3.5 rounded-full bg-peach-deep"></span
+                  ><span class="size-3.5 rounded-full bg-peach-deep"></span
+                  ><span class="size-3.5 rounded-full bg-peach-deep"></span
+                  ><span class="size-3.5 rounded-full bg-peach-deep"></span
+                  ><span class="size-3.5 rounded-full bg-peach-deep"></span>
+                  <span class="size-3.5 rounded-full bg-peach-deep"></span
+                  ><span class="size-3.5 rounded-full bg-peach-deep"></span
+                  ><span class="size-3.5 rounded-full bg-peach-deep"></span
+                  ><span class="size-3.5 rounded-full bg-peach-deep"></span
+                  ><span class="size-3.5 rounded-full bg-peach-deep"></span
+                  ><span class="size-3.5 rounded-full bg-peach-deep"></span
+                  ><span class="size-3.5 rounded-full bg-peach-deep"></span>
+                  <span
+                    class="size-3.5 rounded-full bg-white ring-2 ring-peach-deep"
+                  ></span
+                  ><span class="size-3.5 rounded-full bg-white"></span
+                  ><span class="size-3.5 rounded-full bg-white"></span
+                  ><span class="size-3.5 rounded-full bg-white"></span
+                  ><span class="size-3.5 rounded-full bg-white"></span
+                  ><span class="size-3.5 rounded-full bg-white"></span
+                  ><span class="size-3.5 rounded-full bg-white"></span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <span class="h-1.75 flex-1 rounded-full bg-peach"></span
+                  ><span class="h-1.75 flex-1 rounded-full bg-peach"></span>
+                  <span
+                    class="h-1.75 flex-1 overflow-hidden rounded-full bg-white"
+                    ><span
+                      class="block h-full w-[70%] rounded-full bg-peach"
+                    ></span
+                  ></span>
+                  <span class="h-1.75 flex-1 rounded-full bg-white"></span>
+                  <span
+                    class="h-1.75 w-6 rounded-full border border-dashed border-peach-deep/50"
+                  ></span>
+                </div>
+                <span
+                  class="inline-flex items-center gap-1 text-xs font-bold text-peach-deep"
+                  ><i class="ph-fill ph-moon text-base"></i>Próxima pausa em ~4
+                  semanas · 3 a 9/dez</span
+                >
+              </div>
+
+              <section class="flex flex-col gap-3">
+                <h2 class="font-display text-base font-bold text-ink">
+                  Pílula de hoje
+                </h2>
+                <button
+                  class="flex items-center gap-3 rounded-card bg-white p-3 text-left shadow-card-sm"
+                >
+                  <span
+                    class="grid size-8 shrink-0 place-items-center rounded-[14px] bg-peach-tint text-peach-deep"
+                    ><i class="ph-fill ph-pill text-[22px]"></i
+                  ></span>
+                  <span class="flex flex-1 flex-col"
+                    ><span class="text-sm font-bold">Pílula</span
+                    ><span class="text-xs font-semibold text-ink-read"
+                      >21:00 · comprimido 15</span
+                    ></span
+                  >
+                  <i class="ph ph-circle text-2xl text-control-off"></i>
+                </button>
+              </section>
+
+              <section class="flex flex-col gap-3">
+                <h2 class="font-display text-base font-bold text-ink">
+                  Como você está hoje
+                </h2>
+                <button
+                  class="flex items-center justify-center gap-2 rounded-card border border-dashed border-hairline p-4 text-sm font-semibold text-ink-read"
+                >
+                  <i class="ph-bold ph-plus"></i>Registrar sangramento ou
+                  sintoma
+                </button>
+              </section>
+
+              <a
+                class="flex items-center gap-3 rounded-card bg-white p-3 shadow-card-sm"
+              >
+                <span
+                  class="grid size-8 shrink-0 place-items-center rounded-[14px] bg-peach-tint text-peach-deep"
+                  ><i class="ph-fill ph-calendar-dots text-[20px]"></i
+                ></span>
+                <span class="flex flex-1 flex-col"
+                  ><span class="text-sm font-bold">Calendário e histórico</span
+                  ><span class="text-xs font-semibold text-ink-read"
+                    >última pausa: 6 a 12/ago</span
+                  ></span
+                >
+                <i class="ph-bold ph-caret-right text-ink-faint"></i>
+              </a>
+            </div>
+            <nav
+              class="mt-auto flex items-stretch justify-around border-t border-hairline-soft bg-white px-1 pt-1.5 pb-2"
+            >
+              <span
+                class="flex min-h-11 flex-1 flex-col items-center justify-center gap-0.5 text-nav-inactive"
+                ><i class="ph ph-house text-2xl"></i
+                ><span class="text-[10px] font-semibold">Hoje</span></span
+              >
+              <span
+                class="flex min-h-11 flex-1 flex-col items-center justify-center gap-0.5 text-nav-inactive"
+                ><i class="ph ph-heartbeat text-2xl"></i
+                ><span class="text-[10px] font-semibold">Corpo</span></span
+              >
+              <span
+                class="flex min-h-11 flex-1 flex-col items-center justify-center gap-0.5 text-nav-inactive"
+                ><i class="ph ph-barbell text-2xl"></i
+                ><span class="text-[10px] font-semibold">Treino</span></span
+              >
+              <span
+                class="flex min-h-11 flex-1 flex-col items-center justify-center gap-0.5 text-nav-inactive"
+                ><i class="ph ph-smiley text-2xl"></i
+                ><span class="text-[10px] font-semibold">Mente</span></span
+              >
+              <span
+                class="flex min-h-11 flex-1 flex-col items-center justify-center gap-0.5 text-lilac-deep"
+                ><i class="ph-fill ph-flower-lotus text-2xl"></i
+                ><span class="text-[10px] font-extrabold">Ciclo</span></span
+              >
+              <span
+                class="flex min-h-11 flex-1 flex-col items-center justify-center gap-0.5 text-nav-inactive"
+                ><i class="ph ph-first-aid-kit text-2xl"></i
+                ><span class="text-[10px] font-semibold">Saúde</span></span
+              >
+            </nav>
+          </div>
+          <figcaption
+            class="mt-2 text-center text-sm font-bold text-lilac-deep"
+          >
+            A · Pílula, cartela rolando (o seu caso)
+          </figcaption>
+        </figure>
+
+        <!-- B · pausa -->
+        <figure>
+          <div
+            class="flex w-[360px] flex-col overflow-hidden rounded-[38px] border border-hairline bg-bg shadow-device"
+          >
+            <div class="flex flex-col gap-4 px-5.5 pt-6 pb-4">
+              <header class="flex flex-col gap-1">
+                <h1 class="font-display text-2xl font-bold text-ink">Ciclo</h1>
+                <p class="text-sm font-semibold text-ink-read">
+                  Pílula · pausa a cada 4 cartelas
+                </p>
+              </header>
+              <div
+                class="flex flex-col gap-3 rounded-card-lg bg-peach-tint p-4"
+              >
+                <div class="flex items-center gap-3">
+                  <span
+                    class="grid size-10 shrink-0 place-items-center rounded-[18px] bg-white text-peach-deep"
+                    ><i class="ph-fill ph-moon text-[22px]"></i
+                  ></span>
+                  <div class="flex flex-col">
+                    <span class="font-display text-lg font-bold"
+                      >Pausa · dia 3 de 7</span
+                    ><span class="text-xs font-semibold text-ink-read"
+                      >a cartela volta na qui, 10/dez</span
+                    >
+                  </div>
+                </div>
+                <div class="grid grid-cols-7 gap-1.5 px-1">
+                  <span class="size-3.5 rounded-full bg-peach-deep"></span
+                  ><span class="size-3.5 rounded-full bg-peach-deep"></span
+                  ><span
+                    class="size-3.5 rounded-full bg-white ring-2 ring-peach-deep"
+                  ></span>
+                  <span
+                    class="size-3.5 rounded-full border border-dashed border-peach-deep/50"
+                  ></span
+                  ><span
+                    class="size-3.5 rounded-full border border-dashed border-peach-deep/50"
+                  ></span
+                  ><span
+                    class="size-3.5 rounded-full border border-dashed border-peach-deep/50"
+                  ></span
+                  ><span
+                    class="size-3.5 rounded-full border border-dashed border-peach-deep/50"
+                  ></span>
+                </div>
+              </div>
+
+              <section class="flex flex-col gap-3">
+                <h2 class="font-display text-base font-bold text-ink">
+                  Pílula de hoje
+                </h2>
+                <div
+                  class="flex items-center gap-3 rounded-card border border-dashed border-hairline p-3"
+                >
+                  <span
+                    class="grid size-8 shrink-0 place-items-center rounded-[14px] bg-lilac-tint-soft text-ink-faint"
+                    ><i class="ph-fill ph-coffee text-[20px]"></i
+                  ></span>
+                  <span class="flex flex-1 flex-col"
+                    ><span class="text-sm font-bold text-ink-read"
+                      >Sem pílula na pausa</span
+                    ><span class="text-xs font-semibold text-ink-faint"
+                      >o lembrete descansa também</span
+                    ></span
+                  >
+                </div>
+              </section>
+
+              <section class="flex flex-col gap-3">
+                <div class="flex items-center justify-between">
+                  <h2 class="font-display text-base font-bold text-ink">
+                    Como você está hoje
+                  </h2>
+                  <span
+                    class="inline-flex items-center gap-1 text-xs font-bold text-peach-deep"
+                    ><i class="ph-bold ph-pencil-simple"></i>Editar</span
+                  >
+                </div>
+                <div
+                  class="flex flex-col gap-3 rounded-card bg-white p-4 shadow-card-sm"
+                >
+                  <div class="flex items-center gap-3">
+                    <span
+                      class="grid size-8 shrink-0 place-items-center rounded-[14px] bg-peach-tint text-peach-deep"
+                      ><i class="ph-fill ph-drop text-[20px]"></i></span
+                    ><span class="flex flex-col"
+                      ><span class="text-sm font-bold">Fluxo médio</span
+                      ><span class="text-xs font-semibold text-ink-read"
+                        >2º dia de sangramento</span
+                      ></span
+                    >
+                  </div>
+                  <div class="flex flex-wrap gap-2">
+                    <span
+                      class="rounded-full bg-peach-tint px-3 py-1.5 text-xs font-bold text-peach-deep"
+                      >Cólica</span
+                    ><span
+                      class="rounded-full bg-peach-tint px-3 py-1.5 text-xs font-bold text-peach-deep"
+                      >Cansaço</span
+                    >
+                  </div>
+                </div>
+              </section>
+
+              <a
+                class="flex items-center gap-3 rounded-card bg-white p-3 shadow-card-sm"
+              >
+                <span
+                  class="grid size-8 shrink-0 place-items-center rounded-[14px] bg-peach-tint text-peach-deep"
+                  ><i class="ph-fill ph-calendar-dots text-[20px]"></i
+                ></span>
+                <span class="flex flex-1 flex-col"
+                  ><span class="text-sm font-bold">Calendário e histórico</span
+                  ><span class="text-xs font-semibold text-ink-read"
+                    >sangrou 2 dias depois da pausa começar</span
+                  ></span
+                >
+                <i class="ph-bold ph-caret-right text-ink-faint"></i>
+              </a>
+            </div>
+            <nav
+              class="mt-auto flex items-stretch justify-around border-t border-hairline-soft bg-white px-1 pt-1.5 pb-2"
+            >
+              <span
+                class="flex min-h-11 flex-1 flex-col items-center justify-center gap-0.5 text-nav-inactive"
+                ><i class="ph ph-house text-2xl"></i
+                ><span class="text-[10px] font-semibold">Hoje</span></span
+              >
+              <span
+                class="flex min-h-11 flex-1 flex-col items-center justify-center gap-0.5 text-nav-inactive"
+                ><i class="ph ph-heartbeat text-2xl"></i
+                ><span class="text-[10px] font-semibold">Corpo</span></span
+              >
+              <span
+                class="flex min-h-11 flex-1 flex-col items-center justify-center gap-0.5 text-nav-inactive"
+                ><i class="ph ph-barbell text-2xl"></i
+                ><span class="text-[10px] font-semibold">Treino</span></span
+              >
+              <span
+                class="flex min-h-11 flex-1 flex-col items-center justify-center gap-0.5 text-nav-inactive"
+                ><i class="ph ph-smiley text-2xl"></i
+                ><span class="text-[10px] font-semibold">Mente</span></span
+              >
+              <span
+                class="flex min-h-11 flex-1 flex-col items-center justify-center gap-0.5 text-lilac-deep"
+                ><i class="ph-fill ph-flower-lotus text-2xl"></i
+                ><span class="text-[10px] font-extrabold">Ciclo</span></span
+              >
+              <span
+                class="flex min-h-11 flex-1 flex-col items-center justify-center gap-0.5 text-nav-inactive"
+                ><i class="ph ph-first-aid-kit text-2xl"></i
+                ><span class="text-[10px] font-semibold">Saúde</span></span
+              >
+            </nav>
+          </div>
+          <figcaption
+            class="mt-2 text-center text-sm font-bold text-lilac-deep"
+          >
+            B · Pílula, semana de pausa (sáb, 5/dez)
+          </figcaption>
+        </figure>
+
+        <!-- C · sem método -->
+        <figure>
+          <div
+            class="flex w-[360px] flex-col overflow-hidden rounded-[38px] border border-hairline bg-bg shadow-device"
+          >
+            <div class="flex flex-col gap-4 px-5.5 pt-6 pb-4">
+              <header class="flex flex-col gap-1">
+                <h1 class="font-display text-2xl font-bold text-ink">Ciclo</h1>
+                <p class="text-sm font-semibold text-ink-read">
+                  Sem método hormonal
+                </p>
+              </header>
+              <div
+                class="flex flex-col items-center gap-3 rounded-card-lg bg-peach-tint p-4"
+              >
+                <div
+                  class="relative grid size-36 place-items-center rounded-full"
+                  style="
+                    background: conic-gradient(
+                      #e8916f 0 17%,
+                      #ffffff 17% 79%,
+                      #f7d3c3 79% 96%,
+                      #ffffff 96%
+                    );
+                  "
+                >
+                  <div
+                    class="absolute inset-3 rounded-full bg-peach-tint"
+                  ></div>
+                  <div class="relative flex flex-col items-center">
+                    <span
+                      class="font-display text-4xl font-bold leading-none text-peach-deep"
+                      >9</span
+                    ><span class="text-xs font-bold text-peach-deep"
+                      >dia do ciclo</span
+                    >
+                  </div>
+                </div>
+                <span class="text-center text-xs font-semibold text-ink-read"
+                  >Próxima menstruação<br /><b
+                    class="font-display text-base text-peach-deep"
+                    >entre 24 e 28/nov</b
+                  ></span
+                >
+              </div>
+              <button
+                class="w-full rounded-full bg-peach py-3.5 font-display font-bold text-white shadow-btn-peach"
+              >
+                Menstruei hoje
+              </button>
+              <section class="flex flex-col gap-3">
+                <h2 class="font-display text-base font-bold text-ink">
+                  Como você está hoje
+                </h2>
+                <button
+                  class="flex items-center justify-center gap-2 rounded-card border border-dashed border-hairline p-4 text-sm font-semibold text-ink-read"
+                >
+                  <i class="ph-bold ph-plus"></i>Registrar sintoma ou escape
+                </button>
+              </section>
+              <a
+                class="flex items-center gap-3 rounded-card bg-white p-3 shadow-card-sm"
+              >
+                <span
+                  class="grid size-8 shrink-0 place-items-center rounded-[14px] bg-peach-tint text-peach-deep"
+                  ><i class="ph-fill ph-calendar-dots text-[20px]"></i
+                ></span>
+                <span class="flex flex-1 flex-col"
+                  ><span class="text-sm font-bold">Calendário e histórico</span
+                  ><span class="text-xs font-semibold text-ink-read"
+                    >ciclo médio 29 dias</span
+                  ></span
+                >
+                <i class="ph-bold ph-caret-right text-ink-faint"></i>
+              </a>
+            </div>
+            <nav
+              class="mt-auto flex items-stretch justify-around border-t border-hairline-soft bg-white px-1 pt-1.5 pb-2"
+            >
+              <span
+                class="flex min-h-11 flex-1 flex-col items-center justify-center gap-0.5 text-nav-inactive"
+                ><i class="ph ph-house text-2xl"></i
+                ><span class="text-[10px] font-semibold">Hoje</span></span
+              >
+              <span
+                class="flex min-h-11 flex-1 flex-col items-center justify-center gap-0.5 text-nav-inactive"
+                ><i class="ph ph-heartbeat text-2xl"></i
+                ><span class="text-[10px] font-semibold">Corpo</span></span
+              >
+              <span
+                class="flex min-h-11 flex-1 flex-col items-center justify-center gap-0.5 text-nav-inactive"
+                ><i class="ph ph-barbell text-2xl"></i
+                ><span class="text-[10px] font-semibold">Treino</span></span
+              >
+              <span
+                class="flex min-h-11 flex-1 flex-col items-center justify-center gap-0.5 text-nav-inactive"
+                ><i class="ph ph-smiley text-2xl"></i
+                ><span class="text-[10px] font-semibold">Mente</span></span
+              >
+              <span
+                class="flex min-h-11 flex-1 flex-col items-center justify-center gap-0.5 text-lilac-deep"
+                ><i class="ph-fill ph-flower-lotus text-2xl"></i
+                ><span class="text-[10px] font-extrabold">Ciclo</span></span
+              >
+              <span
+                class="flex min-h-11 flex-1 flex-col items-center justify-center gap-0.5 text-nav-inactive"
+                ><i class="ph ph-first-aid-kit text-2xl"></i
+                ><span class="text-[10px] font-semibold">Saúde</span></span
+              >
+            </nav>
+          </div>
+          <figcaption
+            class="mt-2 text-center text-sm font-bold text-lilac-deep"
+          >
+            C · Sem método (ciclo natural)
+          </figcaption>
+        </figure>
+
+        <!-- D · contínuo -->
+        <figure>
+          <div
+            class="flex w-90 flex-col overflow-hidden rounded-[38px] border border-hairline bg-bg shadow-device"
+          >
+            <div class="flex flex-col gap-4 px-5.5 pt-6 pb-4">
+              <header class="flex flex-col gap-1">
+                <h1 class="font-display text-2xl font-bold text-ink">Ciclo</h1>
+                <p class="text-sm font-semibold text-ink-read">
+                  DIU hormonal · desde jan/2025
+                </p>
+              </header>
+              <div
+                class="flex flex-col gap-3 rounded-card-lg bg-peach-tint p-4"
+              >
+                <div class="flex items-center gap-3">
+                  <span
+                    class="grid size-10 shrink-0 place-items-center rounded-[18px] bg-white text-peach-deep"
+                    ><i class="ph-fill ph-drop-half-bottom text-[22px]"></i
+                  ></span>
+                  <div class="flex flex-col">
+                    <span class="font-display text-lg font-bold"
+                      >Último sangramento há 23 dias</span
+                    ><span class="text-xs font-semibold text-ink-read"
+                      >escape leve em 13/out</span
+                    >
+                  </div>
+                </div>
+                <span class="text-xs font-semibold text-ink-read"
+                  >Com DIU hormonal o sangramento costuma ser irregular, então
+                  não fazemos previsão — só guardamos o que você
+                  registrar.</span
+                >
+              </div>
+              <button
+                class="w-full rounded-full bg-peach-tint py-3.5 font-display font-bold text-peach-deep"
+              >
+                Registrar sangramento
+              </button>
+              <section class="flex flex-col gap-3">
+                <h2 class="font-display text-base font-bold text-ink">
+                  Como você está hoje
+                </h2>
+                <button
+                  class="flex items-center justify-center gap-2 rounded-card border border-dashed border-hairline p-4 text-sm font-semibold text-ink-read"
+                >
+                  <i class="ph-bold ph-plus"></i>Registrar sintoma
+                </button>
+              </section>
+              <a
+                class="flex items-center gap-3 rounded-card bg-white p-3 shadow-card-sm"
+              >
+                <span
+                  class="grid size-8 shrink-0 place-items-center rounded-[14px] bg-peach-tint text-peach-deep"
+                  ><i class="ph-fill ph-calendar-dots text-[20px]"></i
+                ></span>
+                <span class="flex flex-1 flex-col"
+                  ><span class="text-sm font-bold">Calendário e histórico</span
+                  ><span class="text-xs font-semibold text-ink-read"
+                    >3 sangramentos nos últimos 6 meses</span
+                  ></span
+                >
+                <i class="ph-bold ph-caret-right text-ink-faint"></i>
+              </a>
+            </div>
+            <nav
+              class="mt-auto flex items-stretch justify-around border-t border-hairline-soft bg-white px-1 pt-1.5 pb-2"
+            >
+              <span
+                class="flex min-h-11 flex-1 flex-col items-center justify-center gap-0.5 text-nav-inactive"
+                ><i class="ph ph-house text-2xl"></i
+                ><span class="text-[10px] font-semibold">Hoje</span></span
+              >
+              <span
+                class="flex min-h-11 flex-1 flex-col items-center justify-center gap-0.5 text-nav-inactive"
+                ><i class="ph ph-heartbeat text-2xl"></i
+                ><span class="text-[10px] font-semibold">Corpo</span></span
+              >
+              <span
+                class="flex min-h-11 flex-1 flex-col items-center justify-center gap-0.5 text-nav-inactive"
+                ><i class="ph ph-barbell text-2xl"></i
+                ><span class="text-[10px] font-semibold">Treino</span></span
+              >
+              <span
+                class="flex min-h-11 flex-1 flex-col items-center justify-center gap-0.5 text-nav-inactive"
+                ><i class="ph ph-smiley text-2xl"></i
+                ><span class="text-[10px] font-semibold">Mente</span></span
+              >
+              <span
+                class="flex min-h-11 flex-1 flex-col items-center justify-center gap-0.5 text-lilac-deep"
+                ><i class="ph-fill ph-flower-lotus text-2xl"></i
+                ><span class="text-[10px] font-extrabold">Ciclo</span></span
+              >
+              <span
+                class="flex min-h-11 flex-1 flex-col items-center justify-center gap-0.5 text-nav-inactive"
+                ><i class="ph ph-first-aid-kit text-2xl"></i
+                ><span class="text-[10px] font-semibold">Saúde</span></span
+              >
+            </nav>
+          </div>
+          <figcaption
+            class="mt-2 text-center text-sm font-bold text-lilac-deep"
+          >
+            D · Método contínuo (DIU hormonal, implante, injeção, pílula sem
+            pausa)
+          </figcaption>
+        </figure>
+      </div>
+
+      <!-- ============ 3. SHEETS ============ -->
+      <h2 class="mt-12 font-display text-xl font-bold">
+        3 · Registrar o dia e configurar o método
+      </h2>
+      <p class="mt-1 max-w-3xl text-sm font-semibold text-ink-read">
+        Ambos são o BottomSheet do app (grabber, IconChip + título, botão do
+        domínio no rodapé). O registro abre pelo "Registrar" ou tocando num dia
+        do calendário.
+      </p>
+      <div class="mt-5 flex flex-wrap items-start gap-6">
+        <figure>
+          <div
+            class="flex h-[760px] w-[360px] flex-col justify-end overflow-hidden rounded-[38px] border border-hairline bg-[#2b2640]/42 shadow-device"
+          >
+            <div class="flex flex-col rounded-t-sheet bg-white shadow-sheet">
+              <div
+                class="mx-auto mt-2 mb-1 h-1.25 w-10 rounded-full bg-control-off"
+              ></div>
+              <div class="flex items-center gap-3 px-5.5 pt-2">
+                <span
+                  class="grid size-8 shrink-0 place-items-center rounded-[14px] bg-peach-tint text-peach-deep"
+                  ><i class="ph-fill ph-drop text-[22px]"></i
+                ></span>
+                <span class="font-display text-lg font-bold"
+                  >Hoje, qui 5/nov</span
+                >
+              </div>
+              <div class="flex flex-col gap-4 px-5.5 pt-4 pb-2">
+                <span class="text-sm font-bold">Sangramento</span>
+                <div class="-mt-2 flex flex-wrap gap-2">
+                  <span
+                    class="min-h-9 rounded-full bg-lilac-tint-soft px-4 py-2 text-sm font-semibold text-peach-deep"
+                    >Nada</span
+                  >
+                  <span
+                    class="min-h-9 rounded-full bg-lilac-tint-soft px-4 py-2 text-sm font-semibold text-peach-deep"
+                    >Escape</span
+                  >
+                  <span
+                    class="min-h-9 rounded-full bg-lilac-tint-soft px-4 py-2 text-sm font-semibold text-peach-deep"
+                    >Leve</span
+                  >
+                  <span
+                    class="min-h-9 rounded-full bg-peach px-4 py-2 text-sm font-semibold text-white"
+                    >Médio</span
+                  >
+                  <span
+                    class="min-h-9 rounded-full bg-lilac-tint-soft px-4 py-2 text-sm font-semibold text-peach-deep"
+                    >Intenso</span
+                  >
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-sm font-bold">Sintomas</span
+                  ><span
+                    class="inline-flex items-center gap-1 text-xs font-bold text-ink-read"
+                    ><i class="ph-bold ph-sliders-horizontal"></i>editar
+                    lista</span
+                  >
+                </div>
+                <div class="-mt-2 flex flex-wrap gap-2">
+                  <span
+                    class="min-h-9 rounded-full bg-peach px-4 py-2 text-sm font-semibold text-white"
+                    >Cólica</span
+                  >
+                  <span
+                    class="min-h-9 rounded-full bg-lilac-tint-soft px-4 py-2 text-sm font-semibold text-peach-deep"
+                    >Inchaço</span
+                  >
+                  <span
+                    class="min-h-9 rounded-full bg-lilac-tint-soft px-4 py-2 text-sm font-semibold text-peach-deep"
+                    >Dor de cabeça</span
+                  >
+                  <span
+                    class="min-h-9 rounded-full bg-lilac-tint-soft px-4 py-2 text-sm font-semibold text-peach-deep"
+                    >Seios sensíveis</span
+                  >
+                  <span
+                    class="min-h-9 rounded-full bg-lilac-tint-soft px-4 py-2 text-sm font-semibold text-peach-deep"
+                    >Acne</span
+                  >
+                  <span
+                    class="min-h-9 rounded-full bg-peach px-4 py-2 text-sm font-semibold text-white"
+                    >Cansaço</span
+                  >
+                  <span
+                    class="min-h-9 rounded-full bg-lilac-tint-soft px-4 py-2 text-sm font-semibold text-peach-deep"
+                    >Desejo de doce</span
+                  >
+                  <span
+                    class="min-h-9 rounded-full bg-lilac-tint-soft px-4 py-2 text-sm font-semibold text-peach-deep"
+                    >Náusea</span
+                  >
+                  <span
+                    class="min-h-9 rounded-full bg-lilac-tint-soft px-4 py-2 text-sm font-semibold text-peach-deep"
+                    >Dor nas costas</span
+                  >
+                  <span
+                    class="min-h-9 rounded-full bg-lilac-tint-soft px-4 py-2 text-sm font-semibold text-peach-deep"
+                    >Libido alta</span
+                  >
+                  <span
+                    class="min-h-9 rounded-full bg-lilac-tint-soft px-4 py-2 text-sm font-semibold text-peach-deep"
+                    >Libido baixa</span
+                  >
+                  <span
+                    class="min-h-9 rounded-full bg-lilac-tint-soft px-4 py-2 text-sm font-semibold text-peach-deep"
+                    >Corrimento</span
+                  >
+                </div>
+              </div>
+              <div class="px-5.5 pt-2 pb-6">
+                <div
+                  class="w-full rounded-full bg-peach py-3.5 text-center font-display font-bold text-white shadow-btn-peach"
+                >
+                  Salvar
+                </div>
+              </div>
+            </div>
+          </div>
+          <figcaption
+            class="mt-2 text-center text-sm font-bold text-lilac-deep"
+          >
+            Registro do dia
+          </figcaption>
+        </figure>
+
+        <figure>
+          <div
+            class="flex h-[1010px] w-[360px] flex-col justify-end overflow-hidden rounded-[38px] border border-hairline bg-[#2b2640]/42 shadow-device"
+          >
+            <div class="flex flex-col rounded-t-sheet bg-white shadow-sheet">
+              <div
+                class="mx-auto mt-2 mb-1 h-1.25 w-10 rounded-full bg-control-off"
+              ></div>
+              <div class="flex items-center gap-3 px-5.5 pt-2">
+                <span
+                  class="grid size-8 shrink-0 place-items-center rounded-[14px] bg-peach-tint text-peach-deep"
+                  ><i class="ph-fill ph-pill text-[22px]"></i
+                ></span>
+                <span class="font-display text-lg font-bold">Seu método</span>
+              </div>
+              <div class="flex flex-col gap-4 px-5.5 pt-4 pb-2">
+                <div class="flex flex-wrap gap-2">
+                  <span
+                    class="min-h-9 rounded-full bg-lilac-tint-soft px-4 py-2 text-sm font-semibold text-peach-deep"
+                    >Nenhum</span
+                  >
+                  <span
+                    class="min-h-9 rounded-full bg-peach px-4 py-2 text-sm font-semibold text-white"
+                    >Pílula</span
+                  >
+                  <span
+                    class="min-h-9 rounded-full bg-lilac-tint-soft px-4 py-2 text-sm font-semibold text-peach-deep"
+                    >DIU hormonal</span
+                  >
+                  <span
+                    class="min-h-9 rounded-full bg-lilac-tint-soft px-4 py-2 text-sm font-semibold text-peach-deep"
+                    >DIU de cobre</span
+                  >
+                  <span
+                    class="min-h-9 rounded-full bg-lilac-tint-soft px-4 py-2 text-sm font-semibold text-peach-deep"
+                    >Implante</span
+                  >
+                  <span
+                    class="min-h-9 rounded-full bg-lilac-tint-soft px-4 py-2 text-sm font-semibold text-peach-deep"
+                    >Injeção</span
+                  >
+                  <span
+                    class="min-h-9 rounded-full bg-lilac-tint-soft px-4 py-2 text-sm font-semibold text-peach-deep"
+                    >Anel</span
+                  >
+                  <span
+                    class="min-h-9 rounded-full bg-lilac-tint-soft px-4 py-2 text-sm font-semibold text-peach-deep"
+                    >Adesivo</span
+                  >
+                  <span
+                    class="min-h-9 rounded-full bg-lilac-tint-soft px-4 py-2 text-sm font-semibold text-peach-deep"
+                    >Outro</span
+                  >
+                </div>
+                <span class="text-sm font-bold">Cartela</span>
+                <div class="-mt-2 flex flex-wrap gap-2">
+                  <span
+                    class="min-h-9 rounded-full bg-peach px-4 py-2 text-sm font-semibold text-white"
+                    >21 comprimidos</span
+                  >
+                  <span
+                    class="min-h-9 rounded-full bg-lilac-tint-soft px-4 py-2 text-sm font-semibold text-peach-deep"
+                    >24 + 4</span
+                  >
+                  <span
+                    class="min-h-9 rounded-full bg-lilac-tint-soft px-4 py-2 text-sm font-semibold text-peach-deep"
+                    >28</span
+                  >
+                </div>
+                <span class="text-sm font-bold">Pausa a cada</span>
+                <div class="-mt-2 flex items-center justify-between">
+                  <span
+                    class="grid size-12 place-items-center rounded-full bg-lilac-tint text-lilac-deep"
+                    ><i class="ph-bold ph-minus text-[22px]"></i
+                  ></span>
+                  <span class="flex flex-col items-center"
+                    ><span class="font-display text-4xl font-bold">4</span
+                    ><span class="text-sm font-semibold text-ink-read"
+                      >cartelas</span
+                    ></span
+                  >
+                  <span
+                    class="grid size-12 place-items-center rounded-full bg-lilac text-white shadow-btn"
+                    ><i class="ph-bold ph-plus text-[22px]"></i
+                  ></span>
+                </div>
+                <span class="text-sm font-bold">A pausa dura</span>
+                <div class="-mt-2 flex items-center justify-between">
+                  <span
+                    class="grid size-12 place-items-center rounded-full bg-lilac-tint text-lilac-deep"
+                    ><i class="ph-bold ph-minus text-[22px]"></i
+                  ></span>
+                  <span class="flex flex-col items-center"
+                    ><span class="font-display text-4xl font-bold">7</span
+                    ><span class="text-sm font-semibold text-ink-read"
+                      >dias</span
+                    ></span
+                  >
+                  <span
+                    class="grid size-12 place-items-center rounded-full bg-lilac text-white shadow-btn"
+                    ><i class="ph-bold ph-plus text-[22px]"></i
+                  ></span>
+                </div>
+                <div class="flex gap-2">
+                  <div class="flex flex-1 flex-col gap-2">
+                    <span class="text-sm font-bold">Horário</span
+                    ><span
+                      class="rounded-control border border-hairline bg-white px-4 py-3 text-sm font-semibold"
+                      >21:00</span
+                    >
+                  </div>
+                  <div class="flex flex-1 flex-col gap-2">
+                    <span class="text-sm font-bold">Cartela atual começou</span
+                    ><span
+                      class="flex items-center justify-between rounded-control border border-hairline bg-white px-4 py-3 text-sm font-semibold"
+                      >22/out
+                      <i class="ph-fill ph-calendar-blank text-ink-faint"></i
+                    ></span>
+                  </div>
+                </div>
+                <span class="text-sm font-bold"
+                  >Qual cartela da sequência é essa?</span
+                >
+                <div class="-mt-2 flex flex-wrap gap-2">
+                  <span
+                    class="min-h-9 rounded-full bg-lilac-tint-soft px-4 py-2 text-sm font-semibold text-peach-deep"
+                    >1ª</span
+                  >
+                  <span
+                    class="min-h-9 rounded-full bg-lilac-tint-soft px-4 py-2 text-sm font-semibold text-peach-deep"
+                    >2ª</span
+                  >
+                  <span
+                    class="min-h-9 rounded-full bg-peach px-4 py-2 text-sm font-semibold text-white"
+                    >3ª</span
+                  >
+                  <span
+                    class="min-h-9 rounded-full bg-lilac-tint-soft px-4 py-2 text-sm font-semibold text-peach-deep"
+                    >4ª</span
+                  >
+                </div>
+              </div>
+              <div class="px-5.5 pt-2 pb-6">
+                <div
+                  class="w-full rounded-full bg-peach py-3.5 text-center font-display font-bold text-white shadow-btn-peach"
+                >
+                  Salvar método
+                </div>
+              </div>
+            </div>
+          </div>
+          <figcaption
+            class="mt-2 text-center text-sm font-bold text-lilac-deep"
+          >
+            Configurar método (pílula)
+          </figcaption>
+        </figure>
+      </div>
+
+      <!-- ============ 4. CALENDÁRIO / HISTÓRICO ============ -->
+      <h2 class="mt-12 font-display text-xl font-bold">
+        4 · Calendário e histórico
+      </h2>
+      <p class="mt-1 max-w-3xl text-sm font-semibold text-ink-read">
+        Tela interna da aba, com o mesmo header de voltar da Notificações. Uma
+        tela só, rolando: mês em cima, médias e ciclos embaixo. Exemplo de quem
+        não usa método.
+      </p>
+      <div class="mt-5 flex flex-wrap items-start gap-6">
+        <figure>
+          <div
+            class="flex w-[360px] flex-col overflow-hidden rounded-[38px] border border-hairline bg-bg shadow-device"
+          >
+            <div class="flex flex-col gap-4 px-5.5 pt-6 pb-6">
+              <header class="flex items-center justify-between">
+                <span
+                  class="grid size-9.5 place-items-center rounded-control bg-lilac-tint-soft text-lilac-deep"
+                  ><i class="ph-bold ph-arrow-left text-lg"></i
+                ></span>
+                <h1 class="font-display text-lg font-bold">Calendário</h1>
+                <span class="size-9.5"></span>
+              </header>
+              <div
+                class="flex flex-col gap-3 rounded-card bg-white p-4 shadow-card"
+              >
+                <div class="flex items-center justify-between">
+                  <i class="ph-bold ph-caret-left text-ink-faint"></i
+                  ><span class="font-display text-base font-bold"
+                    >novembro 2026</span
+                  ><i class="ph-bold ph-caret-right text-ink-faint"></i>
+                </div>
+                <div
+                  class="grid grid-cols-7 gap-y-1 text-center text-sm font-bold"
+                >
+                  <span class="text-[10px] font-extrabold text-ink-faint"
+                    >D</span
+                  ><span class="text-[10px] font-extrabold text-ink-faint"
+                    >S</span
+                  ><span class="text-[10px] font-extrabold text-ink-faint"
+                    >T</span
+                  ><span class="text-[10px] font-extrabold text-ink-faint"
+                    >Q</span
+                  ><span class="text-[10px] font-extrabold text-ink-faint"
+                    >Q</span
+                  ><span class="text-[10px] font-extrabold text-ink-faint"
+                    >S</span
+                  ><span class="text-[10px] font-extrabold text-ink-faint"
+                    >S</span
+                  >
+                  <span
+                    class="relative mx-auto grid size-9 place-items-center rounded-full bg-peach text-white"
+                    >1<span
+                      class="absolute bottom-0.5 size-1 rounded-full bg-white"
+                    ></span></span
+                  ><span class="mx-auto grid size-9 place-items-center">2</span
+                  ><span class="mx-auto grid size-9 place-items-center">3</span
+                  ><span class="relative mx-auto grid size-9 place-items-center"
+                    >4<span
+                      class="absolute bottom-0.5 size-1 rounded-full bg-lilac"
+                    ></span></span
+                  ><span
+                    class="mx-auto grid size-9 place-items-center rounded-full ring-2 ring-lilac-deep"
+                    >5</span
+                  ><span class="mx-auto grid size-9 place-items-center">6</span
+                  ><span class="mx-auto grid size-9 place-items-center">7</span>
+                  <span class="mx-auto grid size-9 place-items-center">8</span
+                  ><span class="mx-auto grid size-9 place-items-center">9</span
+                  ><span class="mx-auto grid size-9 place-items-center">10</span
+                  ><span
+                    class="mx-auto grid size-9 place-items-center rounded-full bg-peach-tint text-peach-deep"
+                    >11</span
+                  ><span class="mx-auto grid size-9 place-items-center">12</span
+                  ><span class="mx-auto grid size-9 place-items-center">13</span
+                  ><span class="mx-auto grid size-9 place-items-center"
+                    >14</span
+                  >
+                  <span class="mx-auto grid size-9 place-items-center">15</span
+                  ><span class="mx-auto grid size-9 place-items-center">16</span
+                  ><span class="mx-auto grid size-9 place-items-center">17</span
+                  ><span class="mx-auto grid size-9 place-items-center">18</span
+                  ><span class="mx-auto grid size-9 place-items-center">19</span
+                  ><span class="mx-auto grid size-9 place-items-center">20</span
+                  ><span class="mx-auto grid size-9 place-items-center"
+                    >21</span
+                  >
+                  <span class="mx-auto grid size-9 place-items-center">22</span
+                  ><span class="mx-auto grid size-9 place-items-center">23</span
+                  ><span
+                    class="mx-auto grid size-9 place-items-center rounded-full border-2 border-dashed border-peach text-peach-deep"
+                    >24</span
+                  ><span
+                    class="mx-auto grid size-9 place-items-center rounded-full border-2 border-dashed border-peach text-peach-deep"
+                    >25</span
+                  ><span
+                    class="mx-auto grid size-9 place-items-center rounded-full border-2 border-dashed border-peach text-peach-deep"
+                    >26</span
+                  ><span
+                    class="mx-auto grid size-9 place-items-center rounded-full border-2 border-dashed border-peach text-peach-deep"
+                    >27</span
+                  ><span
+                    class="mx-auto grid size-9 place-items-center rounded-full border-2 border-dashed border-peach text-peach-deep"
+                    >28</span
+                  >
+                  <span class="mx-auto grid size-9 place-items-center">29</span
+                  ><span class="mx-auto grid size-9 place-items-center"
+                    >30</span
+                  >
+                </div>
+                <div
+                  class="flex flex-wrap gap-x-3 gap-y-1 text-[11px] font-bold text-ink-read"
+                >
+                  <span class="inline-flex items-center gap-1"
+                    ><span class="size-3 rounded-full bg-peach"></span
+                    >menstruação</span
+                  >
+                  <span class="inline-flex items-center gap-1"
+                    ><span
+                      class="size-3 rounded-full border-2 border-dashed border-peach"
+                    ></span
+                    >prevista</span
+                  >
+                  <span class="inline-flex items-center gap-1"
+                    ><span class="size-3 rounded-full bg-peach-tint"></span
+                    >escape</span
+                  >
+                  <span class="inline-flex items-center gap-1"
+                    ><span class="size-1.5 rounded-full bg-lilac"></span
+                    >sintoma</span
+                  >
+                </div>
+              </div>
+
+              <div
+                class="grid grid-cols-2 gap-2 rounded-card-lg bg-peach-tint p-4"
+              >
+                <div class="flex flex-col items-center gap-0.5">
+                  <span class="font-display text-2xl font-bold text-peach-deep"
+                    >29<span class="text-base opacity-60"> dias</span></span
+                  ><span class="text-xs font-bold text-peach-deep"
+                    >ciclo médio</span
+                  >
+                </div>
+                <div class="flex flex-col items-center gap-0.5">
+                  <span class="font-display text-2xl font-bold text-peach-deep"
+                    >5<span class="text-base opacity-60"> dias</span></span
+                  ><span class="text-xs font-bold text-peach-deep"
+                    >menstruação</span
+                  >
+                </div>
+              </div>
+
+              <section class="flex flex-col gap-3">
+                <h2 class="font-display text-base font-bold">Seus ciclos</h2>
+                <div
+                  class="flex items-center gap-3 rounded-card bg-white p-3 shadow-card-sm"
+                >
+                  <span class="flex flex-1 flex-col"
+                    ><span class="text-sm font-bold">28/out → hoje</span
+                    ><span class="text-xs font-semibold text-ink-read"
+                      >em andamento · dia 9</span
+                    ></span
+                  >
+                </div>
+                <div
+                  class="flex items-center gap-3 rounded-card bg-white p-3 shadow-card-sm"
+                >
+                  <span class="flex flex-1 flex-col"
+                    ><span class="text-sm font-bold">29/set → 27/out</span
+                    ><span class="text-xs font-semibold text-ink-read"
+                      >29 dias · 5 de menstruação</span
+                    ></span
+                  ><span
+                    class="flex h-1.75 w-20 overflow-hidden rounded-full bg-ring-track"
+                    ><span class="w-[17%] bg-peach"></span
+                  ></span>
+                </div>
+                <div
+                  class="flex items-center gap-3 rounded-card bg-white p-3 shadow-card-sm"
+                >
+                  <span class="flex flex-1 flex-col"
+                    ><span class="text-sm font-bold">1/set → 28/set</span
+                    ><span class="text-xs font-semibold text-ink-read"
+                      >28 dias · 4 de menstruação</span
+                    ></span
+                  ><span
+                    class="flex h-1.75 w-20 overflow-hidden rounded-full bg-ring-track"
+                    ><span class="w-[14%] bg-peach"></span
+                  ></span>
+                </div>
+                <div
+                  class="flex items-center gap-2 rounded-card border border-dashed border-hairline p-3 text-xs font-semibold text-ink-read"
+                >
+                  <i class="ph-bold ph-swap text-base text-peach-deep"></i>Desde
+                  3/ago sem método · antes, pílula (fora da média)
+                </div>
+              </section>
+            </div>
+          </div>
+          <figcaption
+            class="mt-2 text-center text-sm font-bold text-lilac-deep"
+          >
+            Calendário + histórico (rolando)
+          </figcaption>
+        </figure>
+
+        <!-- ativação -->
+        <figure>
+          <div
+            class="flex h-[760px] w-[360px] flex-col overflow-hidden rounded-[38px] border border-hairline bg-bg shadow-device"
+          >
+            <div class="flex flex-1 flex-col gap-5 px-5.5 pt-10 pb-8">
+              <div
+                class="mx-auto grid size-28 place-items-center rounded-full bg-peach-tint text-peach-deep"
+              >
+                <i class="ph-fill ph-flower-lotus text-[56px]"></i>
+              </div>
+              <div class="flex flex-col items-center gap-2 text-center">
+                <h1 class="font-display text-2xl font-bold">
+                  Acompanhar seu ciclo?
+                </h1>
+                <p class="text-sm font-semibold text-ink-read">
+                  Registre a menstruação, os sintomas e a pílula — e veja quando
+                  o próximo ciclo deve chegar.
+                </p>
+              </div>
+              <div class="flex gap-3 rounded-card bg-white p-4 shadow-card-sm">
+                <span
+                  class="grid size-8 shrink-0 place-items-center rounded-[14px] bg-green-tint text-green-deep"
+                  ><i class="ph-fill ph-shield-check text-[20px]"></i
+                ></span>
+                <p class="text-xs font-semibold text-ink-read">
+                  São dados de saúde. Ficam só na sua conta, não vão pra
+                  ninguém, e você apaga tudo quando quiser pelo seu perfil.
+                </p>
+              </div>
+              <div class="mt-auto flex flex-col gap-3">
+                <div
+                  class="w-full rounded-full bg-peach py-3.5 text-center font-display font-bold text-white shadow-btn-peach"
+                >
+                  Ativar ciclo
+                </div>
+                <span class="text-center text-sm font-bold text-ink-read"
+                  >Agora não</span
+                >
+              </div>
+            </div>
+          </div>
+          <figcaption
+            class="mt-2 text-center text-sm font-bold text-lilac-deep"
+          >
+            Ativação (perfil ou 4º passo opcional do onboarding)
+          </figcaption>
+        </figure>
+      </div>
+
+      <!-- ============ 5. FORA DA ABA ============ -->
+      <h2 class="mt-12 font-display text-xl font-bold">
+        5 · Fora da aba: Hoje, Corpo e Notificações
+      </h2>
+      <p class="mt-1 max-w-3xl text-sm font-semibold text-ink-read">
+        A pílula conta no ritual Remédios do Hoje. Como o ritual leva pra Corpo,
+        ela também aparece em "Remédios de hoje" (com o chip pêssego do ciclo) —
+        some nos dias de pausa. Os lembretes do ciclo entram na Notificações.
+      </p>
+      <div class="mt-5 flex flex-wrap items-start gap-6">
+        <figure>
+          <div
+            class="flex w-[360px] flex-col overflow-hidden rounded-[38px] border border-hairline bg-bg shadow-device"
+          >
+            <div class="flex flex-col gap-4 px-5.5 pt-6 pb-6">
+              <div class="flex items-center justify-between">
+                <h1 class="font-display text-2xl font-bold">Oi, Larissa</h1>
+                <span class="size-11.5 rounded-full bg-lilac"></span>
+              </div>
+              <h2 class="font-display text-base font-bold">Seus rituais</h2>
+              <div class="grid grid-cols-2 gap-3">
+                <div
+                  class="flex flex-col justify-between rounded-card-lg bg-lilac-tint p-4"
+                >
+                  <span
+                    class="grid size-10 place-items-center rounded-[18px] bg-white text-lilac-deep"
+                    ><i class="ph-fill ph-drop text-[22px]"></i
+                  ></span>
+                  <div class="mt-2 flex flex-col">
+                    <span class="font-display text-lg font-bold"
+                      >Hidratação</span
+                    ><span class="text-xs font-semibold text-ink-soft"
+                      >1250 de 2000 ml</span
+                    >
+                    <div
+                      class="mt-2 h-1.75 overflow-hidden rounded-full bg-white"
+                    >
+                      <div class="h-full w-[62%] rounded-full bg-lilac"></div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="flex flex-col justify-between rounded-card-lg bg-green-tint p-4"
+                >
+                  <span
+                    class="grid size-10 place-items-center rounded-[18px] bg-white text-green-deep"
+                    ><i class="ph-fill ph-fork-knife text-[22px]"></i
+                  ></span>
+                  <div class="mt-2 flex flex-col">
+                    <span class="font-display text-lg font-bold"
+                      >Alimentação</span
+                    ><span class="text-xs font-semibold text-ink-soft"
+                      >2 refeições</span
+                    ><span
+                      class="mt-2 inline-flex items-center gap-1 text-xs font-bold text-green-deep"
+                      ><i class="ph-fill ph-plus-circle"></i>Adicionar</span
+                    >
+                  </div>
+                </div>
+                <div
+                  class="flex flex-col justify-between rounded-card-lg bg-pink-tint p-4"
+                >
+                  <span
+                    class="grid size-10 place-items-center rounded-[18px] bg-white text-pink-deep"
+                    ><i class="ph-fill ph-barbell text-[22px]"></i
+                  ></span>
+                  <div class="mt-2 flex flex-col">
+                    <span class="font-display text-lg font-bold">Treino</span
+                    ><span class="text-xs font-semibold text-ink-soft"
+                      >Peito e tríceps</span
+                    ><span
+                      class="mt-2 inline-flex items-center gap-1 text-xs font-bold text-pink-deep"
+                      ><i class="ph-fill ph-play-circle"></i>Iniciar</span
+                    >
+                  </div>
+                </div>
+                <div
+                  class="flex flex-col justify-between rounded-card-lg bg-coral-tint p-4 ring-2 ring-peach ring-offset-2"
+                >
+                  <span
+                    class="grid size-10 place-items-center rounded-[18px] bg-white text-coral"
+                    ><i class="ph-fill ph-pill text-[22px]"></i
+                  ></span>
+                  <div class="mt-2 flex flex-col">
+                    <span class="font-display text-lg font-bold">Remédios</span
+                    ><span class="text-xs font-semibold text-ink-soft"
+                      >2 de 3 tomados</span
+                    >
+                    <div
+                      class="mt-2 h-1.75 overflow-hidden rounded-full bg-white"
+                    >
+                      <div class="h-full w-[66%] rounded-full bg-coral"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <p class="text-center text-xs font-bold text-peach-deep">
+                ↑ o "3" inclui a pílula · na pausa vira "2 de 2"
+              </p>
+            </div>
+          </div>
+          <figcaption
+            class="mt-2 text-center text-sm font-bold text-lilac-deep"
+          >
+            Hoje · ritual Remédios
+          </figcaption>
+        </figure>
+
+        <figure>
+          <div
+            class="flex w-[360px] flex-col overflow-hidden rounded-[38px] border border-hairline bg-bg shadow-device"
+          >
+            <div class="flex flex-col gap-4 px-5.5 pt-6 pb-6">
+              <header class="flex flex-col gap-1">
+                <h1 class="font-display text-2xl font-bold">Corpo</h1>
+                <p class="text-sm font-semibold text-ink-read">
+                  Seu físico de hoje
+                </p>
+              </header>
+              <section class="flex flex-col gap-3">
+                <h2 class="font-display text-base font-bold">
+                  Remédios de hoje
+                </h2>
+                <div
+                  class="flex items-center gap-3 rounded-card bg-white p-3 shadow-card-sm"
+                >
+                  <span
+                    class="grid size-8 place-items-center rounded-[14px] bg-coral-tint text-coral"
+                    ><i class="ph-fill ph-pill text-[22px]"></i></span
+                  ><span class="flex flex-1 flex-col"
+                    ><span class="text-sm font-bold">Vitamina D</span
+                    ><span class="text-xs font-semibold text-ink-read"
+                      >09:00 · 1 comp.</span
+                    ></span
+                  ><i
+                    class="ph-fill ph-check-circle text-2xl text-green-deep"
+                  ></i>
+                </div>
+                <div
+                  class="flex items-center gap-3 rounded-card bg-white p-3 shadow-card-sm"
+                >
+                  <span
+                    class="grid size-8 place-items-center rounded-[14px] bg-coral-tint text-coral"
+                    ><i class="ph-fill ph-pill text-[22px]"></i></span
+                  ><span class="flex flex-1 flex-col"
+                    ><span class="text-sm font-bold">Magnésio</span
+                    ><span class="text-xs font-semibold text-ink-read"
+                      >13:00 · 1 cápsula</span
+                    ></span
+                  ><i
+                    class="ph-fill ph-check-circle text-2xl text-green-deep"
+                  ></i>
+                </div>
+                <div
+                  class="flex items-center gap-3 rounded-card bg-white p-3 shadow-card-sm"
+                >
+                  <span
+                    class="grid size-8 place-items-center rounded-[14px] bg-peach-tint text-peach-deep"
+                    ><i class="ph-fill ph-flower-lotus text-[20px]"></i></span
+                  ><span class="flex flex-1 flex-col"
+                    ><span class="text-sm font-bold">Pílula</span
+                    ><span class="text-xs font-semibold text-ink-read"
+                      >21:00 · comprimido 15 de 21</span
+                    ></span
+                  ><i class="ph ph-circle text-2xl text-control-off"></i>
+                </div>
+              </section>
+            </div>
+          </div>
+          <figcaption
+            class="mt-2 text-center text-sm font-bold text-lilac-deep"
+          >
+            Corpo · Remédios de hoje
+          </figcaption>
+        </figure>
+
+        <figure>
+          <div
+            class="flex w-[360px] flex-col overflow-hidden rounded-[38px] border border-hairline bg-bg shadow-device"
+          >
+            <div class="flex flex-col gap-4 px-5.5 pt-6 pb-6">
+              <header class="flex items-center justify-between">
+                <span
+                  class="grid size-9.5 place-items-center rounded-control bg-lilac-tint-soft text-lilac-deep"
+                  ><i class="ph-bold ph-arrow-left text-lg"></i
+                ></span>
+                <h1 class="font-display text-lg font-bold">Notificações</h1>
+                <span class="size-9.5"></span>
+              </header>
+              <div class="flex flex-col gap-3">
+                <div
+                  class="flex items-center gap-3 rounded-card bg-white p-4 shadow-card"
+                >
+                  <span
+                    class="grid size-10 place-items-center rounded-[18px] bg-coral-tint text-coral"
+                    ><i class="ph-fill ph-pill text-[22px]"></i></span
+                  ><span class="flex min-w-0 flex-1 flex-col"
+                    ><span class="font-display text-base font-bold"
+                      >Remédios</span
+                    ><span class="truncate text-xs font-semibold text-ink-read"
+                      >no horário de cada remédio</span
+                    ></span
+                  ><span
+                    class="relative h-6.75 w-11.5 shrink-0 rounded-full bg-lilac"
+                    ><span
+                      class="absolute top-0.75 left-5.5 size-5.25 rounded-full bg-white shadow-card-sm"
+                    ></span
+                  ></span>
+                </div>
+                <div
+                  class="flex items-center gap-3 rounded-card bg-white p-4 shadow-card"
+                >
+                  <span
+                    class="grid size-10 place-items-center rounded-[18px] bg-peach-tint text-peach-deep"
+                    ><i class="ph-fill ph-pill text-[22px]"></i></span
+                  ><span class="flex min-w-0 flex-1 flex-col"
+                    ><span class="font-display text-base font-bold">Pílula</span
+                    ><span class="truncate text-xs font-semibold text-ink-read"
+                      >21:00 · descansa na pausa</span
+                    ></span
+                  ><i class="ph-bold ph-caret-right shrink-0 text-ink-faint"></i
+                  ><span
+                    class="relative h-6.75 w-11.5 shrink-0 rounded-full bg-lilac"
+                    ><span
+                      class="absolute top-0.75 left-5.5 size-5.25 rounded-full bg-white shadow-card-sm"
+                    ></span
+                  ></span>
+                </div>
+                <div
+                  class="flex items-center gap-3 rounded-card bg-white p-4 shadow-card"
+                >
+                  <span
+                    class="grid size-10 place-items-center rounded-[18px] bg-peach-tint text-peach-deep"
+                    ><i class="ph-fill ph-calendar-dots text-[22px]"></i></span
+                  ><span class="flex min-w-0 flex-1 flex-col"
+                    ><span class="font-display text-base font-bold"
+                      >Ciclo chegando</span
+                    ><span class="truncate text-xs font-semibold text-ink-read"
+                      >2 dias antes da pausa ou menstruação</span
+                    ></span
+                  ><span
+                    class="relative h-6.75 w-11.5 shrink-0 rounded-full bg-lilac"
+                    ><span
+                      class="absolute top-0.75 left-5.5 size-5.25 rounded-full bg-white shadow-card-sm"
+                    ></span
+                  ></span>
+                </div>
+                <div
+                  class="flex items-center gap-3 rounded-card bg-white p-4 shadow-card"
+                >
+                  <span
+                    class="grid size-10 place-items-center rounded-[18px] bg-peach-tint text-peach-deep"
+                    ><i
+                      class="ph-fill ph-drop-half-bottom text-[22px]"
+                    ></i></span
+                  ><span class="flex min-w-0 flex-1 flex-col"
+                    ><span class="font-display text-base font-bold"
+                      >Ainda menstruada?</span
+                    ><span class="truncate text-xs font-semibold text-ink-read"
+                      >a partir do 5º dia, pra fechar o registro</span
+                    ></span
+                  ><span
+                    class="relative h-6.75 w-11.5 shrink-0 rounded-full bg-control-off"
+                    ><span
+                      class="absolute top-0.75 left-0.75 size-5.25 rounded-full bg-white shadow-card-sm"
+                    ></span
+                  ></span>
+                </div>
+              </div>
+              <div
+                class="flex flex-col gap-2 rounded-card-lg p-4"
+                style="
+                  background: linear-gradient(
+                    160deg,
+                    #c9b6e6,
+                    #e9ddf3 52%,
+                    #f3d9e6
+                  );
+                "
+              >
+                <div
+                  class="flex items-center gap-3 rounded-[20px] bg-white/90 p-3"
+                >
+                  <span
+                    class="grid size-8 place-items-center rounded-[14px] bg-peach-tint text-peach-deep"
+                    ><i class="ph-fill ph-pill text-[20px]"></i></span
+                  ><span class="flex flex-col"
+                    ><span class="text-sm font-bold">Hora da pílula</span
+                    ><span class="text-xs font-semibold text-ink-read"
+                      >comprimido 15 de 21</span
+                    ></span
+                  >
+                </div>
+                <div
+                  class="flex items-center gap-3 rounded-[20px] bg-white/90 p-3"
+                >
+                  <span
+                    class="grid size-8 place-items-center rounded-[14px] bg-peach-tint text-peach-deep"
+                    ><i class="ph-fill ph-moon text-[20px]"></i></span
+                  ><span class="flex flex-col"
+                    ><span class="text-sm font-bold"
+                      >Sua pausa começa em 2 dias</span
+                    ><span class="text-xs font-semibold text-ink-read"
+                      >a cartela 4 termina na terça</span
+                    ></span
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+          <figcaption
+            class="mt-2 text-center text-sm font-bold text-lilac-deep"
+          >
+            Notificações + como chegam
+          </figcaption>
+        </figure>
+      </div>
+    </div>
+  </body>
+</html>
