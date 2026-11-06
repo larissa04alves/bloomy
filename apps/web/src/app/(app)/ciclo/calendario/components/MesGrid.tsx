@@ -27,6 +27,7 @@ export function MesGrid({
   ready,
   error,
   legend,
+  natural,
   onPrev,
   onNext,
   onOpenDay,
@@ -39,6 +40,8 @@ export function MesGrid({
   ready: boolean;
   error: Error | null;
   legend: { id: LegendItem; label: string }[];
+  /** Rótulos do leitor de tela: menstruação (natural) ou sangramento e pausa (hormonal). */
+  natural: boolean;
   onPrev: () => void;
   onNext: () => void;
   onOpenDay: (cell: NonNullable<GridCell>) => void;
@@ -95,7 +98,7 @@ export function MesGrid({
               type="button"
               disabled={cell.future || !ready}
               onClick={() => onOpenDay(cell)}
-              aria-label={dayAriaLabel(cell)}
+              aria-label={dayAriaLabel(cell, natural)}
               className={cn(
                 "relative mx-auto grid size-9 place-items-center rounded-full disabled:cursor-default",
                 cell.mark && MARK[cell.mark],

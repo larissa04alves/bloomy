@@ -10,6 +10,21 @@ import { useCiclo } from "../../hooks/useCiclo";
 import { type GridCell, historyItems, monthBounds, monthGrid, monthLabel, shiftMonth } from "./format";
 
 const WEEKDAY_INITIALS = ["D", "S", "T", "Q", "Q", "S", "S"];
+const TIP_KEY = "bloomy.cycle.calendarTipDismissed";
+
+function readTipDismissed(): boolean {
+  try {
+    return localStorage.getItem(TIP_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+function writeTipDismissed() {
+  try {
+    localStorage.setItem(TIP_KEY, "1");
+  } catch {}
+}
 
 export type LegendItem = "period" | "predicted" | "spotting" | "symptom";
 
@@ -60,6 +75,16 @@ export function useCalendario() {
   const predicted = cycle?.natural?.window ?? cycle?.scheduled?.nextPause ?? null;
   const grid = useMemo(() => monthGrid(month, days, predicted, today), [month, days, predicted, today]);
 
+  // Começa escondida e lê o storage depois de montar para o HTML do servidor e do cliente baterem.
+  const [tipVisible, setTipVisible] = useState(false);
+  useEffect(() => {
+    setTipVisible(!readTipDismissed());
+  }, []);
+  const dismissTip = useCallback(() => {
+    setTipVisible(false);
+    writeTipDismissed();
+  }, []);
+
   const { openRegistro } = c;
   const openDay = useCallback(
     (cell: NonNullable<GridCell>) => {
@@ -67,8 +92,9 @@ export function useCalendario() {
       if (cell.future || !monthReady) return;
       const entry = days.find((d) => d.day === cell.day);
       openRegistro(cell.day, entry ? { flow: entry.flow, symptoms: entry.symptoms } : undefined);
+      dismissTip();
     },
-    [openRegistro, days, monthReady],
+    [openRegistro, days, monthReady, dismissTip],
   );
 
   const { saveDay: saveCycleDay } = c;
@@ -110,6 +136,9 @@ export function useCalendario() {
     retryMonth: () => setMonthAttempt((n) => n + 1),
     legend: cycle ? legendFor(cycle) : [],
     openDay,
+    natural: cycle?.mode === "natural",
+    tipVisible,
+    dismissTip,
     averages,
     history: history.data ? historyItems(history.data, today) : null,
     historyError: history.data ? null : history.error,

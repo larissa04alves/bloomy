@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeftIcon } from "@phosphor-icons/react";
+import { ArrowLeftIcon, HandTapIcon, XIcon } from "@phosphor-icons/react";
 import Link from "next/link";
 
 import { CICLO_HREF } from "@/lib/cycle";
@@ -35,6 +35,21 @@ export default function CalendarioPage() {
         <span className="size-9.5" aria-hidden="true" />
       </header>
 
+      {c.tipVisible ? (
+        <p className="flex items-center gap-1.5 text-xs font-semibold text-ink-read">
+          <HandTapIcon weight="fill" className="shrink-0 text-ink-faint" />
+          <span className="flex-1">Toque num dia para ver ou editar o que você registrou</span>
+          <button
+            type="button"
+            onClick={c.dismissTip}
+            aria-label="Fechar dica"
+            className="grid min-h-9 min-w-9 shrink-0 place-items-center text-ink-faint"
+          >
+            <XIcon weight="bold" />
+          </button>
+        </p>
+      ) : null}
+
       <MesGrid
         month={c.month}
         weekdays={c.weekdays}
@@ -43,6 +58,7 @@ export default function CalendarioPage() {
         error={c.monthError}
         onRetry={c.retryMonth}
         legend={c.legend}
+        natural={c.natural}
         onPrev={c.prevMonth}
         onNext={c.nextMonth}
         onOpenDay={c.openDay}

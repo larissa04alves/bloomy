@@ -237,12 +237,19 @@ describe("dayAriaLabel", () => {
   const cell = { day: "2026-11-05", date: 5, mark: null, symptom: false, today: false, future: false } as const;
 
   it("data por extenso, sem ISO", () => {
-    expect(dayAriaLabel(cell)).toBe("5 de novembro");
+    expect(dayAriaLabel(cell, true)).toBe("5 de novembro");
   });
 
   it("junta hoje, marca e sintoma", () => {
-    expect(dayAriaLabel({ ...cell, mark: "period", symptom: true })).toBe("5 de novembro, menstruação, com sintoma");
-    expect(dayAriaLabel({ ...cell, today: true, mark: "spotting" })).toBe("5 de novembro, hoje, escape");
-    expect(dayAriaLabel({ ...cell, day: "2026-12-01", date: 1, mark: "predicted" })).toBe("1 de dezembro, menstruação prevista");
+    expect(dayAriaLabel({ ...cell, mark: "period", symptom: true }, true)).toBe("5 de novembro, menstruação, com sintoma");
+    expect(dayAriaLabel({ ...cell, today: true, mark: "spotting" }, true)).toBe("5 de novembro, hoje, escape");
+    expect(dayAriaLabel({ ...cell, day: "2026-12-01", date: 1, mark: "predicted" }, true)).toBe(
+      "1 de dezembro, menstruação prevista",
+    );
+  });
+
+  it("com método hormonal fala em sangramento e pausa, como a legenda", () => {
+    expect(dayAriaLabel({ ...cell, mark: "period" }, false)).toBe("5 de novembro, sangramento");
+    expect(dayAriaLabel({ ...cell, mark: "predicted" }, false)).toBe("5 de novembro, pausa prevista");
   });
 });

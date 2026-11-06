@@ -43,17 +43,16 @@ export function monthBounds(month: string): DayRange {
   return { from, to: addDays(`${shiftMonth(month, 1)}-01`, -1) };
 }
 
-const MARK_LABELS: Record<NonNullable<GridMark>, string> = {
-  period: "menstruação",
-  spotting: "escape",
-  predicted: "menstruação prevista",
+const MARK_LABELS: Record<"natural" | "hormonal", Record<NonNullable<GridMark>, string>> = {
+  natural: { period: "menstruação", spotting: "escape", predicted: "menstruação prevista" },
+  hormonal: { period: "sangramento", spotting: "escape", predicted: "pausa prevista" },
 };
 
-export function dayAriaLabel(cell: NonNullable<GridCell>): string {
+export function dayAriaLabel(cell: NonNullable<GridCell>, natural: boolean): string {
   return [
     `${cell.date} de ${MONTH_NAMES[Number(cell.day.slice(5, 7)) - 1]}`,
     cell.today && "hoje",
-    cell.mark && MARK_LABELS[cell.mark],
+    cell.mark && MARK_LABELS[natural ? "natural" : "hormonal"][cell.mark],
     cell.symptom && "com sintoma",
   ]
     .filter(Boolean)
