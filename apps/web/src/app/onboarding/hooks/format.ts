@@ -1,3 +1,5 @@
+import type { Route } from "next";
+
 import { DEFAULT_GOAL_TARGETS, type OnboardingBody } from "@/lib/api-types";
 import {
   BIRTH_DATE_MIN,
@@ -5,12 +7,13 @@ import {
   parseBrDate,
   WEIGHT_GRAMS_LIMITS,
 } from "@/lib/body";
+import { ATIVAR_HREF } from "@/lib/cycle";
 import { parseKg, recommendedWaterMl } from "@/lib/water";
 import { dayFor } from "@/server/shared/day";
 
-/** 1 = "Sobre você"; 2–4 são as metas (água, refeições, treino); 5 pede a
- *  permissão de notificação. */
-export type OnboardingStep = 1 | 2 | 3 | 4 | 5;
+/** 1 = "Sobre você"; 2–4 são as metas (água, refeições, treino); 5 pergunta do
+ *  ciclo; 6 pede a permissão de notificação. */
+export type OnboardingStep = 1 | 2 | 3 | 4 | 5 | 6;
 
 export type OnboardingState = {
   step: OnboardingStep;
@@ -26,6 +29,8 @@ export type OnboardingState = {
   portionMl: number;
   meals: number;
   workoutDays: Set<number>;
+  /** "Ativar" no passo do ciclo só marca a intenção: a ativação acontece em /ciclo/ativar. */
+  cycleIntent: boolean;
 };
 
 export type BodyField = "height" | "weight" | "birthDate";
@@ -42,17 +47,22 @@ export function visibleErrors(errors: BodyErrors, touched: ReadonlySet<BodyField
 /** O passo de lembretes só existe quando a permissão ainda não foi pedida
  *  (`askPush`): concedida, negada ou sem suporte, não há o que perguntar. */
 export function nextStep(step: OnboardingStep, askPush: boolean): OnboardingStep | "finish" {
-  if (step < 4) return (step + 1) as OnboardingStep;
-  if (step === 4 && askPush) return 5;
+  if (step < 5) return (step + 1) as OnboardingStep;
+  if (step === 5 && askPush) return 6;
   return "finish";
 }
 
-/** "Pular" dispensa as metas, não a permissão: sem ela os lembretes, que nascem
- *  ligados, nunca chegam a este aparelho. No "Sobre você" é diferente — pula só os
- *  dados do corpo e segue para a água. */
+/** "Pular" dispensa as metas, não as perguntas do ciclo e da permissão: sem a
+ *  permissão os lembretes, que nascem ligados, nunca chegam a este aparelho. No
+ *  "Sobre você" é diferente — pula só os dados do corpo e segue para a água. */
 export function skipTarget(step: OnboardingStep, askPush: boolean): OnboardingStep | "finish" {
   if (step === 1) return 2;
-  return step < 5 && askPush ? 5 : "finish";
+  if (step < 5) return 5;
+  return step === 5 && askPush ? 6 : "finish";
+}
+
+export function finishHref(state: OnboardingState): Route {
+  return state.cycleIntent ? ATIVAR_HREF : "/home";
 }
 
 function parseCm(raw: string): number | null {

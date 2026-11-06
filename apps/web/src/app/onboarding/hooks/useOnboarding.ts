@@ -17,6 +17,7 @@ import { toastError } from "@/lib/toast";
 import {
   applyBodyStep,
   bodyErrors,
+  finishHref,
   skipBodyStep,
   visibleErrors,
   type BodyField,
@@ -40,6 +41,7 @@ export function useOnboarding() {
     portionMl: DEFAULT_PORTION_ML,
     meals: DEFAULT_GOAL_TARGETS.meals,
     workoutDays: new Set(),
+    cycleIntent: false,
   });
 
   /** Único caminho de escrita: o "Pular" é este mesmo submit, antecipado. */
@@ -58,7 +60,7 @@ export function useOnboarding() {
       }
 
       try {
-        router.replace("/home");
+        router.replace(finishHref(current));
         // Sem `setPending(false)` no sucesso: a navegação desmonta a tela.
       } catch {
         setPending(false);
@@ -102,6 +104,21 @@ export function useOnboarding() {
     }
     await finish(state);
   }, [state, finish]);
+
+  /** Ativar ou pular o ciclo: a escolha precisa ir junto quando este é o último passo. */
+  const chooseCycle = useCallback(
+    (cycleIntent: boolean) => {
+      const next = { ...state, cycleIntent };
+      const target = nextStep(5, askPush);
+      if (target === "finish") {
+        setState(next);
+        void finish(next);
+        return;
+      }
+      setState({ ...next, step: target });
+    },
+    [state, askPush, finish],
+  );
 
   const back = useCallback(() => {
     setState((s) => ({ ...s, step: Math.max(1, s.step - 1) as OnboardingStep }));
@@ -154,8 +171,10 @@ export function useOnboarding() {
       [],
     ),
     toggleDay,
-    totalSteps: askPush ? 5 : 4,
+    totalSteps: askPush ? 6 : 5,
     advance,
+    activateCycle: useCallback(() => chooseCycle(true), [chooseCycle]),
+    skipCycle: useCallback(() => chooseCycle(false), [chooseCycle]),
     activatePush,
     back,
     skip: useCallback(() => {
