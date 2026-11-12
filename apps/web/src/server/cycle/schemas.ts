@@ -74,4 +74,8 @@ export const METHOD_UPDATE_SCHEMA = z.discriminatedUnion("kind", [
 
 export const SYMPTOMS_SCHEMA = z.array(z.enum(CYCLE_SYMPTOM_IDS)).max(CYCLE_SYMPTOM_IDS.length);
 
+export const PILL_COUNT_SCHEMA = z.object({
+  count: z.number().int().min(0).max(PILL_ACTIVE_DAYS_LIMITS.max),
+});
+
 export const DAY_BODY_SCHEMA = z.object({ flow: z.enum(CYCLE_FLOWS), symptoms: SYMPTOMS_SCHEMA });
