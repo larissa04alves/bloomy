@@ -1,6 +1,6 @@
 "use client";
 
-import { PillIcon } from "@phosphor-icons/react";
+import { PencilSimpleIcon, PillIcon } from "@phosphor-icons/react";
 import { type ReactNode, useEffect, useState } from "react";
 
 import { BottomSheet } from "@/components/bottom-sheet";
@@ -29,7 +29,7 @@ import {
 } from "@/lib/cycle-method-form";
 import { dayFor } from "@/server/shared/day";
 
-const UNIT_NOUN = {
+export const UNIT_NOUN = {
   pill: {
     one: "cartela",
     many: "cartelas",
@@ -57,18 +57,18 @@ const UNIT_NOUN = {
 } as const;
 
 // O campo guarda "YYYY-MM-DD" (dia local); o calendário trabalha com Date à meia-noite local.
-const toDate = (day: string) => {
+export const toDate = (day: string) => {
   if (!day) return undefined;
   const [y, m, d] = day.split("-").map(Number);
   return new Date(y, m - 1, d);
 };
 const pad2 = (n: number) => String(n).padStart(2, "0");
-const toDay = (date: Date | undefined) =>
+export const toDay = (date: Date | undefined) =>
   date
     ? `${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(date.getDate())}`
     : "";
 
-function Label({ children }: { children: ReactNode }) {
+export function Label({ children }: { children: ReactNode }) {
   return <span className="text-sm font-bold text-ink">{children}</span>;
 }
 
@@ -96,6 +96,7 @@ export function CycleMethodSheet({
   initial,
   saving = false,
   onSubmit,
+  onFixPack,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -103,6 +104,8 @@ export function CycleMethodSheet({
   saving?: boolean;
   /** Com `initial`, mesmo tipo e mesma pausa, vem sem a posição (só configuração). */
   onSubmit: (input: MethodUpdateInput) => void;
+  /** Abre o drawer da unidade atual (início e pílulas tomadas); sem ele o botão não aparece. */
+  onFixPack?: () => void;
 }) {
   const [form, setForm] = useState<MethodForm>(initial ?? EMPTY_METHOD_FORM);
   const today = dayFor();
@@ -246,10 +249,15 @@ export function CycleMethodSheet({
               onChange={(pauseDays) => set({ pauseDays })}
             />
           </div>
-          {canFix ? (
-            <FixButton onClick={() => set({ fixPosition: true })}>
+          {canFix && onFixPack ? (
+            <button
+              type="button"
+              onClick={onFixPack}
+              className="inline-flex min-h-9 items-center gap-1 self-start rounded-full bg-peach-tint px-3 text-sm font-bold text-peach-deep"
+            >
+              <PencilSimpleIcon weight="bold" />
               {noun.fix}
-            </FixButton>
+            </button>
           ) : null}
         </>
       ) : null}

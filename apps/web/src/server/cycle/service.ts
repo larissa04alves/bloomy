@@ -342,6 +342,37 @@ export async function setPillTaken(
   return { ok: true };
 }
 
+/** "Tomei N desta cartela": marca da 1ª até a N-ésima e desmarca o resto da cartela até hoje. */
+export async function setPillsTakenInPack(
+  db: Db,
+  userId: string,
+  today: string,
+  count: number,
+): Promise<{ ok: true } | { ok: false; reason: "not_pill" | "not_active" | "out_of_range" }> {
+  const method = await currentMethod(db, userId);
+  if (method?.kind !== "pill") return { ok: false, reason: "not_pill" };
+  if (modeOf(method) !== "scheduled") return { ok: false, reason: "not_active" };
+
+  const position = await scheduledPosition(db, userId, method, today);
+  if (position.phase !== "active") return { ok: false, reason: "not_active" };
+  if (count > position.pill) return { ok: false, reason: "out_of_range" };
+
+  const packStart = addDays(today, -(position.pill - 1));
+  await db.transaction(async (tx) => {
+    await tx
+      .delete(cyclePillIntake)
+      .where(
+        and(eq(cyclePillIntake.userId, userId), gte(cyclePillIntake.day, packStart), lte(cyclePillIntake.day, today)),
+      );
+    if (count > 0) {
+      await tx
+        .insert(cyclePillIntake)
+        .values(Array.from({ length: count }, (_, i) => ({ userId, day: addDays(packStart, i) })));
+    }
+  });
+  return { ok: true };
+}
+
 const naturalLogsFrom = (method: CycleMethod) =>
   method.lastPeriodStart! < method.startedOn ? method.lastPeriodStart! : method.startedOn;
 

@@ -23,6 +23,7 @@ import {
   setHiddenSymptoms,
   setMethod,
   setPillTaken,
+  setPillsTakenInPack,
 } from "./service";
 
 afterAll(cleanupTestDbs);
@@ -944,5 +945,86 @@ describe("getCycleHistory", () => {
         ],
       },
     ]);
+  });
+});
+
+describe("setPillsTakenInPack", () => {
+  const daysFrom = (start: string, n: number) => Array.from({ length: n }, (_, i) => addDays(start, i));
+
+  test("marca 1..N e desmarca o resto até hoje; cartela anterior e outra pessoa intactas", async () => {
+    const db = await createTestDb();
+    const userId = await createTestUser(db);
+    const otherId = await createTestUser(db, "user-other");
+    await activateCycle(db, userId, PILL, "2026-11-05");
+    await activateCycle(db, otherId, PILL, "2026-11-05");
+    for (const day of ["2026-10-21", "2026-11-07", "2026-11-08"]) await setPillTaken(db, userId, day, true);
+    await setPillTaken(db, otherId, "2026-11-01", true);
+
+    expect(await setPillsTakenInPack(db, userId, "2026-11-08", 10)).toEqual({ ok: true });
+
+    const state = await getCycleState(db, userId, "2026-11-08");
+    expect(state?.pill?.takenDays).toEqual(daysFrom("2026-10-22", 10));
+    expect(state?.pill?.taken).toBe(false);
+    const rows = await db.select().from(cyclePillIntake);
+    expect(rows.some((r) => r.userId === userId && r.day === "2026-10-21")).toBe(true);
+    expect(rows.filter((r) => r.userId === otherId).map((r) => r.day)).toEqual(["2026-11-01"]);
+  });
+
+  test("N = pílula de hoje marca hoje também", async () => {
+    const db = await createTestDb();
+    const userId = await createTestUser(db);
+    await activateCycle(db, userId, PILL, "2026-11-05");
+
+    expect(await setPillsTakenInPack(db, userId, "2026-11-08", 18)).toEqual({ ok: true });
+
+    const state = await getCycleState(db, userId, "2026-11-08");
+    expect(state?.pill?.taken).toBe(true);
+    expect(state?.pill?.takenDays).toHaveLength(18);
+  });
+
+  test("0 desmarca a cartela toda até hoje", async () => {
+    const db = await createTestDb();
+    const userId = await createTestUser(db);
+    await activateCycle(db, userId, PILL, "2026-11-05");
+    for (const day of ["2026-10-25", "2026-11-08"]) await setPillTaken(db, userId, day, true);
+
+    expect(await setPillsTakenInPack(db, userId, "2026-11-08", 0)).toEqual({ ok: true });
+
+    expect((await getCycleState(db, userId, "2026-11-08"))?.pill?.takenDays).toEqual([]);
+  });
+
+  test("N > pílula de hoje → out_of_range e nada gravado", async () => {
+    const db = await createTestDb();
+    const userId = await createTestUser(db);
+    await activateCycle(db, userId, PILL, "2026-11-05");
+    await setPillTaken(db, userId, "2026-11-07", true);
+
+    expect(await setPillsTakenInPack(db, userId, "2026-11-08", 19)).toEqual({ ok: false, reason: "out_of_range" });
+    expect((await db.select().from(cyclePillIntake)).map((r) => r.day)).toEqual(["2026-11-07"]);
+  });
+
+  test("na pausa → not_active", async () => {
+    const db = await createTestDb();
+    const userId = await createTestUser(db);
+    await activateCycle(db, userId, PILL, "2026-11-05");
+    await addAnchor(db, userId, "pause_started", "2026-11-08");
+
+    expect(await setPillsTakenInPack(db, userId, "2026-11-08", 5)).toEqual({ ok: false, reason: "not_active" });
+  });
+
+  test("pílula contínua → not_active; anel → not_pill", async () => {
+    const db = await createTestDb();
+    const pillUser = await createTestUser(db);
+    const ringUser = await createTestUser(db, "user-ring");
+    await activateCycle(db, pillUser, { kind: "pill", activeDays: 28, pillTime: "21:00" }, "2026-11-05");
+    await activateCycle(
+      db,
+      ringUser,
+      { kind: "ring", pauseEvery: 1, pauseDays: 7, currentUnitStart: "2026-11-01", currentUnit: 1 },
+      "2026-11-05",
+    );
+
+    expect(await setPillsTakenInPack(db, pillUser, "2026-11-05", 1)).toEqual({ ok: false, reason: "not_active" });
+    expect(await setPillsTakenInPack(db, ringUser, "2026-11-05", 1)).toEqual({ ok: false, reason: "not_pill" });
   });
 });

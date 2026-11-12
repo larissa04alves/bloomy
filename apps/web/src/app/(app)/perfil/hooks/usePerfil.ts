@@ -7,7 +7,8 @@ import { api } from "@/lib/api";
 import type { CyclePayload, CycleResponse, MethodUpdateInput, Profile, Reminder } from "@/lib/api-types";
 import { authClient } from "@/lib/auth-client";
 import { METHOD_LABELS } from "@/lib/cycle";
-import { type MethodForm, methodFormFromState } from "@/lib/cycle-method-form";
+import { UNIT_NOUN } from "@/components/cycle-method-sheet";
+import { type MethodForm, methodFormFromState, toMethodInput } from "@/lib/cycle-method-form";
 import { clearLegacyAutoRest } from "@/lib/legacy-auto-rest";
 import { maskBirthDate } from "@/lib/body";
 import { resyncPush, unsubscribeLocalPush } from "@/lib/push";
@@ -16,10 +17,23 @@ import { useLegacyAutoRestMigration } from "@/lib/use-legacy-auto-rest";
 import { usePushSync } from "@/lib/use-push-sync";
 import { useResource } from "@/lib/use-resource";
 import { useSignOut } from "@/lib/use-sign-out";
+import { dayFor } from "@/server/shared/day";
 
-import { ageFrom, birthIso, birthPill, heightPill, isDeletePhrase, revertPatch } from "./format";
+import {
+  ageFrom,
+  birthIso,
+  birthPill,
+  heightPill,
+  isDeletePhrase,
+  type PackDraft,
+  packChanges,
+  packCountRange,
+  packDraftFrom,
+  patchPackDraft,
+  revertPatch,
+} from "./format";
 
-export type PerfilSheet = "height" | "birthDate" | "deleteAccount" | "cycleMethod" | "deleteCycle";
+export type PerfilSheet = "height" | "birthDate" | "deleteAccount" | "cycleMethod" | "currentPack" | "deleteCycle";
 
 export type CicloStatus = "loading" | "error" | "inactive" | "on" | "off";
 
@@ -147,6 +161,8 @@ export function usePerfil() {
   const [heightDraft, setHeightDraft] = useState(HEIGHT_START_CM);
   const [birthRaw, setBirthRaw] = useState("");
   const [methodInitial, setMethodInitial] = useState<MethodForm | undefined>();
+  const [packDraft, setPackDraft] = useState<PackDraft | null>(null);
+  const [packInitial, setPackInitial] = useState<PackDraft | null>(null);
 
   const openSheet = useCallback(
     (which: PerfilSheet) => {
@@ -156,6 +172,11 @@ export function usePerfil() {
       else if (which === "deleteAccount") setDeletePhrase("");
       else if (which === "cycleMethod")
         setMethodInitial(cycleData?.cycle ? methodFormFromState(cycleData.cycle) : undefined);
+      else if (which === "currentPack") {
+        const draft = cycleData?.cycle?.scheduled ? packDraftFrom(cycleData.cycle, dayFor()) : null;
+        setPackDraft(draft);
+        setPackInitial(draft);
+      }
       setSheet(which);
     },
     [profile?.heightCm, profile?.birthDate, cycleData],
@@ -233,6 +254,45 @@ export function usePerfil() {
     },
     [setCycleData],
   );
+
+  const packNoun =
+    cycle && (cycle.method.kind === "pill" || cycle.method.kind === "ring" || cycle.method.kind === "patch")
+      ? UNIT_NOUN[cycle.method.kind]
+      : null;
+  const packCount = cycle && packDraft && packInitial ? packCountRange(packDraft, packInitial, cycle, dayFor()) : null;
+
+  // Posição pelo PUT do método (só se mudou: reancora a sequência), depois as marcações.
+  const savePack = useCallback(async () => {
+    if (!cycle || !packDraft || !packInitial) return;
+    const changes = packChanges(packDraft, packInitial, packCount);
+    if (!changes.position && changes.count === null) {
+      setSheet(null);
+      return;
+    }
+    setCycleBusy(true);
+    try {
+      if (changes.position) {
+        const current = methodFormFromState(cycle);
+        const { cycle: next } = await api.put<CycleResponse>(
+          "/api/cycle/method",
+          toMethodInput(
+            { ...current, fixPosition: true, currentUnitStart: packDraft.start, currentUnit: packDraft.unit },
+            current,
+          ),
+        );
+        setCycleData({ cycle: next, configured: true });
+      }
+      if (changes.count !== null) {
+        const { cycle: next } = await api.put<CycleResponse>("/api/cycle/pill", { count: changes.count });
+        setCycleData({ cycle: next, configured: true });
+      }
+      setSheet(null);
+    } catch (e) {
+      toastError(e, "Não foi possível salvar a cartela");
+    } finally {
+      setCycleBusy(false);
+    }
+  }, [cycle, packDraft, packInitial, packCount, setCycleData]);
 
   const deleteCycle = useCallback(async () => {
     if (cycleBusy) return;
@@ -323,5 +383,23 @@ export function usePerfil() {
     setCycleEnabled,
     saveMethod,
     deleteCycle,
+
+    pack:
+      cycle && packNoun && packDraft
+        ? {
+            title: `${packNoun.one[0].toUpperCase()}${packNoun.one.slice(1)} atual`,
+            noun: packNoun,
+            draft: packDraft,
+            units: cycle.method.pauseEvery ?? 1,
+            countRange: packCount,
+            activeDays: cycle.method.activeDays ?? 0,
+          }
+        : null,
+    setPackDraft: useCallback(
+      (patch: Partial<PackDraft>) =>
+        setPackDraft((d) => (d && cycle && packInitial ? patchPackDraft(d, patch, packInitial, cycle, dayFor()) : d)),
+      [cycle, packInitial],
+    ),
+    savePack,
   };
 }

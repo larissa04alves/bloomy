@@ -7,6 +7,7 @@ import { CycleMethodSheet } from "@/components/cycle-method-sheet";
 
 import { AlturaSheet } from "./components/AlturaSheet";
 import { ApagarCicloSheet } from "./components/ApagarCicloSheet";
+import { CartelaAtualSheet } from "./components/CartelaAtualSheet";
 import { CicloSection } from "./components/CicloSection";
 import { ContaSection } from "./components/ContaSection";
 import { ExcluirContaSheet } from "./components/ExcluirContaSheet";
@@ -100,7 +101,24 @@ export default function PerfilPage() {
         initial={perfil.methodInitial}
         saving={perfil.cycleBusy}
         onSubmit={(input) => void perfil.saveMethod(input)}
+        onFixPack={() => perfil.openSheet("currentPack")}
       />
+
+      {perfil.pack ? (
+        <CartelaAtualSheet
+          open={perfil.isOpen("currentPack")}
+          onOpenChange={(open) => perfil.setSheetOpen("currentPack", open)}
+          title={perfil.pack.title}
+          noun={perfil.pack.noun}
+          draft={perfil.pack.draft}
+          onChange={perfil.setPackDraft}
+          units={perfil.pack.units}
+          countRange={perfil.pack.countRange}
+          activeDays={perfil.pack.activeDays}
+          busy={perfil.cycleBusy}
+          onSave={() => void perfil.savePack()}
+        />
+      ) : null}
 
       <ApagarCicloSheet
         open={perfil.isOpen("deleteCycle")}
